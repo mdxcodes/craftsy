@@ -1,4 +1,4 @@
-# KalaSetu FastAPI Backend Dependencies
+# Craftsy FastAPI Backend Dependencies
 
 fastapi>=0.110.0
 uvicorn[standard]>=0.28.0

@@ -1,5 +1,5 @@
 """
-Karigar Setu Pricing Pipeline — Manual CLI Runner.
+Craftsy Pricing Pipeline — Manual CLI Runner.
 
 Run this script to execute the pricing pipeline stages on demand.
 
@@ -195,7 +195,7 @@ def cmd_status(args) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Karigar Setu — AI Pricing Pipeline CLI",
+        description="Craftsy — AI Pricing Pipeline CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

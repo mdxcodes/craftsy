@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
-import 'package:kalasetu/data/services/pricing_service.dart';
+import 'package:craftsy/data/services/pricing_service.dart';
 
 void main() {
   group('PriceSuggestion & ComparableProduct Models', () {

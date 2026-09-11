@@ -1,5 +1,5 @@
 """
-Karigar Setu Voice Pipeline — Manual CLI Runner.
+Craftsy Voice Pipeline — Manual CLI Runner.
 
 Run this script to execute the voice pipeline stages on demand.
 
@@ -146,7 +146,7 @@ def cmd_status(args) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Karigar Setu voice pipeline runner.",
+        description="Craftsy voice pipeline runner.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

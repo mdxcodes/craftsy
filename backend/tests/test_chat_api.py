@@ -24,7 +24,7 @@ def test_quick_topics():
 
 def test_chat_faq():
     """Verify FAQ questions receive informative answers."""
-    payload = {"message": "How does fair pricing work in KalaSetu?"}
+    payload = {"message": "How does fair pricing work in Craftsy?"}
     response = client.post("/api/v1/chat/message", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -142,7 +142,7 @@ def test_chat_guardrail_trivia():
     assert response.status_code == 200
     data = response.json()
     assert data["action"] is None
-    assert "kalasetu" in data["reply"].lower() or "कलासेतु" in data["reply"]
+    assert "craftsy" in data["reply"].lower() or "Craftsy" in data["reply"]
 
 
 def test_chat_genuine_craft_allowed():
@@ -225,7 +225,7 @@ def test_language_parity_and_mismatch_suggestion():
     })
     assert resp_hi_in_hi_app.status_code == 200
     data3 = resp_hi_in_hi_app.json()
-    assert "सुझाव: यदि आप कलासेतु ऐप की भाषा" not in data3["reply"]
+    assert "सुझाव: यदि आप Craftsy ऐप की भाषा" not in data3["reply"]
     assert "*" not in data3["reply"]
 
 

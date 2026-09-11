@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Kalasetu v3 design-token palette.
+/// Craftsy v3 design-token palette.
 ///
 /// Role hierarchy:
 ///   terracotta  → every primary action button
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 ///   success     → dispatched / delivered / confirmed
 class AppColors {
   // ---------------------------------------------------------------------------
-  // Core palette — exact matches to kalasetu-redesign-v3.html CSS variables
+  // Core palette — exact matches to craftsy-redesign-v3.html CSS variables
   // ---------------------------------------------------------------------------
 
   /// Primary action (terracotta)

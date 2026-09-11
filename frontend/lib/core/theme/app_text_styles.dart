@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Kalasetu v3 typography tokens.
+/// Craftsy v3 typography tokens.
 ///
 /// Display font : Fraunces (variable OTF) — serif, warm, expressive.
 ///   At display/headline sizes use opsz ≈ 9 (smaller optical size = more expressive

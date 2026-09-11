@@ -2,7 +2,7 @@
 
 A clean, easy-to-understand Python project that automatically turns ordinary handicraft photos into clean, studio-quality e-commerce product listings.
 
-Built for students, learners, and hackathons (e.g. Smart India Hackathon / Kalasetu) to showcase how AI & Computer Vision can empower local artisans.
+Built for students, learners, and hackathons (e.g. Smart India Hackathon / Craftsy) to showcase how AI & Computer Vision can empower local artisans.
 
 ---
 

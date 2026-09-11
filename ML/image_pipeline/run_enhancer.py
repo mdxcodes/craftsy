@@ -27,7 +27,7 @@ from processors.input_validation import ImageValidationError
 def print_banner():
     """Display a friendly project banner."""
     print("=" * 60)
-    print("           Kalasetu - AI Image Enhancer")
+    print("           Craftsy - AI Image Enhancer")
     print("   Transforming artisan photos into e-commerce listings")
     print("=" * 60)
 

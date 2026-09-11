@@ -153,7 +153,7 @@ def test_voice_glossary_api():
 
 
 if __name__ == "__main__":
-    print("\n🚀 Running KalaSetu Backend Integration Tests...\n")
+    print("\n🚀 Running Craftsy Backend Integration Tests...\n")
     test_health()
     test_pricing_status()
     test_products_crud_and_sync()

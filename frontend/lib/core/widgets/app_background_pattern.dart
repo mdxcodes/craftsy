@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Kalasetu Warli-art decorative watermark pattern.
+/// Craftsy Warli-art decorative watermark pattern.
 ///
 /// Displays a subtle traditional Warli line-art motif at the bottom of the screen,
 /// sitting just above where the bottom navigation bar begins.

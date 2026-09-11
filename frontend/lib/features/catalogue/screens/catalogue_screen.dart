@@ -267,7 +267,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
       title: 'my_catalogue_title'.tr(),
       body: Column(
         children: [
-          // Search Bar matching kalasetu-redesign-v3.html
+          // Search Bar matching craftsy-redesign-v3.html
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,

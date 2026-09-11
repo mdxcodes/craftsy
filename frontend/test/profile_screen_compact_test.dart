@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/features/profile/screens/profile_screen.dart';
-import 'package:kalasetu/features/profile/screens/my_stats_screen.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
-import 'package:kalasetu/data/services/api_service.dart';
-import 'package:kalasetu/data/models/user_profile.dart';
-import 'package:kalasetu/data/models/product.dart';
+import 'package:craftsy/features/profile/screens/profile_screen.dart';
+import 'package:craftsy/features/profile/screens/my_stats_screen.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
+import 'package:craftsy/data/services/api_service.dart';
+import 'package:craftsy/data/models/user_profile.dart';
+import 'package:craftsy/data/models/product.dart';
 
 class _FakeUserProfileNotifier extends StateNotifier<UserProfile>
     implements UserProfileNotifier {

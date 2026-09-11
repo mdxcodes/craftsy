@@ -1,5 +1,5 @@
 """
-Karigar Setu — Voice Pipeline.
+Craftsy — Voice Pipeline.
 
 Public API for the voice transcription engine. Import from here for clean usage:
 

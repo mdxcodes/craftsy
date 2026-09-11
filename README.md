@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🪔 KalaSetu
+# 🪔 Craftsy
 ### AI-Driven Market Linkage & Smart Cataloging for Marginalized Artisans
 
 docs: https://docs.google.com/document/d/11JJ13SqLMxHMm4TntohtAeoQhq9FtmR79HMz0T-F4cY/edit?usp=sharing
@@ -27,7 +27,7 @@ Government programs already fund thousands of artisans and weavers, and give the
 
 The moment the fair ends, the sales stop — because moving to year-round digital commerce requires things most artisans have never had access to: a decent camera setup, the ability to write an SEO-friendly product description in English, and a sense of what a "fair market price" even looks like. Low digital literacy and language barriers turn a straightforward listing task into an impossible one.
 
-**Karigar Setu closes that gap.** It's a cross-platform mobile app that acts as a virtual business manager — the artisan just points a phone camera and talks in their own language; the AI handles the rest.
+**Craftsy closes that gap.** It's a cross-platform mobile app that acts as a virtual business manager — the artisan just points a phone camera and talks in their own language; the AI handles the rest.
 
 ## 🎯 Core Features
 

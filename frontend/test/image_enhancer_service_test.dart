@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kalasetu/data/services/image_enhancer_service.dart';
+import 'package:craftsy/data/services/image_enhancer_service.dart';
 
 class MockSuccessInterceptor extends Interceptor {
   @override

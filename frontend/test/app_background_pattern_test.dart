@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kalasetu/core/widgets/app_background_pattern.dart';
-import 'package:kalasetu/core/widgets/app_scaffold.dart';
+import 'package:craftsy/core/widgets/app_background_pattern.dart';
+import 'package:craftsy/core/widgets/app_scaffold.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

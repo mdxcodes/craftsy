@@ -4,15 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
-import 'package:kalasetu/core/widgets/motifs/mehrab_clipper.dart';
-import 'package:kalasetu/data/models/chat_message.dart';
-import 'package:kalasetu/data/models/product.dart';
-import 'package:kalasetu/data/models/user_profile.dart';
-import 'package:kalasetu/data/services/chat_service.dart';
-import 'package:kalasetu/features/chatbot/providers/chat_provider.dart';
-import 'package:kalasetu/features/chatbot/screens/chatbot_sheet.dart';
-import 'package:kalasetu/features/chatbot/widgets/kalamitra_fab.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
+import 'package:craftsy/core/widgets/motifs/mehrab_clipper.dart';
+import 'package:craftsy/data/models/chat_message.dart';
+import 'package:craftsy/data/models/product.dart';
+import 'package:craftsy/data/models/user_profile.dart';
+import 'package:craftsy/data/services/chat_service.dart';
+import 'package:craftsy/features/chatbot/providers/chat_provider.dart';
+import 'package:craftsy/features/chatbot/screens/chatbot_sheet.dart';
+import 'package:craftsy/features/chatbot/widgets/kalamitra_fab.dart';
 
 class _FakeChatService implements ChatService {
   @override

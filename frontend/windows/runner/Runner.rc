@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.kalasetu" "\0"
-            VALUE "FileDescription", "kalasetu" "\0"
+            VALUE "CompanyName", "com.craftsy" "\0"
+            VALUE "FileDescription", "Craftsy" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "kalasetu" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.kalasetu. All rights reserved." "\0"
-            VALUE "OriginalFilename", "kalasetu.exe" "\0"
-            VALUE "ProductName", "kalasetu" "\0"
+            VALUE "InternalName", "craftsy" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.craftsy. All rights reserved." "\0"
+            VALUE "OriginalFilename", "craftsy.exe" "\0"
+            VALUE "ProductName", "Craftsy" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

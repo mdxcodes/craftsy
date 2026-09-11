@@ -88,7 +88,7 @@ class _TtsEngine {
 class AppTtsService {
   /// Bridge to MainActivity.kt. Android only — iOS manages voices itself.
   static const MethodChannel _voiceDataChannel =
-      MethodChannel('kalasetu/tts_voice_data');
+      MethodChannel('craftsy/tts_voice_data');
 
   bool _isSpeaking = false;
   bool get isSpeaking => _isSpeaking;

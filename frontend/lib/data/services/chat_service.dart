@@ -234,7 +234,7 @@ class HttpChatService implements ChatService {
     final suggestionPrefix = isLangMismatch
         ? (isQueryHindi
             ? 'सुझाव: यदि आप कलासेतु ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n'
-            : 'Suggestion: If you prefer using KalaSetu in English, you can switch the app language in Language Settings.\n\n')
+            : 'Suggestion: If you prefer using Craftsy in English, you can switch the app language in Language Settings.\n\n')
         : '';
 
     final defaultMismatchAction = isLangMismatch
@@ -388,7 +388,7 @@ class HttpChatService implements ChatService {
         text: suggestionPrefix +
             (isQueryHindi
                 ? 'कलासेतु में मूल्य = कच्चा माल + (काम के घंटे × उचित मजदूरी) + बाज़ार का औसत मूल्य।'
-                : 'KalaSetu Fair Pricing = Raw Materials + (Labor Hours × Fair Wage) + Market Benchmark Comparison.'),
+                : 'Craftsy Fair Pricing = Raw Materials + (Labor Hours × Fair Wage) + Market Benchmark Comparison.'),
         action: ChatActionModel(
           type: 'navigate',
           destination: 'add_product',
@@ -403,7 +403,7 @@ class HttpChatService implements ChatService {
       text: suggestionPrefix +
           (isQueryHindi
               ? 'नमस्ते! मैं कला-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपको उत्पाद जोड़ने, मूल्य निर्धारण, सरकारी योजनाओं और किसी भी स्क्रीन पर ले जाने में मदद कर सकता हूँ।'
-              : 'Namaste! I am KalaMitra, your artisan assistant and guide for KalaSetu. Ask me about craft improvement, govt schemes, pricing, or ask me to take you to any screen!'),
+              : 'Namaste! I am KalaMitra, your artisan assistant and guide for Craftsy. Ask me about craft improvement, govt schemes, pricing, or ask me to take you to any screen!'),
       action: defaultMismatchAction,
       suggestedQueries: isQueryHindi
           ? ['पीएम विश्वकर्मा योजना क्या है?', 'शिल्प सुधार के सुझाव', 'माय कैटलॉग खोलें', 'मेरी कमाई दिखाएं']

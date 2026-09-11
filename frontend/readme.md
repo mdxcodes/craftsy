@@ -4,7 +4,7 @@ A production-quality, cross-platform mobile app connecting marginalized artisans
 
 ## 🎯 Overview
 
-KalaSetu is an intelligent platform that helps artisans:
+Craftsy is an intelligent platform that helps artisans:
 - 📸 Capture and enhance product photos with AI
 - 🎤 Record voice descriptions in their native language
 - 🤖 Get AI-generated product listings in English & Hindi

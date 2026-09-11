@@ -1,5 +1,5 @@
 """
-KalaSetu FastAPI Application Entrypoint.
+Craftsy FastAPI Application Entrypoint.
 
 AI-Driven Market Linkage & Smart Cataloging Backend for Marginalized Artisans.
 """
@@ -97,7 +97,7 @@ app.include_router(chat_router)
 async def root():
     """Welcome index endpoint."""
     return {
-        "message": "Welcome to KalaSetu API Gateway",
+        "message": "Welcome to Craftsy API Gateway",
         "version": settings.app_version,
         "docs": "/docs",
         "health": "/api/v1/health",

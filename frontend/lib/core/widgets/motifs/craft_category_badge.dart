@@ -4,7 +4,7 @@ import '../../theme/app_text_styles.dart';
 import '../../theme/app_spacing.dart';
 import 'petal_ring.dart';
 
-/// Craft category filter badge — pill chip matching kalasetu-redesign-v3.html.
+/// Craft category filter badge — pill chip matching craftsy-redesign-v3.html.
 ///
 /// - Inactive: white/parchment body, 1.5px terracotta border, terracotta icon + text
 /// - Active: terracotta fill, white text/icon

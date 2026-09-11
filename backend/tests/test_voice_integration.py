@@ -224,7 +224,7 @@ def test_voice_error_handling():
 
 
 if __name__ == "__main__":
-    print("\n🚀 Running KalaSetu Voice Integration Tests...\n")
+    print("\n🚀 Running Craftsy Voice Integration Tests...\n")
     test_craft_glossary_endpoint()
     test_voice_error_handling()
     print("\n🎉 ALL VOICE TESTS PASSED SUCCESSFULLY!\n")

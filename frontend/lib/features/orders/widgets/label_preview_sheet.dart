@@ -96,7 +96,7 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
     final (washEn, washHi) = LabelMakerService.defaultWashCareFor(widget.order.productCategory);
 
     final effectiveId = profile.id.isNotEmpty ? profile.id : 'artisan_01';
-    final ondcProfileStub = 'https://kalasetu.ondc.org/artisan/$effectiveId';
+    final ondcProfileStub = 'https://craftsy.ondc.org/artisan/$effectiveId';
 
     return DraggableScrollableSheet(
       initialChildSize: 0.88,
@@ -203,7 +203,7 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'KalaSetu',
+                                    'Craftsy',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kalasetu/features/orders/screens/my_orders_screen.dart';
-import 'package:kalasetu/features/orders/providers/orders_provider.dart';
-import 'package:kalasetu/features/orders/models/order.dart';
+import 'package:craftsy/features/orders/screens/my_orders_screen.dart';
+import 'package:craftsy/features/orders/providers/orders_provider.dart';
+import 'package:craftsy/features/orders/models/order.dart';
 
 void main() {
   testWidgets('My Orders filter chips hug text tightly and default to New tab', (tester) async {

@@ -4,15 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 
-class KalaSetuApp extends ConsumerWidget {
-  const KalaSetuApp({super.key});
+class CraftsyApp extends ConsumerWidget {
+  const CraftsyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
-      title: 'KalaSetu',
+      title: 'Craftsy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routerConfig: router,

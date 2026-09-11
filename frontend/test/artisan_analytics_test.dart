@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/features/profile/screens/my_stats_screen.dart';
-import 'package:kalasetu/features/auth/screens/register_screen.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
-import 'package:kalasetu/data/models/user_profile.dart';
-import 'package:kalasetu/data/models/product.dart';
+import 'package:craftsy/features/profile/screens/my_stats_screen.dart';
+import 'package:craftsy/features/auth/screens/register_screen.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
+import 'package:craftsy/data/models/user_profile.dart';
+import 'package:craftsy/data/models/product.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

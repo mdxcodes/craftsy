@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SocialSharingService {
   static const MethodChannel _whatsappChannel =
-      MethodChannel('com.kalasetu.kalasetu/whatsapp_share');
+      MethodChannel('com.craftsy.app/whatsapp_share');
 
   final Dio _dio;
 

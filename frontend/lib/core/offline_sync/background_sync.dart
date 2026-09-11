@@ -4,7 +4,7 @@ import '../config/api_config.dart';
 import 'offline_sync_service.dart';
 import 'services/upload_api.dart';
 
-const String kSyncTaskName = 'kalasetu-offline-sync-task';
+const String kSyncTaskName = 'craftsy-offline-sync-task';
 
 /// Runs in a separate background isolate — re-initializes everything it
 /// needs from scratch (no state is shared with the foreground app).

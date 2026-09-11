@@ -3,7 +3,7 @@ import 'app_colors.dart';
 import 'app_text_styles.dart';
 import 'app_spacing.dart';
 
-/// Centralized ThemeData for Kalasetu v3
+/// Centralized ThemeData for Craftsy v3
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(

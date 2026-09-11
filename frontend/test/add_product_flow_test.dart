@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/features/add_product/screens/add_product_flow_screen.dart';
-import 'package:kalasetu/data/models/product.dart';
-import 'package:kalasetu/data/models/user_profile.dart';
+import 'package:craftsy/features/add_product/screens/add_product_flow_screen.dart';
+import 'package:craftsy/data/models/product.dart';
+import 'package:craftsy/data/models/user_profile.dart';
 
 class MockHttpOverrides extends HttpOverrides {}
 

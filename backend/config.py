@@ -1,5 +1,5 @@
 """
-KalaSetu Backend Configuration.
+Craftsy Backend Configuration.
 
 Loads environment variables from the root .env file and provides
 centralized application settings.
@@ -19,7 +19,7 @@ UPLOAD_DIR = BACKEND_ROOT / "uploads"
 class Settings(BaseSettings):
     """Application settings with environment variable overrides."""
 
-    app_name: str = "KalaSetu API"
+    app_name: str = "Craftsy API"
     app_version: str = "1.0.0"
     app_description: str = "AI-Driven Market Linkage & Smart Cataloging Backend for Marginalized Artisans"
     debug: bool = False
@@ -87,7 +87,7 @@ class Settings(BaseSettings):
     embedding_model: str = "gemini-embedding-001"
 
     # Database
-    database_url: str = f"sqlite:///{BACKEND_ROOT / 'kalasetu.db'}"
+    database_url: str = f"sqlite:///{BACKEND_ROOT / 'craftsy.db'}"
 
     # Media Storage
     upload_dir: str = str(UPLOAD_DIR)

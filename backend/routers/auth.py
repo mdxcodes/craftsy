@@ -1,5 +1,5 @@
 """
-Authentication and User Profile Router for KalaSetu.
+Authentication and User Profile Router for Craftsy.
 
 Uses the ArtisanDB table for persistent artisan registration and lookup.
 OTP verification is still demo-mode (accepts any 6-digit code).

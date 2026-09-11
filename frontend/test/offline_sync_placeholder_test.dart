@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kalasetu/core/offline_sync/services/upload_api.dart';
+import 'package:craftsy/core/offline_sync/services/upload_api.dart';
 
 void main() {
   group('offline sync placeholder behavior', () {

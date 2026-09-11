@@ -1,1 +1,1 @@
-"""KalaSetu Backend Package."""
+"""Craftsy Backend Package."""

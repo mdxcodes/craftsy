@@ -42,7 +42,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Filter pills (smooth horizontal scrolling matching kalasetu-redesign-v3.html)
+          // Filter pills (smooth horizontal scrolling matching craftsy-redesign-v3.html)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(

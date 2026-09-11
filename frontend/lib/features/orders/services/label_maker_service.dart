@@ -13,7 +13,7 @@ class LabelMakerService {
   LabelMakerService._();
 
   // TODO: Stub URL until ONDC profile endpoint is live; swap in production URL here.
-  static const String _ondcProfileBaseUrl = 'https://kalasetu.ondc.org/artisan';
+  static const String _ondcProfileBaseUrl = 'https://craftsy.ondc.org/artisan';
 
   /// Default bilingual craft stories per category.
   static (String en, String hi) defaultCraftStoryFor(String category) {
@@ -50,8 +50,8 @@ class LabelMakerService {
         );
       default:
         return (
-          'Authentic handcrafted creation made with pride, sustainable materials, and traditional techniques under the KalaSetu artisan initiative.',
-          'कलासेतु पहल के तहत स्थानीय कारीगरों द्वारा पारंपरिक कौशल, प्राकृतिक सामग्री और गौरव के साथ निर्मित प्रामाणिक हस्तशिल्प।',
+          'Authentic handcrafted creation made with pride, sustainable materials, and traditional techniques under the Craftsy artisan initiative.',
+          'Craftsy पहल के तहत स्थानीय कारीगरों द्वारा पारंपरिक कौशल, प्राकृतिक सामग्री और गौरव के साथ निर्मित प्रामाणिक हस्तशिल्प।',
         );
     }
   }
@@ -358,7 +358,7 @@ class LabelMakerService {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text(
-                      'KalaSetu',
+                      'Craftsy',
                       style: pw.TextStyle(
                         font: fonts.bold,
                         fontSize: 16,
@@ -757,7 +757,7 @@ class LabelMakerService {
           pw.Divider(color: borderCol, thickness: 0.8),
           pw.Center(
             child: pw.Text(
-              'Crafted with pride. Packed with care. Delivered with love. — KalaSetu',
+              'Crafted with pride. Packed with care. Delivered with love. — Craftsy',
               style: pw.TextStyle(
                 font: fonts.regular,
                 fontSize: 7.5,

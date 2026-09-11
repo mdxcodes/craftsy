@@ -313,7 +313,7 @@ class CatalogService:
             language_code=request.language_code,
         )
 
-        system_prompt = f"""You are KalaSetu's Master Artisan Cataloger & E-Commerce Merchandising Specialist for authentic Indian handicrafts.
+        system_prompt = f"""You are Craftsy's Master Artisan Cataloger & E-Commerce Merchandising Specialist for authentic Indian handicrafts.
 Your mission is to transform spoken regional voice descriptions into elite, culturally resonant, high-converting, bilingual e-commerce catalog listings.
 
 Domain Handicraft Vocabulary Reference:

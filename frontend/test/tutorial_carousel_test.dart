@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:kalasetu/features/tutorial/models/tutorial_slide_model.dart';
-import 'package:kalasetu/features/tutorial/screens/tutorial_carousel_screen.dart';
-import 'package:kalasetu/features/tutorial/widgets/tutorial_card_widget.dart';
+import 'package:craftsy/features/tutorial/models/tutorial_slide_model.dart';
+import 'package:craftsy/features/tutorial/screens/tutorial_carousel_screen.dart';
+import 'package:craftsy/features/tutorial/widgets/tutorial_card_widget.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

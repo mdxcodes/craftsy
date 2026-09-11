@@ -1,4 +1,4 @@
-# Karigar Setu — Pricing Pipeline Dependencies
+# Craftsy — Pricing Pipeline Dependencies
 # Install: pip install -r requirements.txt
 
 # Google Gemini SDK (embeddings + LLM)

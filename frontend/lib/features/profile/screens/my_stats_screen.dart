@@ -612,7 +612,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen>
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Kalasetu row
+                  // Craftsy row
                   Row(
                     children: [
                       SizedBox(
@@ -621,7 +621,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen>
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'kalasetu_earned_label'.tr(),
+                            'craftsy_earned_label'.tr(),
                             style: AppTextStyles.labelSmall.copyWith(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,

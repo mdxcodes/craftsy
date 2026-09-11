@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kalasetu/features/orders/models/order.dart';
-import 'package:kalasetu/features/orders/screens/order_detail_screen.dart';
-import 'package:kalasetu/features/orders/widgets/packaging_suggestions_sheet.dart';
-import 'package:kalasetu/features/add_product/widgets/step4_pricing_widget.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
+import 'package:craftsy/features/orders/models/order.dart';
+import 'package:craftsy/features/orders/screens/order_detail_screen.dart';
+import 'package:craftsy/features/orders/widgets/packaging_suggestions_sheet.dart';
+import 'package:craftsy/features/add_product/widgets/step4_pricing_widget.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
 
 void main() {
   final testOrder = Order(

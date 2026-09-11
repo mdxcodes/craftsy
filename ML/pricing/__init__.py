@@ -1,5 +1,5 @@
 """
-Karigar Setu — AI-Driven Pricing Pipeline.
+Craftsy — AI-Driven Pricing Pipeline.
 
 Public API for the pricing engine. Import from here for clean usage:
 

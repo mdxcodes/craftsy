@@ -1,4 +1,4 @@
-# KalaSetu — System Architecture & Technical Specification
+# Craftsy — System Architecture & Technical Specification
 
 > **AI-Driven Market Linkage & Smart Cataloging Platform for Marginalized Artisans**
 > *Built for Smart India Hackathon 2026 · Problem Statement PS-90*
@@ -38,7 +38,7 @@
 
 ## 1. Executive Summary & Core Mission
 
-**KalaSetu (कलासेतु — "Bridge of Art")** is an offline-first, multilingual, AI-powered virtual business manager that bridges the digital, economic, and linguistic divide for India's traditional artisans, handloom weavers, and rural craftspersons.
+**Craftsy** is an offline-first, multilingual, AI-powered virtual business manager that bridges the digital, economic, and linguistic divide for India's traditional artisans, handloom weavers, and rural craftspersons.
 
 Government initiatives (*Shilp Samagam*, *Surajkund Mela*, *Dilli Haat*) provide temporary seasonal market exposure, but when exhibitions end, artisan revenues collapse. Craftspeople face four structural barriers:
 
@@ -47,13 +47,13 @@ Government initiatives (*Shilp Samagam*, *Surajkund Mela*, *Dilli Haat*) provide
 3. **Information Asymmetry & Exploitative Pricing** — no real-time price benchmarks; middlemen capture 300–500% retail markups.
 4. **Connectivity Barrier** — unreliable or absent cellular data in rural craft clusters.
 
-KalaSetu solves all four: an artisan photographs their product, speaks naturally in their mother tongue, and the platform automatically (a) removes the cluttered workshop background, (b) transcribes with domain craft-vocabulary biasing, (c) writes bilingual Hindi + English SEO listings, (d) enforces a mathematical fair-price floor backed by live market RAG comparables, (e) reads everything aloud for non-literate users via on-device TTS, and (f) queues everything locally for fully offline operation until connectivity is restored.
+Craftsy solves all four: an artisan photographs their product, speaks naturally in their mother tongue, and the platform automatically (a) removes the cluttered workshop background, (b) transcribes with domain craft-vocabulary biasing, (c) writes bilingual Hindi + English SEO listings, (d) enforces a mathematical fair-price floor backed by live market RAG comparables, (e) reads everything aloud for non-literate users via on-device TTS, and (f) queues everything locally for fully offline operation until connectivity is restored.
 
 ---
 
 ## 2. High-Level System Architecture
 
-KalaSetu is a 5-tier architecture: mobile client, local offline engine, API gateway, AI/ML subsystems, and external public infrastructure.
+Craftsy is a 5-tier architecture: mobile client, local offline engine, API gateway, AI/ML subsystems, and external public infrastructure.
 
 ```mermaid
 flowchart TD
@@ -94,7 +94,7 @@ flowchart TD
         Gateway["FastAPI Gateway (backend/main.py)
 • Dynamic IP Discovery  • CORS  • Static File Serving
 • Threadpool Dispatch for blocking CV tasks"]
-        DB[("SQLite DB (backend/kalasetu.db)
+        DB[("SQLite DB (backend/craftsy.db)
 • artisans  • products  • social_drafts")]
         Services["Core Application Services
 • CatalogService  • ChatService  • PricingService
@@ -180,7 +180,7 @@ Groq primary → Gemini Vision fallback
 | Web Framework | FastAPI (`>=0.115.0`) | Async Python 3.11+, OpenAPI docs at `/docs` |
 | ASGI Server | Uvicorn (`>=0.30.0`) | `uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload` |
 | ORM | SQLAlchemy 2.0 (`>=2.0.35`) | `SessionLocal`, `Base.metadata.create_all` |
-| Database | SQLite 3 (`backend/kalasetu.db`) | Three tables: `artisans`, `products`, `social_drafts` |
+| Database | SQLite 3 (`backend/craftsy.db`) | Three tables: `artisans`, `products`, `social_drafts` |
 | Validation & Config | Pydantic v2 + pydantic-settings | `backend/config.py` → `Settings(BaseSettings)` |
 | Async HTTP | HTTPX (`>=0.27.0`), aiofiles | Async file streaming and multipart upload handling |
 | Static Files | FastAPI StaticFiles | Mounted at `/uploads` → `backend/uploads/` |
@@ -203,7 +203,7 @@ Groq primary → Gemini Vision fallback
 ## 4. Folder Structure & Key Files
 
 ```
-kalasetu/
+craftsy/
 ├── .env                            # Local secrets (gitignored — copy from .env.example)
 ├── .env.example                    # Template listing all required environment variable names
 │
@@ -211,7 +211,7 @@ kalasetu/
 │   ├── config.py                   # Pydantic Settings — API keys, model names, DB URL, upload path
 │   ├── database.py                 # SQLAlchemy engine, SessionLocal, Base, init_db()
 │   ├── main.py                     # FastAPI app, lifespan, CORS, StaticFiles mount, router registration
-│   ├── kalasetu.db                 # SQLite relational database (auto-created at startup)
+│   ├── craftsy.db                 # SQLite relational database (auto-created at startup)
 │   ├── models/
 │   │   ├── db_models.py            # SQLAlchemy ORM tables: ArtisanDB, ProductDB, SocialDraftDB
 │   │   └── schemas.py              # Pydantic request/response schemas for all endpoints
@@ -549,7 +549,7 @@ Instant UI Update (0ms latency)"]
 - `kMaxQueueItemRetries = 5` (defined in `models/queue_item.dart`)
 - `isRetryable` getter: `status == failed && retryCount < 5`
 - Exponential backoff: `delay = min(2^retryCount, 60)` seconds
-- WorkManager task `kalasetu-offline-sync-task`: 15-min periodic, `NetworkType.connected` constraint, runs in background isolate even after app kill
+- WorkManager task `craftsy-offline-sync-task`: 15-min periodic, `NetworkType.connected` constraint, runs in background isolate even after app kill
 
 **Hive NoSQL Store**:
 - `products_box`: Fast product cache with `pendingSync` / `live` status markers
@@ -651,7 +651,7 @@ flowchart TD
 
     Destination -- "WhatsApp" --> WA["SocialSharingService.shareToWhatsApp()
 Android: Native MethodChannel
-(com.kalasetu.kalasetu/whatsapp_share)
+(com.craftsy.app/whatsapp_share)
 Fallback: share_plus universal sheet"]
     
     Destination -- "Instagram / Facebook" --> MetaFlow["Meta Policy Compliance Flow:
@@ -831,7 +831,7 @@ Order(id, customerName, customerAddress, customerPhone, items, totalAmount,
    - Customer Reach Across States
 4. **Fair Wage Premium Metric**: Demonstrates economic empowerment vs. middleman baseline:
    ```
-   Fair Wage Premium = Σ (Direct KalaSetu Selling Price − Estimated Middleman Baseline Rate)
+   Fair Wage Premium = Σ (Direct Craftsy Selling Price − Estimated Middleman Baseline Rate)
    ```
 5. **Visual Dashboards**: Animated revenue trendlines, fair wage comparison cards, category distribution charts.
 
@@ -1269,7 +1269,7 @@ All variables are loaded from the root `.env` file by `backend/config.py` (`Sett
 | `embedding_model` | `gemini-embedding-001` | Gemini embedding model for ChromaDB RAG |
 | `groq_chat_model` | `openai/gpt-oss-120b` | Groq model for primary chat/catalog LLM |
 | `llm_provider` | `groq` | Primary LLM provider (`groq` or `gemini`) |
-| `database_url` | `sqlite:///backend/kalasetu.db` | SQLite DB path |
+| `database_url` | `sqlite:///backend/craftsy.db` | SQLite DB path |
 | `static_url_prefix` | `/uploads` | URL prefix for static media serving |
 | `supported_languages` | `hi, ta, bn, mr, te, gu, kn, ml, pa, or` | Accepted voice language codes |
 
@@ -1329,7 +1329,7 @@ All `GoRouter` navigation must use the named route constants from `frontend/lib/
 
 ### 25.8 Backend Schema Changes Require Manual SQL Migration (for now)
 
-There is no Alembic yet. Adding a column to an existing table requires a manual `ALTER TABLE` SQL statement against `backend/kalasetu.db`. The `Base.metadata.create_all` at startup only creates tables that don't exist — it does **not** apply `ALTER TABLE` for new columns on existing tables.
+There is no Alembic yet. Adding a column to an existing table requires a manual `ALTER TABLE` SQL statement against `backend/craftsy.db`. The `Base.metadata.create_all` at startup only creates tables that don't exist — it does **not** apply `ALTER TABLE` for new columns on existing tables.
 
 ---
 
@@ -1337,7 +1337,7 @@ There is no Alembic yet. Adding a column to an existing table requires a manual 
 
 ### 26.1 Orders — No Backend Integration
 
-**Current state**: All order data in `features/orders/providers/orders_provider.dart` is in-memory mock data. There is no `orders` table in `kalasetu.db` and no `/api/v1/orders` endpoint.
+**Current state**: All order data in `features/orders/providers/orders_provider.dart` is in-memory mock data. There is no `orders` table in `craftsy.db` and no `/api/v1/orders` endpoint.
 
 **Required work**: Create `OrderDB` SQLAlchemy model and `orders` table, implement `backend/routers/orders.py` with CRUD and status updates, add ONDC webhook receiver for inbound marketplace orders, connect `orders_provider.dart` to real API calls.
 
@@ -1379,5 +1379,5 @@ There is no Alembic yet. Adding a column to an existing table requires a manual 
 
 ---
 
-*Document maintained at `docs/ARCHITECTURE.md` — the sole source of truth for KalaSetu system architecture.*
+*Document maintained at `docs/ARCHITECTURE.md` — the sole source of truth for Craftsy system architecture.*
 *Last updated: 2026-09-08 — supersedes refer.md (safe to delete after this update).*

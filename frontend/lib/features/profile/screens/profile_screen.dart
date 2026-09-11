@@ -129,7 +129,7 @@ class ProfileScreen extends ConsumerWidget {
               onTap: () {
                 showAboutDialog(
                   context: context,
-                  applicationName: 'KalaSetu',
+                  applicationName: 'Craftsy',
                   applicationVersion: '1.0.0',
                   applicationLegalese: 'about_desc'.tr(),
                 );
@@ -137,7 +137,7 @@ class ProfileScreen extends ConsumerWidget {
             ),
             _MenuTile(
               icon: Icons.info_outline,
-              title: 'about_kalasetu'.tr(),
+              title: 'about_craftsy'.tr(),
               onTap: () {
                 showDialog(
                   context: context,
@@ -151,7 +151,7 @@ class ProfileScreen extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('about_kalasetu'.tr(), style: AppTextStyles.headlineMedium.copyWith(fontSize: 19), textAlign: TextAlign.center),
+                          Text('about_craftsy'.tr(), style: AppTextStyles.headlineMedium.copyWith(fontSize: 19), textAlign: TextAlign.center),
                           const SizedBox(height: AppSpacing.sm),
                           Text('about_desc'.tr(), style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
                           const SizedBox(height: AppSpacing.lg),

@@ -3,13 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
-import 'package:kalasetu/data/models/chat_message.dart';
-import 'package:kalasetu/data/models/product.dart';
-import 'package:kalasetu/data/services/api_service.dart';
-import 'package:kalasetu/data/services/chat_service.dart';
-import 'package:kalasetu/features/catalogue/providers/catalogue_filter_provider.dart';
-import 'package:kalasetu/features/chatbot/providers/chat_provider.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
+import 'package:craftsy/data/models/chat_message.dart';
+import 'package:craftsy/data/models/product.dart';
+import 'package:craftsy/data/services/api_service.dart';
+import 'package:craftsy/data/services/chat_service.dart';
+import 'package:craftsy/features/catalogue/providers/catalogue_filter_provider.dart';
+import 'package:craftsy/features/chatbot/providers/chat_provider.dart';
 
 class FakeChatService implements ChatService {
   ChatMessageModel? nextReply;
@@ -265,12 +265,12 @@ void main() {
 
     // 3. Check incoming message with asterisks is completely sanitized
     fakeService.nextReply = ChatMessageModel.assistant(
-      text: '**KalaSetu** offers *fair pricing* with **zero** commission!',
+      text: 'Craftsy offers fair pricing with zero commission!',,
     );
-    await chatNotifier.sendMessage('Tell me about KalaSetu');
+    await chatNotifier.sendMessage('Tell me about Craftsy');
     state = container.read(chatNotifierProvider);
     final lastMsg = state.messages.last;
-    expect(lastMsg.text, equals('KalaSetu offers fair pricing with zero commission!'));
+    expect(lastMsg.text, equals('Craftsy offers fair pricing with zero commission!'));
     expect(lastMsg.text, isNot(contains('*')));
   });
 }

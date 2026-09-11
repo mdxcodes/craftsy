@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kalasetu/features/catalogue/screens/catalogue_screen.dart';
-import 'package:kalasetu/data/models/product.dart';
-import 'package:kalasetu/data/services/api_service.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
+import 'package:craftsy/features/catalogue/screens/catalogue_screen.dart';
+import 'package:craftsy/data/models/product.dart';
+import 'package:craftsy/data/services/api_service.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class _FakeProductListNotifier extends StateNotifier<AsyncValue<List<Product>>>

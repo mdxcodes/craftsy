@@ -273,7 +273,7 @@ class HttpSpeechService implements SpeechService {
           descriptionEn: cleanTranscript,
           descriptionHi: cleanTranscript,
           category: categoryHint ?? 'Handicrafts',
-          tags: ['handcrafted', 'artisan', 'kalasetu'],
+          tags: ['handcrafted', 'artisan', 'craftsy'],
         );
 
     if (cleanTranscript.isEmpty) return fallback();
@@ -302,7 +302,7 @@ class HttpSpeechService implements SpeechService {
         final tags = (data['tags'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .toList() ??
-            ['handcrafted', 'artisan', 'kalasetu'];
+            ['handcrafted', 'artisan', 'craftsy'];
 
         debugPrint(
           '[HttpSpeechService] Listing generated:'

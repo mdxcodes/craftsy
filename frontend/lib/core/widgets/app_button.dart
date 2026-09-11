@@ -6,7 +6,7 @@ import '../services/app_sound_service.dart';
 
 enum AppButtonType { primary, secondary, outlined, text }
 
-/// Kalasetu v3 button component.
+/// Craftsy v3 button component.
 ///
 /// Role mapping (must match design spec):
 ///   primary   → terracotta  — the single dominant action per screen

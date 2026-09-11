@@ -1,7 +1,7 @@
 """
 KalaMitra Chatbot & Agent Navigation Router.
 
-Exposes conversational AI assistance and navigation agent endpoints for KalaSetu.
+Exposes conversational AI assistance and navigation agent endpoints for Craftsy.
 """
 
 import time
@@ -73,8 +73,8 @@ async def get_quick_topics() -> Dict[str, Any]:
     Returns curated starter topics and sample queries for new chat conversations.
     """
     return {
-        "welcome_message": "Namaste! I am KalaMitra, your artisan assistant and guide. I can help you improve your crafts, learn market trends, explore government schemes & finance, or navigate KalaSetu. How can I assist you today?",
-        "welcome_message_hi": "नमस्ते! मैं कला-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपके शिल्प को निखारने, सरकारी योजनाओं व ऋण की जानकारी देने, बाज़ार के रुझान समझने, और कलासेतु ऐप में आपकी मदद करने के लिए यहाँ हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?",
+        "welcome_message": "Namaste! I am KalaMitra, your artisan assistant and guide. I can help you improve your crafts, learn market trends, explore government schemes & finance, or navigate Craftsy. How can I assist you today?",
+        "welcome_message_hi": "नमस्ते! मैं कला-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपके शिल्प को निखारने, सरकारी योजनाओं व ऋण की जानकारी देने, बाज़ार के रुझान समझने, और Craftsy ऐप में आपकी मदद करने के लिए यहाँ हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?",
         "topics": [
             {
                 "id": "schemes",
@@ -104,7 +104,7 @@ async def get_quick_topics() -> Dict[str, Any]:
                 "id": "pricing",
                 "label": "Fair Pricing",
                 "label_hi": "उचित मूल्य निर्धारण",
-                "query": "How does KalaSetu calculate fair prices for my crafts?",
+                "query": "How does Craftsy calculate fair prices for my crafts?",
                 "query_hi": "कीमत कैसे तय होती है?",
                 "icon": "currency_inr",
             },

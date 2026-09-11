@@ -5,7 +5,7 @@ import '../theme/app_text_styles.dart';
 import '../theme/app_spacing.dart';
 import 'app_button.dart';
 
-/// Standard confirmation dialog following the KalaSetu design system.
+/// Standard confirmation dialog following the Craftsy design system.
 ///
 /// Features a stacked button layout:
 ///   1. Primary action button (full width on top)

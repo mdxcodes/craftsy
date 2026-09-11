@@ -1,5 +1,5 @@
 """
-SQLAlchemy Database Models for KalaSetu.
+SQLAlchemy Database Models for Craftsy.
 
 Two core tables:
   - ArtisanDB: Registered artisan profiles (phone-verified owners).

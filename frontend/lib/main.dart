@@ -74,7 +74,7 @@ void main() async {
       fallbackLocale: const Locale('en'),
       useOnlyLangCode: true,
       child: const ProviderScope(
-        child: KalaSetuApp(),
+        child: CraftsyApp(),
       ),
     ),
   );

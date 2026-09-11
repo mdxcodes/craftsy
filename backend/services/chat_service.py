@@ -2,7 +2,7 @@
 KalaMitra AI Chatbot & In-App Navigation Agent Service.
 
 Powered by Groq Cloud with offline rule-based fallback.
-Answers queries about KalaSetu (cataloging, voice descriptions, fair pricing,
+Answers queries about Craftsy (cataloging, voice descriptions, fair pricing,
 offline sync, and social media) and acts as an intelligent navigation agent
 routing artisans to in-app screens.
 """
@@ -47,7 +47,7 @@ def build_chat_system_prompt(app_language_code: str, artisan_craft: Optional[str
         craft_name = artisan_craft.strip()
         craft_context = f"""
 ### ARTISAN REGISTERED CRAFT CONTEXT:
-The artisan's registered primary craft in their KalaSetu profile is: "{craft_name}".
+The artisan's registered primary craft in their Craftsy profile is: "{craft_name}".
 CRITICAL INSTRUCTION FOR CRAFT SPECIFICITY:
 Unless the user explicitly asks about some other specific craft (e.g. asking about brass casting when their profile craft is pottery, or asking about wood carving when their profile craft is handloom), ALWAYS ASSUME that the artisan is asking about and referring to their registered craft: "{craft_name}".
 - When they ask general questions like "How do I improve my craft quality?", "How to prevent defects or cracks?", "Where can I source raw materials?", "What fair price should I set?", or "How does weather affect drying?", tailor your advice and practical techniques specifically for {craft_name}.
@@ -55,7 +55,7 @@ Unless the user explicitly asks about some other specific craft (e.g. asking abo
 - ONLY if the artisan explicitly specifies a different craft in their question (e.g. "Tell me about blue pottery" or "How is Chanderi saree woven?"), then provide information for that requested craft instead of their profile craft.
 """
 
-    return f"""You are KalaMitra (कला-मित्र), the warm, respectful, expert AI Artisan Assistant and General Helper (शिल्प व बाज़ार सहायक) for KalaSetu (कलासेतु) — an in-app platform dedicated to empowering traditional Indian craftspeople, handloom weavers, potters, folk artists, and metalworkers.
+    return f"""You are KalaMitra (कला-मित्र), the warm, respectful, expert AI Artisan Assistant and General Helper (शिल्प व बाज़ार सहायक) for Craftsy — an in-app platform dedicated to empowering traditional Indian craftspeople, handloom weavers, potters, folk artists, and metalworkers.
 {craft_context}
 You are an all-in-one assistant, mentor, and companion. You are NOT just an app navigator. Artisans can ask you general questions about their craft, marketplace, suggestions, finance, schemes, and current affairs.
 
@@ -71,7 +71,7 @@ You are an all-in-one assistant, mentor, and companion. You are NOT just an app 
    - SFURTI & ODOP (One District One Product): Common facility centers and cluster-level export support.
    - Ambedkar Hastshilp Vikas Yojana (AHVY) and Handloom Weavers welfare.
 3. Artisan Finance, Credit & Fair Pricing:
-   - Calculating fair selling prices: Cost Floor = Raw Material Cost + (Labor Hours × Fair Hourly Wage). KalaSetu compares products with e-commerce benchmarks so artisans are never underpaid.
+   - Calculating fair selling prices: Cost Floor = Raw Material Cost + (Labor Hours × Fair Hourly Wage). Craftsy compares products with e-commerce benchmarks so artisans are never underpaid.
    - Managing workshop cashflow, raw material budgeting, escaping high-interest moneylender traps, and adopting digital UPI payments.
 4. Marketplace Suggestions & Commercial Trends:
    - Online product catalog presentation, taking clear photos, crafting descriptions with story and heritage.
@@ -110,9 +110,9 @@ The user's currently selected app language is: {app_lang_name} (code: {app_langu
    - If the user asks in a language different from the app's selected language ({app_lang_name}):
      a) FIRST, prepend a brief, friendly one-sentence suggestion (in the question's language) that they can change the app language to their preferred language in Language Settings.
         * Example if App is English and Question is in Hindi:
-          "सुझाव: यदि आप कलासेतु ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n[यहाँ आपका हिंदी में उत्तर]"
+          "सुझाव: यदि आप Craftsy ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n[यहाँ आपका हिंदी में उत्तर]"
         * Example if App is Hindi and Question is in English:
-          "Suggestion: If you prefer using KalaSetu in English, you can switch the app language in Language Settings.\n\n[Your English answer here]"
+          "Suggestion: If you prefer using Craftsy in English, you can switch the app language in Language Settings.\n\n[Your English answer here]"
      b) EMIT A NAVIGATION ACTION TO 'language_settings':
         Provide the action object:
         {{
@@ -127,7 +127,7 @@ The user's currently selected app language is: {app_lang_name} (code: {app_langu
 
 ### LENIENT GUARDRAILS & SCOPE:
 1. PERMITTED & ENCOURAGED TOPICS:
-   - KalaSetu application features, navigation, screens, settings, and workflows.
+   - Craftsy application features, navigation, screens, settings, and workflows.
    - Indian handicrafts, handloom, pottery, woodwork, brassware, jewelry, paintings, leather, stone, bamboo.
    - Craft making techniques, tools, raw materials, finishing, defect troubleshooting, quality improvement.
    - Government schemes (PM Vishwakarma, Pehchan ID, Mudra, SFURTI, ODOP, subsidies, welfare).
@@ -139,7 +139,7 @@ The user's currently selected app language is: {app_lang_name} (code: {app_langu
    - Off-topic celebrity gossip, cricket/sports scores, movies, general politics, general news.
    - Stock trading speculation, crypto, bitcoin, gambling, betting.
    - Medical diagnosis, legal counsel, or personal life advice.
-   If strictly outside of artisan business, craft improvement, schemes, finance, or KalaSetu, politely decline in the user's language without asterisks.
+   If strictly outside of artisan business, craft improvement, schemes, finance, or Craftsy, politely decline in the user's language without asterisks.
 
 ### Output MUST be ONLY valid JSON matching this exact structure:
 {{
@@ -159,7 +159,7 @@ If no navigation or direct action is relevant, set "action": null.
 
 
 class ChatService:
-    """Service providing conversational Q&A and agent navigation for KalaSetu."""
+    """Service providing conversational Q&A and agent navigation for Craftsy."""
 
     def __init__(self):
         self.settings = get_settings()
@@ -176,7 +176,8 @@ class ChatService:
                 reply=(
                     "नमस्ते! मैं कला-मित्र (KalaMitra) हूँ, आपका शिल्प व बाज़ार सहायक। मैं उत्पाद जोड़ने, शिल्प सुधारने, सरकारी योजनाओं (विश्वकर्मा) और उचित मूल्य निर्धारण में आपकी मदद कर सकता हूँ।"
                     if is_hi
-                    else "Namaste! I am KalaMitra, your artisan assistant and guide for KalaSetu. I can help you add products, improve craft quality, understand schemes like PM Vishwakarma, and navigate the app."
+                    is_hi
+                    else "Namaste! I am KalaMitra, your artisan assistant and guide for Craftsy. I can help you add products, improve craft quality, understand schemes like PM Vishwakarma, and navigate the app."
                 ),
                 action=None,
                 suggested_queries=[
@@ -236,7 +237,7 @@ class ChatService:
         # Comprehensive lenient whitelist for all artisan, craft, scheme, and market queries
         core_craft_app_terms = [
             # App & Navigation
-            "kalasetu", "kalamitra", "product", "saman", "craft", "artisan", "karigar",
+            "craftsy", "kalamitra", "product", "saman", "craft", "artisan", "karigar",
             "hastshilp", "pottery", "textile", "woodwork", "painting", "jewelry", "brass",
             "clay", "mitti", "lakdi", "silk", "cotton", "saree", "dupatta", "price",
             "pricing", "cost", "kamai", "bikri", "sales", "earning", "photo", "image",
@@ -291,9 +292,9 @@ class ChatService:
             logger.warning("[Guardrail] Prompt injection attempt blocked: %s", clean[:60])
             return ChatResponseSchema(
                 reply=(
-                    "सुरक्षा नियमों के अनुसार मैं इस अनुरोध को पूरा नहीं कर सकता। मैं केवल कलासेतु ऐप और कारीगरों की सहायता के लिए उपलब्ध हूँ।"
+                    "सुरक्षा नियमों के अनुसार मैं इस अनुरोध को पूरा नहीं कर सकता। मैं केवल Craftsy ऐप और कारीगरों की सहायता के लिए उपलब्ध हूँ।"
                     if is_hi
-                    else "I cannot fulfill this request due to security guidelines. I am exclusively configured to assist artisans with the KalaSetu app."
+                    else "I cannot fulfill this request due to security guidelines. I am exclusively configured to assist artisans with the Craftsy app."
                 ),
                 action=None,
                 suggested_queries=[
@@ -313,9 +314,9 @@ class ChatService:
             logger.warning("[Guardrail] Crypto/gambling blocked: %s", clean[:60])
             return ChatResponseSchema(
                 reply=(
-                    "मैं क्रिप्टोकरेंसी, शेयर बाज़ार या जुए में सहायता नहीं कर सकता। मैं केवल कलासेतु ऐप और हस्तशिल्प व्यवसाय के लिए उपलब्ध हूँ।"
+                    "मैं क्रिप्टोकरेंसी, शेयर बाज़ार या जुए में सहायता नहीं कर सकता। मैं केवल Craftsy ऐप और हस्तशिल्प व्यवसाय के लिए उपलब्ध हूँ।"
                     if is_hi
-                    else "I cannot provide cryptocurrency, trading, or gambling advice. I am exclusively configured to assist artisans with KalaSetu and handicraft guidance."
+                    else "I cannot provide cryptocurrency, trading, or gambling advice. I am exclusively configured to assist artisans with Craftsy and handicraft guidance."
                 ),
                 action=None,
                 suggested_queries=[
@@ -352,9 +353,9 @@ class ChatService:
             logger.warning("[Guardrail] Coding request blocked: %s", clean[:60])
             return ChatResponseSchema(
                 reply=(
-                    "मैं कोडिंग या प्रोग्रामिंग कार्यों में सहायता नहीं कर सकता। मैं केवल कलासेतु ऐप, हस्तशिल्प और कारीगरों के व्यवसाय के लिए बनाया गया हूँ।"
+                    "मैं कोडिंग या प्रोग्रामिंग कार्यों में सहायता नहीं कर सकता। मैं केवल Craftsy ऐप, हस्तशिल्प और कारीगरों के व्यवसाय के लिए बनाया गया हूँ।"
                     if is_hi
-                    else "I cannot write or debug computer code. I am KalaMitra, dedicated solely to assisting artisans with craft improvement, schemes, and the KalaSetu app."
+                    else "I cannot write or debug computer code. I am KalaMitra, dedicated solely to assisting artisans with craft improvement, schemes, and the Craftsy app."
                 ),
                 action=None,
                 suggested_queries=[
@@ -382,9 +383,9 @@ class ChatService:
             logger.warning("[Guardrail] Academic/Homework request blocked: %s", clean[:60])
             return ChatResponseSchema(
                 reply=(
-                    "मैं गृहकार्य या सामान्य निबंध लिखने के लिए उपलब्ध नहीं हूँ। मैं केवल कलासेतु ऐप, सरकारी योजनाओं और हस्तशिल्प व्यवसाय में आपकी मदद कर सकता हूँ।"
+                    "मैं गृहकार्य या सामान्य निबंध लिखने के लिए उपलब्ध नहीं हूँ। मैं केवल Craftsy ऐप, सरकारी योजनाओं और हस्तशिल्प व्यवसाय में आपकी मदद कर सकता हूँ।"
                     if is_hi
-                    else "I cannot write school essays or solve homework problems. I am here exclusively to help you manage your crafts, schemes, and catalogue on KalaSetu."
+                    else "I cannot write school essays or solve homework problems. I am here exclusively to help you manage your crafts, schemes, and catalogue on Craftsy."
                 ),
                 action=None,
                 suggested_queries=[
@@ -413,9 +414,9 @@ class ChatService:
             logger.warning("[Guardrail] Unrelated trivia/advice blocked: %s", clean[:60])
             return ChatResponseSchema(
                 reply=(
-                    "माफ़ कीजिए, मैं केवल कलासेतु ऐप, सरकारी योजनाओं और हस्तशिल्प से जुड़े सवालों के जवाब दे सकता हूँ। सामान्य जानकारी के लिए कृपया सर्च इंजन का उपयोग करें।"
+                    "माफ़ कीजिए, मैं केवल Craftsy ऐप, सरकारी योजनाओं और हस्तशिल्प से जुड़े सवालों के जवाब दे सकता हूँ। सामान्य जानकारी के लिए कृपया सर्च इंजन का उपयोग करें।"
                     if is_hi
-                    else "I apologize, but I am dedicated exclusively to KalaSetu, artisan business, and handicraft guidance. For general queries, please consult a web search engine."
+                    else "I apologize, but I am dedicated exclusively to Craftsy, artisan business, and handicraft guidance. For general queries, please consult a web search engine."
                 ),
                 action=None,
                 suggested_queries=[
@@ -484,9 +485,9 @@ class ChatService:
             )
             if not has_suggestion:
                 if is_query_hindi:
-                    reply = "सुझाव: यदि आप कलासेतु ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n" + reply
+                    reply = "सुझाव: यदि आप Craftsy ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n" + reply
                 else:
-                    reply = "Suggestion: If you prefer using KalaSetu in English, you can switch the app language in Language Settings.\n\n" + reply
+                    reply = "Suggestion: If you prefer using Craftsy in English, you can switch the app language in Language Settings.\n\n" + reply
 
             # If no action was set or action is generic, provide navigation to language_settings
             if action is None:
@@ -577,7 +578,7 @@ class ChatService:
         is_mismatch = (is_query_hindi and language_code != "hi") or (not is_query_hindi and language_code == "hi")
         if is_mismatch:
             if is_query_hindi:
-                suggestion_prefix = "सुझाव: यदि आप कलासेतु ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n"
+                suggestion_prefix = "सुझाव: यदि आप Craftsy ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n"
                 default_action = ChatActionSchema(
                     type="navigate",
                     destination="language_settings",
@@ -587,7 +588,7 @@ class ChatService:
                     params={},
                 )
             else:
-                suggestion_prefix = "Suggestion: If you prefer using KalaSetu in English, you can switch the app language in Language Settings.\n\n"
+                suggestion_prefix = "Suggestion: If you prefer using Craftsy in English, you can switch the app language in Language Settings.\n\n"
                 default_action = ChatActionSchema(
                     type="navigate",
                     destination="language_settings",
@@ -1156,7 +1157,7 @@ class ChatService:
             if is_hindi:
                 return ChatResponseSchema(
                     reply=suggestion_prefix + (
-                        "कलासेतु का उचित मूल्य निर्धारण (Fair Pricing Engine) यह सुनिश्चित करता है कि आपकी मेहनत की पूरी कीमत मिले:\n\n"
+                        "Craftsy का उचित मूल्य निर्धारण (Fair Pricing Engine) यह सुनिश्चित करता है कि आपकी मेहनत की पूरी कीमत मिले:\n\n"
                         "• लागत तल (Floor Price) = कच्चा माल + (श्रम घंटे × प्रति घंटा मजदूरी)\n"
                         "• बाज़ार मूल्य: ई-कॉमर्स बाज़ार के आधार पर आपको एक उचित मूल्य दायरा सुझाया जाता है ताकि आप कभी घाटे में न बेचें।"
                     ),
@@ -1171,7 +1172,7 @@ class ChatService:
                 )
             return ChatResponseSchema(
                 reply=suggestion_prefix + (
-                    "KalaSetu's Fair Pricing Engine ensures you are never underpaid for your artisanal work:\n\n"
+                    "Craftsy's Fair Pricing Engine ensures you are never underpaid for your artisanal work:\n\n"
                     "• Cost Floor = Raw Materials + (Labor Hours × Fair Hourly Wage)\n"
                     "• Market Benchmark: Analyzes similar authentic handicrafts across e-commerce platforms to recommend a fair selling range.\n"
                     "• You always maintain complete control over the final price!"
@@ -1243,7 +1244,7 @@ class ChatService:
             if is_hindi:
                 return ChatResponseSchema(
                     reply=suggestion_prefix + (
-                        "कलासेतु पूरी तरह ऑफ़लाइन भी काम करता है! आप बिना इंटरनेट के भी फ़ोटो ले सकते हैं और ऑडियो रिकॉर्ड कर सकते हैं।\n"
+                        "Craftsy पूरी तरह ऑफ़लाइन भी काम करता है! आप बिना इंटरनेट के भी फ़ोटो ले सकते हैं और ऑडियो रिकॉर्ड कर सकते हैं।\n"
                         "जब भी फ़ोन इंटरनेट से जुड़ेगा, सभी उत्पाद स्वतः ही ऑनलाइन सर्वर पर सिंक हो जाएंगे।"
                     ),
                     action=default_action,
@@ -1251,7 +1252,7 @@ class ChatService:
                 )
             return ChatResponseSchema(
                 reply=suggestion_prefix + (
-                    "KalaSetu is built offline-first! You can take photos and record voice notes even with zero internet connectivity.\n"
+                    "Craftsy is built offline-first! You can take photos and record voice notes even with zero internet connectivity.\n"
                     "All pending items are queued locally on your phone and sync automatically once you are back online."
                 ),
                 action=default_action,

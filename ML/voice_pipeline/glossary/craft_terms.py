@@ -143,7 +143,7 @@ def get_glossary_terms(
             ordered = preferred + MATERIAL_TERMS + remaining
     else:
         if not language_code or language_code in DEVANAGARI_LANGUAGES or language_code in ["auto", "detect", "None"]:
-            conversational_terms = ["नमस्ते", "कलासेतु", "उत्पाद", "नया सामान", "कैटलॉग", "बिक्री", "कमाई"]
+            conversational_terms = ["नमस्ते", "Craftsy", "उत्पाद", "नया सामान", "कैटलॉग", "बिक्री", "कमाई"]
             ordered = conversational_terms + DEVANAGARI_TERMS + list(ALL_TERMS)
         else:
             ordered = list(ALL_TERMS)
