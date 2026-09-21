@@ -306,7 +306,7 @@ class SocialDraftResponse(BaseModel):
     hashtags: List[str]
 
 
-# ── KalaMitra Chatbot & Navigation Agent Schemas ─────────────────────────────
+# ── CraftMitra Chatbot & Navigation Agent Schemas ─────────────────────────────
 
 
 class ChatMessageSchema(BaseModel):
@@ -326,7 +326,7 @@ class ChatActionSchema(BaseModel):
 
 
 class ChatRequestSchema(BaseModel):
-    """User prompt to the KalaMitra assistant."""
+    """User prompt to the CraftMitra assistant."""
     message: str = Field(..., max_length=500, description="User query / utterance (capped at 500 chars to prevent prompt stuffing)")
     history: List[ChatMessageSchema] = Field(default_factory=list, description="Recent conversation turns")
     language_code: Optional[str] = Field(default="en", description="Preferred response language ('en', 'hi', etc.)")
@@ -335,14 +335,14 @@ class ChatRequestSchema(BaseModel):
 
 
 class ChatResponseSchema(BaseModel):
-    """KalaMitra assistant response with optional navigation action."""
+    """CraftMitra assistant response with optional navigation action."""
     reply: str = Field(..., description="Empathetic, clear answer to the user's query")
     action: Optional[ChatActionSchema] = Field(default=None, description="Navigation action if navigation intent was detected")
     suggested_queries: List[str] = Field(default_factory=list, description="Follow-up quick question chips")
 
 
 class VoiceChatResponseSchema(BaseModel):
-    """KalaMitra voice chat response containing Whisper transcription and assistant reply."""
+    """CraftMitra voice chat response containing Whisper transcription and assistant reply."""
     user_transcript: str = Field(..., description="Artisan spoken utterance transcribed by Whisper STT")
     reply: str = Field(..., description="Empathetic, clear answer to the user's query")
     action: Optional[ChatActionSchema] = Field(default=None, description="Navigation action if navigation intent was detected")

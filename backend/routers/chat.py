@@ -18,7 +18,7 @@ from ..services.chat_service import ChatService
 from ..services.catalog_service import CatalogService
 from ..services.storage_service import StorageService
 
-router = APIRouter(prefix="/api/v1/chat", tags=["KalaMitra Assistant"])
+router = APIRouter(prefix="/api/v1/chat", tags=["CraftMitra Assistant"])
 chat_service = ChatService()
 catalog_service = CatalogService()
 storage_service = StorageService()
@@ -41,7 +41,7 @@ def _enforce_rate_limit(req: Request) -> None:
     if len(_client_request_timestamps[client_ip]) >= MAX_REQUESTS_PER_WINDOW:
         raise HTTPException(
             status_code=429,
-            detail="Rate limit exceeded. KalaMitra is limited to 20 requests per minute to prevent key abuse.",
+            detail="Rate limit exceeded. CraftMitra is limited to 20 requests per minute to prevent key abuse.",
         )
     _client_request_timestamps[client_ip].append(now)
 
@@ -52,7 +52,7 @@ async def send_chat_message(
     raw_req: Request,
 ) -> ChatResponseSchema:
     """
-    Process a user message with KalaMitra AI assistant.
+    Process a user message with CraftMitra AI assistant.
     Returns an informative answer, optional in-app navigation action, and follow-up suggestion chips.
     Protected by domain guardrails and rate limiting.
     """

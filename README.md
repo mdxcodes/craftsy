@@ -159,7 +159,7 @@ Environment variables you'll need (see `.env.example`): Supabase URL/key, Chroma
 ## 📁 Project Structure
 
 ```
-karigar-setu/
+craftsy/
 ├── mobile/              # Flutter app — camera, voice capture, offline queue, review UI
 ├── backend/             # FastAPI service — /enhance, /catalog, /price-suggest
 │   ├── image_pipeline/  # rembg, OpenCV, Pillow

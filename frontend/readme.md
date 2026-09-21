@@ -1,4 +1,4 @@
-# KalaSetu Frontend - Flutter Mobile & Web App
+# Craftsy Frontend - Flutter Mobile & Web App
 
 A production-quality, cross-platform mobile app connecting marginalized artisans in India to markets through AI-driven smart cataloging and market linkage.
 
@@ -496,7 +496,7 @@ flutter pub global run devtools
 
 ## 📄 License
 
-© 2026 KalaSetu. All rights reserved.
+© 2026 Craftsy. All rights reserved.
 
 ## 🤝 Support
 

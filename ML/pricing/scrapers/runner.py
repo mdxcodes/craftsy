@@ -183,7 +183,7 @@ class ScraperRunner:
                 response = requests.get(
                     product.image_url,
                     timeout=10,
-                    headers={"User-Agent": "KarigarSetu/1.0"},
+                    headers={"User-Agent": "Craftsy/1.0"},
                 )
                 response.raise_for_status()
 
