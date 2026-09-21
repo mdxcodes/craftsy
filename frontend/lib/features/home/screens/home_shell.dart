@@ -8,7 +8,7 @@ import '../../catalogue/screens/catalogue_screen.dart';
 import '../../add_product/screens/add_product_flow_screen.dart';
 import '../../orders/screens/my_orders_screen.dart';
 import '../../profile/screens/profile_screen.dart';
-import '../../chatbot/widgets/kalamitra_fab.dart';
+import '../../chatbot/widgets/craftmitra_fab.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_route_constants.dart';
@@ -116,7 +116,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           children: screens,
         ),
       ),
-      floatingActionButton: const KalaMitraFab(),
+      floatingActionButton: const CraftMitraFab(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.cardSurface,

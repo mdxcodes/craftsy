@@ -103,5 +103,3 @@ class CraftMitraFab extends ConsumerWidget {
 
 // Backward-compatibility alias
 typedef KalaMitraFab = CraftMitraFab;
-  }
-}
