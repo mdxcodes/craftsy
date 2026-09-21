@@ -72,8 +72,8 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
   Future<List<QueueItem>> getPendingAndFailedItems() {
     return (select(queueItems)
           ..where((t) =>
-              t.status.equals(QueueStatus.pending.index) |
-              t.status.equals(QueueStatus.failed.index))
+              t.status.equalsValue(QueueStatus.pending) |
+              t.status.equalsValue(QueueStatus.failed))
           ..orderBy([
             (t) => OrderingTerm(expression: t.status),
             (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
@@ -84,7 +84,7 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
   /// Get in-progress processing items
   Future<List<QueueItem>> getProcessingItems() {
     return (select(queueItems)
-          ..where((t) => t.status.equals(QueueStatus.processing.index)))
+          ..where((t) => t.status.equalsValue(QueueStatus.processing)))
         .get();
   }
 
@@ -94,9 +94,9 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
     final query = selectOnly(queueItems)
       ..addColumns([countExp])
       ..where(
-        queueItems.status.equals(QueueStatus.pending.index) |
-        queueItems.status.equals(QueueStatus.uploading.index) |
-        queueItems.status.equals(QueueStatus.processing.index),
+        queueItems.status.equalsValue(QueueStatus.pending) |
+        queueItems.status.equalsValue(QueueStatus.uploading) |
+        queueItems.status.equalsValue(QueueStatus.processing),
       );
     final row = await query.getSingle();
     return row.read(countExp) ?? 0;
@@ -107,7 +107,7 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
     final countExp = queueItems.id.count();
     final query = selectOnly(queueItems)
       ..addColumns([countExp])
-      ..where(queueItems.status.equals(QueueStatus.processing.index));
+      ..where(queueItems.status.equalsValue(QueueStatus.processing));
     final row = await query.getSingle();
     return row.read(countExp) ?? 0;
   }
@@ -142,7 +142,7 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
   /// Reset all failed items to pending
   Future<void> retryAllFailed() async {
     await (update(queueItems)
-          ..where((t) => t.status.equals(QueueStatus.failed.index)))
+          ..where((t) => t.status.equalsValue(QueueStatus.failed)))
         .write(
       const QueueItemsCompanion(
         status: Value(QueueStatus.pending),

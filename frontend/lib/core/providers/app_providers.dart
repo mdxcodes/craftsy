@@ -1631,7 +1631,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
 
     try {
       await Future.wait([
-        ?enhanceFuture,
+        if (enhanceFuture != null) enhanceFuture,
         listingFuture,
       ]);
     } catch (e) {

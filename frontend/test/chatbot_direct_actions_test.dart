@@ -265,7 +265,7 @@ void main() {
 
     // 3. Check incoming message with asterisks is completely sanitized
     fakeService.nextReply = ChatMessageModel.assistant(
-      text: 'Craftsy offers fair pricing with zero commission!',,
+      text: 'Craftsy offers fair pricing with zero commission!',
     );
     await chatNotifier.sendMessage('Tell me about Craftsy');
     state = container.read(chatNotifierProvider);

@@ -98,7 +98,7 @@ class AppConfirmationDialog extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-            ?contentWidget,
+            if (contentWidget != null) contentWidget!,
 
             const SizedBox(height: AppSpacing.lg),
 
