@@ -55,7 +55,7 @@ uploads/
 **/uploads/
 !**/uploads/.gitkeep
 
-# Audio & Voice Recordings (Whisper / KalaMitra temporary audio)
+# Audio & Voice Recordings (Whisper / CraftMitra temporary audio)
 *.wav
 *.mp3
 *.m4a
