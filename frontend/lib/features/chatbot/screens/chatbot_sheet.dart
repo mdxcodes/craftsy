@@ -392,7 +392,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                         ],
                       ),
                       Text(
-                        'kalamitra_subtitle'.tr(),
+                        'craftmitra_subtitle'.tr(),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: 12,
@@ -404,7 +404,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 // Refresh chat
                 IconButton(
                   icon: const Icon(Icons.refresh_rounded, color: AppColors.inkSoft, size: 20),
-                  tooltip: 'kalamitra_reset'.tr(),
+                  tooltip: 'craftmitra_reset'.tr(),
                   onPressed: () {
                     ref.read(chatNotifierProvider.notifier).clearChat(
                       EasyLocalization.of(context)?.locale.languageCode ?? 'en',
@@ -522,7 +522,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                               textInputAction: TextInputAction.send,
                               onSubmitted: (_) => _handleSend(),
                               decoration: InputDecoration(
-                                hintText: 'kalamitra_hint'.tr(),
+                                hintText: 'craftmitra_hint'.tr(),
                                 hintStyle: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.textTertiary,
                                 ),

@@ -125,7 +125,7 @@ void main() {
 
       // Verify FAB renders
       expect(find.byType(CraftMitraFab), findsOneWidget);
-      expect(find.text('kalamitra_title'), findsOneWidget);
+      expect(find.text('craftmitra_title'), findsOneWidget);
 
       // Tap FAB to open bottom sheet
       await tester.tap(find.byType(CraftMitraFab));
