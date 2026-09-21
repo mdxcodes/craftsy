@@ -1,67 +1,62 @@
 import 'package:flutter/material.dart';
 
-/// Craftsy v3 design-token palette.
+/// Craftsy v4 design-token palette — "Indigo Loom"
+///
+/// A deep, premium indigo base with warm amber accents.
+/// Completely distinct from the previous terracotta/gold/berry scheme.
 ///
 /// Role hierarchy:
-///   terracotta  → every primary action button
-///   gold        → every secondary/alternate-path button
-///   berry       → accent only (at most one hero card per screen — Analytics only)
-///   blueAccent  → accent only (comparison bars, text-link icons — never a button fill)
-///   success     → dispatched / delivered / confirmed
+///   indigo       → every primary action button, app bar, FAB
+///   amber        → every secondary/alternate-path button, highlights
+///   teal         → accent only (success states, info cards)
+///   coral        → accent only (warnings, error states)
 class AppColors {
   // ---------------------------------------------------------------------------
-  // Core palette — exact matches to craftsy-redesign-v3.html CSS variables
+  // Core palette — Indigo Loom
   // ---------------------------------------------------------------------------
 
-  /// Primary action (terracotta)
-  static const terracotta     = Color(0xFFB84A29); // --terracotta
-  static const terracottaDark = Color(0xFF8C371A); // --terracotta-press
-  static const terracottaLight= Color(0xFFF3DBCC); // --terracotta-tint
+  /// Primary action (deep indigo)
+  static const indigo         = Color(0xFF2D3A8C);
+  static const indigoDark     = Color(0xFF1A1A2E);
+  static const indigoLight    = Color(0xFFE8EAF6);
 
-  /// Secondary action (gold) — drives every secondary / alternate-path button
-  static const gold           = Color(0xFFE59A2C); // --gold
-  static const goldDark       = Color(0xFFB87A1E); // --gold-press
-  static const goldLight      = Color(0xFFFBEACB); // --gold-tint
+  /// Secondary action (warm amber) — drives every secondary / alternate-path button
+  static const amber          = Color(0xFFE8912D);
+  static const amberDark      = Color(0xFFC75B39);
+  static const amberLight     = Color(0xFFFFF3E0);
 
-  /// Accent 1 (berry) — at most one hero-metric card per screen; never a button
-  static const berry          = Color(0xFF924C6C); // --berry
-  static const berryDark      = Color(0xFF743A54); // --berry-press
-  static const berryLight     = Color(0xFFF0DEE6); // --berry-tint
+  /// Accent 1 (teal) — success states, info cards; never a button fill
+  static const teal           = Color(0xFF00696E);
+  static const tealDark       = Color(0xFF004F52);
+  static const tealLight      = Color(0xFFE0F2F1);
 
-  /// Accent 2 (blue) — comparison bars, text-link icons; never a button fill
-  static const blueAccent     = Color(0xFF265067); // --blue
-  static const blueAccentDark = Color(0xFF1B3A4C); // --blue-press
-  static const blueAccentLight= Color(0xFFDCE6EB); // --blue-tint
-
-  /// Success / dispatched / delivered / payment confirmed
-  static const success        = Color(0xFF3B5E3C); // --success
-  static const successLight   = Color(0xFFDEE8DA); // --success-tint
+  /// Accent 2 (coral) — warnings, error states; never a button fill
+  static const coral          = Color(0xFFD84343);
+  static const coralDark      = Color(0xFFB71C1C);
+  static const coralLight     = Color(0xFFFFEBEE);
 
   // ---------------------------------------------------------------------------
-  // Ink — warm near-black text instead of pure black
+  // Ink — cool near-black text
   // ---------------------------------------------------------------------------
-  static const ink            = Color(0xFF201A18); // --ink
-  static const inkSoft        = Color(0xFF6E645F); // --ink-soft
-  static const inkFaint       = Color(0xFFA79C93); // --ink-faint
+  static const ink            = Color(0xFF1A1A2E);
+  static const inkSoft        = Color(0xFF545468);
+  static const inkFaint       = Color(0xFF9E9EB0);
 
   // ---------------------------------------------------------------------------
   // Surfaces
   // ---------------------------------------------------------------------------
-  static const parchment      = Color(0xFFF8F5F0); // --parchment (page bg)
-  static const parchmentDeep  = Color(0xFFEFE6D8); // --parchment-deep (track/segmented)
-  static const cardSurface    = Color(0xFFFFFDF9); // --card
+  static const parchment      = Color(0xFFF5F5FA);
+  static const parchmentDeep  = Color(0xFFE8E8F0);
+  static const cardSurface    = Color(0xFFFFFFFF);
 
   // ---------------------------------------------------------------------------
   // Structural
   // ---------------------------------------------------------------------------
-  static const dottedBorder   = Color(0xFFD6CCC2); // --dotted
-  /// rgba(32,26,24,0.14) — used for borders, field outlines, card outlines
-  static const line           = Color(0x24201A18);
-  /// resting card shadow rgba(32,26,24,0.08)
-  static const shadow         = Color(0x14201A18);
-  /// lifted / sheet shadow rgba(32,26,24,0.28)
-  static const shadowLifted   = Color(0x47201A18);
-  static const overlay        = Color(0x6B1C1613); // rgba(28,22,19,0.42)
+  static const dottedBorder   = Color(0xFFD0D0E0);
+  static const line           = Color(0x241A1A2E);
+  static const shadow         = Color(0x141A1A2E);
+  static const shadowLifted   = Color(0x471A1A2E);
+  static const overlay        = Color(0x6B0A0A1A);
 
   // ---------------------------------------------------------------------------
   // Semantic convenience aliases
@@ -75,57 +70,63 @@ class AppColors {
   static const surface        = cardSurface;
   static const surfaceVariant = parchmentDeep;
 
-  static const error          = terracotta;   // use sparingly; terracotta IS the error primary
-  static const warning        = gold;
+  static const error          = coral;
+  static const warning        = amber;
   static const border         = dottedBorder;
   static const divider        = line;
 
   // ---------------------------------------------------------------------------
-  // Status badge roles (order cards + filter chips)
+  // Status badge roles
   // ---------------------------------------------------------------------------
-  static const statusActionBg   = terracottaLight;  // "New" / action required
-  static const statusActionFg   = terracottaDark;
-  static const statusPendingBg  = goldLight;        // "Packed" / processing
-  static const statusPendingFg  = goldDark;
-  static const statusSuccessBg  = successLight;     // Dispatched / delivered
-  static const statusSuccessFg  = success;
+  static const statusActionBg   = indigoLight;
+  static const statusActionFg   = indigoDark;
+  static const statusPendingBg  = amberLight;
+  static const statusPendingFg  = amberDark;
+  static const statusSuccessBg  = tealLight;
+  static const statusSuccessFg  = teal;
 
   // ---------------------------------------------------------------------------
   // Legacy aliases — kept so un-migrated screens still compile.
-  // Updated to point to new v3 token values.
+  // Updated to point to new v4 token values.
   // ---------------------------------------------------------------------------
+  static const terracotta     = indigo;
+  static const terracottaDark = indigoDark;
+  static const terracottaLight= indigoLight;
+  static const gold           = amber;
+  static const goldDark       = amberDark;
+  static const goldLight      = amberLight;
+  static const berry          = teal;
+  static const berryDark      = tealDark;
+  static const berryLight     = tealLight;
+  static const blueAccent     = indigo;
+  static const blueAccentDark = indigoDark;
+  static const blueAccentLight= indigoLight;
+  static const success        = teal;
+  static const successLight   = tealLight;
+
   static const plaster         = parchment;
   static const plasterDark     = parchmentDeep;
   static const charcoal        = ink;
   static const charcoalSoft    = inkSoft;
   static const cream           = cardSurface;
   static const oak             = dottedBorder;
-  static const mustard         = gold;
-  static const brick           = terracottaDark;
-  static const aboveRange      = berry;
-
-  static const online          = success;
-  static const syncing         = gold;
+  static const mustard         = amber;
+  static const brick           = indigoDark;
+  static const aboveRange      = teal;
+  static const online          = teal;
+  static const syncing         = amber;
   static const offline         = inkSoft;
-
-  static const statusLive      = success;
-  static const statusPending   = gold;
+  static const statusLive      = teal;
+  static const statusPending   = amber;
   static const statusDraft     = inkSoft;
-  static const statusSold      = gold;
-
-  static const indigo          = terracottaDark;
-  static const indigoLight     = terracotta;
-  static const indigoDark      = ink;
-  static const turmeric        = gold;
-  static const turmericLight   = goldLight;
-  static const turmericDark    = goldDark;
-  static const forestGreen     = success;
-  static const forestGreenLight= successLight;
-  static const forestGreenDark = Color(0xFF2B4A2C);
-
-  // Keep old terracottaLight alias pointing to new tint
-  // (some screens still reference it via the old name)
-  static const info            = blueAccent;
+  static const statusSold      = amber;
+  static const turmeric        = amber;
+  static const turmericLight   = amberLight;
+  static const turmericDark    = amberDark;
+  static const forestGreen     = teal;
+  static const forestGreenLight= tealLight;
+  static const forestGreenDark = tealDark;
+  static const info            = indigo;
 
   AppColors._();
 }

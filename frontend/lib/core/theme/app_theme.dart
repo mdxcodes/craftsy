@@ -10,24 +10,24 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
 
-      // Color scheme — v3 palette
+      // Color scheme — v4 Indigo Loom palette
       colorScheme: ColorScheme.light(
-        primary:            AppColors.terracotta,
+        primary:            AppColors.indigo,
         onPrimary:          AppColors.textOnPrimary,
-        primaryContainer:   AppColors.terracottaLight,
-        onPrimaryContainer: AppColors.terracottaDark,
+        primaryContainer:   AppColors.indigoLight,
+        onPrimaryContainer: AppColors.indigoDark,
 
-        secondary:            AppColors.gold,
+        secondary:            AppColors.amber,
         onSecondary:          AppColors.textOnPrimary,
-        secondaryContainer:   AppColors.goldLight,
-        onSecondaryContainer: AppColors.goldDark,
+        secondaryContainer:   AppColors.amberLight,
+        onSecondaryContainer: AppColors.amberDark,
 
-        tertiary:             AppColors.berry,      // accent — rarely used
+        tertiary:             AppColors.teal,      // accent — rarely used
         onTertiary:           AppColors.textOnPrimary,
-        tertiaryContainer:    AppColors.berryLight,
-        onTertiaryContainer:  AppColors.berryDark,
+        tertiaryContainer:    AppColors.tealLight,
+        onTertiaryContainer:  AppColors.tealDark,
 
-        error:    AppColors.terracottaDark,
+        error:    AppColors.coral,
         onError:  AppColors.textOnPrimary,
 
         surface:                   AppColors.cardSurface,
@@ -85,10 +85,10 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button — primary action: terracotta pill with inset shadow
+      // Elevated Button — primary action: indigo pill with inset shadow
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.terracotta,
+          backgroundColor: AppColors.indigo,
           foregroundColor: AppColors.textOnPrimary,
           minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
           padding: const EdgeInsets.symmetric(
@@ -125,14 +125,14 @@ class AppTheme {
       // Text Button — ghost / link style
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.terracotta,
+          foregroundColor: AppColors.indigo,
           minimumSize: const Size(0, AppSpacing.minTouchTarget),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           textStyle: AppTextStyles.labelMedium,
         ),
       ),
 
-      // Input Decoration — card surface, line border, terracotta focus ring
+      // Input Decoration — card surface, line border, indigo focus ring
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardSurface,
@@ -150,26 +150,26 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.terracotta, width: 2),
+          borderSide: const BorderSide(color: AppColors.indigo, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.terracottaDark, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.coral, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.terracottaDark, width: 2),
+          borderSide: const BorderSide(color: AppColors.coral, width: 2),
         ),
         labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
         hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
-        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.terracottaDark),
+        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.coral),
       ),
 
-      // Chip — pill shape; selected = terracotta fill
+      // Chip — pill shape; selected = indigo fill
       // NOTE: cascades globally — accepted risk per design brief.
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.parchmentDeep,
-        selectedColor: AppColors.terracotta,
+        selectedColor: AppColors.indigo,
         disabledColor: AppColors.parchmentDeep,
         labelStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.textPrimary),
         secondaryLabelStyle: AppTextStyles.labelSmall.copyWith(
@@ -189,7 +189,7 @@ class AppTheme {
       // Bottom Navigation Bar
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardSurface,
-        selectedItemColor: AppColors.terracotta,
+        selectedItemColor: AppColors.indigo,
         unselectedItemColor: AppColors.inkFaint,
         selectedLabelStyle: AppTextStyles.labelSmall,
         unselectedLabelStyle: AppTextStyles.labelSmall,
@@ -199,7 +199,7 @@ class AppTheme {
 
       // FAB
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.terracotta,
+        backgroundColor: AppColors.indigo,
         foregroundColor: AppColors.textOnPrimary,
         elevation: AppElevation.subtle,
         shape: RoundedRectangleBorder(
@@ -244,7 +244,7 @@ class AppTheme {
 
       // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.terracotta,
+        color: AppColors.indigo,
       ),
 
       // Divider

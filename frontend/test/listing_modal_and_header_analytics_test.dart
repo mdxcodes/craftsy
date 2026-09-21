@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:kalasetu/features/add_product/widgets/step5_confirm_widget.dart';
-import 'package:kalasetu/features/orders/screens/my_orders_screen.dart';
-import 'package:kalasetu/features/catalogue/screens/catalogue_screen.dart';
-import 'package:kalasetu/core/providers/app_providers.dart';
-import 'package:kalasetu/data/models/product.dart';
-import 'package:kalasetu/data/models/user_profile.dart';
-import 'package:kalasetu/data/services/api_service.dart';
+import 'package:craftsy/features/add_product/widgets/step5_confirm_widget.dart';
+import 'package:craftsy/features/orders/screens/my_orders_screen.dart';
+import 'package:craftsy/features/catalogue/screens/catalogue_screen.dart';
+import 'package:craftsy/core/providers/app_providers.dart';
+import 'package:craftsy/data/models/product.dart';
+import 'package:craftsy/data/models/user_profile.dart';
+import 'package:craftsy/data/services/api_service.dart';
 
 class _FakeAddProductNotifier extends StateNotifier<AddProductDraft>
     implements AddProductFlowNotifier {
