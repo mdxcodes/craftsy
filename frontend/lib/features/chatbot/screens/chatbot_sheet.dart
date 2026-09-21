@@ -43,7 +43,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
   int _recordDuration = 0;
   Timer? _recordTimer;
 
-  // Repeats a KalaMitra reply on tap. One shared engine for the whole
+  // Repeats a CraftMitra reply on tap. One shared engine for the whole
   // conversation — only one message plays at a time — tracked by message id
   // so the correct bubble's icon reflects playback state.
   final AppTtsService _tts = AppTtsService();
@@ -92,7 +92,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
 
     final text = msg.text.replaceAll('*', '');
 
-    // KalaMitra answers in the language of the *question*, not the app
+    // CraftMitra answers in the language of the *question*, not the app
     // language — ask in Hindi inside an English-locale app and the reply comes
     // back in Hindi. Picking the voice from the app locale would then read
     // Devanagari with the English voice and produce nothing intelligible, so
@@ -333,7 +333,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/images/kalamitra_logo.png',
+                      'assets/images/craftmitra_logo.png',
                       width: 44,
                       height: 44,
                       fit: BoxFit.contain,
@@ -352,7 +352,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                       Row(
                         children: [
                           Text(
-                            'kalamitra_title'.tr(),
+                            'craftmitra_title'.tr(),
                             style: AppTextStyles.headlineSmall.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
@@ -737,7 +737,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
             ),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/kalamitra_logo.png',
+                'assets/images/craftmitra_logo.png',
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,
@@ -1019,7 +1019,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
             ),
             child: ClipOval(
               child: Image.asset(
-                'assets/images/kalamitra_logo.png',
+                'assets/images/craftmitra_logo.png',
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,

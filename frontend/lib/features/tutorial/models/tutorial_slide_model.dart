@@ -105,7 +105,7 @@ class TutorialSlidesData {
         '1-Tap Copy & Share',
       ],
     ),
-    // ── Slide 6: Step 5 — KalaMitra AI Assistant (NEW) ──────────────────
+    // ── Slide 6: Step 5 — CraftMitra AI Assistant (NEW) ──────────────────
     TutorialSlideModel(
       stepIndex: 5,
       badgeKey: 'slide6_badge',

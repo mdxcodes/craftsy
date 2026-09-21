@@ -12,7 +12,7 @@ import 'package:craftsy/data/models/user_profile.dart';
 import 'package:craftsy/data/services/chat_service.dart';
 import 'package:craftsy/features/chatbot/providers/chat_provider.dart';
 import 'package:craftsy/features/chatbot/screens/chatbot_sheet.dart';
-import 'package:craftsy/features/chatbot/widgets/kalamitra_fab.dart';
+import 'package:craftsy/features/chatbot/widgets/craftmitra_fab.dart';
 
 class _FakeChatService implements ChatService {
   @override
@@ -77,7 +77,7 @@ void main() {
       },
     );
 
-    final tempDir = await Directory.systemTemp.createTemp('hive_kalamitra_test');
+    final tempDir = await Directory.systemTemp.createTemp('hive_craftmitra_test');
     Hive.init(tempDir.path);
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(UserProfileAdapter());
@@ -96,8 +96,8 @@ void main() {
     }
   });
 
-  group('KalaMitra FAB & Scalloped Bottom Sheet Tests', () {
-    testWidgets('KalaMitraFab renders with consistent dimensions and triggers Mehrab sheet', (tester) async {
+  group('CraftMitra FAB & Scalloped Bottom Sheet Tests', () {
+    testWidgets('CraftMitraFab renders with consistent dimensions and triggers Mehrab sheet', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -116,7 +116,7 @@ void main() {
           ],
           child: const MaterialApp(
             home: Scaffold(
-              floatingActionButton: KalaMitraFab(),
+              floatingActionButton: CraftMitraFab(),
             ),
           ),
         ),
@@ -124,11 +124,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify FAB renders
-      expect(find.byType(KalaMitraFab), findsOneWidget);
+      expect(find.byType(CraftMitraFab), findsOneWidget);
       expect(find.text('kalamitra_title'), findsOneWidget);
 
       // Tap FAB to open bottom sheet
-      await tester.tap(find.byType(KalaMitraFab));
+      await tester.tap(find.byType(CraftMitraFab));
       await tester.pumpAndSettle();
 
       // Verify MehrabSheetContainer & MehrabClipper were used (scalloped top border treatment)

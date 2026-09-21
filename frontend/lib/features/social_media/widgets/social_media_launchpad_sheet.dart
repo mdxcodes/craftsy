@@ -475,8 +475,8 @@ class _SocialMediaLaunchpadSheetState
                            _t(
                               context,
                               'generating_caption_ai',
-                              fallbackEn: 'Generating {platform} caption with KalaMitra AI...',
-                              fallbackHi: 'कला-मित्र AI द्वारा {platform} कैप्शन तैयार किया जा रहा है...',
+                              fallbackEn: 'Generating {platform} caption with CraftMitra AI...',
+                              fallbackHi: 'क्राफ्ट-मित्र AI द्वारा {platform} कैप्शन तैयार किया जा रहा है...',
                               namedArgs: {'platform': platformName},
                            ),
                            style: AppTextStyles.bodyMedium.copyWith(

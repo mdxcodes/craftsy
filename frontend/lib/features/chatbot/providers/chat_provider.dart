@@ -57,8 +57,8 @@ class ChatNotifier extends StateNotifier<ChatState> {
     final artisanCraft = _ref.read(userProfileProvider).craftType;
     final isHi = languageCode == 'hi';
     final welcomeMsg = isHi
-        ? 'नमस्ते! मैं कला-मित्र हूँ, कलासेतु में आपका शिल्प व बाज़ार सहायक।\n\nमैं आपको शिल्प सुधारने, सरकारी योजनाओं (पीएम विश्वकर्मा/मुद्रा), बाज़ार के रुझान, उचित मूल्य निर्धारण समझने, या किसी भी स्क्रीन पर ले जाने में मदद कर सकता हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?'
-        : 'Namaste! I am KalaMitra, your artisan assistant and market guide for Craftsy.\n\nI can help you improve your craft quality, explore government schemes (PM Vishwakarma / Mudra), understand fair pricing, or navigate to any screen. How can I help you today?';
+        ? 'नमस्ते! मैं क्राफ्ट-मित्र हूँ, Craftsy में आपका शिल्प व बाज़ार सहायक।\n\nमैं आपको शिल्प सुधारने, सरकारी योजनाओं (पीएम विश्वकर्मा/मुद्रा), बाज़ार के रुझान, उचित मूल्य निर्धारण समझने, या किसी भी स्क्रीन पर ले जाने में मदद कर सकता हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?'
+        : 'Namaste! I am CraftMitra, your artisan assistant and market guide for Craftsy.\n\nI can help you improve your craft quality, explore government schemes (PM Vishwakarma / Mudra), understand fair pricing, or navigate to any screen. How can I help you today?';
 
     final topics = await _service.getQuickTopics(languageCode: languageCode);
 

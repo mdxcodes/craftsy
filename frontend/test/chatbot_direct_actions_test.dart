@@ -239,7 +239,7 @@ void main() {
     expect(lastMsg.text, contains('synced'));
   });
 
-  test('KalaMitra assistant persona and asterisk elimination', () async {
+  test('CraftMitra assistant persona and asterisk elimination', () async {
     final container = ProviderContainer(
       overrides: [
         chatServiceProvider.overrideWithValue(fakeService),

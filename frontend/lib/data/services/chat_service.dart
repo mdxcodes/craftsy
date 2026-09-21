@@ -402,8 +402,8 @@ class HttpChatService implements ChatService {
     return ChatMessageModel.assistant(
       text: suggestionPrefix +
           (isQueryHindi
-              ? 'नमस्ते! मैं कला-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपको उत्पाद जोड़ने, मूल्य निर्धारण, सरकारी योजनाओं और किसी भी स्क्रीन पर ले जाने में मदद कर सकता हूँ।'
-              : 'Namaste! I am KalaMitra, your artisan assistant and guide for Craftsy. Ask me about craft improvement, govt schemes, pricing, or ask me to take you to any screen!'),
+              ? 'नमस्ते! मैं क्राफ्ट-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपको उत्पाद जोड़ने, मूल्य निर्धारण, सरकारी योजनाओं और किसी भी स्क्रीन पर ले जाने में मदद कर सकता हूँ।'
+              : 'Namaste! I am CraftMitra, your artisan assistant and guide for Craftsy. Ask me about craft improvement, govt schemes, pricing, or ask me to take you to any screen!'),
       action: defaultMismatchAction,
       suggestedQueries: isQueryHindi
           ? ['पीएम विश्वकर्मा योजना क्या है?', 'शिल्प सुधार के सुझाव', 'माय कैटलॉग खोलें', 'मेरी कमाई दिखाएं']

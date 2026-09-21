@@ -84,7 +84,7 @@ class CraftMitraFab extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'kalamitra_title'.tr(),
+                  'craftmitra_title'.tr(),
                   style: AppTextStyles.labelLarge.copyWith(
                     color: AppColors.cardSurface,
                     fontWeight: FontWeight.w700,
