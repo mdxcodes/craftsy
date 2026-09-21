@@ -1,5 +1,5 @@
 """
-Tests for KalaMitra Direct Action Execution (Tool Calling).
+Tests for CraftMitra Direct Action Execution (Tool Calling).
 """
 
 from fastapi.testclient import TestClient

@@ -18,7 +18,7 @@
 9. [Feature 5: Dual Offline-First Storage & Sync Engine](#9-feature-5-dual-offline-first-storage--sync-engine)
 10. [Feature 6: Product Catalogue & Inventory Management](#10-feature-6-product-catalogue--inventory-management)
 11. [Feature 7: Social Media Launchpad (WhatsApp, Instagram, Facebook)](#11-feature-7-social-media-launchpad-whatsapp-instagram-facebook)
-12. [Feature 8: KalaMitra AI Chatbot & Navigation Agent](#12-feature-8-kalamitra-ai-chatbot--navigation-agent)
+12. [Feature 8: CraftMitra AI Chatbot & Navigation Agent](#12-feature-8-craftmitra-ai-chatbot--navigation-agent)
 13. [Feature 9: Order Management, AI Packaging Advisory & PDF Labels](#13-feature-9-order-management-ai-packaging-advisory--pdf-labels)
 14. [Feature 10: Artisan Performance & Revenue Analytics](#14-feature-10-artisan-performance--revenue-analytics)
 15. [Feature 11: On-Device Bilingual TTS & Page Guide System](#15-feature-11-on-device-bilingual-tts--page-guide-system)
@@ -64,7 +64,7 @@ flowchart TD
 
     subgraph Tier1 ["1. Client Layer — Flutter App (Android / iOS)"]
         UI["Mobile Presentation & User Workflows
-• 5-Step Cataloging Wizard  • KalaMitra AI Chatbot & Agent
+• 5-Step Cataloging Wizard  • CraftMitra AI Chatbot & Agent
 • Orders & Packaging Advice  • Performance Analytics
 • Social Media Launchpad  • Onboarding Tutorial"]
         TTS["On-Device TTS Engine (AppTtsService)
@@ -110,7 +110,7 @@ rembg (U²-Net) + CLAHE + Auto-Crop + 1080×1080 Canvas"]
 Whisper Large v3 + Craft Glossary Biasing + Silence Filter"]
         Pricing["Dynamic Pricing Engine (ML/pricing)
 Cost Floor Enforcer + Gemini Embeddings + ChromaDB RAG"]
-        KalaMitra["KalaMitra Conversational Agent
+        CraftMitra["CraftMitra Conversational Agent
 Groq Cloud LLM + Craft Context + Tool Actions"]
         SocialAI["Social Media Caption Generator
 Groq primary → Gemini Vision fallback
@@ -132,9 +132,9 @@ Groq primary → Gemini Vision fallback
     Services --> CV
     Services --> ASR
     Services --> Pricing
-    Services --> KalaMitra
+    Services --> CraftMitra
     Services --> SocialAI
-    KalaMitra <--> Models
+    CraftMitra <--> Models
     Pricing <--> Models
     SocialAI <--> Models
     State -.->|"Direct Native Intents
@@ -143,7 +143,7 @@ Groq primary → Gemini Vision fallback
 
     class UI,State,TTS client;
     class HiveStore,DriftQueue,Gateway,DB,Services gateway;
-    class CV,ASR,Pricing,KalaMitra,SocialAI ai;
+    class CV,ASR,Pricing,CraftMitra,SocialAI ai;
     class ONDC,Social,Models external;
 ```
 
@@ -191,7 +191,7 @@ Groq primary → Gemini Vision fallback
 | Layer | Technology | Role |
 |-------|-----------|------|
 | Speech-to-Text | Whisper Large v3 (via Groq / OpenAI-compatible endpoint) | Regional audio transcription with craft glossary prompt biasing |
-| Primary LLM | Groq Cloud (`openai/gpt-oss-120b`) | Catalog listing generation, pricing reasoning, KalaMitra agent, social captions (primary) |
+| Primary LLM | Groq Cloud (`openai/gpt-oss-120b`) | Catalog listing generation, pricing reasoning, CraftMitra agent, social captions (primary) |
 | Multimodal LLM | Google Gemini (`gemini-3.6-flash`) | Social media caption generation (fallback), cost-breakdown analysis, multimodal vision |
 | Embeddings | Gemini `gemini-embedding-001` | 3072-dimensional multimodal embeddings for ChromaDB pricing RAG |
 | Computer Vision | rembg (U²-Net), OpenCV, Pillow | Background removal, CLAHE lighting, gray-world white balance, 1080×1080 canvas |
@@ -226,7 +226,7 @@ craftsy/
 │   │   └── voice.py                # POST /api/v1/voice/{transcribe,process}
 │   ├── services/
 │   │   ├── catalog_service.py      # Multimodal cataloging: silence check, glossary biasing, LLM listing
-│   │   ├── chat_service.py         # KalaMitra agent: system prompt, guardrails, direct action parsing
+│   │   ├── chat_service.py         # CraftMitra agent: system prompt, guardrails, direct action parsing
 │   │   ├── groq_client.py          # Groq Cloud API wrapper (chat completions + Whisper STT)
 │   │   ├── pricing_service.py      # Cost floor math + ChromaDB RAG + LLM pricing inference
 │   │   ├── social_media_service.py # Per-channel caption generation (Groq primary, Gemini fallback)
@@ -295,7 +295,7 @@ craftsy/
             ├── add_product/        # 5-step multimodal product digitization wizard
             ├── auth/               # Splash, Language, Sign-In, Register, OTP, NGO Auth screens
             ├── catalogue/          # Product grid, search, filters, product detail
-            ├── chatbot/            # KalaMitra FAB, chat sheet, direct action handlers
+            ├── chatbot/            # CraftMitra FAB, chat sheet, direct action handlers
             ├── home/               # HomeShell (IndexedStack, 4-tab bottom nav + FAB)
             ├── notifications/      # Notifications screen (TTS per-notification, markAllRead)
             ├── orders/             # Orders list, order detail, PDF label, packaging advisory
@@ -715,11 +715,11 @@ social_drafts(id PK, listing_id FK→products NULLABLE, draft_key NULLABLE,
 
 ---
 
-## 12. Feature 8: KalaMitra AI Chatbot & Navigation Agent
+## 12. Feature 8: CraftMitra AI Chatbot & Navigation Agent
 
 ### 12.1 User-Facing Flow
 
-1. **Invocation**: Tapping the floating KalaMitra mascot FAB (`KalaMitraFab`) on HomeShell → opens `ChatbotSheet` as a bottom sheet, or navigate to `/assistant` for full-screen.
+1. **Invocation**: Tapping the floating CraftMitra mascot FAB (`CraftMitraFab`) on HomeShell → opens `ChatbotSheet` as a bottom sheet, or navigate to `/assistant` for full-screen.
 2. **Input**: Artisan taps quick prompt chip, types text, or holds voice record button.
 3. **Voice Path**: Audio → `POST /api/v1/chat/voice` → Whisper transcription → routed into `ChatService`.
 4. **System Prompt Injection**: `chat_service.py` injects artisan profile context (registered craft, cluster, language), curated domain knowledge (PM Vishwakarma, Pehchan Card, Mudra Loans, defect prevention, safe packaging), and strict formatting rules.
@@ -755,7 +755,7 @@ Drains Drift offline queue immediately"]
 | File | Role |
 |------|------|
 | `frontend/lib/features/chatbot/screens/chatbot_sheet.dart` | Chat UI, history, voice input, TTS playback |
-| `frontend/lib/features/chatbot/widgets/kalamitra_fab.dart` | Floating action button on HomeShell |
+| `frontend/lib/features/chatbot/widgets/craftmitra_fab.dart` | Floating action button on HomeShell |
 | `frontend/lib/data/services/chat_service.dart` | HTTP calls + direct action parsing |
 | `frontend/lib/data/models/chat_message.dart` | `ChatMessage`, `DirectAction` models |
 | `backend/routers/chat.py` | Chat endpoints + rate limiting |
@@ -1195,7 +1195,7 @@ sequenceDiagram
 - **API Rate Limiting**:
   - Chat endpoint: 20 requests/minute/client IP.
   - Social caption generation: 5 regenerations/hour/listing (in-memory sliding window).
-- **Accessible Prompt Guardrails**: System prompts enforce clean plain-text output (zero asterisks) and restrict KalaMitra to craft guidance, government schemes, and marketplace assistance only.
+- **Accessible Prompt Guardrails**: System prompts enforce clean plain-text output (zero asterisks) and restrict CraftMitra to craft guidance, government schemes, and marketplace assistance only.
 - **CORS**: Currently wide-open for development. Restrict `cors_origins` in `backend/config.py` before production.
 - **Token Storage**: Auth tokens stored in Hive `auth_box` (encrypted at rest by Hive on supported platforms).
 
@@ -1219,7 +1219,7 @@ sequenceDiagram
 | Test File | Path | Focus |
 |-----------|------|-------|
 | Chatbot Direct Actions | `frontend/test/chatbot_direct_actions_test.dart` | Riverpod chat notifier mutating Hive status + undo |
-| KalaMitra Redesign | `frontend/test/kalamitra_redesign_test.dart` | KalaMitra UI rendering, voice input integration |
+| CraftMitra Redesign | `frontend/test/craftmitra_redesign_test.dart` | CraftMitra UI rendering, voice input integration |
 | Add Product Flow | `frontend/test/add_product_flow_test.dart` | Multi-step draft progression, resumption, validation |
 | Bilingual Listing | `frontend/test/add_product_bilingual_test.dart` | EN + HI field population from voice transcription |
 | Artisan Analytics | `frontend/test/artisan_analytics_test.dart` | Fair Wage Premium calculations |
@@ -1251,7 +1251,7 @@ All variables are loaded from the root `.env` file by `backend/config.py` (`Sett
 | Variable | Example Value | Required | Purpose |
 |----------|--------------|----------|---------|
 | `GEMINI_API_KEY` | `AIzaSy...` | **Yes** | Google Gemini API key — used for catalog listing generation, social caption fallback, and price embeddings (`gemini-3.6-flash`, `gemini-embedding-001`) |
-| `GROQ_API_KEY` | `gsk_...` | **Yes*** | Groq Cloud API key for chat completions (`openai/gpt-oss-120b`) — primary LLM for KalaMitra, cataloging, and social captions |
+| `GROQ_API_KEY` | `gsk_...` | **Yes*** | Groq Cloud API key for chat completions (`openai/gpt-oss-120b`) — primary LLM for CraftMitra, cataloging, and social captions |
 | `WHISPER_API_KEY` | `sk_...` | **Yes*** | API key for Whisper transcription endpoint (can be same as GROQ_API_KEY when using Groq's Whisper endpoint) |
 | `WHISPER_BASE_URL` | `https://api.groq.com/openai/v1` | No | Override Whisper endpoint — defaults to OpenAI. Point to Groq for `whisper-large-v3` |
 | `WHISPER_MODEL` | `whisper-large-v3` | No | Whisper model ID — default `whisper-large-v3` |

@@ -1,5 +1,5 @@
 """
-Tests for KalaMitra Chatbot & In-App Navigation Agent API.
+Tests for CraftMitra Chatbot & In-App Navigation Agent API.
 """
 
 from fastapi.testclient import TestClient

@@ -6,8 +6,8 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/providers/app_providers.dart';
 import '../screens/chatbot_sheet.dart';
 
-class KalaMitraFab extends ConsumerWidget {
-  const KalaMitraFab({super.key});
+class CraftMitraFab extends ConsumerWidget {
+  const CraftMitraFab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,7 +65,7 @@ class KalaMitraFab extends ConsumerWidget {
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/images/kalamitra_logo.png',
+                      'assets/images/craftmitra_logo.png',
                       width: 28,
                       height: 28,
                       fit: BoxFit.contain,
@@ -98,5 +98,10 @@ class KalaMitraFab extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+// Backward-compatibility alias
+typedef KalaMitraFab = CraftMitraFab;
   }
 }

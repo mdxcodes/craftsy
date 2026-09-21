@@ -1,5 +1,5 @@
 """
-KalaMitra Chatbot & Agent Navigation Router.
+CraftMitra Chatbot & Agent Navigation Router.
 
 Exposes conversational AI assistance and navigation agent endpoints for Craftsy.
 """
@@ -73,7 +73,7 @@ async def get_quick_topics() -> Dict[str, Any]:
     Returns curated starter topics and sample queries for new chat conversations.
     """
     return {
-        "welcome_message": "Namaste! I am KalaMitra, your artisan assistant and guide. I can help you improve your crafts, learn market trends, explore government schemes & finance, or navigate Craftsy. How can I assist you today?",
+        "welcome_message": "Namaste! I am CraftMitra, your artisan assistant and guide. I can help you improve your crafts, learn market trends, explore government schemes & finance, or navigate Craftsy. How can I assist you today?",
         "welcome_message_hi": "नमस्ते! मैं कला-मित्र हूँ, आपका शिल्प व बाज़ार सहायक। मैं आपके शिल्प को निखारने, सरकारी योजनाओं व ऋण की जानकारी देने, बाज़ार के रुझान समझने, और Craftsy ऐप में आपकी मदद करने के लिए यहाँ हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?",
         "topics": [
             {
@@ -153,7 +153,7 @@ async def send_voice_chat_message(
     artisan_craft: Optional[str] = Form(None, description="Registered craft type from artisan profile"),
 ) -> VoiceChatResponseSchema:
     """
-    Process an artisan's spoken voice note with KalaMitra using Whisper STT.
+    Process an artisan's spoken voice note with CraftMitra using Whisper STT.
     Transcribes audio in the spoken language using Whisper, then generates conversational answer + navigation action.
     Protected by rate limits.
     """
@@ -213,7 +213,7 @@ async def send_voice_chat_message(
                 suggested_queries=[],
             )
 
-        # Process user question with KalaMitra AI Chatbot
+        # Process user question with CraftMitra AI Chatbot
         # We pass the app language code to chat_service so it can detect language mismatches
         chat_req = ChatRequestSchema(
             message=user_transcript,

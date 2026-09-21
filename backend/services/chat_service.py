@@ -1,5 +1,5 @@
 """
-KalaMitra AI Chatbot & In-App Navigation Agent Service.
+CraftMitra AI Chatbot & In-App Navigation Agent Service.
 
 Powered by Groq Cloud with offline rule-based fallback.
 Answers queries about Craftsy (cataloging, voice descriptions, fair pricing,
@@ -55,7 +55,7 @@ Unless the user explicitly asks about some other specific craft (e.g. asking abo
 - ONLY if the artisan explicitly specifies a different craft in their question (e.g. "Tell me about blue pottery" or "How is Chanderi saree woven?"), then provide information for that requested craft instead of their profile craft.
 """
 
-    return f"""You are KalaMitra (कला-मित्र), the warm, respectful, expert AI Artisan Assistant and General Helper (शिल्प व बाज़ार सहायक) for Craftsy — an in-app platform dedicated to empowering traditional Indian craftspeople, handloom weavers, potters, folk artists, and metalworkers.
+    return f"""You are CraftMitra (क्राफ्ट-मित्र), the warm, respectful, expert AI Artisan Assistant and General Helper (शिल्प व बाज़ार सहायक) for Craftsy — an in-app platform dedicated to empowering traditional Indian craftspeople, handloom weavers, potters, folk artists, and metalworkers.
 {craft_context}
 You are an all-in-one assistant, mentor, and companion. You are NOT just an app navigator. Artisans can ask you general questions about their craft, marketplace, suggestions, finance, schemes, and current affairs.
 
@@ -174,10 +174,9 @@ class ChatService:
             is_hi = app_lang == "hi"
             return ChatResponseSchema(
                 reply=(
-                    "नमस्ते! मैं कला-मित्र (KalaMitra) हूँ, आपका शिल्प व बाज़ार सहायक। मैं उत्पाद जोड़ने, शिल्प सुधारने, सरकारी योजनाओं (विश्वकर्मा) और उचित मूल्य निर्धारण में आपकी मदद कर सकता हूँ।"
+                    "नमस्ते! मैं क्राफ्ट-मित्र (CraftMitra) हूँ, आपका शिल्प व बाज़ार सहायक। मैं उत्पाद जोड़ने, शिल्प सुधारने, सरकारी योजनाओं (विश्वकर्मा) और उचित मूल्य निर्धारण में आपकी मदद कर सकता हूँ।"
                     if is_hi
-                    is_hi
-                    else "Namaste! I am KalaMitra, your artisan assistant and guide for Craftsy. I can help you add products, improve craft quality, understand schemes like PM Vishwakarma, and navigate the app."
+                    else "Namaste! I am CraftMitra, your artisan assistant and guide for Craftsy. I can help you add products, improve craft quality, understand schemes like PM Vishwakarma, and navigate the app."
                 ),
                 action=None,
                 suggested_queries=[
@@ -237,7 +236,7 @@ class ChatService:
         # Comprehensive lenient whitelist for all artisan, craft, scheme, and market queries
         core_craft_app_terms = [
             # App & Navigation
-            "craftsy", "kalamitra", "product", "saman", "craft", "artisan", "karigar",
+            "craftsy", "craftmitra", "product", "saman", "craft", "artisan", "karigar",
             "hastshilp", "pottery", "textile", "woodwork", "painting", "jewelry", "brass",
             "clay", "mitti", "lakdi", "silk", "cotton", "saree", "dupatta", "price",
             "pricing", "cost", "kamai", "bikri", "sales", "earning", "photo", "image",
@@ -355,7 +354,7 @@ class ChatService:
                 reply=(
                     "मैं कोडिंग या प्रोग्रामिंग कार्यों में सहायता नहीं कर सकता। मैं केवल Craftsy ऐप, हस्तशिल्प और कारीगरों के व्यवसाय के लिए बनाया गया हूँ।"
                     if is_hi
-                    else "I cannot write or debug computer code. I am KalaMitra, dedicated solely to assisting artisans with craft improvement, schemes, and the Craftsy app."
+                    else "I cannot write or debug computer code. I am CraftMitra, dedicated solely to assisting artisans with craft improvement, schemes, and the Craftsy app."
                 ),
                 action=None,
                 suggested_queries=[
@@ -1264,12 +1263,12 @@ class ChatService:
         craft_mention_en = f"Your registered craft category is '{profile_craft_raw}'. " if profile_craft_raw else ""
         if is_hindi:
             return ChatResponseSchema(
-                reply=suggestion_prefix + f"नमस्ते! मैं कला-मित्र (KalaMitra) हूँ, आपका शिल्प व बाज़ार सहायक। {craft_mention_hi}मैं ऐप नेविगेशन, शिल्प सुधार, सरकारी योजनाओं (विश्वकर्मा) और उचित मूल्य तय करने में आपकी सहायता कर सकता हूँ। आप क्या जानना चाहते हैं?",
+                reply=suggestion_prefix + f"नमस्ते! मैं क्राफ्ट-मित्र (CraftMitra) हूँ, आपका शिल्प व बाज़ार सहायक। {craft_mention_hi}मैं ऐप नेविगेशन, शिल्प सुधार, सरकारी योजनाओं (विश्वकर्मा) और उचित मूल्य तय करने में आपकी सहायता कर सकता हूँ। आप क्या जानना चाहते हैं?",
                 action=default_action,
                 suggested_queries=["सरकारी योजनाएं बताएं", "शिल्प सुधार सुझाव", "नया उत्पाद कैसे जोड़ें?", "माय कैटलॉग खोलें"],
             )
         return ChatResponseSchema(
-            reply=suggestion_prefix + f"Namaste! I am KalaMitra, your artisan assistant and guide. {craft_mention_en}I can help answer your questions about craft techniques, government schemes like PM Vishwakarma, fair pricing, market trends, or take you directly to any screen in the app. How can I help you?",
+            reply=suggestion_prefix + f"Namaste! I am CraftMitra, your artisan assistant and guide. {craft_mention_en}I can help answer your questions about craft techniques, government schemes like PM Vishwakarma, fair pricing, market trends, or take you directly to any screen in the app. How can I help you?",
             action=default_action,
             suggested_queries=["Tell me about PM Vishwakarma", "How to improve my craft?", "How to add a product?", "Open my catalogue"],
         )
