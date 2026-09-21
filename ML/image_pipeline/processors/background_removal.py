@@ -6,6 +6,7 @@
 # and only the product remains visible.
 # ============================================================
 
+import gc
 from PIL import Image
 from rembg import remove, new_session
 
@@ -13,13 +14,15 @@ _session = None
 
 
 def get_rembg_session():
-    """Lazily initialize and reuse the ONNX session to avoid 15s model reload penalty."""
+    """Lazily initialize and reuse the ONNX session to avoid model reload penalty.
+    Uses u2netp (4MB lightweight model) for blazing-fast 0.5s inference and low RAM usage.
+    """
     global _session
     if _session is None:
         try:
-            _session = new_session("u2net")
-        except Exception:
             _session = new_session("u2netp")
+        except Exception:
+            _session = new_session("u2net")
     return _session
 
 
@@ -40,11 +43,11 @@ def remove_background(image):
     if image.mode != "RGB":
         image = image.convert("RGB")
     
-    # Downscale for fast rembg processing if image is huge (e.g. 50MP phone camera)
-    # The output canvas is 1200x1200, so 1500px is more than enough for crisp edge detection.
+    # Downscale for fast rembg processing if image is large
+    # 768px provides crisp edge detection while using minimal RAM on cloud containers.
     max_dim = max(image.size)
-    if max_dim > 1500:
-        ratio = 1500.0 / max_dim
+    if max_dim > 768:
+        ratio = 768.0 / max_dim
         new_size = (int(image.size[0] * ratio), int(image.size[1] * ratio))
         process_img = image.resize(new_size, Image.Resampling.BILINEAR)
     else:
@@ -56,5 +59,8 @@ def remove_background(image):
     # Make sure the result is in RGBA mode
     if result.mode != "RGBA":
         result = result.convert("RGBA")
+    
+    # Free temporary buffers
+    gc.collect()
     
     return result

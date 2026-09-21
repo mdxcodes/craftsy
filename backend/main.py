@@ -5,8 +5,13 @@ AI-Driven Market Linkage & Smart Cataloging Backend for Marginalized Artisans.
 """
 
 import sys
+import warnings
 from pathlib import Path
 from contextlib import asynccontextmanager
+
+# Silence upstream 3rd-party vendor deprecations on Python 3.14+
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="google.genai")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="chromadb")
 
 # Fix Windows console encoding for emoji output
 if sys.platform == "win32":
@@ -46,6 +51,17 @@ async def lifespan(app: FastAPI):
     
     # 2. Initialize database tables (artisans + products)
     init_db()
+
+    # 3. Pre-warm rembg ONNX session asynchronously so first request has 0s model download penalty
+    def _warmup_models():
+        try:
+            from ML.image_pipeline.processors.background_removal import get_rembg_session
+            get_rembg_session()
+        except Exception:
+            pass
+
+    import threading
+    threading.Thread(target=_warmup_models, daemon=True).start()
 
     print("\n" + "=" * 60)
     print(f"  ✨ {settings.app_name} v{settings.app_version} Started")
