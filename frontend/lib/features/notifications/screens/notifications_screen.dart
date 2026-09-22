@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../core/services/app_tts_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -85,6 +86,36 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
+  String _actionLabelFor(NotificationType type) {
+    switch (type) {
+      case NotificationType.listingLive:
+        return 'notif_action_view_listing'.tr();
+      case NotificationType.pendingSync:
+        return 'notif_action_view_drafts'.tr();
+      case NotificationType.buyerView:
+        return 'notif_action_view_product'.tr();
+      case NotificationType.priceSuggestion:
+        return 'notif_action_view_suggestion'.tr();
+      case NotificationType.newOrder:
+        return 'notif_action_view_order'.tr();
+    }
+  }
+
+  String _actionRouteFor(NotificationType type) {
+    switch (type) {
+      case NotificationType.listingLive:
+        return '/catalogue';
+      case NotificationType.pendingSync:
+        return '/catalogue';
+      case NotificationType.buyerView:
+        return '/catalogue';
+      case NotificationType.priceSuggestion:
+        return '/catalogue';
+      case NotificationType.newOrder:
+        return '/orders';
+    }
+  }
+
   String _relativeTime(DateTime t) {
     final diff = DateTime.now().difference(t);
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
@@ -127,58 +158,105 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     const Icon(Icons.notifications_none, size: 56, color: AppColors.textTertiary),
                     const SizedBox(height: AppSpacing.md),
                     Text('no_notifications_title'.tr(), style: AppTextStyles.headlineMedium),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'notif_local_only'.tr(),
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkFaint),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),
             )
-          : ListView.separated(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              itemCount: notifications.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                final item = notifications[index];
-                final (icon, color) = _iconAndColorFor(item.type);
-                return Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppRadii.card),
-                    border: Border.all(color: AppColors.oak, width: 0.6),
+          : Column(
+              children: [
+                // Honest local-only notice
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.screenPadding,
+                    vertical: AppSpacing.xs,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.sm),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.14),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(icon, color: color, size: AppSpacing.iconSize),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.messageKey.tr(), style: AppTextStyles.bodyMedium),
-                            const SizedBox(height: 4),
-                            Text(_relativeTime(item.timestamp), style: AppTextStyles.caption),
-                          ],
-                        ),
-                      ),
-                      SpeakerAffordance.compact(
-                        isSpeaking: _speakingId == item.id,
-                        onTap: () => _speakNotification(
-                          item.id,
-                          item.messageKey.tr(),
-                          item.timestamp,
-                        ),
-                      ),
-                    ],
+                  child: Semantics(
+                    label: 'notif_local_only'.tr(),
+                    child: Text(
+                      'notif_local_only'.tr(),
+                      style: AppTextStyles.caption.copyWith(color: AppColors.inkFaint),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                );
-              },
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                    itemCount: notifications.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (context, index) {
+                      final item = notifications[index];
+                      final (icon, color) = _iconAndColorFor(item.type);
+                      final actionLabel = _actionLabelFor(item.type);
+                      final actionRoute = _actionRouteFor(item.type);
+                      return Semantics(
+                        label: '${item.messageKey.tr()}, ${_relativeTime(item.timestamp)}',
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppRadii.card),
+                            border: Border.all(color: AppColors.oak, width: 0.6),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(AppSpacing.sm),
+                                    decoration: BoxDecoration(
+                                      color: color.withValues(alpha: 0.14),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(icon, color: color, size: AppSpacing.iconSize),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(item.messageKey.tr(), style: AppTextStyles.bodyMedium),
+                                        const SizedBox(height: 4),
+                                        Text(_relativeTime(item.timestamp), style: AppTextStyles.caption),
+                                      ],
+                                    ),
+                                  ),
+                                  SpeakerAffordance.compact(
+                                    isSpeaking: _speakingId == item.id,
+                                    onTap: () => _speakNotification(
+                                      item.id,
+                                      item.messageKey.tr(),
+                                      item.timestamp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () => context.push(actionRoute),
+                                    child: Text(actionLabel),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
     );
   }

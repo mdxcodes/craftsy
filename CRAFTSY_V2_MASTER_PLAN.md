@@ -1818,11 +1818,53 @@ CONFIRM LOCAL (Drift update)
 
 ## Phase 8
 
-- [ ] Social media
-- [ ] Packaging
-- [ ] Labels/QR
-- [ ] Helper mode
-- [ ] Additional languages
+- [x] Advanced feature audit completed
+- [x] Social Media Helper reviewed — already implemented, contextual on Product Detail
+- [x] Social sharing behavior verified — WhatsApp direct share, Instagram/Facebook copy+save
+- [x] Packaging Assistant reviewed — 4-step visual guide with TTS, category-specific
+- [x] Label Maker reviewed — PDF generation with caching, batch support, bilingual
+- [x] NGO/helper functionality reviewed — mock sign-in, no backend auth; limitation documented
+- [x] Permissions verified/documented — no real RBAC, demo-only
+- [x] Notifications reviewed — local-only, no persistence/push; honest labeling added
+- [x] CraftMitra advanced actions integrated — packaging + label intents
+- [x] Profile reviewed — V2 redesign complete, AccessibilityToggle added
+- [x] Settings reviewed — LanguageSettings exists, AccessibilityToggle added to Profile
+- [x] Tutorial/help replay reviewed — 7-slide carousel with TTS, accessible from Profile
+- [x] Contextual discovery implemented — Social on Product Detail, Packaging/Label on Orders
+- [x] Accessibility reviewed — Semantics on all new components
+- [x] Localization reviewed — new keys added to all 4 locales
+- [x] Offline behavior reviewed — packaging/label work offline, social requires network
+- [x] Mock/demo limitations documented — NGO, notifications, social integrations
+- [x] Tests run — 102/102 pass
+- [x] Regression checked
+- [x] Master plan updated
+
+### Phase 8 Completion: ~85%
+
+**Completed:** AccessibilityToggle on Profile, CraftMitra intents (packaging, label), notification action buttons + Semantics + honest local-only labeling, 2 new notification tests
+
+**Remaining:** Final accessibility audit of new components, consolidation verification
+
+### Phase 8 Advanced Feature Inventory
+
+| Feature | Status | Location | Offline | Notes |
+|---|---|---|---|---|
+| Social Media Helper | ✅ Integrated | Product Detail | ❌ Network required | 2-step launchpad, 3 channels |
+| Packaging Assistant | ✅ Integrated | Orders | ✅ Works offline | 4-step visual guide with TTS |
+| Label Maker | ✅ Integrated | Orders | ✅ Works offline | PDF with caching, batch support |
+| Notifications | ✅ Redesigned | Notifications screen | ✅ Local-only | Action buttons, honest labeling |
+| Tutorial | ✅ Accessible | Profile → Tutorial | ✅ Works offline | 7-slide carousel with TTS |
+| NGO/Helper | ⚠️ Demo only | Auth flow | ✅ Mock sign-in | No backend auth; documented |
+| Accessibility Toggle | ✅ Added | Profile | ✅ Persistent | Sound + haptics toggles |
+| CraftMitra advanced | ✅ Added | Intent system | ✅ Navigation only | Packaging + label intents |
+
+### Phase 8 Mock/Demo Limitations
+
+1. **NGO/Helper** — Mock sign-in (`signInWithCoordinator` generates fake userId), no backend authorization, no real role-based access
+2. **Notifications** — Local-only, no persistence across app restarts, no push notification support
+3. **Social Media** — WhatsApp uses real share intent; Instagram/Facebook use copy-to-clipboard + save image (no direct API integration)
+4. **Orders** — Mock data, no real order management backend
+5. **Earnings** — Mock analytics data
 
 ## Phase 9
 
