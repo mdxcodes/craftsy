@@ -9,6 +9,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../../core/widgets/visual_status_chip.dart';
 import '../../../core/widgets/motifs/craft_category_badge.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
@@ -264,20 +265,37 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  (IconData, Color, Color, String) _statusVisual(ProductStatus status) {
+  String _statusLabelKey(ProductStatus status) {
     switch (status) {
       case ProductStatus.live:
-        return (Icons.check_circle, AppColors.statusSuccessBg, AppColors.statusSuccessFg, 'status_live');
+        return 'status_live';
       case ProductStatus.pendingSync:
-        return (Icons.cloud_queue, AppColors.statusPendingBg, AppColors.statusPendingFg, 'status_pending_sync');
+        return 'status_pending_sync';
       case ProductStatus.draft:
-        return (Icons.edit_note, AppColors.parchmentDeep, AppColors.inkSoft, 'status_draft');
+        return 'status_draft';
       case ProductStatus.sold:
-        return (Icons.sell, AppColors.goldLight, AppColors.goldDark, 'status_sold');
+        return 'status_sold';
       case ProductStatus.soldOut:
-        return (Icons.remove_shopping_cart_outlined, AppColors.terracottaLight, AppColors.terracottaDark, 'status_sold_out');
+        return 'status_sold_out';
       case ProductStatus.listingRemoved:
-        return (Icons.visibility_off_outlined, AppColors.parchmentDeep, AppColors.inkFaint, 'status_listing_removed');
+        return 'status_listing_removed';
+    }
+  }
+
+  VisualStatusType _mapStatusToVisualType(ProductStatus status) {
+    switch (status) {
+      case ProductStatus.live:
+        return VisualStatusType.success;
+      case ProductStatus.pendingSync:
+        return VisualStatusType.warning;
+      case ProductStatus.draft:
+        return VisualStatusType.pending;
+      case ProductStatus.sold:
+        return VisualStatusType.success;
+      case ProductStatus.soldOut:
+        return VisualStatusType.error;
+      case ProductStatus.listingRemoved:
+        return VisualStatusType.offline;
     }
   }
 
@@ -370,7 +388,7 @@ class ProductDetailScreen extends ConsumerWidget {
             ),
           );
 
-          final (statusIcon, statusBg, statusFg, statusLabelKey) = _statusVisual(product.status);
+          final visualType = _mapStatusToVisualType(product.status);
           final isNonLive = product.isNonLive;
 
           return CustomScrollView(
@@ -444,7 +462,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'relist',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.refresh, color: AppColors.statusSuccessFg, size: 18),
+                                    const Icon(Icons.refresh, color: AppColors.teal, size: 18),
                                     const SizedBox(width: 8),
                                     Text('relist_item_btn'.tr()),
                                   ],
@@ -455,7 +473,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'sold_out',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.remove_shopping_cart_outlined, color: AppColors.terracotta, size: 18),
+                                    const Icon(Icons.remove_shopping_cart_outlined, color: AppColors.coral, size: 18),
                                     const SizedBox(width: 8),
                                     Text('mark_sold_out_btn'.tr()),
                                   ],
@@ -465,7 +483,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'remove_listing',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.visibility_off_outlined, color: AppColors.goldDark, size: 18),
+                                    const Icon(Icons.visibility_off_outlined, color: AppColors.inkSoft, size: 18),
                                     const SizedBox(width: 8),
                                     Text('remove_listing_btn'.tr()),
                                   ],
@@ -556,27 +574,10 @@ class ProductDetailScreen extends ConsumerWidget {
                           Flexible(child: _buildCategoryBadge(product.category)),
                           const SizedBox(width: 8),
                         ],
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: statusBg,
-                            borderRadius: BorderRadius.circular(AppRadii.chip),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(statusIcon, size: 12, color: statusFg),
-                              const SizedBox(width: 5),
-                              Text(
-                                statusLabelKey.tr(),
-                                style: AppTextStyles.labelSmall.copyWith(
-                                  color: statusFg,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11.5,
-                                ),
-                              ),
-                            ],
-                          ),
+                        VisualStatusChip(
+                          type: visualType,
+                          label: _statusLabelKey(product.status).tr(),
+                          compact: true,
                         ),
                       ],
                     ),
@@ -627,7 +628,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     Text(
                       '₹${product.price.toStringAsFixed(0)}',
                       style: AppTextStyles.headlineLarge.copyWith(
-                        color: isNonLive ? AppColors.inkSoft : AppColors.terracottaDark,
+                        color: isNonLive ? AppColors.inkSoft : AppColors.indigoDark,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -731,22 +732,18 @@ class ProductDetailScreen extends ConsumerWidget {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          const Icon(Icons.remove_shopping_cart_outlined, size: 16, color: AppColors.terracotta),
+                                          const Icon(Icons.remove_shopping_cart_outlined, size: 16, color: AppColors.coral),
                                           const SizedBox(width: 6),
                                           Flexible(
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                'mark_sold_out_btn'.tr(),
-                                                textAlign: TextAlign.center,
-                                                maxLines: 2,
-                                                style: AppTextStyles.labelMedium.copyWith(
-                                                  color: AppColors.terracotta,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  height: 1.2,
-                                                ),
+                                            child: Text(
+                                              'mark_sold_out_btn'.tr(),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              style: AppTextStyles.labelMedium.copyWith(
+                                                color: AppColors.coral,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                height: 1.2,
                                               ),
                                             ),
                                           ),
@@ -772,19 +769,15 @@ class ProductDetailScreen extends ConsumerWidget {
                                           const Icon(Icons.visibility_off_outlined, size: 16, color: AppColors.inkSoft),
                                           const SizedBox(width: 6),
                                           Flexible(
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                'remove_listing_btn'.tr(),
-                                                textAlign: TextAlign.center,
-                                                maxLines: 2,
-                                                style: AppTextStyles.labelMedium.copyWith(
-                                                  color: AppColors.inkSoft,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  height: 1.2,
-                                                ),
+                                            child: Text(
+                                              'remove_listing_btn'.tr(),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              style: AppTextStyles.labelMedium.copyWith(
+                                                color: AppColors.inkSoft,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                height: 1.2,
                                               ),
                                             ),
                                           ),

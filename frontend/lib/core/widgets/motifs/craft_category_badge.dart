@@ -108,12 +108,16 @@ class CraftCategoryBadge extends StatelessWidget {
               ),
               SizedBox(width: showPetalRing ? 7 : 5),
             ],
-            Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(
-                fontSize: 12.5,
-                color: fgColor,
-                fontWeight: FontWeight.w700,
+            Flexible(
+              child: Text(
+                label,
+                style: AppTextStyles.labelSmall.copyWith(
+                  fontSize: 12.5,
+                  color: fgColor,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

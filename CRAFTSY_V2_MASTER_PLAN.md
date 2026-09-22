@@ -1658,10 +1658,10 @@ UI (SnackBar + TTS)
 ## Phase 5
 
 - [x] Catalogue redesign — V2 design system applied
-- [ ] Product detail redesign — pending
+- [x] Product detail redesign — V2 design system applied (VisualStatusChip, indigo palette, Flexible text, no FittedBox)
 - [x] Orders redesign — V2 design system applied
 - [x] Earnings redesign — simplified hero earnings, 7-day trend, order summary
-- [ ] Profile redesign — pending
+- [x] Profile redesign — V2 design system applied (indigo palette, Card+InkWell menu tiles, Semantics)
 
 ## Phase 6
 

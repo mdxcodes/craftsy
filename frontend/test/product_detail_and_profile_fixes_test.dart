@@ -134,12 +134,20 @@ void main() {
       // Confirm IntrinsicHeight is used for the action buttons row
       expect(find.byType(IntrinsicHeight), findsAtLeastNWidgets(1));
 
-      // Confirm FittedBox is used inside both buttons for text scaling
-      expect(find.byType(FittedBox), findsAtLeastNWidgets(2));
-
       // Confirm OutlinedButton pills exist
       final buttons = find.byType(OutlinedButton);
       expect(buttons, findsNWidgets(2));
+
+      // Confirm buttons use Flexible text (not FittedBox) for large-text safety
+      expect(find.byType(FittedBox), findsNothing);
+
+      // Confirm button text has maxLines set for overflow protection
+      final buttonTexts = tester.widgetList<Text>(
+        find.descendant(of: find.byType(OutlinedButton), matching: find.byType(Text)),
+      );
+      for (final text in buttonTexts) {
+        expect(text.maxLines, greaterThanOrEqualTo(1), reason: 'Button text should have maxLines for large-text safety');
+      }
 
       final size0 = tester.getSize(buttons.at(0));
       final size1 = tester.getSize(buttons.at(1));
