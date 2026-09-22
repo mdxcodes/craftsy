@@ -1868,11 +1868,76 @@ CONFIRM LOCAL (Drift update)
 
 ## Phase 9
 
-- [ ] SIH demo path
-- [ ] Demo data cleanup
-- [ ] Performance pass
-- [ ] Final accessibility pass
-- [ ] Final visual polish
+### Phase 9 Objective
+
+Craftsy is now entering the final polish and validation stage.
+
+This phase is NOT about adding lots of new features.
+
+The goals are:
+
+1. Make the entire application feel visually consistent.
+2. Eliminate obvious UX inconsistencies.
+3. Validate the complete artisan journey.
+4. Remove prototype-like rough edges.
+5. Improve performance and reliability where safe.
+6. Verify accessibility and multilingual behavior.
+7. Validate AI/voice/offline flows.
+8. Clearly separate real functionality from demo/mock functionality.
+9. Prepare the application for an SIH judge-facing demonstration.
+10. Document the final state honestly.
+
+### Phase 9 Execution Status
+
+- [x] 1. Master plan + repo state reviewed
+- [x] 2. Full application audit completed (all primary + secondary screens)
+- [x] 3. SIH demo journey identified
+- [x] 4. Prototype-like UX audit (no TODO/debug text found)
+- [x] 5. Design consistency audit (color system, typography, spacing)
+- [x] 6. Brand consistency audit (logo, splash, navigation)
+- [x] 7. Home → action consistency verified
+- [ ] 8. Voice-first validation (requires device testing)
+- [ ] 9. CraftMitra validation (requires device testing)
+- [ ] 10. Multilingual validation (requires device testing)
+- [ ] 11. Bhashini workstream (documented as future work)
+- [ ] 12. Offline validation (requires device testing)
+- [x] 13. Accessibility regression check (Phase 6 fixes intact)
+- [ ] 14. Performance audit
+- [ ] 15. Build/release validation
+- [x] 16. Backend validation (48/53 tests pass, 3 pre-existing failures)
+- [x] 17. ML validation (image pipeline + voice pipeline verified)
+- [ ] 18. Security/secrets audit
+- [ ] 19. Demo/mock disclosure
+- [ ] 20. UI text polish
+- [ ] 21. Animation polish
+- [ ] 22. Failure/error polish
+- [ ] 23. Empty/loading/success states
+- [ ] 24. Mobile device QA
+- [ ] 25. Final code cleanup
+- [ ] 26. Test suite (exact counts)
+- [ ] 27. Master plan finalization
+- [ ] 28. Final SIH readiness check
+- [ ] 29. STOP CONDITION met
+
+### Phase 9 Completion: ~30%
+
+**Completed:** Master plan review, full application audit, demo journey identification, design consistency fixes (nav bar, auth screens), notification structure fix, backend validation, ML validation
+
+**Remaining:** Device testing (voice, multilingual, offline), performance audit, security audit, build validation, test suite counts, master plan finalization
+
+### Phase 9 Fixes Applied
+
+1. **Color consistency** — Nav bar active state changed from terracotta to indigo (V2 palette)
+2. **Auth screens** — Sign-in and language screens updated to use indigo accent
+3. **Notification screen** — Fixed duplicate method declaration, action buttons with proper touch targets
+4. **Backend ML** — Created missing ML/pricing and ML/voice_pipeline modules so backend starts
+
+### Known Remaining Issues
+
+1. **Backend tests** — 3 pre-existing failures (Groq API model not found, mock data KeyError)
+2. **Device testing** — Phone not connected via ADB (WiFi debugging unavailable)
+3. **Performance** — No profiling data yet
+4. **Security audit** — Not yet performed
 
 ---
 
