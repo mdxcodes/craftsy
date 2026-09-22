@@ -36,7 +36,11 @@ class AppImage extends StatelessWidget {
         );
 
     if (imageUrl.isEmpty) {
-      return fallback;
+      return Semantics(
+        image: true,
+        label: 'No image available',
+        child: fallback,
+      );
     }
 
     String resolvedUrl = imageUrl;
@@ -57,72 +61,92 @@ class AppImage extends StatelessWidget {
     if (!kIsWeb && !isNetwork && !isBlobOrLocalhost) {
       final file = File(resolvedUrl);
       if (file.existsSync()) {
-        return Image.file(
-          file,
-          width: width,
-          height: height,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) => fallback,
+        return Semantics(
+          image: true,
+          label: 'Product photo',
+          child: Image.file(
+            file,
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: (context, error, stackTrace) => fallback,
+          ),
         );
       }
-      return fallback;
+      return Semantics(
+        image: true,
+        label: 'No image available',
+        child: fallback,
+      );
     }
 
     if (isBlobOrLocalhost) {
-      return Image.network(
-        resolvedUrl,
-        width: width,
-        height: height,
-        fit: fit,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            width: width,
-            height: height,
-            color: AppColors.parchmentDeep,
-            child: const Center(
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: AppColors.terracotta,
+      return Semantics(
+        image: true,
+        label: 'Product photo',
+        child: Image.network(
+          resolvedUrl,
+          width: width,
+          height: height,
+          fit: fit,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: width,
+              height: height,
+              color: AppColors.parchmentDeep,
+              child: const Center(
+                child: SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.terracotta,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          debugPrint(
-            'AppImage failed to load network image: $resolvedUrl ($error)',
-          );
-          return fallback;
-        },
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint(
+              'AppImage failed to load network image: $resolvedUrl ($error)',
+            );
+            return fallback;
+          },
+        ),
       );
     }
 
     if (isNetwork) {
-      return CachedNetworkImage(
-        imageUrl: resolvedUrl,
-        width: width,
-        height: height,
-        fit: fit,
-        placeholder: (context, url) => Container(
+      return Semantics(
+        image: true,
+        label: 'Product photo',
+        child: CachedNetworkImage(
+          imageUrl: resolvedUrl,
           width: width,
           height: height,
-          color: AppColors.surfaceVariant,
-          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          fit: fit,
+          placeholder: (context, url) => Container(
+            width: width,
+            height: height,
+            color: AppColors.surfaceVariant,
+            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          ),
+          errorWidget: (context, url, error) => fallback,
         ),
-        errorWidget: (context, url, error) => fallback,
       );
     }
 
-    return Image.file(
-      File(resolvedUrl),
-      width: width,
-      height: height,
-      fit: fit,
-      errorBuilder: (context, error, stackTrace) => fallback,
+    return Semantics(
+      image: true,
+      label: 'Product photo',
+      child: Image.file(
+        File(resolvedUrl),
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => fallback,
+      ),
     );
   }
 }

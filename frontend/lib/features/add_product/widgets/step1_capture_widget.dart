@@ -13,6 +13,10 @@ import '../../../core/widgets/motifs/dotted_border_box.dart';
 import '../../../core/widgets/motifs/mehrab_clipper.dart';
 import '../../../core/providers/app_providers.dart';
 
+/// V2 Step 1 — Capture.
+///
+/// Camera-first with large capture control, visual framing guidance,
+/// minimal written instructions, and clear retake/use-photo actions.
 class Step1CaptureWidget extends ConsumerStatefulWidget {
   const Step1CaptureWidget({super.key});
 
@@ -119,7 +123,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                     color: AppColors.parchmentDeep,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: AppColors.terracotta),
+                  child: const Icon(Icons.camera_alt, color: AppColors.indigo),
                 ),
                 title: Text('take_photo'.tr(), style: AppTextStyles.headlineSmall),
                 subtitle: Text('capture_new_photo_sub'.tr(), style: AppTextStyles.bodySmall),
@@ -163,55 +167,61 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
 
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Step Title & Subtitle
+          // Step Title — short, action-oriented
           Text(
             hasImage ? 'review_photo_title'.tr() : 'capture_title'.tr(),
             style: AppTextStyles.headlineLarge,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             hasImage ? 'review_photo_subtitle'.tr() : 'capture_subtitle'.tr(),
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Cycling guidance cues with fade transitions
+          // Visual framing guidance — animated cues
           _buildGuidanceCues(),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
 
           if (!hasImage) ...[
-            // Photo capture placeholder with dotted border motif
+            // ── NO IMAGE YET: Large capture control ──────────────────────────
+            // Visual framing guide — product in frame illustration
             DottedBorderBox(
               width: double.infinity,
-              height: 200,
+              height: 220,
               backgroundColor: AppColors.parchmentDeep,
               radius: AppRadii.card,
               borderColor: AppColors.dottedBorder,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Visual framing guide icon
                   Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: const BoxDecoration(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
                       color: AppColors.cardSurface,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0x0C000000),
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
+                          color: AppColors.shadow,
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.camera_alt_rounded, size: 36, color: AppColors.terracotta),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      size: 40,
+                      color: AppColors.indigo,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     child: Text(
                       'capture_instructions'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
@@ -224,14 +234,18 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Primary action: Take Photo — large, obvious
             AppButton(
               label: 'take_photo'.tr(),
               icon: Icons.camera_alt,
               isLoading: _isPickingImage,
               onPressed: () => _pickImage(ImageSource.camera),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Secondary action: Upload from Gallery
             AppButton(
               label: 'upload_gallery'.tr(),
               icon: Icons.photo_library,
@@ -240,6 +254,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
               onPressed: () => _pickImage(ImageSource.gallery),
             ),
           ] else ...[
+            // ── IMAGE CAPTURED: Show photo + actions ─────────────────────────
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -248,7 +263,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadii.card),
                 child: SizedBox(
-                  height: 230,
+                  height: 250,
                   width: double.infinity,
                   child: AppImage(
                     imageUrl: displayImagePath,
@@ -257,18 +272,19 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
 
+            // Additional angles section
             Text(
               'additional_angles_title'.tr(),
               style: AppTextStyles.headlineSmall,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               'additional_angles_subtitle'.tr(),
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
 
             SizedBox(
               height: 72,
@@ -316,7 +332,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.add_a_photo_outlined, size: 20, color: AppColors.terracotta),
+                            const Icon(Icons.add_a_photo_outlined, size: 20, color: AppColors.indigo),
                             const SizedBox(height: 2),
                             Text(
                               'add_another_angle'.tr(),
@@ -333,14 +349,17 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.lg),
 
+            // Primary action: "Looks Good" — large, obvious
             AppButton(
               label: 'accept_photo'.tr(),
               icon: Icons.check_circle_outline,
               onPressed: () => ref.read(addProductFlowProvider.notifier).confirmPhoto(),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Secondary action: "Try Another Photo"
             AppButton(
               label: 'redo_photo'.tr(),
               icon: Icons.refresh,
@@ -348,7 +367,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
               onPressed: _showPhotoSourceSheet,
             ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );

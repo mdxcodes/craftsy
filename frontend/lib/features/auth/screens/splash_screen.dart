@@ -68,7 +68,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                     borderRadius: BorderRadius.circular(AppRadii.xl),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.terracotta.withValues(alpha: 0.1),
+                        color: AppColors.indigo.withValues(alpha: 0.1),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -91,7 +91,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
               const SizedBox(
                 width: 32,
                 height: 32,
-                child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.terracotta),
+                child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.indigo),
               ),
             ],
           ),

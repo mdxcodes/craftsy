@@ -122,13 +122,13 @@ void main() {
         ),
       );
       await tester.pump();
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
 
       // Verify title and cards render
       expect(find.text('my_stats_title'), findsOneWidget);
-      expect(find.text('fair_wage_premium_title'), findsOneWidget);
+      expect(find.text('this_month_earnings'), findsOneWidget);
       expect(find.text('sales_trend_title'), findsOneWidget);
-      expect(find.text('popular_crafts_title'), findsOneWidget);
+      expect(find.text('order_summary_title'), findsOneWidget);
     });
   });
 }

@@ -57,9 +57,13 @@ class CraftCategoryBadge extends StatelessWidget {
 
     final hasIcon = icon is! _NullPainter;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
+    return Semantics(
+      button: true,
+      label: label,
+      selected: isActive,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         padding: EdgeInsets.only(
@@ -104,16 +108,21 @@ class CraftCategoryBadge extends StatelessWidget {
               ),
               SizedBox(width: showPetalRing ? 7 : 5),
             ],
-            Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(
-                fontSize: 12.5,
-                color: fgColor,
-                fontWeight: FontWeight.w700,
+            Flexible(
+              child: Text(
+                label,
+                style: AppTextStyles.labelSmall.copyWith(
+                  fontSize: 12.5,
+                  color: fgColor,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

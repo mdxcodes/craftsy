@@ -12,8 +12,15 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/motifs/mehrab_clipper.dart';
 import '../../../core/widgets/speaker_affordance.dart';
+import '../../../core/widgets/primary_action_button.dart';
+import '../../../core/widgets/secondary_action_button.dart';
 import '../../../core/providers/app_providers.dart';
 
+/// V2 Step 3 — AI Review.
+///
+/// "Craftsy did the hard work" moment. Highly visual review with
+/// progressive disclosure — show the big picture first, let the
+/// artisan drill into details if they want.
 class Step3AiReviewWidget extends ConsumerStatefulWidget {
   const Step3AiReviewWidget({super.key});
 
@@ -64,22 +71,11 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
     }
   }
 
-  // Reads back the title and description in whichever language is currently
-  // selected. This is the app's core correctness gate: the listing text is
-  // AI-generated from the artisan's voice note, and many artisans cannot
-  // read it to check the AI understood them correctly — hearing it is the
-  // only way they can verify it before it goes live.
-  //
-  // The guide comes first so the artisan knows they are allowed to correct
-  // the text and which button moves them on; hearing the listing alone does
-  // not tell them either.
   Future<void> _speakListing() async {
     if (_tts.isSpeaking) {
       await _tts.stop();
       return;
     }
-    // The language toggle on this screen, not the app locale, decides which
-    // version is on screen — so it decides what is spoken, guide included.
     final languageCode = _selectedLanguageIndex == 0 ? 'en' : 'hi';
     final guide = TtsPageGuides.aiListingReview.forLanguage(languageCode);
     final text = '$guide${_titleController.text}. ${_descController.text}';
@@ -102,7 +98,6 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
     if (!mounted) return;
     final draft = ref.read(addProductFlowProvider);
     if (draft.originalImagePath.isEmpty || draft.currentStep != 2) return;
-    // If already enhanced and voice note transcribed, do not trigger processing again
     if (draft.isEnhanced && (draft.voiceTranscript.isNotEmpty || draft.recordedAudioPath.isEmpty)) {
       return;
     }
@@ -146,7 +141,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     color: AppColors.parchmentDeep,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: AppColors.terracotta),
+                  child: const Icon(Icons.camera_alt, color: AppColors.indigo),
                 ),
                 title: Text('take_photo'.tr(), style: AppTextStyles.headlineSmall),
                 subtitle: Text('capture_new_photo_sub'.tr(), style: AppTextStyles.bodySmall),
@@ -246,13 +241,15 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
       children: [
         SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // ── HERO: Big image + product name + price ────────────────────
               if (draft.originalImagePath.isNotEmpty) ...[
+                // Large product image
                 SizedBox(
-                  height: 240,
+                  height: 260,
                   child: hasEnhancedImage
                       ? _BeforeAfterSlider(
                           beforePath: draft.originalImagePath,
@@ -318,35 +315,38 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                           ),
                         ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.md),
+
+                // Retake photo link
                 Center(
                   child: TextButton.icon(
                     onPressed: _showRetakePhotoSheet,
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       size: 18,
-                      color: AppColors.terracottaDark,
+                      color: AppColors.indigoDark,
                     ),
                     label: Text(
                       'retake_photo_title'.tr(),
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.terracottaDark,
+                        color: AppColors.indigoDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.sm),
               ],
 
+              // ── "Your product is ready" header ──────────────────────────
               Row(
                 children: [
                   const Icon(
                     Icons.auto_awesome,
-                    color: AppColors.terracotta,
-                    size: 22,
+                    color: AppColors.indigo,
+                    size: 24,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'ai_review_title'.tr(),
@@ -359,16 +359,16 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 'ai_review_subtitle'.tr(),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.inkSoft,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
-              // Bilingual Toggle Tabs
+              // ── Bilingual Toggle Tabs ──────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -406,7 +406,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _selectedLanguageIndex == 0
-                                  ? AppColors.terracotta
+                                  ? AppColors.indigo
                                   : AppColors.inkSoft,
                             ),
                           ),
@@ -441,7 +441,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _selectedLanguageIndex == 1
-                                  ? AppColors.terracotta
+                                  ? AppColors.indigo
                                   : AppColors.inkSoft,
                             ),
                           ),
@@ -451,8 +451,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
+              // ── Product Title ──────────────────────────────────────────
               TextField(
                 controller: _titleController,
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
@@ -469,7 +470,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.terracotta, width: 1.5),
+                    borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
                   ),
                   filled: true,
                   fillColor: AppColors.cardSurface,
@@ -486,8 +487,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   }
                 },
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpacing.md),
 
+              // ── Product Description ────────────────────────────────────
               TextField(
                 controller: _descController,
                 maxLines: 3,
@@ -506,7 +508,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.terracotta, width: 1.5),
+                    borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
                   ),
                   filled: true,
                   fillColor: AppColors.cardSurface,
@@ -523,8 +525,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   }
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
+              // ── Tags ──────────────────────────────────────────────────
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -533,12 +536,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     label: Text(
                       '#$tag',
                       style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.terracottaDark,
+                        color: AppColors.indigoDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    backgroundColor: AppColors.terracottaLight,
-                    deleteIconColor: AppColors.terracottaDark,
+                    backgroundColor: AppColors.indigoLight,
+                    deleteIconColor: AppColors.indigoDark,
                     side: BorderSide.none,
                     onDeleted: () =>
                         ref.read(addProductFlowProvider.notifier).removeTag(tag),
@@ -548,8 +551,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.sm),
 
+              // Add custom tag
               Row(
                 children: [
                   Expanded(
@@ -573,7 +577,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadii.button),
-                          borderSide: const BorderSide(color: AppColors.terracotta, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
                         ),
                         filled: true,
                         fillColor: AppColors.cardSurface,
@@ -598,8 +602,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
+              // ── Re-record voice link ──────────────────────────────────
               Center(
                 child: TextButton.icon(
                   onPressed: () {
@@ -608,30 +613,32 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   icon: const Icon(
                     Icons.mic_none_outlined,
                     size: 18,
-                    color: AppColors.terracottaDark,
+                    color: AppColors.indigoDark,
                   ),
                   label: Text(
                     're_record'.tr(),
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.terracottaDark,
+                      color: AppColors.indigoDark,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.md),
 
-              AppButton(
+              // ── PRIMARY ACTION: "Looks Good" ──────────────────────────
+              PrimaryActionButton(
                 label: 'looks_good'.tr(),
                 icon: Icons.arrow_forward,
                 onPressed: () =>
                     ref.read(addProductFlowProvider.notifier).submitForPricingAndAdvance(),
               ),
-              const SizedBox(height: 10),
-              AppButton(
+              const SizedBox(height: AppSpacing.sm),
+
+              // ── SECONDARY ACTION: "Regenerate" ────────────────────────
+              SecondaryActionButton(
                 label: 'regenerate_btn'.tr(),
                 icon: Icons.refresh,
-                type: AppButtonType.outlined,
                 onPressed: () {
                   if (!isOnline) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -649,7 +656,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                       .regenerateAll(languageCode: lang);
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
         ),
@@ -678,7 +685,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                       height: 52,
                       child: CircularProgressIndicator(
                         strokeWidth: 4,
-                        color: AppColors.terracotta,
+                        color: AppColors.indigo,
                         backgroundColor: AppColors.parchmentDeep,
                       ),
                     ),
@@ -765,7 +772,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                                   height: 28,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: AppColors.terracotta,
+                                    color: AppColors.indigo,
                                   ),
                                 ),
                                 SizedBox(height: 8),

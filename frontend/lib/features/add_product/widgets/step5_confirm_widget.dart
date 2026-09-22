@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../core/services/app_tts_service.dart';
-import '../../../core/services/tts_page_guides.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_image.dart';
-import '../../../core/widgets/speaker_affordance.dart';
+import '../../../core/widgets/speak_button.dart';
+import '../../../core/widgets/primary_action_button.dart';
+import '../../../core/widgets/secondary_action_button.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
 import '../../../data/services/social_media_service.dart';
@@ -39,53 +40,6 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
   void dispose() {
     _tts.dispose();
     super.dispose();
-  }
-
-  // This is the last checkpoint before the listing goes live. Reading the
-  // full title, description, and price back as one summary is the final
-  // version of the same correctness gate as step 3 — the artisan confirms
-  // what is actually about to publish, not just what was drafted earlier.
-  //
-  // Title and description are picked by the current app language, not
-  // hardcoded to English — speaking English text through a Hindi voice
-  // renders it as mispronounced phonetic gibberish, the same code-mixing
-  // failure the voice pipeline's transcription stage exists to avoid.
-  Future<void> _speakSummary({
-    required String titleEn,
-    required String titleHi,
-    required String descriptionEn,
-    required String descriptionHi,
-    required double price,
-  }) async {
-    if (_tts.isSpeaking) {
-      await _tts.stop();
-      return;
-    }
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
-            EasyLocalization.of(context)?.locale.languageCode) ==
-        'hi';
-    final langCode = isHindi ? 'hi' : 'en';
-    final title = isHindi && titleHi.isNotEmpty ? titleHi : titleEn;
-    final description = isHindi && descriptionHi.isNotEmpty ? descriptionHi : descriptionEn;
-    final priceStatement = isHindi
-        ? 'मूल्य ${price.toStringAsFixed(0)} रुपये। '
-        : 'Price: ${price.toStringAsFixed(0)} rupees. ';
-    final guide = TtsPageGuides.confirmPublish.forLanguage(langCode);
-    final summary = '$guide$title. $priceStatement$description';
-    final result = await _tts.speak(
-      summary,
-      languageCode: langCode,
-    );
-    if (result == TtsResult.voiceUnavailable && mounted) {
-      final opened = await _tts.openVoiceDownloadScreen();
-      if (!opened && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
-        );
-      }
-    }
   }
 
   Future<void> _handleListProduct() async {
@@ -335,7 +289,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                 onPressed: () {
                   Navigator.pop(dialogCtx);
                   ref.read(addProductFlowProvider.notifier).reset();
-                  ref.read(homeTabIndexProvider.notifier).state = 1;
+                  ref.read(homeTabIndexProvider.notifier).state = 2;
                 },
               ),
             ],
@@ -377,21 +331,21 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         children: [
           Row(
             children: [
-              const Icon(Icons.fact_check_outlined, color: AppColors.terracotta, size: 24),
-              const SizedBox(width: 8),
+              const Icon(Icons.fact_check_outlined, color: AppColors.indigo, size: 24),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text('confirm_title'.tr(), style: AppTextStyles.headlineLarge),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             'confirm_subtitle'.tr(),
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Product Summary Card
+          // ── PRODUCT SUMMARY CARD ──────────────────────────────────────
           Container(
             decoration: BoxDecoration(
               color: AppColors.cardSurface,
@@ -439,10 +393,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                   ),
 
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Category + status badges
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -496,28 +451,21 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         ],
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppSpacing.sm),
 
+                      // TTS: Speak the summary
                       Align(
                         alignment: Alignment.centerRight,
-                        child: SpeakerAffordance(
-                          isSpeaking: _tts.isSpeaking,
-                          onTap: () => _speakSummary(
-                            titleEn: draft.titleEn.isNotEmpty
-                                ? draft.titleEn
-                                : 'Handcrafted ${draft.category}',
-                            titleHi: draft.titleHi,
-                            descriptionEn: draft.descriptionEn.isNotEmpty
-                                ? draft.descriptionEn
-                                : draft.voiceTranscript,
-                            descriptionHi: draft.descriptionHi,
-                            price: draft.finalPrice,
-                          ),
+                        child: SpeakButton(
+                          text: '$primaryTitle. ₹${draft.finalPrice.toStringAsFixed(0)}',
+                          compact: true,
+                          color: AppColors.indigo,
                         ),
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.xs),
 
+                      // Product title
                       Text(
                         primaryTitle,
                         style: AppTextStyles.headlineMedium,
@@ -530,18 +478,20 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         ),
                       ],
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.sm),
 
+                      // Price
                       Text(
                         '₹${draft.finalPrice.toStringAsFixed(0)}',
                         style: AppTextStyles.displaySmall.copyWith(
-                          color: AppColors.terracottaDark,
+                          color: AppColors.indigo,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppSpacing.sm),
 
+                      // Description
                       Text(
                         displayDescription,
                         style: AppTextStyles.bodySmall.copyWith(
@@ -552,10 +502,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         overflow: TextOverflow.ellipsis,
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppSpacing.md),
 
+                      // Fair price guarantee badge
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: AppColors.successLight,
                           borderRadius: BorderRadius.circular(AppRadii.sm),
@@ -564,7 +515,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         child: Row(
                           children: [
                             const Icon(Icons.verified, color: AppColors.success, size: 18),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Text(
                                 'floor_price_guarantee'.tr(),
@@ -584,13 +535,13 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
 
+          // ── SOCIAL MEDIA HELPER ─────────────────────────────────────
           if (draft.originalImagePath.isNotEmpty || draft.additionalImagePaths.isNotEmpty) ...[
-            AppButton(
+            SecondaryActionButton(
               label: 'social_media_helper'.tr(),
               icon: Icons.share,
-              type: AppButtonType.secondary,
               onPressed: () {
                 final images = [
                   if (draft.isEnhanced && draft.enhancedImagePath.isNotEmpty)
@@ -620,16 +571,17 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                 );
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm),
           ],
 
-          AppButton(
+          // ── PRIMARY ACTION: "List Product Now" ────────────────────────
+          PrimaryActionButton(
             label: 'list_product_btn'.tr(),
             icon: Icons.cloud_upload_outlined,
             isLoading: _isPublishing,
             onPressed: _handleListProduct,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

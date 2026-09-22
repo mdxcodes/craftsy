@@ -42,7 +42,7 @@ class LanguageSettingsScreen extends ConsumerWidget {
 
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Language set to ${lang['name']}')),
+                  SnackBar(content: Text('language_set_to'.tr(namedArgs: {'lang': lang['name']!}))),
                 );
               }
             },

@@ -4,18 +4,19 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/providers/app_providers.dart';
-import '../../catalogue/screens/catalogue_screen.dart';
 import '../../add_product/screens/add_product_flow_screen.dart';
 import '../../orders/screens/my_orders_screen.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../../profile/screens/my_stats_screen.dart';
 import '../../chatbot/widgets/craftmitra_fab.dart';
+import 'home_v2_screen.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_route_constants.dart';
 import '../../../core/services/app_sound_service.dart';
 import '../../auth/providers/auth_provider.dart';
 
-final homeTabIndexProvider = StateProvider<int>((ref) => 1); // Default: Catalogue
+final homeTabIndexProvider = StateProvider<int>((ref) => 0); // Default: Home V2
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -36,7 +37,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Future<void> _checkAndLaunchTutorialIfFirstTime() async {
     if (!mounted) return;
     final currentTab = ref.read(homeTabIndexProvider);
-    if (currentTab != 1) return; // Only trigger for Catalogue tab
+    if (currentTab != 0) return; // Only trigger for Home tab
 
     final authState = ref.read(authStateProvider);
     final userId = authState.userId ?? authState.phoneNumber ?? 'default_artisan';
@@ -52,7 +53,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   Future<void> _handleTabTap(int index) async {
     AppSoundService.instance.playTapSound();
-    if (index == 0) {
+    if (index == 2) {
+      // Add Product tab — check for draft
       final draft = ref.read(addProductFlowProvider);
       if (draft.hasExistingDraft && !draft.resumePromptHandled) {
         final shouldResume = await showDialog<bool>(
@@ -83,7 +85,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     }
 
     ref.read(homeTabIndexProvider.notifier).state = index;
-    if (index == 1) {
+    if (index == 0) {
       _checkAndLaunchTutorialIfFirstTime();
     }
   }
@@ -97,9 +99,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     final currentIndex = ref.watch(homeTabIndexProvider);
 
     const screens = [
-      AddProductFlowScreen(),
-      CatalogueScreen(),
+      HomeV2Screen(),
       MyOrdersScreen(),
+      AddProductFlowScreen(),
+      MyStatsScreen(),
       ProfileScreen(),
     ];
 
@@ -133,34 +136,42 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               children: [
                 Expanded(
                   child: _NavItem(
-                    icon: Icons.add_photo_alternate_outlined,
-                    label: 'tab_add_product'.tr(context: context),
+                    icon: Icons.home_outlined,
+                    label: 'home_tab'.tr(context: context),
                     isActive: currentIndex == 0,
                     onTap: () => _handleTabTap(0),
                   ),
                 ),
                 Expanded(
                   child: _NavItem(
-                    icon: Icons.grid_view_outlined,
-                    label: 'tab_catalogue'.tr(context: context),
+                    icon: Icons.receipt_long_outlined,
+                    label: 'tab_my_orders'.tr(context: context),
                     isActive: currentIndex == 1,
                     onTap: () => _handleTabTap(1),
                   ),
                 ),
                 Expanded(
                   child: _NavItem(
-                    icon: Icons.receipt_long_outlined,
-                    label: 'tab_my_orders'.tr(context: context),
+                    icon: Icons.add_photo_alternate_outlined,
+                    label: 'tab_add_product'.tr(context: context),
                     isActive: currentIndex == 2,
                     onTap: () => _handleTabTap(2),
                   ),
                 ),
                 Expanded(
                   child: _NavItem(
-                    icon: Icons.person_outline,
-                    label: 'tab_profile'.tr(context: context),
+                    icon: Icons.trending_up_outlined,
+                    label: 'home_my_stats'.tr(context: context),
                     isActive: currentIndex == 3,
                     onTap: () => _handleTabTap(3),
+                  ),
+                ),
+                Expanded(
+                  child: _NavItem(
+                    icon: Icons.person_outline,
+                    label: 'tab_profile'.tr(context: context),
+                    isActive: currentIndex == 4,
+                    onTap: () => _handleTabTap(4),
                   ),
                 ),
               ],
@@ -188,7 +199,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.terracotta : AppColors.inkFaint;
+    final color = isActive ? AppColors.indigo : AppColors.inkFaint;
 
     return Semantics(
       label: label,
@@ -222,7 +233,7 @@ class _NavItem extends StatelessWidget {
                 SizedBox(
                   width: 14,
                   height: 2,
-                  child: CustomPaint(painter: _DashedLinePainter(color: color)),
+                  child: CustomPaint(painter: _DashedLinePainter(color: AppColors.indigo)),
                 )
               else
                 const SizedBox(height: 2),

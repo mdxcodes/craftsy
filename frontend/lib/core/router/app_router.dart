@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'app_route_constants.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/language_screen.dart';
@@ -9,6 +10,7 @@ import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/ngo_auth_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
 import '../../features/home/screens/home_shell.dart';
+import '../../features/home/screens/home_v2_screen.dart';
 import '../../features/catalogue/screens/catalogue_screen.dart';
 import '../../features/catalogue/screens/product_detail_screen.dart';
 import '../../features/add_product/screens/add_product_flow_screen.dart';
@@ -35,7 +37,7 @@ class RouterNotifier extends ChangeNotifier {
       (previous, next) {
         final justLoggedIn = previous?.isAuthenticated != true && next.isAuthenticated;
         if (justLoggedIn) {
-          _ref.read(homeTabIndexProvider.notifier).state = 1;
+          _ref.read(homeTabIndexProvider.notifier).state = 0;
         }
         notifyListeners();
       },
@@ -138,6 +140,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const HomeShell(),
       ),
       GoRoute(
+        path: '/home-v2',
+        name: AppRouteConstants.homeV2,
+        builder: (context, state) => const HomeV2Screen(),
+      ),
+      GoRoute(
         path: '/catalogue',
         name: AppRouteConstants.catalogue,
         builder: (context, state) => const CatalogueScreen(),
@@ -153,8 +160,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final args = state.extra;
           if (args is! SocialMediaArgs) {
-            return const Scaffold(
-              body: Center(child: Text('Social media helper arguments are missing.')),
+            return Scaffold(
+              body: Center(child: Text('social_media_args_missing'.tr())),
             );
           }
           return SocialMediaScreen(args: args);
@@ -211,8 +218,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final order = state.extra;
           if (order is! Order) {
-            return const Scaffold(
-              body: Center(child: Text('Order not found.')),
+            return Scaffold(
+              body: Center(child: Text('order_not_found'.tr())),
             );
           }
           return OrderDetailScreen(order: order);

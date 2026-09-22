@@ -63,7 +63,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     borderRadius: BorderRadius.circular(AppRadii.lg),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.terracotta.withValues(alpha: 0.08),
+                        color: AppColors.indigo.withValues(alpha: 0.08),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),

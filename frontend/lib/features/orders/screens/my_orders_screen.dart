@@ -42,7 +42,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Filter pills (smooth horizontal scrolling matching craftsy-redesign-v3.html)
+          // Filter pills
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(
@@ -106,7 +106,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                                 content: Text(
                                   'status_updated_to'.tr(namedArgs: {'status': next.labelKey.tr()}),
                                 ),
-                                backgroundColor: AppColors.terracotta,
+                                backgroundColor: AppColors.indigo,
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -123,9 +123,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
 
   Color _statusDotColor(OrderStatus status) {
     switch (status) {
-      case OrderStatus.newOrder:  return AppColors.terracotta;
-      case OrderStatus.packed:    return AppColors.gold;
-      case OrderStatus.shipped:   return AppColors.success;
+      case OrderStatus.newOrder:  return AppColors.amber;
+      case OrderStatus.packed:    return AppColors.indigo;
+      case OrderStatus.shipped:   return AppColors.teal;
       case OrderStatus.delivered: return AppColors.success;
       case OrderStatus.cancelled: return AppColors.inkSoft;
     }
@@ -325,30 +325,30 @@ class _OrderCardState extends State<_OrderCard> {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppRadii.card),
           child: Padding(
-            padding: const EdgeInsets.all(14.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 46x46 Thumbnail matching mockup
+                // 64x64 Thumbnail — larger, more visible
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     color: AppColors.parchmentDeep,
-                    borderRadius: BorderRadius.circular(11),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   clipBehavior: Clip.antiAlias,
                   alignment: Alignment.center,
                   child: order.productImagePath.isNotEmpty
                       ? AppImage(
                           imageUrl: order.productImagePath,
-                          width: 46,
-                          height: 46,
+                          width: 64,
+                          height: 64,
                           fit: BoxFit.cover,
                         )
                       : _buildCategoryThumb(order.productCategory),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
 
                 // Card body
                 Expanded(
@@ -363,32 +363,32 @@ class _OrderCardState extends State<_OrderCard> {
                             child: Text(
                               displayProductTitle,
                               style: AppTextStyles.headlineSmall.copyWith(
-                                fontSize: 15.5,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.ink,
                                 height: 1.3,
                               ),
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           SpeakerAffordance.compact(
                             isSpeaking: _tts.isSpeaking,
                             onTap: _speakSummary,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           _StatusBadge(status: order.status),
                         ],
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 6),
 
                       // Meta row: User + Location
                       Row(
                         children: [
                           const Icon(
                             Icons.person_outline,
-                            size: 13,
+                            size: 14,
                             color: AppColors.inkSoft,
                           ),
                           const SizedBox(width: 4),
@@ -397,27 +397,27 @@ class _OrderCardState extends State<_OrderCard> {
                               order.buyerName,
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.inkSoft,
-                                fontSize: 12.5,
+                                fontSize: 13,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Text(
                             '•',
                             style: TextStyle(
                               color: AppColors.inkFaint,
-                              fontSize: 10,
+                              fontSize: 11,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Flexible(
                             child: Text(
                               order.buyerCity,
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.inkSoft,
-                                fontSize: 12.5,
+                                fontSize: 13,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -425,7 +425,7 @@ class _OrderCardState extends State<_OrderCard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
 
                       // Price row: Price x Quantity + Time
                       Row(
@@ -437,9 +437,9 @@ class _OrderCardState extends State<_OrderCard> {
                                 TextSpan(
                                   text: '₹${order.amount.toStringAsFixed(0)}',
                                   style: AppTextStyles.labelMedium.copyWith(
-                                    color: AppColors.terracottaDark,
+                                    color: AppColors.indigo,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 14.5,
+                                    fontSize: 16,
                                   ),
                                 ),
                                 if (order.quantity > 1) ...[
@@ -448,7 +448,7 @@ class _OrderCardState extends State<_OrderCard> {
                                     text: '× ${order.quantity}',
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.inkSoft,
-                                      fontSize: 13,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
@@ -525,48 +525,49 @@ class _StatusBadge extends StatelessWidget {
 
     switch (status) {
       case OrderStatus.newOrder:
-        bg = AppColors.statusActionBg;
-        fg = AppColors.statusActionFg;
-        icon = Icons.auto_awesome;
+        bg = AppColors.amberLight;
+        fg = AppColors.amberDark;
+        icon = Icons.fiber_new_outlined;
         break;
       case OrderStatus.packed:
-        bg = AppColors.statusPendingBg;
-        fg = AppColors.statusPendingFg;
+        bg = AppColors.indigoLight;
+        fg = AppColors.indigoDark;
         icon = Icons.inventory_2_outlined;
         break;
       case OrderStatus.shipped:
-        bg = AppColors.statusSuccessBg;
-        fg = AppColors.statusSuccessFg;
+        bg = AppColors.tealLight;
+        fg = AppColors.tealDark;
         icon = Icons.local_shipping_outlined;
         break;
       case OrderStatus.delivered:
-        bg = AppColors.statusSuccessBg;
-        fg = AppColors.statusSuccessFg;
+        bg = AppColors.successLight;
+        fg = AppColors.teal;
         icon = Icons.check_circle_outline;
         break;
       case OrderStatus.cancelled:
-        bg = AppColors.line;
+        bg = AppColors.parchmentDeep;
         fg = AppColors.inkSoft;
         icon = Icons.cancel_outlined;
         break;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppRadii.chip),
+        border: Border.all(color: fg.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: fg),
+          Icon(icon, size: 12, color: fg),
           const SizedBox(width: 4),
           Text(
             status.labelKey.tr(),
             style: AppTextStyles.labelSmall.copyWith(
               color: fg,
-              fontSize: 11,
+              fontSize: 11.5,
               fontWeight: FontWeight.w700,
             ),
           ),

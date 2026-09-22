@@ -324,20 +324,24 @@ class _PackagingSuggestionsSheetState extends State<PackagingSuggestionsSheet> {
                 onTap: () => _speakAllSteps(steps),
               ),
               const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: const BoxDecoration(
-                    color: AppColors.parchmentDeep,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.close,
-                      size: 16,
-                      color: AppColors.inkSoft,
+              Semantics(
+                button: true,
+                label: 'close'.tr(),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: AppColors.parchmentDeep,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: AppColors.inkSoft,
+                      ),
                     ),
                   ),
                 ),
