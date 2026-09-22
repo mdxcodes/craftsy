@@ -13,6 +13,8 @@ import '../../../core/widgets/visual_status_chip.dart';
 import '../../../core/widgets/large_action_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/offline_state.dart';
+import '../../../core/widgets/sync_status_banner.dart';
+import '../../../core/widgets/draft_resume_card.dart';
 import '../../orders/models/order.dart';
 import '../../orders/providers/orders_provider.dart';
 
@@ -49,6 +51,14 @@ class HomeV2Screen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.md),
               const OfflineState(),
             ],
+
+            // Draft resume card
+            const SizedBox(height: AppSpacing.md),
+            const DraftResumeCard(),
+
+            // Sync queue status
+            const SizedBox(height: AppSpacing.md),
+            const SyncStatusBanner(),
 
             const SizedBox(height: AppSpacing.lg),
 

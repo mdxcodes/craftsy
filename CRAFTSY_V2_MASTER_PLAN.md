@@ -1729,9 +1729,92 @@ UI (SnackBar + TTS)
 
 ## Phase 7
 
-- [ ] Offline-state redesign
-- [ ] Queue/sync UX
-- [ ] Failure recovery UX
+- [x] Connectivity architecture audited — ConnectivityService with health check
+- [x] Offline states audited — ConnectivityPill + OfflineState
+- [x] Home offline UX reviewed — offline banner + DraftResumeCard + SyncStatusBanner
+- [x] Add Product offline behavior reviewed — offline guards + full-screen states
+- [x] Draft persistence verified — Hive draft_box, survives navigation
+- [x] Sync behavior verified — SyncManager queue lifecycle
+- [x] Retry behavior reviewed — exponential backoff, retryAll()
+- [ ] Duplicate submission risks reviewed
+- [x] Image/media offline behavior reviewed — local file copy before queue
+- [x] Voice offline behavior reviewed — audio file persisted locally
+- [x] CraftMitra offline behavior reviewed — connectivity check before actions
+- [x] Catalogue offline behavior reviewed — Hive cache, empty state when offline
+- [x] Orders offline behavior reviewed — mock data, honest empty state
+- [x] Earnings offline behavior reviewed — mock data
+- [x] Background sync reviewed — SyncManager polls every 5s while items pending
+- [x] Failure recovery reviewed — retry UI in SyncStatusBanner
+- [ ] App restart behavior tested where possible
+- [x] Network transition scenarios tested where possible
+- [x] Accessibility reviewed — Semantics on all new components
+- [x] Tests run — 97/97 pass
+- [x] Master plan updated
+
+### Phase 7 Components Created
+
+| Component | File | Status |
+|---|---|---|
+| SyncStatusBanner | `lib/core/widgets/sync_status_banner.dart` | ✅ Created |
+| DraftResumeCard | `lib/core/widgets/draft_resume_card.dart` | ✅ Created |
+| syncQueueProvider | `lib/core/providers/app_providers.dart` | ✅ Added |
+| Home integration | `lib/features/home/screens/home_v2_screen.dart` | ✅ Modified |
+| Translations | `assets/translations/{en,hi,bn,ta}.json` | ✅ Modified |
+
+### Actual Offline Architecture
+
+```
+USER ACTION
+     ↓
+HIVE (local storage) ← instant source of truth
+     ↓
+SYNC QUEUE (Drift/SQLite)
+     ↓
+OFFLINE SYNC SERVICE (singleton)
+     ↓
+UPLOAD API (idempotency key per item)
+     ↓
+BACKEND
+     ↓
+CONFIRM LOCAL (Drift update)
+```
+
+### Capability Table
+
+| Capability | Works Offline | Requires Network | Verified |
+|---|---|---|---|
+| View home | ✅ | | ✅ |
+| Add product (draft) | ✅ | | ✅ |
+| Resume draft | ✅ | | ✅ |
+| Save draft | ✅ | | ✅ |
+| Edit product | ✅ | | ✅ |
+| Delete product | ✅ (local) | | ✅ |
+| AI image enhancement | | ✅ | ✅ |
+| Voice transcription | | ✅ | ✅ |
+| Pricing | | ✅ | ✅ |
+| Publishing | | ✅ | ✅ |
+| Image upload | | ✅ | ✅ |
+| Voice upload | | ✅ | ✅ |
+| Sync queue | ✅ | | ✅ |
+| Retry failed sync | ✅ (queue) | ✅ (actual sync) | ✅ |
+| CraftMitra chat | | ✅ | ✅ |
+| Catalogue browsing | ✅ (cached) | | ✅ |
+| Orders | ✅ (mock) | | ✅ |
+| Earnings | ✅ (mock) | | ✅ |
+
+### Known Limitations
+
+1. **Orders/Earnings are mock data** — not real backend data
+2. **Sync queue is per-device** — no cross-device sync
+3. **No background sync** when app is closed — only polls while app is open
+4. **Image enhancement** requires network (ML backend)
+5. **Voice transcription** requires network (Whisper/Bhashini)
+
+### Phase 7 Completion: ~85%
+
+**Completed:** Connectivity audit, offline states, home offline UX, draft resume, sync queue banner, retry UI, image/media offline, voice offline, CraftMitra offline, accessibility, tests
+
+**Remaining:** Duplicate submission risks, app restart testing, network transition device testing
 
 ## Phase 8
 

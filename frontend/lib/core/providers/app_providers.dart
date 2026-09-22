@@ -141,6 +141,13 @@ final syncServiceProvider = Provider<SyncService>((ref) {
   return service;
 });
 
+// --- Sync Queue Provider (OfflineSyncService) ---
+final syncQueueProvider = StreamProvider<List<QueueItem>>((ref) {
+  final offlineSync = OfflineSyncService.instance;
+  if (!offlineSync.isInitialized) return const Stream.empty();
+  return offlineSync.watchQueue();
+});
+
 // --- Connectivity Provider ---
 final connectivityProvider = StreamProvider<bool>((ref) async* {
   final connectivity = Connectivity();
