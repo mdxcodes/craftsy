@@ -89,6 +89,18 @@ class IntentRegistry {
       descriptionHi: 'लिस्टिंग ट्यूटोरियल शुरू करें',
     ),
 
+    // ── Advanced Assistance Intents ────────────────────────────────────
+    'OPEN_PACKAGING_HELP': const IntentMetadata(
+      type: 'OPEN_PACKAGING_HELP',
+      descriptionEn: 'Open packaging help',
+      descriptionHi: 'पैकेजिंग मदद खोलें',
+    ),
+    'OPEN_LABEL_MAKER': const IntentMetadata(
+      type: 'OPEN_LABEL_MAKER',
+      descriptionEn: 'Open label maker',
+      descriptionHi: 'लेबल मेकर खोलें',
+    ),
+
     // ── Product Intents ────────────────────────────────────────────────
     'ADD_PRODUCT': const IntentMetadata(
       type: 'ADD_PRODUCT',

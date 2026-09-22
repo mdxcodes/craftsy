@@ -51,8 +51,13 @@ class IntentParser {
       return _intent('OPEN_NOTIFICATIONS', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['craftmitra', 'क्राफ्ट-मित्र', 'assistant', 'सहायक', 'help', 'मदद', 'madad'])) {
-      return _intent('OPEN_CRAFTMITRA', isHindi: isHindi);
+    // ── Advanced Assistance Intents (check before CraftMitra) ──────────
+    if (_matchesAny(clean, ['packaging', 'packing', 'पैकेजिंग', 'package', 'pack', 'पैक', 'kaise pack', 'कैसे पैक'])) {
+      return _intent('OPEN_PACKAGING_HELP', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['label', 'लेबल', 'sticker', 'sticker', 'label maker', 'label banao', 'लेबल बनाओ', 'label banana'])) {
+      return _intent('OPEN_LABEL_MAKER', isHindi: isHindi);
     }
 
     if (_matchesAny(clean, ['social', 'सोशल', 'share', 'sharing', 'promote', 'promotion'])) {
@@ -65,6 +70,10 @@ class IntentParser {
 
     if (_matchesAny(clean, ['tutorial', 'ट्यूटोरियल', 'guide', 'how to', 'कैसे', 'kaise', 'learn', 'सीखें'])) {
       return _intent('OPEN_TUTORIAL', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['craftmitra', 'क्राफ्ट-मित्र', 'assistant', 'सहायक', 'help', 'मदद', 'madad'])) {
+      return _intent('OPEN_CRAFTMITRA', isHindi: isHindi);
     }
 
     // ── Product Intents ───────────────────────────────────────────────

@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/router/app_route_constants.dart';
+import '../../../core/widgets/accessibility_toggle.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
@@ -104,6 +105,11 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
             ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // Accessibility settings
+            const AccessibilityToggle(),
 
             const SizedBox(height: AppSpacing.md),
 

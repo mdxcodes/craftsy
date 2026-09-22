@@ -198,5 +198,23 @@ void main() {
       expect(intent, isNotNull);
       expect(intent!.type, 'OPEN_LANGUAGE_SETTINGS');
     });
+
+    test('parses OPEN_PACKAGING_HELP intent', () {
+      final intent = IntentParser.parse('packaging help');
+      expect(intent, isNotNull);
+      expect(intent!.type, 'OPEN_PACKAGING_HELP');
+    });
+
+    test('parses OPEN_LABEL_MAKER intent', () {
+      final intent = IntentParser.parse('label maker');
+      expect(intent, isNotNull);
+      expect(intent!.type, 'OPEN_LABEL_MAKER');
+    });
+
+    test('parses Hindi packaging intent', () {
+      final intent = IntentParser.parse('पैकेजिंग मदद');
+      expect(intent, isNotNull);
+      expect(intent!.type, 'OPEN_PACKAGING_HELP');
+    });
   });
 }

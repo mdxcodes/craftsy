@@ -94,7 +94,13 @@ class IntentExecutor {
       case 'OPEN_TUTORIAL':
         return _executeOpenTutorial();
 
-      // ── Product Actions ─────────────────────────────────────────────
+      // ── Advanced Assistance ──────────────────────────────────────────
+      case 'OPEN_PACKAGING_HELP':
+        return _executeOpenPackagingHelp();
+      case 'OPEN_LABEL_MAKER':
+        return _executeOpenLabelMaker();
+
+      // ── Product Intents ───────────────────────────────────────────────
       case 'ADD_PRODUCT':
         return _executeAddProduct();
       case 'OPEN_PRODUCT':
@@ -192,6 +198,20 @@ class IntentExecutor {
     _context.push('/listing-tutorial');
     _closeChatbotSheet();
     return IntentResult.success(_isHindi() ? 'ट्यूटोरियल शुरू कर रहा हूँ।' : 'Starting tutorial.');
+  }
+
+  IntentResult _executeOpenPackagingHelp() {
+    // Packaging help is contextual to orders — navigate to orders
+    _context.push('/orders');
+    _closeChatbotSheet();
+    return IntentResult.success(_isHindi() ? 'पैकेजिंग मदद खोल रहा हूँ।' : 'Opening packaging help.');
+  }
+
+  IntentResult _executeOpenLabelMaker() {
+    // Label maker is contextual to orders — navigate to orders
+    _context.push('/orders');
+    _closeChatbotSheet();
+    return IntentResult.success(_isHindi() ? 'लेबल मेकर खोल रहा हूँ।' : 'Opening label maker.');
   }
 
   // ── Product Executors ───────────────────────────────────────────────
