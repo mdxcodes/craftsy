@@ -199,7 +199,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.terracotta : AppColors.inkFaint;
+    final color = isActive ? AppColors.indigo : AppColors.inkFaint;
 
     return Semantics(
       label: label,
@@ -233,7 +233,7 @@ class _NavItem extends StatelessWidget {
                 SizedBox(
                   width: 14,
                   height: 2,
-                  child: CustomPaint(painter: _DashedLinePainter(color: color)),
+                  child: CustomPaint(painter: _DashedLinePainter(color: AppColors.indigo)),
                 )
               else
                 const SizedBox(height: 2),

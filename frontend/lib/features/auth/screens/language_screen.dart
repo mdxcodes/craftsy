@@ -48,7 +48,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              const Icon(Icons.language, size: 48, color: AppColors.terracotta),
+              const Icon(Icons.language, size: 48, color: AppColors.indigo),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'choose_language_title'.tr(),
@@ -85,12 +85,12 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: _selectedCode == lang['code']
-                                    ? AppColors.terracotta
+                                    ? AppColors.indigo
                                     : AppColors.surface,
                                 borderRadius: BorderRadius.circular(AppRadii.xl),
                                 border: Border.all(
                                   color: _selectedCode == lang['code']
-                                      ? AppColors.terracottaDark
+                                      ? AppColors.indigoDark
                                       : AppColors.oak,
                                 ),
                               ),
