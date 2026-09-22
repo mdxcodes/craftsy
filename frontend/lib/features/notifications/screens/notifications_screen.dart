@@ -243,9 +243,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  TextButton(
-                                    onPressed: () => context.push(actionRoute),
-                                    child: Text(actionLabel),
+                                  Semantics(
+                                    button: true,
+                                    label: actionLabel,
+                                    child: TextButton(
+                                      onPressed: () => context.push(actionRoute),
+                                      style: TextButton.styleFrom(
+                                        minimumSize: const Size(88, 48),
+                                      ),
+                                      child: Text(actionLabel),
+                                    ),
                                   ),
                                 ],
                               ),
