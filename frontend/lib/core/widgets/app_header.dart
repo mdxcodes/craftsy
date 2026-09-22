@@ -70,7 +70,7 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: const BoxDecoration(
-                          color: AppColors.terracotta,
+                          color: AppColors.indigo,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
