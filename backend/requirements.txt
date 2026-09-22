@@ -19,3 +19,10 @@ python-dotenv>=1.0.0
 requests>=2.31.0
 mutagen>=1.47.0
 
+# AI Image Enhancement (rembg background removal + ONNX runtime)
+rembg>=2.0.50
+onnxruntime>=1.17.0
+opencv-python-headless>=4.9.0
+numpy>=1.26.0
+scikit-image>=0.22.0
+
