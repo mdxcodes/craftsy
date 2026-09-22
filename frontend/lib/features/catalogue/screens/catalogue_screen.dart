@@ -10,7 +10,6 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/motifs/craft_category_badge.dart';
-import '../../../core/widgets/motifs/empty_craft_state.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
 import '../../social_media/providers/social_media_provider.dart';
@@ -274,7 +273,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
       ],
       body: Column(
         children: [
-          // Search Bar matching craftsy-redesign-v3.html
+          // Search Bar — simple, voice-compatible
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
@@ -288,13 +287,18 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkFaint),
                 prefixIcon: const Icon(Icons.search, color: AppColors.inkFaint, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18, color: AppColors.inkSoft),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                          ref.read(catalogueFilterProvider.notifier).setSearchQuery('');
-                        },
+                    ? Semantics(
+                        button: true,
+                        label: 'clear_search'.tr(),
+                        child: IconButton(
+                          icon: const Icon(Icons.clear, size: 18, color: AppColors.inkSoft),
+                          tooltip: 'clear_search'.tr(),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                            ref.read(catalogueFilterProvider.notifier).setSearchQuery('');
+                          },
+                        ),
                       )
                     : null,
                 filled: true,
@@ -313,7 +317,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadii.button),
-                  borderSide: const BorderSide(color: AppColors.terracotta, width: 2),
+                  borderSide: const BorderSide(color: AppColors.indigo, width: 2),
                 ),
               ),
               onChanged: (val) {
@@ -325,9 +329,9 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
 
           const SizedBox(height: 10),
 
-          // Craft Category Badges with Petal Ring
+          // Craft Category Badges
           SizedBox(
-            height: 44,
+            height: 48,
             child: ListView.builder(
               physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               scrollDirection: Axis.horizontal,
@@ -348,7 +352,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
           Expanded(
             child: productsAsync.when(
               loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.terracotta),
+                child: CircularProgressIndicator(color: AppColors.indigo),
               ),
               error: (err, stack) => Center(
                 child: Padding(
@@ -356,7 +360,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: AppColors.terracottaDark),
+                      const Icon(Icons.error_outline, size: 48, color: AppColors.coralDark),
                       const SizedBox(height: AppSpacing.md),
                       Text('error_loading_catalogue'.tr(), style: AppTextStyles.headlineMedium),
                       const SizedBox(height: AppSpacing.sm),
@@ -380,21 +384,43 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          EmptyCraftState(
-                            title: 'no_products_title'.tr(),
-                            subtitle: 'no_products_desc'.tr(),
+                          // Empty state — friendly, not technical
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.xl),
+                            decoration: BoxDecoration(
+                              color: AppColors.parchmentDeep,
+                              borderRadius: BorderRadius.circular(AppRadii.card),
+                              border: Border.all(color: AppColors.line),
+                            ),
+                            child: Column(
+                              children: [
+                                const Icon(Icons.shopping_bag_outlined, size: 64, color: AppColors.indigo),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  'no_products_title'.tr(),
+                                  style: AppTextStyles.headlineMedium,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  'no_products_desc'.tr(),
+                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.lg),
                           AppButton(
                             label: 'add_product_btn'.tr(),
                             icon: Icons.add_photo_alternate_rounded,
                             type: AppButtonType.primary,
                             width: 240,
                             onPressed: () {
-                              ref.read(homeTabIndexProvider.notifier).state = 0;
+                              ref.read(homeTabIndexProvider.notifier).state = 2;
                             },
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: AppSpacing.sm),
                           AppButton(
                             label: 'how_to_list_btn'.tr(),
                             icon: Icons.play_circle_outline_rounded,
@@ -411,7 +437,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 }
 
                 return RefreshIndicator(
-                  color: AppColors.terracotta,
+                  color: AppColors.indigo,
                   onRefresh: () => ref
                       .read(productListProvider.notifier)
                       .loadProducts(forceRefresh: true),
@@ -423,7 +449,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                     ),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.60,
+                      childAspectRatio: 0.62,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
@@ -506,7 +532,7 @@ class _GridProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Image thumbnail with live/status tag
+              // Product Image — large, prominent
               Expanded(
                 child: Stack(
                   children: [
@@ -531,9 +557,9 @@ class _GridProductCard extends StatelessWidget {
                 ),
               ),
 
-              // Card details body
+              // Card details — minimal: name, price
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -541,7 +567,7 @@ class _GridProductCard extends StatelessWidget {
                     Text(
                       displayTitle,
                       style: AppTextStyles.headlineSmall.copyWith(
-                        fontSize: 13.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.ink,
                         height: 1.3,
@@ -549,17 +575,17 @@ class _GridProductCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       '₹${product.price.toStringAsFixed(0)}',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.terracottaDark,
+                        color: AppColors.indigo,
                         fontWeight: FontWeight.w700,
-                        fontSize: 14.5,
+                        fontSize: 16,
                       ),
                     ),
                     if (onSocialTap != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       GestureDetector(
                         onTap: onSocialTap,
                         child: Padding(
@@ -568,17 +594,17 @@ class _GridProductCard extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.share_outlined,
-                                size: 13,
-                                color: AppColors.terracotta,
+                                size: 14,
+                                color: AppColors.indigo,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   'social_media_helper'.tr(),
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.terracotta,
+                                    color: AppColors.indigo,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 10.5,
+                                    fontSize: 11,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,

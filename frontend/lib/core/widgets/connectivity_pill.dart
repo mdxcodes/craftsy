@@ -25,46 +25,53 @@ class ConnectivityPill extends ConsumerWidget {
     final IconData icon;
     final String label;
 
+    final String semanticLabel;
     if (!isOnline) {
       bgColor = AppColors.error.withValues(alpha: 0.15);
       textColor = AppColors.error;
       icon = Icons.wifi_off_rounded;
       label = 'offline'.tr();
+      semanticLabel = 'offline_status'.tr();
     } else if (isSyncing) {
       bgColor = AppColors.warning.withValues(alpha: 0.15);
       textColor = AppColors.warning;
       icon = Icons.sync_rounded;
       label = 'syncing'.tr();
+      semanticLabel = 'syncing_status'.tr();
     } else {
       bgColor = AppColors.success.withValues(alpha: 0.15);
       textColor = AppColors.success;
       icon = Icons.wifi_rounded;
       label = 'online'.tr();
+      semanticLabel = 'online_status'.tr();
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(999.0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: AppSpacing.xs),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: textColor,
+    return Semantics(
+      label: semanticLabel,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(999.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: textColor),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

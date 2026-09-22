@@ -55,22 +55,15 @@ void main() {
       expect(find.text('period_last_3_months'), findsOneWidget);
       expect(find.text('period_all_time'), findsOneWidget);
 
-      // Check hero card labels
-      expect(find.text('total_sales_revenue'), findsOneWidget);
-      expect(find.text('fair_wage_premium_title'), findsOneWidget);
+      // Check V2 hero card labels
+      expect(find.text('this_month_earnings'), findsOneWidget);
       expect(find.text('sales_trend_title'), findsOneWidget);
-      expect(find.text('order_fulfillment_title'), findsOneWidget);
-      expect(find.text('popular_crafts_title'), findsOneWidget);
+      expect(find.text('order_summary_title'), findsOneWidget);
+      expect(find.text('total_listings'), findsOneWidget);
+      expect(find.text('average_order_value'), findsOneWidget);
 
       // Verify period switching works cleanly
       await tester.tap(find.text('period_all_time'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      // Verify Popular Crafts sort toggle works
-      expect(find.text('sort_by_views'), findsOneWidget);
-      expect(find.text('sort_by_sales'), findsOneWidget);
-      await tester.tap(find.text('sort_by_views'), warnIfMissed: false);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
     });

@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/motifs/tanka_stitch_painter.dart';
 
+/// V2 Step Progress Bar — visual journey indicator.
+///
+/// Shows the 5-step selling journey with emoji icons and visual progress.
+/// Current step is highlighted with a glow effect.
+/// Completed steps show a checkmark.
+/// Does NOT show "Step X of Y" text — communicates visually.
 class StepProgressBar extends StatelessWidget {
   final int currentStep; // 0 to 4
   final int totalSteps;
@@ -14,20 +21,23 @@ class StepProgressBar extends StatelessWidget {
     this.onStepTapped,
   });
 
-  static const List<IconData> _stepIcons = [
-    Icons.photo_camera_outlined,
-    Icons.mic_none_outlined,
-    Icons.auto_awesome_outlined,
-    Icons.sell_outlined,
-    Icons.cloud_upload_outlined,
+  static const List<String> _stepEmojis = [
+    '📸', // Capture
+    '🎤', // Describe
+    '✨', // AI Review
+    '💰', // Pricing
+    '✅', // Confirm
   ];
+
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: List.generate(totalSteps * 2 - 1, (index) {
           if (index.isOdd) {
@@ -37,7 +47,7 @@ class StepProgressBar extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.0),
                 child: SizedBox(
-                  height: 2,
+                  height: 3,
                   child: isCompleted
                       ? const CustomPaint(
                           painter: TankaStitchPainter(
@@ -58,39 +68,29 @@ class StepProgressBar extends StatelessWidget {
             final stepIndex = index ~/ 2;
             final isCompleted = stepIndex < currentStep;
             final isCurrent = stepIndex == currentStep;
-            final iconData = stepIndex < _stepIcons.length
-                ? _stepIcons[stepIndex]
-                : Icons.circle;
+            final emoji = stepIndex < _stepEmojis.length
+                ? _stepEmojis[stepIndex]
+                : '⚪';
 
             Color bgColor = AppColors.cardSurface;
             Color borderColor = AppColors.line;
-            Color iconColor = AppColors.inkFaint;
             List<BoxShadow>? shadows;
-            Widget child;
 
             if (isCompleted) {
               bgColor = AppColors.success;
               borderColor = AppColors.success;
-              iconColor = Colors.white;
-              child = const Icon(Icons.check, size: 16, color: Colors.white);
             } else if (isCurrent) {
-              bgColor = AppColors.terracotta;
-              borderColor = AppColors.terracotta;
-              iconColor = Colors.white;
-              shadows = const [
+              bgColor = AppColors.indigo;
+              borderColor = AppColors.indigo;
+              shadows = [
                 BoxShadow(
-                  color: AppColors.terracottaLight,
+                  color: AppColors.indigoLight,
                   spreadRadius: 4,
                   blurRadius: 0,
                 ),
               ];
-              child = Icon(iconData, size: 16, color: Colors.white);
-            } else {
-              child = Icon(iconData, size: 16, color: iconColor);
             }
 
-            // Only allow navigating back to completed steps (checkmark).
-            // Future or current steps cannot be jumped to via the step indicator.
             final canNavigateBack = isCompleted;
 
             return GestureDetector(
@@ -102,16 +102,19 @@ class StepProgressBar extends StatelessWidget {
                   : HitTestBehavior.deferToChild,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                width: 34,
-                height: 34,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: bgColor,
-                  border: Border.all(color: borderColor, width: 1.5),
+                  border: Border.all(color: borderColor, width: 2),
                   boxShadow: shadows,
                 ),
                 alignment: Alignment.center,
-                child: child,
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 18),
+                ),
               ),
             );
           }

@@ -55,7 +55,7 @@ class SpeakerAffordance extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
           child: Padding(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(14),
             child: Icon(icon, size: 20, color: AppColors.terracottaDark),
           ),
         ),
@@ -114,7 +114,7 @@ class VoiceUnavailableNotice extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              'Voice not installed for this language',
+              'voice_not_installed'.tr(),
               style: TextStyle(fontSize: 11.5, color: Colors.orange.shade800),
             ),
           ),
@@ -122,9 +122,9 @@ class VoiceUnavailableNotice extends StatelessWidget {
             onPressed: onDownload,
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: const Size(0, 32),
+              minimumSize: const Size(0, 48),
             ),
-            child: const Text('Download', style: TextStyle(fontSize: 12)),
+            child: Text('download_voice_btn'.tr(), style: TextStyle(fontSize: 12)),
           ),
         ],
       ),

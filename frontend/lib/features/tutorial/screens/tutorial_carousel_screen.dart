@@ -81,7 +81,7 @@ class _TutorialCarouselScreenState extends ConsumerState<TutorialCarouselScreen>
 
   void _finishTutorialAndStartListing() {
     _ttsService.stop();
-    ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Add Product tab
+    ref.read(homeTabIndexProvider.notifier).state = 2; // Switch to Add Product tab
     if (context.canPop()) {
       context.pop();
     } else {

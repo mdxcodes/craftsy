@@ -71,21 +71,42 @@ class ResponsiveCard extends StatelessWidget {
     final responsiveRadius =
         borderRadius ?? BorderRadius.circular(AppRadii.getCardRadius(context));
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: elevation ?? AppElevation.none,
-        shape: RoundedRectangleBorder(
-          borderRadius: responsiveRadius,
-          side: elevation == null
-              ? const BorderSide(color: AppColors.oak, width: 0.6)
-              : BorderSide.none,
+    if (onTap != null) {
+      return Semantics(
+        button: true,
+        label: 'Tap to open',
+        child: GestureDetector(
+          onTap: onTap,
+          child: Card(
+            elevation: elevation ?? AppElevation.none,
+            shape: RoundedRectangleBorder(
+              borderRadius: responsiveRadius,
+              side: elevation == null
+                  ? const BorderSide(color: AppColors.oak, width: 0.6)
+                  : BorderSide.none,
+            ),
+            color: backgroundColor ?? AppColors.surface,
+            child: Padding(
+              padding: responsivePadding,
+              child: child,
+            ),
+          ),
         ),
-        color: backgroundColor ?? AppColors.surface,
-        child: Padding(
-          padding: responsivePadding,
-          child: child,
-        ),
+      );
+    }
+
+    return Card(
+      elevation: elevation ?? AppElevation.none,
+      shape: RoundedRectangleBorder(
+        borderRadius: responsiveRadius,
+        side: elevation == null
+            ? const BorderSide(color: AppColors.oak, width: 0.6)
+            : BorderSide.none,
+      ),
+      color: backgroundColor ?? AppColors.surface,
+      child: Padding(
+        padding: responsivePadding,
+        child: child,
       ),
     );
   }

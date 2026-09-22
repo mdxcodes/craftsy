@@ -152,17 +152,21 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
                       ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: const BoxDecoration(
-                        color: AppColors.parchmentDeep,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.close, size: 16, color: AppColors.inkSoft),
+                  Semantics(
+                    button: true,
+                    label: 'close'.tr(),
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: const BoxDecoration(
+                          color: AppColors.parchmentDeep,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.close, size: 18, color: AppColors.inkSoft),
+                        ),
                       ),
                     ),
                   ),

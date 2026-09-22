@@ -7,6 +7,7 @@ class AppRouteConstants {
   static const String otp = 'otp';
 
   static const String home = 'home';
+  static const String homeV2 = 'homeV2';
   static const String catalogue = 'catalogue';
   static const String addProduct = 'addProduct';
   static const String socialMediaHelper = 'socialMediaHelper';

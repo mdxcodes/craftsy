@@ -33,13 +33,16 @@ class EmptyCraftState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Opacity(
-              opacity: 0.7,
-              child: SizedBox(
-                width: 88,
-                height: 88,
-                child: CustomPaint(
-                  painter: _PottersWheelPainter(color: AppColors.inkFaint),
+            Semantics(
+              label: '$title. $subtitle',
+              child: Opacity(
+                opacity: 0.7,
+                child: SizedBox(
+                  width: 88,
+                  height: 88,
+                  child: CustomPaint(
+                    painter: _PottersWheelPainter(color: AppColors.inkFaint),
+                  ),
                 ),
               ),
             ),

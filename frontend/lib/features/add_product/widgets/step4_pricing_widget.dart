@@ -7,9 +7,10 @@ import '../../../core/services/tts_page_guides.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/motifs/dotted_border_box.dart';
 import '../../../core/widgets/speaker_affordance.dart';
+import '../../../core/widgets/primary_action_button.dart';
+import '../../../core/widgets/speak_button.dart';
 import '../../../core/providers/app_providers.dart';
 
 class Step4PricingWidget extends ConsumerStatefulWidget {
@@ -114,7 +115,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
         children: [
           Row(
             children: [
-              const Icon(Icons.sell_outlined, color: AppColors.terracotta, size: 24),
+              const Icon(Icons.sell_outlined, color: AppColors.indigo, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text('pricing_title'.tr(), style: AppTextStyles.headlineLarge),
@@ -126,72 +127,65 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
             'pricing_subtitle'.tr(),
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Price hero container with card styling
+          // ── PRICE HERO: Big, obvious suggested price ──────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl, horizontal: AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.cardSurface,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.indigoLight,
+                  AppColors.cardSurface,
+                ],
+              ),
               borderRadius: BorderRadius.circular(AppRadii.card),
-              border: Border.all(color: AppColors.line),
+              border: Border.all(color: AppColors.indigo.withValues(alpha: 0.2)),
               boxShadow: AppElevation.cardShadow,
             ),
             child: Column(
               children: [
                 Text(
-                  'price_slider_label'.tr().toUpperCase(),
-                  style: AppTextStyles.labelSmall.copyWith(
+                  'suggested_price'.tr(),
+                  style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.inkSoft,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.8,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   '₹${currentPrice.toStringAsFixed(0)}',
-                  style: AppTextStyles.displaySmall.copyWith(
-                    color: AppColors.terracottaDark,
+                  style: AppTextStyles.displayLarge.copyWith(
+                    color: AppColors.indigo,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
+                // TTS: Speak the suggested price
+                SpeakButton(
+                  text: '₹${currentPrice.toStringAsFixed(0)}',
+                  compact: true,
+                  color: AppColors.indigo,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                // Confidence + market position badges
                 Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 6,
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.goldLight,
+                        color: AppColors.amberLight,
                         borderRadius: BorderRadius.circular(AppRadii.button),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.auto_awesome, size: 14, color: AppColors.goldDark),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${'suggested_price'.tr()}: ₹${draft.suggestedPrice.toStringAsFixed(0)}',
-                            style: AppTextStyles.labelSmall.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.goldDark,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(AppRadii.button),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.verified_outlined, size: 14, color: AppColors.success),
+                          const Icon(Icons.auto_awesome, size: 14, color: AppColors.amberDark),
                           const SizedBox(width: 4),
                           Text(
                             'score_match'.tr(namedArgs: {
@@ -199,7 +193,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                             }),
                             style: AppTextStyles.labelSmall.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.success,
+                              color: AppColors.amberDark,
                             ),
                           ),
                         ],
@@ -208,7 +202,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.terracotta.withValues(alpha: 0.12),
+                        color: AppColors.teal.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(AppRadii.button),
                       ),
                       child: Text(
@@ -216,7 +210,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                         style: AppTextStyles.labelSmall.copyWith(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.6,
-                          color: AppColors.terracottaDark,
+                          color: AppColors.tealDark,
                         ),
                       ),
                     ),
@@ -225,9 +219,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Muted Gradient Slider: Red -> Green -> Gold
+          // ── PRICE SLIDER: Visual, with floor price indicator ────────────
           Stack(
             alignment: Alignment.center,
             children: [
@@ -238,9 +232,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   borderRadius: BorderRadius.circular(4),
                   gradient: const LinearGradient(
                     colors: [
-                      AppColors.terracottaLight, // Below fair floor
-                      AppColors.success,         // Fair pricing sweet spot
-                      AppColors.gold,            // Premium margin
+                      AppColors.coralLight, // Below fair floor
+                      AppColors.teal,        // Fair pricing sweet spot
+                      AppColors.amber,       // Premium margin
                     ],
                   ),
                 ),
@@ -251,8 +245,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   activeTrackColor: Colors.transparent,
                   inactiveTrackColor: Colors.transparent,
                   thumbColor: AppColors.ink,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
                   overlayColor: AppColors.ink.withValues(alpha: 0.12),
                 ),
                 child: Slider(
@@ -278,7 +272,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                     '${'calculated_floor_price'.tr()}: ₹${draft.floorPrice.toStringAsFixed(0)}',
                     style: AppTextStyles.labelSmall.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: currentPrice < draft.floorPrice ? AppColors.error : AppColors.inkSoft,
+                      color: currentPrice < draft.floorPrice ? AppColors.coral : AppColors.inkSoft,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -291,7 +285,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: AppSpacing.md),
 
           // Pricing Reasoning Card
           Container(
@@ -345,14 +339,14 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.md),
 
-          // Cost Breakdown Accordion
+          // ── COST BREAKDOWN: Visual cost breakdown ──────────────────────
           InkWell(
             onTap: () => setState(() => _showCostBreakdown = !_showCostBreakdown),
             borderRadius: BorderRadius.circular(AppRadii.card),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -361,8 +355,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.shield_outlined, size: 18, color: AppColors.terracotta),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.shield_outlined, size: 18, color: AppColors.indigo),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'cost_breakdown_floor_title'.tr(),
@@ -383,9 +377,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
           ),
 
           if (_showCostBreakdown) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: AppColors.parchmentDeep,
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -396,6 +390,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   _CostItem(
                     label: 'raw_materials_cost'.tr(),
                     value: '₹${draft.rawMaterialCost.toStringAsFixed(0)}',
+                    icon: Icons.inventory_2_outlined,
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -404,6 +399,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   _CostItem(
                     label: 'labour_hours'.tr(),
                     value: '${draft.laborHours} hrs',
+                    icon: Icons.schedule_outlined,
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -412,20 +408,21 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   _CostItem(
                     label: 'hourly_rate'.tr(),
                     value: '₹${draft.hourlyRate.toStringAsFixed(0)}/hr',
+                    icon: Icons.payments_outlined,
                   ),
                 ],
               ),
             ),
           ],
 
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.md),
 
-          // Market Benchmarks Accordion
+          // ── MARKET BENCHMARKS ─────────────────────────────────────────
           InkWell(
             onTap: () => setState(() => _showMarketBenchmarks = !_showMarketBenchmarks),
             borderRadius: BorderRadius.circular(AppRadii.card),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -434,8 +431,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.storefront_outlined, size: 18, color: AppColors.terracotta),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.storefront_outlined, size: 18, color: AppColors.indigo),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       draft.comparableProducts.isNotEmpty
@@ -460,10 +457,10 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
           ),
 
           if (_showMarketBenchmarks) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             if (draft.comparableProducts.isEmpty)
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: AppColors.parchmentDeep,
                   borderRadius: BorderRadius.circular(AppRadii.card),
@@ -478,7 +475,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ...draft.comparableProducts.map(
                 (comp) => Container(
                   margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(AppRadii.card),
@@ -506,12 +503,12 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: AppColors.goldLight,
+                                    color: AppColors.amberLight,
                                     borderRadius: BorderRadius.circular(AppRadii.button),
                                   ),
                                   child: Text(
                                     comp.sourcePlatform,
-                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.goldDark),
+                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.amberDark),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -520,7 +517,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                                     'score': (comp.similarityScore * 100).toStringAsFixed(0),
                                   }),
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: AppColors.success,
+                                    color: AppColors.teal,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -533,7 +530,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                       Text(
                         '₹${comp.sellingPrice.toStringAsFixed(0)}',
                         style: AppTextStyles.headlineMedium.copyWith(
-                          color: AppColors.terracottaDark,
+                          color: AppColors.indigoDark,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -543,11 +540,11 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ),
           ],
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
-          // Custom price manual entry field
+          // ── CUSTOM PRICE ENTRY ────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: AppColors.cardSurface,
               borderRadius: BorderRadius.circular(AppRadii.card),
@@ -559,8 +556,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.edit_note_outlined, size: 18, color: AppColors.terracotta),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.edit_note_outlined, size: 18, color: AppColors.indigo),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
                         'custom_price_label'.tr(),
@@ -614,7 +611,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppRadii.button),
-                            borderSide: const BorderSide(color: AppColors.terracotta, width: 1.5),
+                            borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
                           ),
                           isDense: true,
                         ),
@@ -649,13 +646,15 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
             ),
           ),
 
-          const SizedBox(height: 24),
-          AppButton(
+          const SizedBox(height: AppSpacing.lg),
+
+          // ── PRIMARY ACTION: "This price is OK" ────────────────────────
+          PrimaryActionButton(
             label: 'next'.tr(),
             icon: Icons.arrow_forward,
             onPressed: () => ref.read(addProductFlowProvider.notifier).nextStep(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );
@@ -665,7 +664,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
 class _CostItem extends StatelessWidget {
   final String label;
   final String value;
-  const _CostItem({required this.label, required this.value});
+  final IconData? icon;
+  const _CostItem({required this.label, required this.value, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -673,10 +673,20 @@ class _CostItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
-          child: Text(
-            label,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
-            overflow: TextOverflow.ellipsis,
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 18, color: AppColors.inkSoft),
+                const SizedBox(width: 8),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(width: 8),

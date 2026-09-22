@@ -34,18 +34,32 @@ class AppIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    final effectiveConstraints = constraints ?? const BoxConstraints(
+      minWidth: 48,
+      minHeight: 48,
+    );
+
+    final button = IconButton(
       icon: icon,
       onPressed: AppSoundFeedback.wrap(onPressed),
       tooltip: tooltip,
       color: color,
       iconSize: iconSize,
       padding: padding,
-      constraints: constraints,
+      constraints: effectiveConstraints,
       style: style,
       visualDensity: visualDensity,
       alignment: alignment,
       enableFeedback: enableFeedback,
+    );
+
+    // Ensure minimum 48x48 touch target even with custom constraints
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: effectiveConstraints.minWidth < 48 ? 48 : effectiveConstraints.minWidth,
+        minHeight: effectiveConstraints.minHeight < 48 ? 48 : effectiveConstraints.minHeight,
+      ),
+      child: button,
     );
   }
 }

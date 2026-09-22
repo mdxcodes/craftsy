@@ -12,11 +12,18 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/cycling_guidance_cue.dart';
 import '../../../core/widgets/motifs/dotted_border_box.dart';
+import '../../../core/widgets/speak_button.dart';
+import '../../../core/widgets/listening_state.dart';
+import '../../../core/widgets/processing_state.dart' as app_widgets;
 import '../../../core/providers/app_providers.dart';
 import '../../../core/offline_sync/models/queue_item.dart';
 
 const double _kLowConfidenceThreshold = 0.75;
 
+/// V2 Step 2 — Tell Craftsy.
+///
+/// Voice-first with a large mic button, clear listening state,
+/// transcription display, and typing as fallback.
 class Step2DescribeWidget extends ConsumerStatefulWidget {
   const Step2DescribeWidget({super.key});
 
@@ -246,145 +253,157 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
 
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Step Title — action-oriented
           Text('describe_title'.tr(), style: AppTextStyles.headlineLarge),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             'describe_subtitle'.tr(),
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
 
-          // Central interactive recording / check / replay circle
+          // ── VOICE ACTION: Large mic button ────────────────────────────────
           Center(
-            child: GestureDetector(
-              onTap: () {
-                if (_isRecording) {
-                  _toggleRecording();
-                } else if (_showCheckmark) {
-                  // Transitioning
-                } else if (hasAudio) {
-                  _togglePlayAudio();
-                } else {
-                  _toggleRecording();
-                }
-              },
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  final scale = _isRecording
-                      ? 1.0 + (_pulseController.value * 0.12)
-                      : (_showCheckmark ? 1.05 : 1.0);
+            child: Column(
+              children: [
+                // Large recording button — the primary action
+                GestureDetector(
+                  onTap: () {
+                    if (_isRecording) {
+                      _toggleRecording();
+                    } else if (_showCheckmark) {
+                      // Transitioning — ignore taps
+                    } else if (hasAudio) {
+                      _togglePlayAudio();
+                    } else {
+                      _toggleRecording();
+                    }
+                  },
+                  child: AnimatedBuilder(
+                    animation: _pulseController,
+                    builder: (context, child) {
+                      final scale = _isRecording
+                          ? 1.0 + (_pulseController.value * 0.12)
+                          : (_showCheckmark ? 1.05 : 1.0);
 
-                  Color circleColor;
-                  Color shadowColor;
-                  IconData iconData;
-                  String labelText;
+                      Color circleColor;
+                      Color shadowColor;
+                      IconData iconData;
+                      String labelText;
 
-                  if (_isRecording) {
-                    circleColor = AppColors.error;
-                    shadowColor = AppColors.error;
-                    iconData = Icons.stop_rounded;
-                    labelText = 'stop_recording'.tr();
-                  } else if (_showCheckmark) {
-                    circleColor = AppColors.success;
-                    shadowColor = AppColors.successLight;
-                    iconData = Icons.check_circle_rounded;
-                    labelText = 'recorded_success'.tr();
-                  } else if (hasAudio) {
-                    circleColor = AppColors.ink;
-                    shadowColor = AppColors.inkFaint;
-                    iconData = _isPlayingAudio ? Icons.pause_rounded : Icons.play_arrow_rounded;
-                    labelText = _isPlayingAudio ? 'audio_playing'.tr() : 'tap_to_replay'.tr();
-                  } else {
-                    circleColor = AppColors.terracotta;
-                    shadowColor = AppColors.terracottaLight;
-                    iconData = Icons.mic;
-                    labelText = 'tap_to_speak'.tr();
-                  }
+                      if (_isRecording) {
+                        circleColor = AppColors.coral;
+                        shadowColor = AppColors.coral;
+                        iconData = Icons.stop_rounded;
+                        labelText = 'stop_recording'.tr();
+                      } else if (_showCheckmark) {
+                        circleColor = AppColors.success;
+                        shadowColor = AppColors.successLight;
+                        iconData = Icons.check_circle_rounded;
+                        labelText = 'recorded_success'.tr();
+                      } else if (hasAudio) {
+                        circleColor = AppColors.ink;
+                        shadowColor = AppColors.inkFaint;
+                        iconData = _isPlayingAudio ? Icons.pause_rounded : Icons.play_arrow_rounded;
+                        labelText = _isPlayingAudio ? 'audio_playing'.tr() : 'tap_to_replay'.tr();
+                      } else {
+                        circleColor = AppColors.indigo;
+                        shadowColor = AppColors.indigoLight;
+                        iconData = Icons.mic;
+                        labelText = 'tap_to_speak'.tr();
+                      }
 
-                  return Transform.scale(
-                    scale: scale,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: circleColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: shadowColor.withValues(alpha: 0.4),
-                            blurRadius: _isRecording ? 20 : 10,
-                            spreadRadius: _isRecording ? 6 : 2,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            iconData,
-                            size: 42,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: 4),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              labelText,
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                      return Transform.scale(
+                        scale: scale,
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: circleColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: shadowColor.withValues(alpha: 0.4),
+                                blurRadius: _isRecording ? 24 : 12,
+                                spreadRadius: _isRecording ? 8 : 3,
                               ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                iconData,
+                                size: 48,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                                child: Text(
+                                  labelText,
+                                  style: AppTextStyles.labelMedium.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                // Listening state indicator
+                if (_isRecording)
+                  const ListeningState(),
+
+                // Processing state indicator
+                if (_showCheckmark)
+                  const app_widgets.ProcessingState(),
+
+                // Replay button (when audio exists and not recording)
+                if (hasAudio && !_isRecording && !_showCheckmark) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  SpeakButton(
+                    text: 'tap_to_replay'.tr(),
+                    compact: true,
+                    color: AppColors.indigo,
+                  ),
+                ],
+
+                // Re-record button
+                if (hasAudio && !_isRecording && !_showCheckmark) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  AppButton(
+                    label: 'rerecord_voice_desc'.tr(),
+                    icon: Icons.refresh_rounded,
+                    type: AppButtonType.outlined,
+                    onPressed: _rerecord,
+                  ),
+                ],
+              ],
             ),
           ),
 
-          if (_isRecording) ...[
-            const SizedBox(height: 12),
-            Text(
-              'recording'.tr(),
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-
-          if (hasAudio && !_isRecording && !_showCheckmark) ...[
-            const SizedBox(height: 16),
-            Center(
-              child: AppButton(
-                label: 'rerecord_voice_desc'.tr(),
-                icon: Icons.refresh_rounded,
-                type: AppButtonType.outlined,
-                onPressed: _rerecord,
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xl),
 
           // Divider with "or type description" label
           Row(
             children: [
               const Expanded(child: DottedBorderBox.divider()),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: Text(
                   'or_type_description'.tr(),
                   style: AppTextStyles.labelSmall.copyWith(
@@ -397,7 +416,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
           // Guidance prompt cycling cues
           CyclingGuidanceCue(
@@ -409,8 +428,9 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             onCueChanged: (cue) {},
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
+          // Text input — fallback, not primary
           TextField(
             controller: _textController,
             focusNode: _textFocusNode,
@@ -431,7 +451,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadii.card),
-                borderSide: const BorderSide(color: AppColors.terracotta, width: 1.5),
+                borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
               ),
               filled: true,
               fillColor: AppColors.cardSurface,
@@ -443,22 +463,22 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
 
           if (draft.voiceTranscript.isNotEmpty &&
               draft.transcriptionConfidence < _kLowConfidenceThreshold) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.goldLight,
+                color: AppColors.amberLight,
                 borderRadius: BorderRadius.circular(AppRadii.sm),
-                border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: AppColors.goldDark, size: 18),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.info_outline, color: AppColors.amberDark, size: 18),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'Some words might need review. You can edit the text above.',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.goldDark),
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.amberDark),
                     ),
                   ),
                 ],
@@ -466,8 +486,9 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             ),
           ],
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
+          // Primary action: "Looks & Sounds Right"
           AppButton(
             label: 'sounds_right'.tr(),
             icon: Icons.arrow_forward,
@@ -486,7 +507,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
               }
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

@@ -437,17 +437,16 @@ class ChatNotifier extends StateNotifier<ChatState> {
         query: query,
         category: category,
       );
-      _ref.read(homeTabIndexProvider.notifier).state = 1;
-
+      context.push('/catalogue');
       if (Navigator.of(context, rootNavigator: true).canPop()) {
         Navigator.of(context, rootNavigator: true).pop();
       }
       return;
     }
 
-    // 2. Direct status update action tap -> jump to catalogue to see it
+    // 2. Direct status update action tap -> jump to orders to see it
     if (action.isStatusUpdate) {
-      _ref.read(homeTabIndexProvider.notifier).state = 1;
+      _ref.read(homeTabIndexProvider.notifier).state = 1; // Orders tab
       if (Navigator.of(context, rootNavigator: true).canPop()) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -482,19 +481,19 @@ class ChatNotifier extends StateNotifier<ChatState> {
       // Destination mapping fallback
       switch (action.destination) {
         case 'add_product':
-          _ref.read(homeTabIndexProvider.notifier).state = 0;
+          _ref.read(homeTabIndexProvider.notifier).state = 2; // Add Product tab
           break;
         case 'catalogue':
-          _ref.read(homeTabIndexProvider.notifier).state = 1;
+          context.push('/catalogue');
           break;
         case 'notifications':
-          _ref.read(homeTabIndexProvider.notifier).state = 2;
+          context.push('/notifications');
           break;
         case 'profile':
-          _ref.read(homeTabIndexProvider.notifier).state = 3;
+          _ref.read(homeTabIndexProvider.notifier).state = 4; // Profile tab
           break;
         case 'my_stats':
-          context.push('/my-stats');
+          _ref.read(homeTabIndexProvider.notifier).state = 3; // Stats tab
           break;
         case 'language_settings':
           context.push('/language-settings');

@@ -325,8 +325,38 @@ class ProductDetailScreen extends ConsumerWidget {
 
     return AppScaffold(
       body: productsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        loading: () => Center(
+          child: Semantics(
+            label: 'loading'.tr(),
+            liveRegion: true,
+            child: const CircularProgressIndicator(),
+          ),
+        ),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: AppColors.coralDark),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'error_loading_product'.tr(),
+                  style: AppTextStyles.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                AppButton(
+                  label: 'retry'.tr(),
+                  width: 140,
+                  onPressed: () {
+                    ref.read(productListProvider.notifier).loadProducts(forceRefresh: true);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (products) {
           final product = products.firstWhere(
             (p) => p.id == productId,

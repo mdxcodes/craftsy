@@ -182,12 +182,17 @@ class AppButton extends StatelessWidget {
         break;
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
-        minHeight: type == AppButtonType.text ? 0.0 : minButtonHeight,
+    return Semantics(
+      button: true,
+      label: label,
+      enabled: onPressed != null,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
+          minHeight: type == AppButtonType.text ? 0.0 : minButtonHeight,
+        ),
+        child: button,
       ),
-      child: button,
     );
   }
 }
