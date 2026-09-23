@@ -1944,9 +1944,83 @@ The goals are:
 - Mobile device QA (requires device reconnection)
 
 **Test Suite Exact Counts:**
-- Backend: 48/53 pass (3 pre-existing failures from Groq API and mock data)
+- Backend: 49/53 pass (2 pre-existing failures from Groq API and mock data)
 - Frontend: 102/102 pass
-- Total: 150/155 pass (96.8% pass rate)
+- Total: 151/155 pass (97.4% pass rate)
+
+---
+
+## Unified Commerce Hub
+
+**Status:** Complete
+
+### Architecture
+
+```
+Flutter App → CommerceHubService → Channel Adapters
+                                          ├── CraftsyChannel
+                                          ├── ONDCChannel
+                                          └── GeMChannel
+```
+
+### Backend Implementation
+
+**New Files:**
+- `backend/services/commerce_hub_service.py` — Unified commerce operations
+- `backend/routers/commerce_hub.py` — 9 API endpoints
+
+**Modified Files:**
+- `backend/models/db_models.py` — Added `stock` column to ProductDB
+- `backend/models/schemas.py` — Added `stock` to ProductBase/ProductUpdate/ProductResponse
+- `backend/routers/products.py` — Stock handling in create/update/response
+- `backend/main.py` — Registered commerce_hub_router
+- `backend/routers/__init__.py` — Added commerce_hub_router export
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/commerce-hub/summary/{artisan_id}` | Unified commerce summary |
+| GET | `/api/v1/commerce-hub/products/{product_id}/channels` | Channel statuses |
+| GET | `/api/v1/commerce-hub/products/{product_id}/detail` | Product detail with channels |
+| GET | `/api/v1/commerce-hub/products/{product_id}/inventory` | Unified inventory |
+| GET | `/api/v1/commerce-hub/products/{product_id}/sync-status` | Cross-channel sync |
+| GET | `/api/v1/commerce-hub/orders/{artisan_id}` | All orders (filterable) |
+| GET | `/api/v1/commerce-hub/orders/{artisan_id}/channel-summary` | Orders by channel |
+| POST | `/api/v1/commerce-hub/products/{product_id}/channels/{channel}/enable` | Enable channel |
+| POST | `/api/v1/commerce-hub/products/{product_id}/channels/{channel}/disable` | Disable channel |
+
+### Flutter Implementation
+
+**New Files:**
+- `frontend/lib/core/models/commerce_hub_models.dart` — 7 model classes
+- `frontend/lib/core/providers/commerce_hub_provider.dart` — API client + Riverpod providers
+- `frontend/lib/features/commerce/screens/unified_commerce_hub_screen.dart` — 4-tab dashboard
+- `frontend/lib/features/commerce/widgets/commerce_summary_card.dart`
+- `frontend/lib/features/commerce/widgets/order_channel_summary_card.dart`
+- `frontend/lib/features/commerce/widgets/inventory_overview_card.dart`
+
+**Modified Files:**
+- `frontend/lib/data/models/product.dart` — Added `stock` field (HiveField 16)
+- Translation files — 7 new keys in all 4 locales
+
+### Key Features
+
+- **ONE product model** — Single source of truth for all channels
+- **ONE inventory** — Stock updates propagate across all channels
+- **ONE order experience** — Unified order list with channel filtering
+- **Cross-channel sync status** — Track sync state per channel
+- **Channel enable/disable** — Toggle channels per product
+- **User-friendly status labels** — Mapped from internal status values
+
+### Commerce Summary
+
+The dashboard shows:
+- Total/live products
+- Channel counts (Craftsy, ONDC, GeM)
+- Total orders
+- Products needing attention
+- Low stock alerts
 
 ---
 
