@@ -37,6 +37,7 @@ def init_db() -> None:
     # Import models so SQLAlchemy registers them with Base.metadata
     from .models.db_models import ArtisanDB, ProductDB, SocialDraftDB  # noqa: F401
     from .models.commerce_models import ProductChannelDB, ChannelAuditLogDB  # noqa: F401
+    from .models.order_models import OrderDB  # noqa: F401
     from datetime import datetime
 
     Base.metadata.create_all(bind=engine)

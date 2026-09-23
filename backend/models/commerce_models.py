@@ -154,13 +154,12 @@ class ProductChannelDB(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    # Relationship
-    product = relationship("ProductDB", backref="channels")
+    # Relationship (no backref to avoid lazy-load issues in tests)
+    product = relationship("ProductDB")
 
 
 class ChannelAuditLogDB(Base):
-    """
-    Audit log for all channel operations.
+    """Audit log for all channel operations.
 
     Tracks every publish, update, unpublish, and sync attempt.
     """
@@ -178,8 +177,8 @@ class ChannelAuditLogDB(Base):
     success = Column(Integer, default=0)  # 0 or 1 (SQLite boolean)
     created_at = Column(DateTime, default=datetime.now)
 
-    # Relationship
-    product = relationship("ProductDB", backref="audit_logs")
+    # Relationship (no backref to avoid lazy-load issues in tests)
+    product = relationship("ProductDB")
 
 
 # ── Flutter-compatible Schemas ───────────────────────────────────────────────

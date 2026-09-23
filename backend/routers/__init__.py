@@ -6,6 +6,8 @@ from .auth import router as auth_router
 from .voice import router as voice_router
 from .social import router as social_router
 from .chat import router as chat_router
+from .commerce import router as commerce_router
+from .orders import router as orders_router
 
 __all__ = [
     "health_router",
@@ -16,4 +18,6 @@ __all__ = [
     "voice_router",
     "social_router",
     "chat_router",
+    "commerce_router",
+    "orders_router",
 ]

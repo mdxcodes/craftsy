@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 
-from .commerce_models import (
+from ..models.commerce_models import (
     ChannelType,
     CraftsyChannelStatus,
     ONDCChannelStatus,
@@ -44,8 +44,8 @@ from .commerce_models import (
     GEM_REQUIRED_FIELDS,
     CRAFTSY_REQUIRED_FIELDS,
 )
-from .db_models import ProductDB
-from .schemas import ProductResponse
+from ..models.db_models import ProductDB
+from ..models.schemas import ProductResponse
 
 logger = logging.getLogger(__name__)
 

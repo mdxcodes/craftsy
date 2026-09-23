@@ -1919,11 +1919,19 @@ The goals are:
 - [ ] 28. Final SIH readiness check
 - [ ] 29. STOP CONDITION met
 
-### Phase 9 Completion: ~30%
+### Phase 9 Completion: ~40%
 
-**Completed:** Master plan review, full application audit, demo journey identification, design consistency fixes (nav bar, auth screens), notification structure fix, backend validation, ML validation
+**Completed:** Master plan review, full application audit, demo journey identification, design consistency fixes (nav bar, auth screens), notification structure fix, backend validation, ML validation, commerce channel foundation (models, service, router, UI)
 
-**Remaining:** Device testing (voice, multilingual, offline), performance audit, security audit, build validation, test suite counts, master plan finalization
+**Commerce Foundation Implemented:**
+- Backend: commerce_models.py (ChannelType, ChannelStatus, ProductChannelDB, ChannelAuditLogDB)
+- Backend: commerce_service.py (multi-channel abstraction, validation, audit logging)
+- Backend: commerce.py router (/api/v1/commerce/* endpoints)
+- Frontend: commerce_models.dart, channel_status_card.dart
+- Frontend: product_channel_selector_screen.dart, government_selling_screen.dart
+- No fake ONDC/GeM API calls — honest status returns
+
+**Remaining:** Device testing (voice, multilingual, offline), performance audit, security audit, build validation, ONDC adapter scaffolding, GeM guided workflow wiring, test suite counts, master plan finalization
 
 ### Phase 9 Fixes Applied
 
