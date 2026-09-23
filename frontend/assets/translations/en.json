@@ -756,5 +756,12 @@
   "gem_fill_product_details": "Fill product details from Craftsy data",
   "gem_upload_product_images": "Upload product images (white background)",
   "gem_set_pricing": "Set pricing",
-  "gem_submit_approval": "Submit for approval"
+  "gem_submit_approval": "Submit for approval",
+  "commerce_hub_title": "Commerce Hub",
+  "commerce_hub_overview": "Overview",
+  "commerce_hub_products": "Products",
+  "commerce_hub_orders": "Orders",
+  "commerce_hub_inventory": "Inventory",
+  "commerce_hub_summary": "Commerce Summary",
+  "commerce_hub_error": "Failed to load commerce data"
 }

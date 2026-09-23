@@ -8,6 +8,7 @@ from .social import router as social_router
 from .chat import router as chat_router
 from .commerce import router as commerce_router
 from .orders import router as orders_router
+from .commerce_hub import router as commerce_hub_router
 
 __all__ = [
     "health_router",
@@ -20,4 +21,5 @@ __all__ = [
     "chat_router",
     "commerce_router",
     "orders_router",
+    "commerce_hub_router",
 ]

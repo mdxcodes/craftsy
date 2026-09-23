@@ -566,5 +566,12 @@
   "gem_fill_product_details": "Fill product details from Craftsy data",
   "gem_upload_product_images": "Upload product images (white background)",
   "gem_set_pricing": "Set pricing",
-  "gem_submit_approval": "Submit for approval"
+  "gem_submit_approval": "Submit for approval",
+  "commerce_hub_title": "কমার্স হাব",
+  "commerce_hub_overview": "সংক্ষিপ্ত বিবরণ",
+  "commerce_hub_products": "পণ্য",
+  "commerce_hub_orders": "অর্ডার",
+  "commerce_hub_inventory": "ইনভেন্টরি",
+  "commerce_hub_summary": "কমার্স সারাংশ",
+  "commerce_hub_error": "কমার্স ডেটা লোড করতে ব্যর্থ"
 }

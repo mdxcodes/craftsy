@@ -108,6 +108,8 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
         existing.category = product.category
         existing.tags = json.dumps(product.tags)
         existing.status = product.status
+        if product.stock is not None:
+            existing.stock = product.stock
         existing.updated_at = datetime.now()
         db.commit()
         db.refresh(existing)
@@ -125,6 +127,7 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
             category=product.category,
             tags=json.dumps(product.tags),
             status=product.status,
+            stock=product.stock if product.stock is not None else 0,
             created_at=product.created_at or datetime.now(),
         )
         db.add(db_item)
@@ -143,6 +146,7 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
         category=db_item.category,
         tags=db_item.tags_list,
         status=db_item.status,
+        stock=db_item.stock,
         created_at=db_item.created_at,
         updated_at=db_item.updated_at,
     )
@@ -177,6 +181,8 @@ async def update_product(
         db_item.tags = json.dumps(update_data.tags)
     if update_data.status is not None:
         db_item.status = update_data.status
+    if update_data.stock is not None:
+        db_item.stock = update_data.stock
 
     db_item.updated_at = datetime.now()
     db.commit()
@@ -194,6 +200,7 @@ async def update_product(
         category=db_item.category,
         tags=db_item.tags_list,
         status=db_item.status,
+        stock=db_item.stock,
         created_at=db_item.created_at,
         updated_at=db_item.updated_at,
     )

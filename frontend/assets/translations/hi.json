@@ -756,5 +756,12 @@
   "gem_fill_product_details": "Craftsy डेटा से उत्पाद विवरण भरें",
   "gem_upload_product_images": "उत्पाद फ़ोटो अपलोड करें (सफेद पृष्ठभूमि)",
   "gem_set_pricing": "मूल्य निर्धारण सेट करें",
-  "gem_submit_approval": "अनुमोदन के लिए जमा करें"
+  "gem_submit_approval": "अनुमोदन के लिए जमा करें",
+  "commerce_hub_title": "कॉमर्स हब",
+  "commerce_hub_overview": "अवलोकन",
+  "commerce_hub_products": "उत्पाद",
+  "commerce_hub_orders": "ऑर्डर",
+  "commerce_hub_inventory": "इन्वेंटरी",
+  "commerce_hub_summary": "कॉमर्स सारांश",
+  "commerce_hub_error": "कॉमर्स डेटा लोड करने में विफल"
 }

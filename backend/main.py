@@ -40,6 +40,7 @@ from backend.routers import (
     chat_router,
     commerce_router,
     orders_router,
+    commerce_hub_router,
 )
 
 settings = get_settings()

@@ -79,6 +79,10 @@ class Product extends HiveObject {
   @HiveField(15)
   final String? statusReason;
 
+  /// Available stock quantity (unified inventory across all channels)
+  @HiveField(16)
+  final int stock;
+
   Product({
     required this.id,
     required this.title,
@@ -96,6 +100,7 @@ class Product extends HiveObject {
     this.statusUpdatedAt,
     this.restockQuantity,
     this.statusReason,
+    this.stock = 0,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// All captured photos in order (primary first), for the review screen's
@@ -130,6 +135,7 @@ class Product extends HiveObject {
     DateTime? statusUpdatedAt,
     int? restockQuantity,
     String? statusReason,
+    int? stock,
   }) {
     return Product(
       id: id ?? this.id,
@@ -148,6 +154,7 @@ class Product extends HiveObject {
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
       restockQuantity: restockQuantity ?? this.restockQuantity,
       statusReason: statusReason ?? this.statusReason,
+      stock: stock ?? this.stock,
     );
   }
 
@@ -169,6 +176,7 @@ class Product extends HiveObject {
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
       'restockQuantity': restockQuantity,
       'statusReason': statusReason,
+      'stock': stock,
     };
   }
 
@@ -223,6 +231,7 @@ class Product extends HiveObject {
               : null),
       restockQuantity: json['restockQuantity'] as int?,
       statusReason: json['statusReason'] as String?,
+      stock: json['stock'] as int? ?? 0,
     );
   }
 }

@@ -566,5 +566,12 @@
   "gem_fill_product_details": "Fill product details from Craftsy data",
   "gem_upload_product_images": "Upload product images (white background)",
   "gem_set_pricing": "Set pricing",
-  "gem_submit_approval": "Submit for approval"
+  "gem_submit_approval": "Submit for approval",
+  "commerce_hub_title": "வணிக மையம்",
+  "commerce_hub_overview": "கண்ணோட்டம்",
+  "commerce_hub_products": "பொருட்கள்",
+  "commerce_hub_orders": "ஆர்டர்கள்",
+  "commerce_hub_inventory": "சரக்கு",
+  "commerce_hub_summary": "வணிக சுருக்கம்",
+  "commerce_hub_error": "வணிக தரவை ஏற்றுவதில் தோல்வி"
 }
