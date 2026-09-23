@@ -76,6 +76,22 @@ class IntentParser {
       return _intent('OPEN_CRAFTMITRA', isHindi: isHindi);
     }
 
+    // ── GeM Government Selling Intents ─────────────────────────────────
+    if (_matchesAny(clean, ['sell to government', 'sarkar ko becho', 'सरकार को बेचो', 'sarkari bikri', 'सरकारी बिक्री', 'gem selling', 'gem par becho', 'gem bikri']) ||
+        (clean.contains('gem') && (clean.contains('sell') || clean.contains('becho') || clean.contains('bikri') || clean.contains('government') || clean.contains('sarkar')))) {
+      return _intent('SELL_TO_GOVERNMENT', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['gem readiness', 'gem ki tayyari', 'gem check', 'gem kaise chal raha', 'sarkari bikri tayyari']) ||
+        (clean.contains('gem') && (clean.contains('ready') || clean.contains('tayyari') || clean.contains('check') || clean.contains('kaise')))) {
+      return _intent('CHECK_GEM_READINESS', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['gem help', 'gem madad', 'gem kaise', 'gem guide', 'gem setup', 'sarkari bikri madad']) ||
+        (clean.contains('gem') && (clean.contains('help') || clean.contains('madad') || clean.contains('kaise') || clean.contains('guide') || clean.contains('setup')))) {
+      return _intent('GET_GEM_HELP', isHindi: isHindi);
+    }
+
     // ── ONDC Commerce Intents ─────────────────────────────────────────
     if (_matchesAny(clean, ['sell on ondc', 'ondc par becho', 'ONDC पर बेचो', 'ondc par dal do', 'ONDC पर डाल दो', 'ondc par bechna', 'ondc par padao']) ||
         (clean.contains('ondc') && (clean.contains('sell') || clean.contains('becho') || clean.contains('dal') || clean.contains('padao') || clean.contains('list') || clean.contains('share')))) {

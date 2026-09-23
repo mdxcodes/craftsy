@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/primary_action_button.dart';
 import '../../../core/widgets/secondary_action_button.dart';
 
 class _GemStep {
-  final String title;
-  final String description;
+  final String titleKey;
+  final String descKey;
   final IconData icon;
 
   const _GemStep({
-    required this.title,
-    required this.description,
+    required this.titleKey,
+    required this.descKey,
     required this.icon,
   });
 }
@@ -41,23 +42,23 @@ class _GovernmentSellingScreenState
 
   final List<_GemStep> _steps = const [
     _GemStep(
-      title: 'Check Eligibility',
-      description: 'Verify your business meets GeM seller requirements.',
+      titleKey: 'gem_eligibility_check',
+      descKey: 'gem_eligibility_desc',
       icon: Icons.fact_check_outlined,
     ),
     _GemStep(
-      title: 'Prepare Documents',
-      description: 'Gather required documents: GST, PAN, Aadhaar, business proof.',
+      titleKey: 'gem_prepare_documents',
+      descKey: 'gem_documents_required',
       icon: Icons.description_outlined,
     ),
     _GemStep(
-      title: 'Product Catalogue',
-      description: 'Prepare product information for GeM listing.',
+      titleKey: 'gem_product_catalogue',
+      descKey: 'gem_product_info',
       icon: Icons.inventory_2_outlined,
     ),
     _GemStep(
-      title: 'Review & Submit',
-      description: 'Review everything before proceeding to GeM.',
+      titleKey: 'gem_review_and_submit',
+      descKey: 'gem_ready_for_submission',
       icon: Icons.fact_check,
     ),
   ];
@@ -66,7 +67,7 @@ class _GovernmentSellingScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Government Selling'),
+        title: Text('gem_selling_title'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -85,8 +86,7 @@ class _GovernmentSellingScreenState
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'This assistant helps you prepare for Government Selling. '
-                    'You will complete the final steps on the official GeM portal.',
+                    'gem_info_banner'.tr(),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColors.amberDark,
@@ -119,7 +119,7 @@ class _GovernmentSellingScreenState
                 if (_currentStep > 0)
                   Expanded(
                     child: SecondaryActionButton(
-                      label: 'Back',
+                      label: 'gem_back'.tr(),
                       onPressed: () {
                         setState(() {
                           _currentStep--;
@@ -131,8 +131,8 @@ class _GovernmentSellingScreenState
                 Expanded(
                   child: PrimaryActionButton(
                     label: _currentStep < _steps.length - 1
-                        ? 'Continue'
-                        : 'Review & Proceed',
+                        ? 'gem_continue'.tr()
+                        : 'gem_review_submit'.tr(),
                     onPressed: _isLoading ? null : _handleNext,
                   ),
                 ),
@@ -213,7 +213,7 @@ class _GovernmentSellingScreenState
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                step.title,
+                step.titleKey.tr(),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -223,7 +223,7 @@ class _GovernmentSellingScreenState
         ),
         const SizedBox(height: 16),
         Text(
-          step.description,
+          step.descKey.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -252,19 +252,20 @@ class _GovernmentSellingScreenState
   List<Widget> _buildEligibilityContent() {
     return [
       _buildInfoCard(
-        'Business Registration',
-        'Your business must be registered with a valid GST number.',
+        'gem_business_registration',
+        'gem_business_registration_desc',
         Icons.business,
       ),
       const SizedBox(height: 12),
       _buildInfoCard(
-        'Make in India',
-        'Products must be manufactured in India.',
-        Icons.flag),
+        'gem_make_in_india',
+        'gem_make_in_india_desc',
+        Icons.flag,
+      ),
       const SizedBox(height: 12),
       _buildInfoCard(
-        'Category Match',
-        'Your craft category must match GeM\'s approved categories.',
+        'gem_category_match',
+        'gem_category_match_desc',
         Icons.category,
       ),
     ];
@@ -272,17 +273,17 @@ class _GovernmentSellingScreenState
 
   List<Widget> _buildDocumentsContent() {
     const documents = [
-      'GST Certificate',
-      'PAN Card',
-      'Aadhaar Card',
-      'Business Address Proof',
-      'Bank Account Details',
+      'gem_gst_certificate',
+      'gem_pan_card',
+      'gem_aadhaar_card',
+      'gem_business_address_proof',
+      'gem_bank_account_details',
     ];
 
     return [
-      const Text(
-        'Required Documents',
-        style: TextStyle(
+      Text(
+        'gem_documents_title'.tr(),
+        style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
@@ -290,7 +291,7 @@ class _GovernmentSellingScreenState
       ),
       const SizedBox(height: 12),
       ...documents.map(
-        (doc) => Padding(
+        (docKey) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
@@ -299,7 +300,7 @@ class _GovernmentSellingScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  doc,
+                  docKey.tr(),
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
@@ -313,26 +314,26 @@ class _GovernmentSellingScreenState
   List<Widget> _buildProductCatalogueContent() {
     return [
       _buildInfoCard(
-        'Product Title',
-        'Clear, descriptive title that matches GeM naming conventions.',
+        'gem_product_title',
+        'gem_product_title_desc',
         Icons.title,
       ),
       const SizedBox(height: 12),
       _buildInfoCard(
-        'Technical Specifications',
-        'Detailed specifications: dimensions, weight, material, color.',
+        'gem_technical_specs',
+        'gem_technical_specs_desc',
         Icons.list_alt,
       ),
       const SizedBox(height: 12),
       _buildInfoCard(
-        'Product Images',
-        'High-quality images from multiple angles.',
+        'gem_product_images',
+        'gem_product_images_desc',
         Icons.image_outlined,
       ),
       const SizedBox(height: 12),
       _buildInfoCard(
-        'Pricing',
-        'Competitive pricing including GST.',
+        'gem_pricing',
+        'gem_pricing_desc',
         Icons.currency_rupee,
       ),
     ];
@@ -340,22 +341,22 @@ class _GovernmentSellingScreenState
 
   List<Widget> _buildReviewContent() {
     return [
-      _buildReviewSection('Business', [
-        'Business Name: [To be provided]',
-        'GST Number: [To be provided]',
-        'PAN: [To be provided]',
+      _buildReviewSection('gem_review_business', [
+        'gem_business_name: ${'gem_to_be_provided'.tr()}',
+        'gem_gst_number: ${'gem_to_be_provided'.tr()}',
+        'gem_pan: ${'gem_to_be_provided'.tr()}',
       ]),
       const SizedBox(height: 16),
-      _buildReviewSection('Product', [
-        'Title: [From Craftsy listing]',
-        'Category: [From Craftsy listing]',
-        'Price: [From Craftsy listing]',
+      _buildReviewSection('gem_review_product', [
+        'gem_product_title: ${'gem_from_craftsy'.tr()}',
+        'gem_category: ${'gem_from_craftsy'.tr()}',
+        'gem_pricing: ${'gem_from_craftsy'.tr()}',
       ]),
       const SizedBox(height: 16),
-      _buildReviewSection('Documents', [
-        'GST Certificate: [To upload]',
-        'PAN Card: [To upload]',
-        'Aadhaar Card: [To upload]',
+      _buildReviewSection('gem_review_documents', [
+        'gem_gst_certificate: ${'gem_to_upload'.tr()}',
+        'gem_pan_card: ${'gem_to_upload'.tr()}',
+        'gem_aadhaar_card: ${'gem_to_upload'.tr()}',
       ]),
       const SizedBox(height: 24),
       Container(
@@ -371,8 +372,7 @@ class _GovernmentSellingScreenState
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'After proceeding, you will be guided to the official GeM portal '
-                'to complete your seller registration and product listing.',
+                'gem_proceed_dialog_msg'.tr(),
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.amberDark,
@@ -385,7 +385,7 @@ class _GovernmentSellingScreenState
     ];
   }
 
-  Widget _buildInfoCard(String title, String description, IconData icon) {
+  Widget _buildInfoCard(String titleKey, String descKey, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -403,7 +403,7 @@ class _GovernmentSellingScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  titleKey.tr(),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -412,7 +412,7 @@ class _GovernmentSellingScreenState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  description,
+                  descKey.tr(),
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -426,12 +426,12 @@ class _GovernmentSellingScreenState
     );
   }
 
-  Widget _buildReviewSection(String title, List<String> items) {
+  Widget _buildReviewSection(String titleKey, List<String> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          titleKey.tr(),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -483,29 +483,24 @@ class _GovernmentSellingScreenState
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Proceed to GeM Portal'),
-          content: const Text(
-            'You are about to proceed to the official GeM portal to complete '
-            'your Government Selling registration. Craftsy will not store any '
-            'of your GeM credentials.\n\n'
-            'Do you want to continue?',
-          ),
+          title: Text('gem_proceed_dialog_title'.tr()),
+          content: Text('gem_proceed_dialog_msg'.tr()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text('gem_cancel'.tr()),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Opening GeM portal instructions...'),
+                  SnackBar(
+                    content: Text('gem_opening_instructions'.tr()),
                     backgroundColor: AppColors.indigo,
                   ),
                 );
               },
-              child: const Text('Continue'),
+              child: Text('gem_continue'.tr()),
             ),
           ],
         );

@@ -37,7 +37,25 @@ class IntentRegistry {
 
   /// All registered intents.
   static final Map<String, IntentMetadata> _intents = {
-    // ── Commerce / Channel Intents ─────────────────────────────────────
+    // ── GeM Government Selling Intents ─────────────────────────────────
+    'SELL_TO_GOVERNMENT': const IntentMetadata(
+      type: 'SELL_TO_GOVERNMENT',
+      descriptionEn: 'Sell a product to the government',
+      descriptionHi: 'सरकार को उत्पाद बेचें',
+      safety: IntentSafety.confirmRequired,
+    ),
+    'CHECK_GEM_READINESS': const IntentMetadata(
+      type: 'CHECK_GEM_READINESS',
+      descriptionEn: 'Check government selling readiness',
+      descriptionHi: 'सरकारी बिक्री तैयारी जांचें',
+    ),
+    'GET_GEM_HELP': const IntentMetadata(
+      type: 'GET_GEM_HELP',
+      descriptionEn: 'Get help with government selling',
+      descriptionHi: 'सरकारी बिक्री में मदद लें',
+    ),
+
+    // ── ONDC Commerce Intents ─────────────────────────────────────────
     'SELL_ON_ONDC': const IntentMetadata(
       type: 'SELL_ON_ONDC',
       descriptionEn: 'Sell a product on ONDC',

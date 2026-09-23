@@ -112,6 +112,14 @@ class IntentExecutor {
       case 'CHECK_PRODUCT_PRICE':
         return _executeCheckProductPrice(intent);
 
+      // ── GeM Government Selling Actions ───────────────────────────────
+      case 'SELL_TO_GOVERNMENT':
+        return _executeSellToGovernment(intent);
+      case 'CHECK_GEM_READINESS':
+        return _executeCheckGemReadiness();
+      case 'GET_GEM_HELP':
+        return _executeGetGemHelp();
+
       // ── ONDC Commerce Actions ─────────────────────────────────────────
       case 'SELL_ON_ONDC':
         return _executeSellOnOndc(intent);
@@ -336,6 +344,69 @@ class IntentExecutor {
       _isHindi()
           ? '"${matched.title}" की कीमत ₹${matched.price.toStringAsFixed(0)} है।'
           : '"${matched.title}" is priced at ₹${matched.price.toStringAsFixed(0)}.',
+    );
+  }
+
+  // ── GeM Government Selling Executors ───────────────────────────────
+
+  IntentResult _executeSellToGovernment(CraftsyIntent intent) {
+    final productName = intent.parameters['product_name'] as String?;
+    if (productName == null || productName.isEmpty) {
+      return IntentResult.failure(
+        _isHindi()
+            ? 'कृपया उत्पाद का नाम बताएं। सरकार को क्या बेचना है?'
+            : 'Please specify a product name. What do you want to sell to the government?',
+      );
+    }
+
+    // Find product in catalogue
+    final products = _ref.read(productListProvider).value ?? [];
+    Product? matched;
+    for (final p in products) {
+      if (p.title.toLowerCase().contains(productName.toLowerCase()) ||
+          p.titleHi.toLowerCase().contains(productName.toLowerCase())) {
+        matched = p;
+        break;
+      }
+    }
+
+    if (matched == null) {
+      return IntentResult.failure(
+        _isHindi()
+            ? 'कैटलॉग में "$productName" नाम का कोई उत्पाद नहीं मिला।'
+            : 'Could not find "$productName" in your catalogue.',
+      );
+    }
+
+    // Navigate to product detail for channel selection
+    _context.push('/product/${matched.id}');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? '"${matched.title}" खोल रहा हूँ। सरकारी बिक्री के लिए "Sell to Government" बटन दबाएं।'
+          : 'Opening "${matched.title}". Tap "Sell to Government" to start.',
+    );
+  }
+
+  IntentResult _executeCheckGemReadiness() {
+    // Navigate to catalogue to show channel statuses
+    _context.push('/catalogue');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? 'आपके उत्पादों की सरकारी बिक्री तैयारी दिखा रहा हूँ।'
+          : 'Showing government selling readiness for your products.',
+    );
+  }
+
+  IntentResult _executeGetGemHelp() {
+    // Navigate to tutorial which includes government selling information
+    _context.push('/listing-tutorial');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? 'सरकारी बिक्री के बारे में जानकारी दिखा रहा हूँ।'
+          : 'Showing government selling information.',
     );
   }
 

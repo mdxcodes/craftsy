@@ -151,13 +151,140 @@ class ONDCError(BaseModel):
 class GeMChannelStatus(str, Enum):
     """GeM (Government e-Marketplace) channel status."""
     NOT_CONNECTED = "not_connected"
+    NOT_STARTED = "not_started"
+    PROFILE_INCOMPLETE = "profile_incomplete"
+    DOCUMENTS_REQUIRED = "documents_required"
+    VERIFICATION_REQUIRED = "verification_required"
+    PRODUCT_REQUIREMENTS_MISSING = "product_requirements_missing"
+    READY_FOR_SUBMISSION = "ready_for_submission"
+    SUBMISSION_PENDING = "submission_pending"
+    PUBLISHED = "published"
+    ACTIVE = "active"
+    ACTION_REQUIRED = "action_required"
+    ERROR = "error"
     ELIGIBILITY_REQUIRED = "eligibility_required"
     NEEDS_INFORMATION = "needs_information"
     READY = "ready"
     PENDING = "pending"
-    PUBLISHED = "published"
     REJECTED = "rejected"
     DISCONNECTED = "disconnected"
+    ASSISTED_WORKFLOW = "assisted_workflow"
+
+
+# GeM state transitions: current_status → allowed_next_states
+GEM_STATE_TRANSITIONS = {
+    GeMChannelStatus.NOT_CONNECTED: [
+        GeMChannelStatus.NOT_STARTED,
+        GeMChannelStatus.ASSISTED_WORKFLOW,
+    ],
+    GeMChannelStatus.NOT_STARTED: [
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+        GeMChannelStatus.DOCUMENTS_REQUIRED,
+        GeMChannelStatus.ELIGIBILITY_REQUIRED,
+        GeMChannelStatus.ASSISTED_WORKFLOW,
+    ],
+    GeMChannelStatus.PROFILE_INCOMPLETE: [
+        GeMChannelStatus.DOCUMENTS_REQUIRED,
+        GeMChannelStatus.VERIFICATION_REQUIRED,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.DOCUMENTS_REQUIRED: [
+        GeMChannelStatus.VERIFICATION_REQUIRED,
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.VERIFICATION_REQUIRED: [
+        GeMChannelStatus.READY_FOR_SUBMISSION,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.PRODUCT_REQUIREMENTS_MISSING: [
+        GeMChannelStatus.READY_FOR_SUBMISSION,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.READY_FOR_SUBMISSION: [
+        GeMChannelStatus.SUBMISSION_PENDING,
+        GeMChannelStatus.PUBLISHED,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.SUBMISSION_PENDING: [
+        GeMChannelStatus.PUBLISHED,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.PUBLISHED: [
+        GeMChannelStatus.ACTIVE,
+        GeMChannelStatus.ERROR,
+        GeMChannelStatus.DISCONNECTED,
+    ],
+    GeMChannelStatus.ACTIVE: [
+        GeMChannelStatus.ACTION_REQUIRED,
+        GeMChannelStatus.ERROR,
+        GeMChannelStatus.DISCONNECTED,
+    ],
+    GeMChannelStatus.ACTION_REQUIRED: [
+        GeMChannelStatus.ACTIVE,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.ERROR: [
+        GeMChannelStatus.NOT_CONNECTED,
+        GeMChannelStatus.NOT_STARTED,
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+    ],
+    GeMChannelStatus.ELIGIBILITY_REQUIRED: [
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+        GeMChannelStatus.NOT_STARTED,
+    ],
+    GeMChannelStatus.NEEDS_INFORMATION: [
+        GeMChannelStatus.READY,
+        GeMChannelStatus.VERIFICATION_REQUIRED,
+    ],
+    GeMChannelStatus.READY: [
+        GeMChannelStatus.READY_FOR_SUBMISSION,
+        GeMChannelStatus.PUBLISHED,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.PENDING: [
+        GeMChannelStatus.PUBLISHED,
+        GeMChannelStatus.ACTIVE,
+        GeMChannelStatus.ERROR,
+    ],
+    GeMChannelStatus.REJECTED: [
+        GeMChannelStatus.NOT_STARTED,
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+    ],
+    GeMChannelStatus.DISCONNECTED: [
+        GeMChannelStatus.NOT_CONNECTED,
+        GeMChannelStatus.NOT_STARTED,
+    ],
+    GeMChannelStatus.ASSISTED_WORKFLOW: [
+        GeMChannelStatus.NOT_STARTED,
+        GeMChannelStatus.PROFILE_INCOMPLETE,
+        GeMChannelStatus.DOCUMENTS_REQUIRED,
+        GeMChannelStatus.VERIFICATION_REQUIRED,
+        GeMChannelStatus.READY_FOR_SUBMISSION,
+    ],
+}
+
+
+class GeMError(BaseModel):
+    """Human-readable GeM error for artisan display."""
+    error_code: str
+    title: str
+    message: str
+    action_required: Optional[str] = None
+    is_retryable: bool = False
+
+
+class GeMReadiness(BaseModel):
+    """GeM seller readiness assessment."""
+    seller_ready: bool
+    product_ready: bool
+    missing_information: List[str] = Field(default_factory=list)
+    missing_documents: List[str] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
+    category_requirements: List[str] = Field(default_factory=list)
+    next_actions: List[str] = Field(default_factory=list)
+    ready_for_workflow: bool
+    readiness_status: str
 
 
 # ── Channel Requirements ─────────────────────────────────────────────────────

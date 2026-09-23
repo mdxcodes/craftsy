@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.commerce_models import (
     ChannelType,
+    GeMChannelStatus,
     ONDCChannelStatus,
     ONDCError,
     ChannelPublishRequest,
@@ -24,6 +25,7 @@ from ..models.commerce_models import (
 )
 from ..services.commerce_service import commerce_service
 from ..services.ondc_adapter import ondc_adapter
+from ..services.gem_adapter import gem_adapter
 
 router = APIRouter(prefix="/api/v1/commerce", tags=["Commerce Channels"])
 
@@ -233,5 +235,72 @@ async def reconcile_ondc_order(
     """Reconcile ONDC order state with Craftsy order state (foundation)."""
     try:
         return ondc_adapter.reconcile_ondc_order_state(db, order_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# GeM-Specific Endpoints (Foundation)
+
+
+@router.get("/gem/readiness/{product_id}")
+async def get_gem_readiness(
+    product_id: str,
+    db: Session = Depends(get_db),
+):
+    """Get GeM seller readiness assessment for a product."""
+    try:
+        return gem_adapter.get_gem_readiness(db, product_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/gem/seller-checklist")
+async def get_gem_seller_checklist(
+    db: Session = Depends(get_db),
+):
+    """Get GeM seller registration checklist."""
+    try:
+        return gem_adapter.get_gem_seller_checklist(db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/gem/guided-workflow/{product_id}")
+async def get_gem_guided_workflow(
+    product_id: str,
+    db: Session = Depends(get_db),
+):
+    """Get guided workflow for GeM selling preparation."""
+    try:
+        return gem_adapter.get_gem_guided_workflow(db, product_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/gem/validate-state-transition")
+async def validate_gem_state_transition(
+    current_status: GeMChannelStatus,
+    new_status: GeMChannelStatus,
+):
+    """Validate a GeM state transition."""
+    try:
+        is_valid = gem_adapter.validate_state_transition(current_status, new_status)
+        return {"valid": is_valid, "current": current_status, "new": new_status}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/gem/error/{error_code}")
+async def get_gem_error(
+    error_code: str,
+    details: Optional[str] = None,
+):
+    """Get human-readable GeM error for artisan display."""
+    try:
+        return gem_adapter.get_gem_error(error_code, details)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

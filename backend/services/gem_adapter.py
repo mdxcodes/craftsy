@@ -53,6 +53,9 @@ from sqlalchemy.orm import Session
 from ..models.commerce_models import (
     ChannelType,
     GeMChannelStatus,
+    GeMError,
+    GeMReadiness,
+    GEM_STATE_TRANSITIONS,
     ChannelRequirement,
     ChannelRequirements,
     ChannelPublishRequest,
@@ -193,6 +196,149 @@ class GeMAdapter:
             "country_of_origin": None,
             "make_in_india": None,
         }
+
+    def validate_state_transition(
+        self,
+        current_status: GeMChannelStatus,
+        new_status: GeMChannelStatus,
+    ) -> bool:
+        """Check if a state transition is valid."""
+        allowed = GEM_STATE_TRANSITIONS.get(current_status, [])
+        return new_status in allowed
+
+    def get_gem_error(
+        self,
+        error_code: str,
+        details: Optional[str] = None,
+    ) -> GeMError:
+        """Get human-readable GeM error for artisan display."""
+        error_map = {
+            "GEM_NOT_CONNECTED": GeMError(
+                error_code="GEM_NOT_CONNECTED",
+                title="Government Selling not connected",
+                message="Connect your GeM account to start selling.",
+                action_required="Complete GeM seller registration",
+                is_retryable=False,
+            ),
+            "GEM_REGISTRATION_REQUIRED": GeMError(
+                error_code="GEM_REGISTRATION_REQUIRED",
+                title="Seller registration required",
+                message="You must register as a GeM seller to continue.",
+                action_required="Complete GeM seller registration",
+                is_retryable=False,
+            ),
+            "GEM_DOCUMENTS_REQUIRED": GeMError(
+                error_code="GEM_DOCUMENTS_REQUIRED",
+                title="Documents required",
+                message="Please upload the required documents.",
+                action_required="Upload required documents",
+                is_retryable=True,
+            ),
+            "GEM_VERIFICATION_REQUIRED": GeMError(
+                error_code="GEM_VERIFICATION_REQUIRED",
+                title="Verification required",
+                message="Your documents need to be verified by GeM.",
+                action_required="Wait for GeM verification",
+                is_retryable=False,
+            ),
+            "GEM_PRODUCT_REQUIREMENTS_MISSING": GeMError(
+                error_code="GEM_PRODUCT_REQUIREMENTS_MISSING",
+                title="Product requirements incomplete",
+                message="Some required product information is missing.",
+                action_required="Complete product details",
+                is_retryable=True,
+            ),
+            "GEM_SUBMISSION_FAILED": GeMError(
+                error_code="GEM_SUBMISSION_FAILED",
+                title="Submission failed",
+                message="Your product submission to GeM failed. Please try again.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+            "GEM_REJECTED": GeMError(
+                error_code="GEM_REJECTED",
+                title="GeM rejected the request",
+                message="GeM did not accept your product. Please review and try again.",
+                action_required="Review product information",
+                is_retryable=True,
+            ),
+            "GEM_SERVICE_UNAVAILABLE": GeMError(
+                error_code="GEM_SERVICE_UNAVAILABLE",
+                title="GeM temporarily unavailable",
+                message="GeM is currently unavailable. Please try again later.",
+                action_required="Try again later",
+                is_retryable=True,
+            ),
+            "GEM_UNKNOWN_ERROR": GeMError(
+                error_code="GEM_UNKNOWN_ERROR",
+                title="Something went wrong",
+                message="An unexpected error occurred. Please try again.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+        }
+        return error_map.get(error_code, error_map["GEM_UNKNOWN_ERROR"])
+
+    def get_gem_readiness(
+        self,
+        db: Session,
+        product_id: str,
+    ) -> GeMReadiness:
+        """Get GeM seller readiness assessment for a product."""
+        product = db.query(ProductDB).filter(ProductDB.id == product_id).first()
+        if not product:
+            raise ValueError(f"Product {product_id} not found")
+
+        missing_information = []
+        missing_documents = []
+        warnings = []
+        category_requirements = []
+        next_actions = []
+
+        # Check product information
+        if not product.title:
+            missing_information.append("Product title")
+        if not product.description:
+            missing_information.append("Product description")
+        if not product.price or product.price <= 0:
+            missing_information.append("Product price")
+        if not product.image_url:
+            missing_information.append("Product image")
+
+        # Check GeM-specific fields (not yet in ProductDB)
+        missing_documents.extend([
+            "GST Certificate",
+            "PAN Card",
+            "Aadhaar Card",
+            "Business Address Proof",
+        ])
+
+        # Category requirements
+        category_requirements.append("Category must match GeM approved categories")
+
+        # Determine readiness
+        seller_ready = len(missing_documents) == 0
+        product_ready = len(missing_information) == 0
+        ready_for_workflow = seller_ready and product_ready
+
+        # Next actions
+        if missing_information:
+            next_actions.append("Complete product information")
+        if missing_documents:
+            next_actions.append("Upload required documents")
+        next_actions.append("Complete GeM seller registration on official portal")
+
+        return GeMReadiness(
+            seller_ready=seller_ready,
+            product_ready=product_ready,
+            missing_information=missing_information,
+            missing_documents=missing_documents,
+            warnings=warnings,
+            category_requirements=category_requirements,
+            next_actions=next_actions,
+            ready_for_workflow=ready_for_workflow,
+            readiness_status="ready" if ready_for_workflow else "not_ready",
+        )
 
     def get_gem_seller_checklist(
         self,
