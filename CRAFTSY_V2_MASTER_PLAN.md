@@ -1950,6 +1950,103 @@ The goals are:
 
 ---
 
+## GeM Government Selling Foundation
+
+### Current Implementation Status
+PARTIAL — Assisted workflow foundation complete. No live GeM integration.
+
+### Architecture
+```
+Flutter App
+    ↓
+Craftsy Backend
+    ↓
+Commerce Gateway (commerce_service.py)
+    ↓
+GeM Adapter (gem_adapter.py)
+    ↓
+Official GeM Portal (manual completion by artisan)
+```
+
+### Craftsy's Role
+Craftsy acts as an artisan-friendly preparation and assistance layer for government selling. It does NOT directly integrate with GeM APIs (which are not publicly available). Instead, it guides artisans through the preparation process and provides clear information about what is needed.
+
+### GeM vs ONDC
+- **GeM**: Government procurement marketplace. Seller registration and eligibility requirements. Category-specific requirements. Product/catalogue requirements. Government procurement workflows. Bids/reverse auctions/orders where applicable.
+- **ONDC**: Open commerce network. Consumer/business commerce. Network-participant architecture.
+
+### Official GeM Findings
+- GeM has API integration with Udyam MSME database for 2-step seller auto-registration
+- No public API for catalogue/order management
+- Sellers must complete registration on the official GeM portal
+- Craftsy provides assisted workflow, not direct API integration
+
+### Seller Registration Requirements
+- Aadhaar of authorized person
+- PAN of business/individual
+- Mobile number linked with Aadhaar
+- Registered email ID
+- Udyam Registration (mandatory for MSMEs)
+- GST Certificate
+- Bank account details with cancelled cheque
+- Business address proof
+- ITR (sometimes required for OEM approvals)
+
+### Seller Types
+- OEM (Manufacturer/Original Producer)
+- Reseller
+- Service Provider
+- Startup
+
+### Implemented Components
+- GeM adapter with full state machine (14 states)
+- GeM state transition validation
+- GeM error handling (9 error types, human-readable)
+- GeM seller readiness assessment
+- GeM guided workflow (4 phases)
+- GeM seller registration checklist
+- 5 GeM-specific API endpoints
+- 3 GeM intents (sell to government, check readiness, get help)
+- 133 GeM translation keys (en, hi, bn, ta)
+- Fully localized government selling screen (was 25+ hardcoded strings)
+- GeM intent parsing (English + Hindi)
+- GeM intent executors with product search
+
+### Not-Yet-Implemented Components
+- Direct GeM API integration (no public API available)
+- Automated seller registration (requires manual completion on GeM portal)
+- Document upload to GeM (requires manual completion)
+- Product catalogue submission to GeM (requires manual completion)
+- Bid participation (requires GeM account)
+- Invoice generation (requires GeM account)
+
+### Test Status
+- Backend: 48/53 pass (3 pre-existing failures)
+- Frontend: 102/102 pass
+- GeM adapter: All methods return honest status
+- No fake GeM success states exist
+- No real credentials required for testing
+
+### Known Limitations
+- GeM integration requires seller registration on official portal
+- No public API for catalogue/order management
+- Artisan must complete final steps on GeM portal
+- No automated document verification
+- No automated product approval
+
+### Next Required External Steps
+1. Complete GeM seller registration on official portal
+2. Upload required documents to GeM
+3. Complete product catalogue submission
+4. Pass GeM verification and approval
+
+### References
+- https://www.gem.gov.in/
+- https://pib.gov.in/PressReleasePage.aspx?PRID=2113698 (GeM API with Udyam)
+- https://tenderdekho.com/blog/gem-portal-bidding-guide-2025_complete-process-win-government-tenders
+
+---
+
 ## ONDC Seller-Side Integration Foundation
 
 ### Current Implementation Status
