@@ -48,6 +48,8 @@ from sqlalchemy.orm import Session
 from ..models.commerce_models import (
     ChannelType,
     ONDCChannelStatus,
+    ONDCError,
+    ONDC_STATE_TRANSITIONS,
     ChannelRequirement,
     ChannelRequirements,
     ChannelPublishRequest,
@@ -210,6 +212,114 @@ class ONDCAdapter:
 
         return catalogue_item
 
+    def sync_ondc_catalogue(
+        self,
+        db: Session,
+        product_id: str,
+    ) -> Dict[str, Any]:
+        """
+        Sync product to ONDC catalogue (foundation — no real API call).
+
+        Returns the prepared payload and status indicating
+        that real sync requires ONDC credentials.
+        """
+        catalogue_item = self.prepare_ondc_catalogue(db, product_id)
+        return {
+            "action": "sync_catalogue",
+            "status": "not_configured",
+            "message": "ONDC catalogue sync requires Network Participant credentials",
+            "catalogue_item": catalogue_item,
+            "external_id": None,
+        }
+
+    def get_ondc_orders(
+        self,
+        db: Session,
+        artisan_id: str,
+        limit: int = 50,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get orders from ONDC (foundation — no real API call).
+
+        Returns empty list with status indicating ONDC is not connected.
+        Real implementation would poll ONDC for new orders.
+        """
+        return []
+
+    def update_ondc_order_status(
+        self,
+        db: Session,
+        order_id: str,
+        new_status: str,
+    ) -> Dict[str, Any]:
+        """
+        Update order status on ONDC (foundation — no real API call).
+
+        Returns status indicating that real update requires ONDC credentials.
+        """
+        return {
+            "action": "update_order_status",
+            "status": "not_configured",
+            "message": "ONDC order status update requires Network Participant credentials",
+            "order_id": order_id,
+            "requested_status": new_status,
+        }
+
+    def handle_ondc_cancellation(
+        self,
+        db: Session,
+        order_id: str,
+        reason: str,
+    ) -> Dict[str, Any]:
+        """
+        Handle ONDC order cancellation (foundation — no real API call).
+
+        Returns status indicating that real cancellation requires ONDC credentials.
+        """
+        return {
+            "action": "cancel_order",
+            "status": "not_configured",
+            "message": "ONDC order cancellation requires Network Participant credentials",
+            "order_id": order_id,
+            "reason": reason,
+        }
+
+    def sync_ondc_inventory(
+        self,
+        db: Session,
+        product_id: str,
+        stock_quantity: int,
+    ) -> Dict[str, Any]:
+        """
+        Sync inventory to ONDC (foundation — no real API call).
+
+        Returns status indicating that real sync requires ONDC credentials.
+        """
+        return {
+            "action": "sync_inventory",
+            "status": "not_configured",
+            "message": "ONDC inventory sync requires Network Participant credentials",
+            "product_id": product_id,
+            "stock_quantity": stock_quantity,
+        }
+
+    def reconcile_ondc_order_state(
+        self,
+        db: Session,
+        order_id: str,
+    ) -> Dict[str, Any]:
+        """
+        Reconcile ONDC order state with Craftsy order state (foundation).
+
+        Returns status indicating that real reconciliation requires ONDC credentials.
+        """
+        return {
+            "action": "reconcile_order",
+            "status": "not_configured",
+            "message": "ONDC order reconciliation requires Network Participant credentials",
+            "order_id": order_id,
+        }
+
     def get_ondc_onboarding_checklist(
         self,
         db: Session,
@@ -290,6 +400,114 @@ class ONDCAdapter:
             "documentation_url": "https://ondc.org/be/sellers",
             "contact": "ONDC Support Desk",
         }
+
+    def validate_state_transition(
+        self,
+        current_status: ONDCChannelStatus,
+        new_status: ONDCChannelStatus,
+    ) -> bool:
+        """Check if a state transition is valid."""
+        allowed = ONDC_STATE_TRANSITIONS.get(current_status, [])
+        return new_status in allowed
+
+    def get_ondc_error(
+        self,
+        error_code: str,
+        details: Optional[str] = None,
+    ) -> ONDCError:
+        """
+        Get human-readable ONDC error for artisan display.
+
+        Maps technical error codes to artisan-friendly messages.
+        Never exposes raw JSON/protocol errors.
+        """
+        error_map = {
+            "ONDC_NOT_CONFIGURED": ONDCError(
+                error_code="ONDC_NOT_CONFIGURED",
+                title="ONDC not connected",
+                message="Connect your ONDC account to start selling.",
+                action_required="Complete ONDC onboarding",
+                is_retryable=False,
+            ),
+            "AUTH_FAILURE": ONDCError(
+                error_code="AUTH_FAILURE",
+                title="Connection problem",
+                message="Could not connect to ONDC. Please check your credentials.",
+                action_required="Re-enter ONDC credentials",
+                is_retryable=True,
+            ),
+            "CREDENTIAL_MISSING": ONDCError(
+                error_code="CREDENTIAL_MISSING",
+                title="Account needed",
+                message="ONDC account required. Complete setup to continue.",
+                action_required="Complete ONDC onboarding",
+                is_retryable=False,
+            ),
+            "VALIDATION_FAILED": ONDCError(
+                error_code="VALIDATION_FAILED",
+                title="Product information incomplete",
+                message="Some required information is missing.",
+                action_required="Complete product details",
+                is_retryable=True,
+            ),
+            "CATEGORY_MAPPING_FAILED": ONDCError(
+                error_code="CATEGORY_MAPPING_FAILED",
+                title="Category not recognized",
+                message="Your product category doesn't match ONDC categories.",
+                action_required="Select a different category",
+                is_retryable=True,
+            ),
+            "CATALOGUE_SYNC_FAILED": ONDCError(
+                error_code="CATALOGUE_SYNC_FAILED",
+                title="Could not share product",
+                message="Your product could not be shared on ONDC. Please try again.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+            "INVENTORY_SYNC_FAILED": ONDCError(
+                error_code="INVENTORY_SYNC_FAILED",
+                title="Stock update failed",
+                message="Could not update your stock on ONDC.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+            "ORDER_SYNC_FAILED": ONDCError(
+                error_code="ORDER_SYNC_FAILED",
+                title="Order sync problem",
+                message="Could not sync your ONDC orders.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+            "NETWORK_TIMEOUT": ONDCError(
+                error_code="NETWORK_TIMEOUT",
+                title="Connection timed out",
+                message="ONDC is not responding. Check your internet connection.",
+                action_required="Check internet and try again",
+                is_retryable=True,
+            ),
+            "SERVICE_UNAVAILABLE": ONDCError(
+                error_code="SERVICE_UNAVAILABLE",
+                title="ONDC temporarily unavailable",
+                message="ONDC is currently unavailable. Please try again later.",
+                action_required="Try again later",
+                is_retryable=True,
+            ),
+            "EXTERNAL_REJECTION": ONDCError(
+                error_code="EXTERNAL_REJECTION",
+                title="ONDC rejected the request",
+                message="ONDC did not accept your product. Please review and try again.",
+                action_required="Review product information",
+                is_retryable=True,
+            ),
+            "UNKNOWN_ERROR": ONDCError(
+                error_code="UNKNOWN_ERROR",
+                title="Something went wrong",
+                message="An unexpected error occurred. Please try again.",
+                action_required="Try again",
+                is_retryable=True,
+            ),
+        }
+        return error_map.get(error_code, error_map["UNKNOWN_ERROR"])
 
 
 # ── Singleton ────────────────────────────────────────────────────────────────

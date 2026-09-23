@@ -76,6 +76,22 @@ class IntentParser {
       return _intent('OPEN_CRAFTMITRA', isHindi: isHindi);
     }
 
+    // ── ONDC Commerce Intents ─────────────────────────────────────────
+    if (_matchesAny(clean, ['sell on ondc', 'ondc par becho', 'ONDC पर बेचो', 'ondc par dal do', 'ONDC पर डाल दो', 'ondc par bechna', 'ondc par padao']) ||
+        (clean.contains('ondc') && (clean.contains('sell') || clean.contains('becho') || clean.contains('dal') || clean.contains('padao') || clean.contains('list') || clean.contains('share')))) {
+      return _intent('SELL_ON_ONDC', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['ondc status', 'ondc ki sthiti', 'ONDC की स्थिति', 'ondc check', 'ondc kaise chal raha']) ||
+        (clean.contains('ondc') && (clean.contains('status') || clean.contains('sthiti') || clean.contains('check') || clean.contains('kaise')))) {
+      return _intent('CHECK_ONDC_STATUS', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, ['ondc help', 'ondc madad', 'ONDC मदद', 'ondc kaise', 'ONDC कैसे', 'ondc guide', 'ondc setup']) ||
+        (clean.contains('ondc') && (clean.contains('help') || clean.contains('madad') || clean.contains('kaise') || clean.contains('guide') || clean.contains('setup')))) {
+      return _intent('GET_ONDC_HELP', isHindi: isHindi);
+    }
+
     // ── Product Intents ───────────────────────────────────────────────
     if (_matchesAny(clean, ['add product', 'add a product', 'add new product', 'naya saman', 'नया सामान', 'upload', 'bechna', 'बेचना', 'list', 'jodna', 'जोड़ना', 'create product', 'photo', 'फोटो']) ||
         (clean.contains('add') && (clean.contains('product') || clean.contains('item') || clean.contains('craft') || clean.contains('saman')))) {

@@ -112,6 +112,14 @@ class IntentExecutor {
       case 'CHECK_PRODUCT_PRICE':
         return _executeCheckProductPrice(intent);
 
+      // ── ONDC Commerce Actions ─────────────────────────────────────────
+      case 'SELL_ON_ONDC':
+        return _executeSellOnOndc(intent);
+      case 'CHECK_ONDC_STATUS':
+        return _executeCheckOndcStatus();
+      case 'GET_ONDC_HELP':
+        return _executeGetOndcHelp();
+
       // ── Order Actions ───────────────────────────────────────────────
       case 'CHECK_ORDER_STATUS':
         return _executeCheckOrderStatus(intent);
@@ -328,6 +336,69 @@ class IntentExecutor {
       _isHindi()
           ? '"${matched.title}" की कीमत ₹${matched.price.toStringAsFixed(0)} है।'
           : '"${matched.title}" is priced at ₹${matched.price.toStringAsFixed(0)}.',
+    );
+  }
+
+  // ── ONDC Commerce Executors ────────────────────────────────────────
+
+  IntentResult _executeSellOnOndc(CraftsyIntent intent) {
+    final productName = intent.parameters['product_name'] as String?;
+    if (productName == null || productName.isEmpty) {
+      return IntentResult.failure(
+        _isHindi()
+            ? 'कृपया उत्पाद का नाम बताएं। ONDC पर क्या बेचना है?'
+            : 'Please specify a product name. What do you want to sell on ONDC?',
+      );
+    }
+
+    // Find product in catalogue
+    final products = _ref.read(productListProvider).value ?? [];
+    Product? matched;
+    for (final p in products) {
+      if (p.title.toLowerCase().contains(productName.toLowerCase()) ||
+          p.titleHi.toLowerCase().contains(productName.toLowerCase())) {
+        matched = p;
+        break;
+      }
+    }
+
+    if (matched == null) {
+      return IntentResult.failure(
+        _isHindi()
+            ? 'कैटलॉग में "$productName" नाम का कोई उत्पाद नहीं मिला।'
+            : 'Could not find "$productName" in your catalogue.',
+      );
+    }
+
+    // Navigate to product detail for channel selection
+    _context.push('/product/${matched.id}');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? '"${matched.title}" खोल रहा हूँ। ONDC पर बेचने के लिए "Sell on ONDC" बटन दबाएं।'
+          : 'Opening "${matched.title}". Tap "Sell on ONDC" to list it.',
+    );
+  }
+
+  IntentResult _executeCheckOndcStatus() {
+    // Navigate to catalogue to show channel statuses
+    _context.push('/catalogue');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? 'आपके उत्पादों की ONDC स्थिति दिखा रहा हूँ।'
+          : 'Showing ONDC status for your products.',
+    );
+  }
+
+  IntentResult _executeGetOndcHelp() {
+    // Navigate to tutorial which includes ONDC information
+    _context.push('/listing-tutorial');
+    _closeChatbotSheet();
+    return IntentResult.success(
+      _isHindi()
+          ? 'ONDC बेचने के बारे में जानकारी दिखा रहा हूँ।'
+          : 'Showing ONDC selling information.',
     );
   }
 

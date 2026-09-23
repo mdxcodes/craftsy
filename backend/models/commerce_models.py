@@ -47,14 +47,105 @@ class CraftsyChannelStatus(str, Enum):
 
 
 class ONDCChannelStatus(str, Enum):
-    """ONDC channel status."""
+    """ONDC channel status with full state machine."""
+    NOT_CONFIGURED = "not_configured"
+    PENDING_ONBOARDING = "pending_onboarding"
+    CREDENTIALS_REQUIRED = "credentials_required"
+    VALIDATION_REQUIRED = "validation_required"
+    READY_TO_PUBLISH = "ready_to_publish"
+    PUBLISHED = "published"
+    SYNCING = "syncing"
+    SYNCED = "synced"
+    ERROR = "error"
     NOT_CONNECTED = "not_connected"
     NEEDS_INFORMATION = "needs_information"
     READY = "ready"
     PENDING = "pending"
-    PUBLISHED = "published"
     FAILED = "failed"
     DISCONNECTED = "disconnected"
+
+
+# ONDC state transitions: current_status → allowed_next_states
+ONDC_STATE_TRANSITIONS = {
+    ONDCChannelStatus.NOT_CONFIGURED: [
+        ONDCChannelStatus.PENDING_ONBOARDING,
+        ONDCChannelStatus.CREDENTIALS_REQUIRED,
+        ONDCChannelStatus.NOT_CONNECTED,
+    ],
+    ONDCChannelStatus.PENDING_ONBOARDING: [
+        ONDCChannelStatus.CREDENTIALS_REQUIRED,
+        ONDCChannelStatus.VALIDATION_REQUIRED,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.CREDENTIALS_REQUIRED: [
+        ONDCChannelStatus.VALIDATION_REQUIRED,
+        ONDCChannelStatus.PENDING_ONBOARDING,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.VALIDATION_REQUIRED: [
+        ONDCChannelStatus.READY_TO_PUBLISH,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.READY_TO_PUBLISH: [
+        ONDCChannelStatus.PUBLISHED,
+        ONDCChannelStatus.SYNCING,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.PUBLISHED: [
+        ONDCChannelStatus.SYNCING,
+        ONDCChannelStatus.SYNCED,
+        ONDCChannelStatus.ERROR,
+        ONDCChannelStatus.DISCONNECTED,
+    ],
+    ONDCChannelStatus.SYNCING: [
+        ONDCChannelStatus.SYNCED,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.SYNCED: [
+        ONDCChannelStatus.SYNCING,
+        ONDCChannelStatus.ERROR,
+        ONDCChannelStatus.DISCONNECTED,
+    ],
+    ONDCChannelStatus.ERROR: [
+        ONDCChannelStatus.NOT_CONFIGURED,
+        ONDCChannelStatus.PENDING_ONBOARDING,
+        ONDCChannelStatus.CREDENTIALS_REQUIRED,
+    ],
+    ONDCChannelStatus.NOT_CONNECTED: [
+        ONDCChannelStatus.NOT_CONFIGURED,
+        ONDCChannelStatus.PENDING_ONBOARDING,
+    ],
+    ONDCChannelStatus.NEEDS_INFORMATION: [
+        ONDCChannelStatus.READY,
+        ONDCChannelStatus.VALIDATION_REQUIRED,
+    ],
+    ONDCChannelStatus.READY: [
+        ONDCChannelStatus.READY_TO_PUBLISH,
+        ONDCChannelStatus.PUBLISHED,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.PENDING: [
+        ONDCChannelStatus.PUBLISHED,
+        ONDCChannelStatus.ERROR,
+    ],
+    ONDCChannelStatus.FAILED: [
+        ONDCChannelStatus.NOT_CONFIGURED,
+        ONDCChannelStatus.PENDING_ONBOARDING,
+    ],
+    ONDCChannelStatus.DISCONNECTED: [
+        ONDCChannelStatus.NOT_CONFIGURED,
+        ONDCChannelStatus.PENDING_ONBOARDING,
+    ],
+}
+
+
+class ONDCError(BaseModel):
+    """Human-readable ONDC error for artisan display."""
+    error_code: str
+    title: str
+    message: str
+    action_required: Optional[str] = None
+    is_retryable: bool = False
 
 
 class GeMChannelStatus(str, Enum):

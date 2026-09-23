@@ -37,6 +37,24 @@ class IntentRegistry {
 
   /// All registered intents.
   static final Map<String, IntentMetadata> _intents = {
+    // ── Commerce / Channel Intents ─────────────────────────────────────
+    'SELL_ON_ONDC': const IntentMetadata(
+      type: 'SELL_ON_ONDC',
+      descriptionEn: 'Sell a product on ONDC',
+      descriptionHi: 'उत्पाद को ONDC पर बेचें',
+      safety: IntentSafety.confirmRequired,
+    ),
+    'CHECK_ONDC_STATUS': const IntentMetadata(
+      type: 'CHECK_ONDC_STATUS',
+      descriptionEn: 'Check ONDC selling status',
+      descriptionHi: 'ONDC बेचने की स्थिति जांचें',
+    ),
+    'GET_ONDC_HELP': const IntentMetadata(
+      type: 'GET_ONDC_HELP',
+      descriptionEn: 'Get help with ONDC selling',
+      descriptionHi: 'ONDC बेचने में मदद लें',
+    ),
+
     // ── Navigation Intents (SAFE) ──────────────────────────────────────
     'OPEN_HOME': const IntentMetadata(
       type: 'OPEN_HOME',
