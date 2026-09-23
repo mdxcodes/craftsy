@@ -40,7 +40,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
 
     return queueAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (items) {
         if (items.isEmpty) return const SizedBox.shrink();
 
