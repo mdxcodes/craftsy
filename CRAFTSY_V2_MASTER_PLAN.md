@@ -1950,6 +1950,97 @@ The goals are:
 
 ---
 
+## ONDC Seller-Side Integration Foundation
+
+### Current Implementation Status
+PARTIAL - Foundation/adapter layer complete. No live ONDC connection.
+
+### Architecture
+```
+Flutter App
+    ↓
+Craftsy Backend
+    ↓
+Commerce Gateway (commerce_service.py)
+    ↓
+ONDC Adapter (ondc_adapter.py)
+    ↓
+ONDC Network (Beckn protocol) — NOT YET CONNECTED
+```
+
+### Seller-Side Role
+Marketplace Seller Node (MSN) — Craftsy aggregates multiple artisans and lists their products on ONDC.
+
+### Onboarding Requirements
+1. Register as Network Participant (subscriber_id)
+2. Generate signing keys (Ed25519)
+3. SSL certificate for domain
+4. Complete /subscribe payload
+5. Staging environment testing
+6. Pre-production certification
+7. Production access
+
+### Credentials Required
+- ONDC Network Participant signing keys
+- SSL certificate
+- Staging environment access
+- Pre-production certification
+
+### Implemented Components
+- ONDC adapter with full state machine (12 states)
+- ONDC state transition validation
+- ONDC error handling (11 error types, human-readable)
+- ONDC catalogue preparation and sync (foundation)
+- ONDC order handling (foundation)
+- ONDC inventory sync (foundation)
+- ONDC order reconciliation (foundation)
+- ONDC onboarding checklist API
+- 9 ONDC-specific API endpoints
+- 3 ONDC intents (sell, check status, get help)
+- 48 ONDC translation keys (en, hi, bn, ta)
+- ONDC intent parsing (English + Hindi)
+- ONDC intent executors with product search
+
+### Not-Yet-Implemented Components
+- Real ONDC API calls (requires credentials)
+- ONDC catalogue publication (requires staging access)
+- ONDC order ingestion (requires production access)
+- ONDC inventory synchronization (requires credentials)
+- ONDC payment settlement (requires credentials)
+- ONDC callback handling (requires domain verification)
+- ONDC signing key management (requires security infrastructure)
+
+### Test Status
+- Backend: 48/53 pass (3 pre-existing failures)
+- Frontend: 102/102 pass
+- ONDC adapter: All methods return honest "not_configured" status
+- No fake ONDC success states exist
+- No real credentials required for testing
+
+### Known Limitations
+- ONDC integration requires Network Participant registration
+- ONDC integration requires staging environment access
+- ONDC integration requires pre-production certification
+- ONDC integration requires production environment access
+- GeM integration requires seller registration on official portal
+- No real ONDC/GeM API calls are made
+- All ONDC operations return honest "not_configured" status
+
+### Next Required External Steps
+1. Register as ONDC Network Participant
+2. Generate Ed25519 signing keys
+3. Obtain SSL certificate
+4. Complete staging environment testing
+5. Pass pre-production certification
+6. Get production environment access
+
+### References
+- https://ondc.org/be/sellers
+- https://github.com/ONDC-Official/developer-docs
+- https://app.swaggerhub.com/apis-docs/ONDC/ONDC-Registry-Onboarding/2.0.5
+
+---
+
 ## Commerce Channel Integration
 
 ### Completed
