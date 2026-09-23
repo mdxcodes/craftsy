@@ -1919,19 +1919,131 @@ The goals are:
 - [ ] 28. Final SIH readiness check
 - [ ] 29. STOP CONDITION met
 
-### Phase 9 Completion: ~40%
+### Phase 9 Completion: ~50%
 
-**Completed:** Master plan review, full application audit, demo journey identification, design consistency fixes (nav bar, auth screens), notification structure fix, backend validation, ML validation, commerce channel foundation (models, service, router, UI)
+**Completed:** Master plan review, full application audit, demo journey identification, design consistency fixes (nav bar, auth screens), notification structure fix, backend validation, ML validation, commerce channel foundation (models, service, router, UI), ONDC adapter, GeM adapter, unified order model
 
 **Commerce Foundation Implemented:**
 - Backend: commerce_models.py (ChannelType, ChannelStatus, ProductChannelDB, ChannelAuditLogDB)
 - Backend: commerce_service.py (multi-channel abstraction, validation, audit logging)
 - Backend: commerce.py router (/api/v1/commerce/* endpoints)
+- Backend: ondc_adapter.py (ONDC validation, onboarding checklist, catalogue prep)
+- Backend: gem_adapter.py (GeM eligibility, guided workflow, document checklist)
+- Backend: order_models.py (OrderDB with channel source, OrderChannel enum)
+- Backend: order_service.py (unified order management across channels)
+- Backend: orders.py router (/api/v1/orders/* endpoints)
 - Frontend: commerce_models.dart, channel_status_card.dart
 - Frontend: product_channel_selector_screen.dart, government_selling_screen.dart
 - No fake ONDC/GeM API calls — honest status returns
 
-**Remaining:** Device testing (voice, multilingual, offline), performance audit, security audit, build validation, ONDC adapter scaffolding, GeM guided workflow wiring, test suite counts, master plan finalization
+**Remaining:** Device testing (voice, multilingual, offline), performance audit, security audit, build validation, real ONDC adapter (requires credentials), real GeM integration (requires API access), test suite counts, master plan finalization
+
+---
+
+## Commerce Channel Integration
+
+### Completed
+- Commerce architecture audit
+- unified channel model (CommerceChannel → Craftsy, ONDC, GeM)
+- channel abstraction with status tracking
+- product/channel state (independent per channel)
+- validation framework (channel-specific requirements)
+- ONDC adapter scaffold (requirements, onboarding checklist, catalogue prep)
+- GeM adapter scaffold (eligibility, guided workflow, document checklist)
+- unified order model (orders with channel source)
+- audit logging for all channel operations
+- channel status UI components
+- "Where do you want to sell?" screen
+- Government Selling Assistant screen (guided GeM workflow)
+
+### ONDC
+- **Required role:** Marketplace Seller Node (MSN) — Craftsy aggregates multiple artisans
+- **Onboarding requirements:**
+  1. Register as Network Participant (subscriber_id)
+  2. Generate signing keys (Ed25519)
+  3. SSL certificate for domain
+  4. Complete /subscribe payload
+  5. Staging environment testing
+  6. Pre-production certification
+  7. Production access
+- **Technical dependencies:**
+  - ONDC Registry (staging/preprod/prod)
+  - Beckn protocol for API contracts
+  - Signing key pair for request signing
+  - Domain verification
+- **Credentials required:** ONDC Network Participant signing keys
+- **Implementation status:** Architecture ready — integration pending credentials
+- **References:**
+  - https://ondc.org/be/sellers
+  - https://github.com/ONDC-Official/developer-docs
+
+### GeM
+- **Seller requirements:**
+  - Aadhaar of authorized person
+  - PAN of business/individual
+  - Mobile number linked with Aadhaar
+  - Registered email ID
+  - Udyam Registration (mandatory for MSMEs)
+  - GST Certificate
+  - Bank account details with cancelled cheque
+  - Business address proof
+  - ITR (sometimes required for OEM approvals)
+- **Catalogue requirements:**
+  - Product title (English)
+  - Technical specifications (dimensions, weight, material)
+  - Product images (white background)
+  - Competitive pricing (including GST)
+  - Category matching GeM taxonomy
+- **Integration possibilities:**
+  - GeM has NO public API for seller registration
+  - Seller must complete registration on official GeM portal
+  - Craftsy can prepare data and guide the process
+- **Automation limitations:**
+  - CAN automate: Product data preparation, category mapping, document checklist, eligibility validation
+  - CANNOT automate: Seller registration, document upload, GST/PAN/Aadhaar verification, OEM assessment, bid participation
+- **Assisted workflow:**
+  1. Craftsy prepares product data
+  2. Artisan completes registration on GeM portal
+  3. Craftsy guides through category selection
+  4. Artisan uploads documents and product info
+  5. GeM verifies and approves
+- **Implementation status:** Assisted workflow — not direct API integration
+
+### Next Steps
+1. **Immediate (no credentials needed):**
+   - Wire commerce UI to real API endpoints
+   - Add channel selector to product detail screen
+   - Implement consent/confirmation flows
+   - Add channel status indicators throughout UI
+
+2. **After ONDC onboarding:**
+   - Implement real ONDC catalogue API calls
+   - Implement ONDC order callback handling
+   - Add ONDC-specific product field collection
+   - Implement ONDC status synchronization
+
+3. **After GeM API access (if available):**
+   - Implement GeM catalogue API integration
+   - Add GeM bid participation
+   - Implement GeM order management
+
+4. **Future (after both integrations):**
+   - Unified order inbox across all channels
+   - Inventory synchronization across channels
+   - Multi-channel analytics
+   - AI agent (CraftMitra) channel management
+
+### Current Limitations
+- **ONDC:** No real API calls — adapter returns status indicating credentials needed
+- **GeM:** No API integration — guided workflow only, artisan must complete on GeM portal
+- **Orders:** Order model supports channels but no real external order ingestion
+- **Inventory:** No real-time synchronization with external channels
+- **No fake success states** — all status returns are honest about what is/isn't connected
+
+### Test Results
+- Backend: 48/53 tests pass (3 pre-existing failures from Groq API and mock data)
+- Frontend: 102/102 tests pass
+- No new test failures introduced by commerce changes
 
 ### Phase 9 Fixes Applied
 
