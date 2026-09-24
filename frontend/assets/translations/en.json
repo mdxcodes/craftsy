@@ -865,5 +865,22 @@
   "undo": "Undo",
   "speak_question": "Speak your question (Whisper)",
   "mic_permission_required": "Microphone permission is required.",
-  "stats_general_category": "General Crafts"
+  "stats_general_category": "General Crafts",
+  "advisor_title": "Business Advisor",
+  "advisor_subtitle": "Insights from your catalogue data",
+  "advisor_no_products": "No products yet",
+  "advisor_no_products_desc": "Add products to get business insights.",
+  "advisor_add_product": "Add Product",
+  "advisor_price_review": "Price Review",
+  "advisor_low_stock": "Low Stock Alert",
+  "advisor_slow_moving": "Slow Moving Products",
+  "advisor_ask_craftmitra": "Ask CraftMitra",
+  "advisor_current_price": "Current Price:",
+  "advisor_in_stock": "in stock",
+  "advisor_status_live": "Live",
+  "advisor_status_soldOut": "Sold Out",
+  "advisor_status_draft": "Draft",
+  "advisor_status_sold": "Sold",
+  "advisor_status_pendingSync": "Pending Sync",
+  "advisor_status_listingRemoved": "Listing Removed"
 }

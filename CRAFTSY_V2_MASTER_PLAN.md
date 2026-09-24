@@ -2028,9 +2028,25 @@ Make Craftsy feel like ONE complete, coherent application. Connect and polish wh
 - **Voice/CraftMitra → Action Execution:** ⚠️ Partial (voice UI added, backend pipeline exists, end-to-end not tested on device)
 
 ### Test Suite
-- Frontend: 102/102 pass
-- Backend: 49/53 pass (2 pre-existing)
+- Frontend: 104/104 pass
+- Backend: 48/53 pass (3 pre-existing failures)
 - Analyzer: Clean (info only)
+
+### Business Advisor (Bhavya Integration)
+- **Status:** Complete
+- **Source:** Selective integration from `/secondary/craftsy_bhavya/Craftsy`
+- **Implementation:** Real data from `productListProvider` — no hardcoded metrics
+- **Features:** Price Review, Low Stock Alert (stock ≤ 5), Slow Moving (isNonLive), Empty State, CraftMitra CTA
+- **Route:** `/business-advisor`
+- **Localization:** 17 keys × 4 locales (en, hi, bn, ta)
+- **Tests:** 2/2 pass
+- **Accessibility:** Uses AppScaffold, EmptyState, AppButton, Semantics
+
+### Bhavya Integration Notes
+- Most Bhavya features were already present in canonical Craftsy
+- Whisper/Groq ASR NOT imported — canonical Bhashini/LanguageService remains authoritative
+- Update Price/Update Stock NOT duplicated — canonical product_detail_screen.dart already provides them
+- Android-native rejected — com.kalasetu package conflicts with com.craftsy.app widget system
 
 ---
 

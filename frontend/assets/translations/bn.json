@@ -680,5 +680,22 @@
   "craftmitra_title": "ক্রাফটমিত্র",
   "craftmitra_subtitle": "আপনার AI সহকারী",
   "craftmitra_hint": "আপনার পণ্য সম্পর্কে যেকোনো কিছু জিজ্ঞেস করুন...",
-  "stats_general_category": "সাধারণ কারুশিল্প"
+  "stats_general_category": "সাধারণ কারুশিল্প",
+  "advisor_title": "ব্যবসায়িক পরামর্শক",
+  "advisor_subtitle": "আপনার ক্যাটালগ ডেটা থেকে তথ্য",
+  "advisor_no_products": "এখনও কোনো পণ্য নেই",
+  "advisor_no_products_desc": "ব্যবসায়িক তথ্য পেতে পণ্য যোগ করুন।",
+  "advisor_add_product": "পণ্য যোগ করুন",
+  "advisor_price_review": "মূল্য পর্যালোচনা",
+  "advisor_low_stock": "কম স্টক সতর্কতা",
+  "advisor_slow_moving": "ধীর বিক্রয়যোগ্য পণ্য",
+  "advisor_ask_craftmitra": "ক্রাফটমিত্রাকে জিজ্ঞেস করুন",
+  "advisor_current_price": "বর্তমান মূল্য:",
+  "advisor_in_stock": "স্টকে আছে",
+  "advisor_status_live": "লাইভ",
+  "advisor_status_soldOut": "সোল্ড আউট",
+  "advisor_status_draft": "ড্রাফ্ট",
+  "advisor_status_sold": "বিক্রি হয়েছে",
+  "advisor_status_pendingSync": "সিংক মুলতুবি",
+  "advisor_status_listingRemoved": "লিস্টিং সরানো হয়েছে"
 }

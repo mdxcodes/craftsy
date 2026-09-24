@@ -865,5 +865,22 @@
   "undo": "वापस लें",
   "speak_question": "बोलकर पूछें (व्हिस्पर)",
   "mic_permission_required": "माइक्रोफ़ोन की अनुमति आवश्यक है।",
-  "stats_general_category": "सामान्य शिल्प"
+  "stats_general_category": "सामान्य शिल्प",
+  "advisor_title": "बिज़नेस एडवाइज़र",
+  "advisor_subtitle": "आपके कैटलॉग डेटा से जानकारी",
+  "advisor_no_products": "अभी कोई उत्पाद नहीं",
+  "advisor_no_products_desc": "बिज़नेस जानकारी के लिए उत्पाद जोड़ें।",
+  "advisor_add_product": "उत्पाद जोड़ें",
+  "advisor_price_review": "मूल्य समीक्षा",
+  "advisor_low_stock": "कम स्टॉक चेतावनी",
+  "advisor_slow_moving": "धीमी बिक्री वाले उत्पाद",
+  "advisor_ask_craftmitra": "क्राफ्टमित्र से पूछें",
+  "advisor_current_price": "वर्तमान मूल्य:",
+  "advisor_in_stock": "स्टॉक में",
+  "advisor_status_live": "लाइव",
+  "advisor_status_soldOut": "सोल्ड आउट",
+  "advisor_status_draft": "ड्राफ्ट",
+  "advisor_status_sold": "बिक गया",
+  "advisor_status_pendingSync": "सिंक लंबित",
+  "advisor_status_listingRemoved": "लिस्टिंग हटाई गई"
 }
