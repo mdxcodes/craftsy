@@ -680,5 +680,22 @@
   "craftmitra_title": "கிராஃப்ட்மித்ரா",
   "craftmitra_subtitle": "உங்கள் AI உதவியாளர்",
   "craftmitra_hint": "உங்கள் பொருட்கள் குறித்து எதையும் கேளுங்கள்...",
-  "stats_general_category": "பொது கைவினை"
+  "stats_general_category": "பொது கைவினை",
+  "advisor_title": "வணிக ஆலோசனையாளர்",
+  "advisor_subtitle": "உங்கள் பட்டியல் தரவிலிருந்து நுண்ணறிவுகள்",
+  "advisor_no_products": "இன்னும் பொருட்கள் இல்லை",
+  "advisor_no_products_desc": "வணிக நுண்ணறிவுகளுக்கு பொருட்களைச் சேர்க்கவும்.",
+  "advisor_add_product": "பொருளைச் சேர்",
+  "advisor_price_review": "விலை மதிப்பாய்வு",
+  "advisor_low_stock": "குறைந்த சரக்கு எச்சரிக்கை",
+  "advisor_slow_moving": "மெதுவான விற்பனை பொருட்கள்",
+  "advisor_ask_craftmitra": "கிராஃப்ட்மித்ராவிடம் கேளுங்கள்",
+  "advisor_current_price": "தற்போதைய விலை:",
+  "advisor_in_stock": "சரக்கு உள்ளது",
+  "advisor_status_live": "நேரடி",
+  "advisor_status_soldOut": "விற்றுவிட்டது",
+  "advisor_status_draft": "வரைவு",
+  "advisor_status_sold": "விற்கப்பட்டது",
+  "advisor_status_pendingSync": "ஒத்திவைக்கப்பட்ட ஒத்திசைவு",
+  "advisor_status_listingRemoved": "பட்டியல் நீக்கப்பட்டது"
 }

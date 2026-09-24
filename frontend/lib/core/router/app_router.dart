@@ -11,6 +11,7 @@ import '../../features/auth/screens/ngo_auth_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
 import '../../features/home/screens/home_shell.dart';
 import '../../features/home/screens/home_v2_screen.dart';
+import '../../features/home/screens/business_advisor_screen.dart';
 import '../../features/catalogue/screens/catalogue_screen.dart';
 import '../../features/catalogue/screens/product_detail_screen.dart';
 import '../../features/add_product/screens/add_product_flow_screen.dart';
@@ -220,6 +221,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: AppRouteConstants.inventory,
         builder: (context, state) =>
             UnifiedCommerceHubScreen(artisanId: 'default_artisan', initialTab: 3),
+      ),
+      GoRoute(
+        path: '/business-advisor',
+        name: AppRouteConstants.businessAdvisor,
+        builder: (context, state) => const BusinessAdvisorScreen(),
       ),
       GoRoute(
         path: '/craftmitra',
