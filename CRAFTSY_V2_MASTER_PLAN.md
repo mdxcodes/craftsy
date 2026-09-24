@@ -2179,11 +2179,70 @@ Android Widgets (Glance — to be implemented in Phase 3+)
 7. No stale-data timestamp display in widgets yet
 
 ### Next Phase
-Phase 7: Selling Channels Widget + WorkManager periodic sync
+Phase 8: WorkManager periodic sync + deep-link intent filters in AndroidManifest
 
 ---
 
-## Android Widgets — Phase 6: CraftMitra Widget
+## Android Widgets — Phase 7: Selling Channels Widget
+
+### Status: COMPLETE
+
+**Craftsy Selling Channels Widget** — answers "Where am I selling, and what do I need to do?"
+
+| Component | File |
+|-----------|------|
+| `SellingChannelsWidget.kt` | GlanceAppWidget — renders channel states |
+| `SellingChannelsWidgetReceiver.kt` | AppWidgetProvider — lifecycle events |
+| `selling_channels_widget_info.xml` | Widget metadata (180x110dp min, 3x3 cells) |
+| `widget_selling_channels.xml` | Initial placeholder layout |
+| `SellingChannelsWidgetStateTest.kt` | 25 unit tests |
+
+### Actual Channel States
+
+| Channel | Default State | Truthfulness |
+|---------|---------------|--------------|
+| Craftsy | ACTIVE | Native marketplace — always available for authenticated artisan |
+| ONDC | NOT_CONFIGURED | Adapter scaffold only — no real API integration |
+| Government/GeM | NOT_CONFIGURED | No direct GeM API integration |
+
+**TRUTHFULNESS RULE:** The widget NEVER claims a channel is connected/active unless the existing implementation proves it. ONDC and GeM are scaffolds — they show NOT_CONFIGURED until real API onboarding happens.
+
+### Deep Links
+
+| Channel | Destination | Status |
+|---------|-------------|--------|
+| Craftsy | `/catalogue` | ✅ Existing |
+| ONDC | `/commerce-hub` | ✅ Existing |
+| Government | `/commerce-hub` | ✅ Existing |
+| Sell & Grow button | `/commerce-hub` | ✅ Existing |
+
+### States
+
+- **Logged out:** "Open Craftsy to sign in"
+- **Data unavailable:** "Open Craftsy to update"
+- **Stale:** Shows warning indicator
+- **Normal:** Channel rows with name, state label, detail text
+
+### Accessibility
+
+- State communicated via text: "Active", "Not configured", "Setup required"
+- Color is reinforcement only — not sole indicator
+- Touch targets: full row width
+- Screen reader: "ONDC, setup required, open selling channels"
+
+### Security
+
+- No ONDC credentials, GeM credentials, API keys, signing keys, or tokens
+- Only user-facing channel status is displayed
+- Account isolation via accountId-scoped SharedPreferences keys
+
+### Build Results
+
+- `compileDebugKotlin`: BUILD SUCCESS
+- `flutter test`: 102/102 pass
+- APK installed on device Q4JZAMFUKNPNW8WO
+
+---
 
 ### Status: COMPLETE
 
