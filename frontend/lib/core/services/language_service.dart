@@ -50,11 +50,18 @@ abstract class LanguageService {
   /// [audioBytes] is the recorded audio data.
   /// [languageCode] is the expected language (e.g., 'hi', 'en').
   /// Returns the transcribed text or null on failure.
-  Future<String?> speechToText(List<int> audioBytes, {required String languageCode});
+  Future<String?> speechToText(
+    List<int> audioBytes, {
+    required String languageCode,
+  });
 
   /// Translate [text] from [sourceLanguage] to [targetLanguage].
   /// Returns the translated text or null on failure.
-  Future<String?> translate(String text, {required String sourceLanguage, required String targetLanguage});
+  Future<String?> translate(
+    String text, {
+    required String sourceLanguage,
+    required String targetLanguage,
+  });
 
   /// Convert [text] to speech and play it.
   /// [languageCode] is the target language.
@@ -66,7 +73,10 @@ abstract class LanguageService {
   Future<String?> detectLanguage(String text);
 
   /// Check if a specific capability is available for a language.
-  bool isCapabilitySupported(String languageCode, LanguageCapability capability);
+  bool isCapabilitySupported(
+    String languageCode,
+    LanguageCapability capability,
+  );
 
   /// Get the fallback language code for a capability.
   String getFallbackLanguage(LanguageCapability capability);
@@ -84,10 +94,17 @@ abstract class LanguageProvider {
   Future<bool> isAvailable();
 
   /// ASR: transcribe audio to text.
-  Future<String?> transcribe(List<int> audioBytes, {required String languageCode});
+  Future<String?> transcribe(
+    List<int> audioBytes, {
+    required String languageCode,
+  });
 
   /// NMT: translate text.
-  Future<String?> translateText(String text, {required String sourceLanguage, required String targetLanguage});
+  Future<String?> translateText(
+    String text, {
+    required String sourceLanguage,
+    required String targetLanguage,
+  });
 
   /// TTS: synthesize speech.
   Future<List<int>?> synthesize(String text, {required String languageCode});
@@ -108,13 +125,23 @@ class FallbackLanguageProvider implements LanguageProvider {
   Future<bool> isAvailable() async => false;
 
   @override
-  Future<String?> transcribe(List<int> audioBytes, {required String languageCode}) async => null;
+  Future<String?> transcribe(
+    List<int> audioBytes, {
+    required String languageCode,
+  }) async => null;
 
   @override
-  Future<String?> translateText(String text, {required String sourceLanguage, required String targetLanguage}) async => null;
+  Future<String?> translateText(
+    String text, {
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async => null;
 
   @override
-  Future<List<int>?> synthesize(String text, {required String languageCode}) async => null;
+  Future<List<int>?> synthesize(
+    String text, {
+    required String languageCode,
+  }) async => null;
 
   @override
   Future<String?> detect(String text) async => null;
@@ -159,20 +186,30 @@ class BhashiniLanguageProvider implements LanguageProvider {
   }
 
   @override
-  Future<String?> transcribe(List<int> audioBytes, {required String languageCode}) async {
+  Future<String?> transcribe(
+    List<int> audioBytes, {
+    required String languageCode,
+  }) async {
     // Would call backend /api/v1/voice/transcribe with Bhashini proxy
     // Backend uses configured Bhashini credentials
     return null;
   }
 
   @override
-  Future<String?> translateText(String text, {required String sourceLanguage, required String targetLanguage}) async {
+  Future<String?> translateText(
+    String text, {
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async {
     // Would call backend /api/v1/translate with Bhashini NMT
     return null;
   }
 
   @override
-  Future<List<int>?> synthesize(String text, {required String languageCode}) async {
+  Future<List<int>?> synthesize(
+    String text, {
+    required String languageCode,
+  }) async {
     // Would call backend /api/v1/tts with Bhashini TTS
     return null;
   }
@@ -196,90 +233,92 @@ class CraftsyLanguageService implements LanguageService {
   CraftsyLanguageService({
     List<LanguageProvider>? providers,
     String defaultLanguage = 'en',
-  })  : _providers = providers ?? [BhashiniLanguageProvider(), FallbackLanguageProvider()],
-        _defaultLanguage = defaultLanguage,
-        _languages = {
-          'en': const LanguageConfig(
-            code: 'en',
-            displayName: 'English',
-            nativeName: 'English',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: true,
-          ),
-          'hi': const LanguageConfig(
-            code: 'hi',
-            displayName: 'Hindi',
-            nativeName: 'हिन्दी',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: true,
-          ),
-          'bn': const LanguageConfig(
-            code: 'bn',
-            displayName: 'Bengali',
-            nativeName: 'বাংলা',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'ta': const LanguageConfig(
-            code: 'ta',
-            displayName: 'Tamil',
-            nativeName: 'தமிழ்',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'te': const LanguageConfig(
-            code: 'te',
-            displayName: 'Telugu',
-            nativeName: 'తెలుగు',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'mr': const LanguageConfig(
-            code: 'mr',
-            displayName: 'Marathi',
-            nativeName: 'मराठी',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'gu': const LanguageConfig(
-            code: 'gu',
-            displayName: 'Gujarati',
-            nativeName: 'ગુજરાતી',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'kn': const LanguageConfig(
-            code: 'kn',
-            displayName: 'Kannada',
-            nativeName: 'ಕನ್ನಡ',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'ml': const LanguageConfig(
-            code: 'ml',
-            displayName: 'Malayalam',
-            nativeName: 'മലയാളം',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-          'pa': const LanguageConfig(
-            code: 'pa',
-            displayName: 'Punjabi',
-            nativeName: 'ਪੰਜਾਬੀ',
-            asrSupported: true,
-            nmtSupported: true,
-            ttsSupported: false,
-          ),
-        };
+  }) : _providers =
+           providers ??
+           [BhashiniLanguageProvider(), FallbackLanguageProvider()],
+       _defaultLanguage = defaultLanguage,
+       _languages = {
+         'en': const LanguageConfig(
+           code: 'en',
+           displayName: 'English',
+           nativeName: 'English',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: true,
+         ),
+         'hi': const LanguageConfig(
+           code: 'hi',
+           displayName: 'Hindi',
+           nativeName: 'हिन्दी',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: true,
+         ),
+         'bn': const LanguageConfig(
+           code: 'bn',
+           displayName: 'Bengali',
+           nativeName: 'বাংলা',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'ta': const LanguageConfig(
+           code: 'ta',
+           displayName: 'Tamil',
+           nativeName: 'தமிழ்',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'te': const LanguageConfig(
+           code: 'te',
+           displayName: 'Telugu',
+           nativeName: 'తెలుగు',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'mr': const LanguageConfig(
+           code: 'mr',
+           displayName: 'Marathi',
+           nativeName: 'मराठी',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'gu': const LanguageConfig(
+           code: 'gu',
+           displayName: 'Gujarati',
+           nativeName: 'ગુજરાતી',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'kn': const LanguageConfig(
+           code: 'kn',
+           displayName: 'Kannada',
+           nativeName: 'ಕನ್ನಡ',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'ml': const LanguageConfig(
+           code: 'ml',
+           displayName: 'Malayalam',
+           nativeName: 'മലയാളം',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+         'pa': const LanguageConfig(
+           code: 'pa',
+           displayName: 'Punjabi',
+           nativeName: 'ਪੰਜਾਬੀ',
+           asrSupported: true,
+           nmtSupported: true,
+           ttsSupported: false,
+         ),
+       };
 
   @override
   List<LanguageConfig> getSupportedLanguages() => _languages.values.toList();
@@ -288,10 +327,16 @@ class CraftsyLanguageService implements LanguageService {
   LanguageConfig? getLanguage(String code) => _languages[code];
 
   @override
-  Future<String?> speechToText(List<int> audioBytes, {required String languageCode}) async {
+  Future<String?> speechToText(
+    List<int> audioBytes, {
+    required String languageCode,
+  }) async {
     for (final provider in _providers) {
       if (await provider.isAvailable()) {
-        final result = await provider.transcribe(audioBytes, languageCode: languageCode);
+        final result = await provider.transcribe(
+          audioBytes,
+          languageCode: languageCode,
+        );
         if (result != null) return result;
       }
     }
@@ -299,10 +344,18 @@ class CraftsyLanguageService implements LanguageService {
   }
 
   @override
-  Future<String?> translate(String text, {required String sourceLanguage, required String targetLanguage}) async {
+  Future<String?> translate(
+    String text, {
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async {
     for (final provider in _providers) {
       if (await provider.isAvailable()) {
-        final result = await provider.translateText(text, sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
+        final result = await provider.translateText(
+          text,
+          sourceLanguage: sourceLanguage,
+          targetLanguage: targetLanguage,
+        );
         if (result != null) return result;
       }
     }
@@ -313,7 +366,10 @@ class CraftsyLanguageService implements LanguageService {
   Future<bool> textToSpeech(String text, {required String languageCode}) async {
     for (final provider in _providers) {
       if (await provider.isAvailable()) {
-        final result = await provider.synthesize(text, languageCode: languageCode);
+        final result = await provider.synthesize(
+          text,
+          languageCode: languageCode,
+        );
         if (result != null) return true;
       }
     }
@@ -332,7 +388,10 @@ class CraftsyLanguageService implements LanguageService {
   }
 
   @override
-  bool isCapabilitySupported(String languageCode, LanguageCapability capability) {
+  bool isCapabilitySupported(
+    String languageCode,
+    LanguageCapability capability,
+  ) {
     final config = _languages[languageCode];
     if (config == null) return false;
     switch (capability) {

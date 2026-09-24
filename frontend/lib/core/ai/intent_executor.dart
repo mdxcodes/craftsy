@@ -160,74 +160,100 @@ class IntentExecutor {
   IntentResult _executeOpenHome() {
     _ref.read(homeTabIndexProvider.notifier).state = 0;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'होम स्क्रीन खोल रहा हूँ।' : 'Opening home screen.');
+    return IntentResult.success(
+      _isHindi() ? 'होम स्क्रीन खोल रहा हूँ।' : 'Opening home screen.',
+    );
   }
 
   IntentResult _executeOpenCatalogue() {
     _context.push('/catalogue');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'आपका कैटलॉग खोल रहा हूँ।' : 'Opening your catalogue.');
+    return IntentResult.success(
+      _isHindi() ? 'आपका कैटलॉग खोल रहा हूँ।' : 'Opening your catalogue.',
+    );
   }
 
   IntentResult _executeOpenOrders() {
     _ref.read(homeTabIndexProvider.notifier).state = 1;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.');
+    return IntentResult.success(
+      _isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.',
+    );
   }
 
   IntentResult _executeOpenEarnings() {
     _ref.read(homeTabIndexProvider.notifier).state = 3;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'आपकी कमाई खोल रहा हूँ।' : 'Opening your earnings.');
+    return IntentResult.success(
+      _isHindi() ? 'आपकी कमाई खोल रहा हूँ।' : 'Opening your earnings.',
+    );
   }
 
   IntentResult _executeOpenProfile() {
     _ref.read(homeTabIndexProvider.notifier).state = 4;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'आपकी प्रोफ़ाइल खोल रहा हूँ।' : 'Opening your profile.');
+    return IntentResult.success(
+      _isHindi() ? 'आपकी प्रोफ़ाइल खोल रहा हूँ।' : 'Opening your profile.',
+    );
   }
 
   IntentResult _executeOpenNotifications() {
     _context.push('/notifications');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'नोटिफिकेशन खोल रहा हूँ।' : 'Opening notifications.');
+    return IntentResult.success(
+      _isHindi() ? 'नोटिफिकेशन खोल रहा हूँ।' : 'Opening notifications.',
+    );
   }
 
   IntentResult _executeOpenCraftMitra() {
     // Already in chatbot — just acknowledge
-    return IntentResult.success(_isHindi() ? 'मैं यहाँ हूँ, बात करें।' : 'I am here, let\'s talk.');
+    return IntentResult.success(
+      _isHindi() ? 'मैं यहाँ हूँ, बात करें।' : 'I am here, let\'s talk.',
+    );
   }
 
   IntentResult _executeOpenSocialHelper() {
     _context.push('/social-media-helper');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'सोशल मीडिया सहायक खोल रहा हूँ।' : 'Opening social media helper.');
+    return IntentResult.success(
+      _isHindi()
+          ? 'सोशल मीडिया सहायक खोल रहा हूँ।'
+          : 'Opening social media helper.',
+    );
   }
 
   IntentResult _executeOpenLanguageSettings() {
     _context.push('/language-settings');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'भाषा सेटिंग्स खोल रहा हूँ।' : 'Opening language settings.');
+    return IntentResult.success(
+      _isHindi() ? 'भाषा सेटिंग्स खोल रहा हूँ।' : 'Opening language settings.',
+    );
   }
 
   IntentResult _executeOpenTutorial() {
     _context.push('/listing-tutorial');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'ट्यूटोरियल शुरू कर रहा हूँ।' : 'Starting tutorial.');
+    return IntentResult.success(
+      _isHindi() ? 'ट्यूटोरियल शुरू कर रहा हूँ।' : 'Starting tutorial.',
+    );
   }
 
   IntentResult _executeOpenPackagingHelp() {
     // Packaging help is contextual to orders — navigate to orders
     _context.push('/orders');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'पैकेजिंग मदद खोल रहा हूँ।' : 'Opening packaging help.');
+    return IntentResult.success(
+      _isHindi() ? 'पैकेजिंग मदद खोल रहा हूँ।' : 'Opening packaging help.',
+    );
   }
 
   IntentResult _executeOpenLabelMaker() {
     // Label maker is contextual to orders — navigate to orders
     _context.push('/orders');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'लेबल मेकर खोल रहा हूँ।' : 'Opening label maker.');
+    return IntentResult.success(
+      _isHindi() ? 'लेबल मेकर खोल रहा हूँ।' : 'Opening label maker.',
+    );
   }
 
   // ── Product Executors ───────────────────────────────────────────────
@@ -235,13 +261,17 @@ class IntentExecutor {
   IntentResult _executeAddProduct() {
     _ref.read(homeTabIndexProvider.notifier).state = 2;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'नया सामान जोड़ते हैं।' : 'Let\'s add a new product.');
+    return IntentResult.success(
+      _isHindi() ? 'नया सामान जोड़ते हैं।' : 'Let\'s add a new product.',
+    );
   }
 
   IntentResult _executeOpenProduct(CraftsyIntent intent) {
     final productName = intent.parameters['product_name'] as String?;
     if (productName == null || productName.isEmpty) {
-      return IntentResult.failure(_isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.');
+      return IntentResult.failure(
+        _isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.',
+      );
     }
 
     // Find product in catalogue
@@ -266,18 +296,24 @@ class IntentExecutor {
     _context.push('/product/${matched.id}');
     _closeChatbotSheet();
     return IntentResult.success(
-      _isHindi() ? '"${matched.title}" खोल रहा हूँ।' : 'Opening "${matched.title}".',
+      _isHindi()
+          ? '"${matched.title}" खोल रहा हूँ।'
+          : 'Opening "${matched.title}".',
     );
   }
 
   IntentResult _executeEditProduct(CraftsyIntent intent) {
     final productName = intent.parameters['product_name'] as String?;
     if (productName == null || productName.isEmpty) {
-      return IntentResult.failure(_isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.');
+      return IntentResult.failure(
+        _isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.',
+      );
     }
 
     // Navigate to catalogue with search
-    _ref.read(catalogueFilterProvider.notifier).setFilter(query: productName, category: null);
+    _ref
+        .read(catalogueFilterProvider.notifier)
+        .setFilter(query: productName, category: null);
     _context.push('/catalogue');
     _closeChatbotSheet();
     return IntentResult.success(
@@ -288,7 +324,9 @@ class IntentExecutor {
   Future<IntentResult> _executeDeleteProduct(CraftsyIntent intent) async {
     final productName = intent.parameters['product_name'] as String?;
     if (productName == null || productName.isEmpty) {
-      return IntentResult.failure(_isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.');
+      return IntentResult.failure(
+        _isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.',
+      );
     }
 
     // Find and delete product
@@ -312,14 +350,18 @@ class IntentExecutor {
 
     await _ref.read(productListProvider.notifier).deleteProduct(matched.id);
     return IntentResult.success(
-      _isHindi() ? '"${matched.title}" हटा दिया गया।' : '"${matched.title}" has been deleted.',
+      _isHindi()
+          ? '"${matched.title}" हटा दिया गया।'
+          : '"${matched.title}" has been deleted.',
     );
   }
 
   IntentResult _executeCheckProductPrice(CraftsyIntent intent) {
     final productName = intent.parameters['product_name'] as String?;
     if (productName == null || productName.isEmpty) {
-      return IntentResult.failure(_isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.');
+      return IntentResult.failure(
+        _isHindi() ? 'उत्पाद का नाम बताएं।' : 'Please specify a product name.',
+      );
     }
 
     final products = _ref.read(productListProvider).value ?? [];
@@ -481,7 +523,9 @@ class IntentExecutor {
       // Navigate to orders screen
       _ref.read(homeTabIndexProvider.notifier).state = 1;
       _closeChatbotSheet();
-      return IntentResult.success(_isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.');
+      return IntentResult.success(
+        _isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.',
+      );
     }
 
     // Find specific order
@@ -503,7 +547,9 @@ class IntentExecutor {
   IntentResult _executeResumeDraft() {
     _ref.read(homeTabIndexProvider.notifier).state = 2;
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'ड्राफ्ट फिर से शुरू कर रहा हूँ।' : 'Resuming your draft.');
+    return IntentResult.success(
+      _isHindi() ? 'ड्राफ्ट फिर से शुरू कर रहा हूँ।' : 'Resuming your draft.',
+    );
   }
 
   // ── App Executors ───────────────────────────────────────────────────
@@ -511,13 +557,17 @@ class IntentExecutor {
   IntentResult _executeChangeLanguage() {
     _context.push('/language-settings');
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'भाषा सेटिंग्स खोल रहा हूँ।' : 'Opening language settings.');
+    return IntentResult.success(
+      _isHindi() ? 'भाषा सेटिंग्स खोल रहा हूँ।' : 'Opening language settings.',
+    );
   }
 
   IntentResult _executeLogout() {
     _ref.read(authStateProvider.notifier).signOut();
     _closeChatbotSheet();
-    return IntentResult.success(_isHindi() ? 'लॉग आउट कर रहा हूँ।' : 'Logging out.');
+    return IntentResult.success(
+      _isHindi() ? 'लॉग आउट कर रहा हूँ।' : 'Logging out.',
+    );
   }
 
   // ── Sync Executors ──────────────────────────────────────────────────
@@ -571,7 +621,10 @@ class IntentExecutor {
 
   Future<bool> _requestConfirmation(CraftsyIntent intent) async {
     final isHi = _isHindi();
-    final description = IntentRegistry.getDescription(intent.type, isHindi: isHi);
+    final description = IntentRegistry.getDescription(
+      intent.type,
+      isHindi: isHi,
+    );
 
     final result = await showDialog<bool>(
       context: _context,

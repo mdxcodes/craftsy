@@ -24,7 +24,9 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
     await context.setLocale(Locale(_selectedCode));
 
     final currentProfile = ref.read(userProfileProvider);
-    ref.read(userProfileProvider.notifier).updateProfile(
+    ref
+        .read(userProfileProvider.notifier)
+        .updateProfile(
           currentProfile.copyWith(preferredLanguage: _selectedCode),
         );
 
@@ -58,7 +60,9 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'choose_language_subtitle'.tr(),
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -75,10 +79,13 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                           selected: _selectedCode == lang['code'],
                           label: '${lang['name']} (${lang['native']})',
                           child: InkWell(
-                            onTap: () => setState(() => _selectedCode = lang['code']!),
+                            onTap: () =>
+                                setState(() => _selectedCode = lang['code']!),
                             borderRadius: BorderRadius.circular(AppRadii.xl),
                             child: Container(
-                              constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+                              constraints: const BoxConstraints(
+                                minHeight: AppSpacing.minTouchTarget,
+                              ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppSpacing.lg,
                                 vertical: AppSpacing.md,
@@ -87,7 +94,9 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                                 color: _selectedCode == lang['code']
                                     ? AppColors.indigo
                                     : AppColors.surface,
-                                borderRadius: BorderRadius.circular(AppRadii.xl),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.xl,
+                                ),
                                 border: Border.all(
                                   color: _selectedCode == lang['code']
                                       ? AppColors.indigoDark
@@ -111,10 +120,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              AppButton(
-                label: 'continue_btn'.tr(),
-                onPressed: _handleContinue,
-              ),
+              AppButton(label: 'continue_btn'.tr(), onPressed: _handleContinue),
               const SizedBox(height: AppSpacing.md),
             ],
           ),

@@ -45,15 +45,16 @@ class CraftCategoryBadge extends StatelessWidget {
     required this.label,
     this.isActive = false,
     this.onTap,
-  })  : icon = const _NullPainter(),
-        showPetalRing = false;
+  }) : icon = const _NullPainter(),
+       showPetalRing = false;
 
   @override
   Widget build(BuildContext context) {
     final bgColor = isActive ? AppColors.terracotta : AppColors.cardSurface;
-    final fgColor = isActive ? AppColors.textOnPrimary : AppColors.terracottaDark;
-    final borderColor =
-        isActive ? AppColors.terracotta : AppColors.terracotta;
+    final fgColor = isActive
+        ? AppColors.textOnPrimary
+        : AppColors.terracottaDark;
+    final borderColor = isActive ? AppColors.terracotta : AppColors.terracotta;
 
     final hasIcon = icon is! _NullPainter;
 
@@ -64,65 +65,65 @@ class CraftCategoryBadge extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: EdgeInsets.only(
-          left: hasIcon
-              ? (showPetalRing ? AppSpacing.xs : AppSpacing.sm)
-              : AppSpacing.md,
-          right: AppSpacing.md,
-          top: AppSpacing.xs,
-          bottom: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(AppRadii.chip),
-          border: Border.all(color: borderColor, width: 1.5),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (hasIcon) ...[
-              SizedBox(
-                width: showPetalRing ? 26 : 18,
-                height: showPetalRing ? 26 : 18,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Petal ring behind icon
-                    if (showPetalRing)
-                      PetalRing(
-                        size: 32,
-                        color: isActive ? Colors.white : AppColors.gold,
-                        opacity: 0.55,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          padding: EdgeInsets.only(
+            left: hasIcon
+                ? (showPetalRing ? AppSpacing.xs : AppSpacing.sm)
+                : AppSpacing.md,
+            right: AppSpacing.md,
+            top: AppSpacing.xs,
+            bottom: AppSpacing.xs,
+          ),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(AppRadii.chip),
+            border: Border.all(color: borderColor, width: 1.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasIcon) ...[
+                SizedBox(
+                  width: showPetalRing ? 26 : 18,
+                  height: showPetalRing ? 26 : 18,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Petal ring behind icon
+                      if (showPetalRing)
+                        PetalRing(
+                          size: 32,
+                          color: isActive ? Colors.white : AppColors.gold,
+                          opacity: 0.55,
+                        ),
+                      CustomPaint(
+                        size: const Size(15, 15),
+                        painter: _ColoredPainter(
+                          delegate: icon,
+                          color: fgColor,
+                        ),
                       ),
-                    CustomPaint(
-                      size: const Size(15, 15),
-                      painter: _ColoredPainter(
-                        delegate: icon,
-                        color: fgColor,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+                SizedBox(width: showPetalRing ? 7 : 5),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    fontSize: 12.5,
+                    color: fgColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(width: showPetalRing ? 7 : 5),
             ],
-            Flexible(
-              child: Text(
-                label,
-                style: AppTextStyles.labelSmall.copyWith(
-                  fontSize: 12.5,
-                  color: fgColor,
-                  fontWeight: FontWeight.w700,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -177,10 +178,31 @@ class PotteryIconPainter extends CustomPainter {
     // Body path: rounded bulging shape
     final body = Path()
       ..moveTo(sw * 0.342, sh * 0.258)
-      ..cubicTo(sw * 0.1, sh * 0.379, sw * 0.0, sh * 0.508, sw * 0.042, sh * 0.833)
+      ..cubicTo(
+        sw * 0.1,
+        sh * 0.379,
+        sw * 0.0,
+        sh * 0.508,
+        sw * 0.042,
+        sh * 0.833,
+      )
       ..cubicTo(sw * 0.083, sh * 1.0, sw * 0.25, sh * 1.0, sw * 0.5, sh * 1.0)
-      ..cubicTo(sw * 0.75, sh * 1.0, sw * 0.917, sh * 1.0, sw * 0.958, sh * 0.833)
-      ..cubicTo(sw * 1.0, sh * 0.508, sw * 0.9, sh * 0.379, sw * 0.658, sh * 0.258);
+      ..cubicTo(
+        sw * 0.75,
+        sh * 1.0,
+        sw * 0.917,
+        sh * 1.0,
+        sw * 0.958,
+        sh * 0.833,
+      )
+      ..cubicTo(
+        sw * 1.0,
+        sh * 0.508,
+        sw * 0.9,
+        sh * 0.379,
+        sw * 0.658,
+        sh * 0.258,
+      );
     canvas.drawPath(body, p);
   }
 
@@ -212,8 +234,22 @@ class TextileIconPainter extends CustomPainter {
     // Outer eye ellipse
     final eye = Path()
       ..moveTo(sw * 0.083, sh * 0.5)
-      ..cubicTo(sw * 0.267, sh * 0.1, sw * 0.733, sh * 0.1, sw * 0.917, sh * 0.5)
-      ..cubicTo(sw * 0.733, sh * 0.9, sw * 0.267, sh * 0.9, sw * 0.083, sh * 0.5)
+      ..cubicTo(
+        sw * 0.267,
+        sh * 0.1,
+        sw * 0.733,
+        sh * 0.1,
+        sw * 0.917,
+        sh * 0.5,
+      )
+      ..cubicTo(
+        sw * 0.733,
+        sh * 0.9,
+        sw * 0.267,
+        sh * 0.9,
+        sw * 0.083,
+        sh * 0.5,
+      )
       ..close();
     canvas.drawPath(eye, stroke);
     // Centre dot
@@ -253,7 +289,10 @@ class JewelryIconPainter extends CustomPainter {
 
     // Horizontal belt line
     canvas.drawLine(
-        Offset(sw * 0.0, sh * 0.375), Offset(sw * 1.0, sh * 0.375), p);
+      Offset(sw * 0.0, sh * 0.375),
+      Offset(sw * 1.0, sh * 0.375),
+      p,
+    );
   }
 
   @override

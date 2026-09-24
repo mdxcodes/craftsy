@@ -200,16 +200,22 @@ class Product extends HiveObject {
     return Product(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      titleHi: json['titleHi'] as String? ?? (json['title_hi'] as String? ?? ''),
+      titleHi:
+          json['titleHi'] as String? ?? (json['title_hi'] as String? ?? ''),
       description: json['description'] as String? ?? '',
-      descriptionHi: json['descriptionHi'] as String? ?? (json['description_hi'] as String? ?? ''),
+      descriptionHi:
+          json['descriptionHi'] as String? ??
+          (json['description_hi'] as String? ?? ''),
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      photoPath: json['photoPath'] as String? ??
+      photoPath:
+          json['photoPath'] as String? ??
           (json['image_url'] as String? ?? (json['imageUrl'] as String? ?? '')),
       category: (json['category'] as String?)?.trim().isNotEmpty == true
           ? (json['category'] as String).trim()
           : 'Handicraft',
-      tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+          [],
       status: ProductStatus.values.firstWhere(
         (e) => e.name == json['status'],
         orElse: () => ProductStatus.draft,
@@ -217,9 +223,11 @@ class Product extends HiveObject {
       createdAt: json['created_at'] != null
           ? (DateTime.tryParse(json['created_at'] as String) ?? DateTime.now())
           : (json['createdAt'] != null
-              ? (DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now())
-              : DateTime.now()),
-      additionalPhotoPaths: (json['additionalPhotoPaths'] as List<dynamic>?)
+                ? (DateTime.tryParse(json['createdAt'] as String) ??
+                      DateTime.now())
+                : DateTime.now()),
+      additionalPhotoPaths:
+          (json['additionalPhotoPaths'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -227,8 +235,8 @@ class Product extends HiveObject {
       statusUpdatedAt: json['statusUpdatedAt'] != null
           ? DateTime.tryParse(json['statusUpdatedAt'] as String)
           : (json['updated_at'] != null
-              ? DateTime.tryParse(json['updated_at'] as String)
-              : null),
+                ? DateTime.tryParse(json['updated_at'] as String)
+                : null),
       restockQuantity: json['restockQuantity'] as int?,
       statusReason: json['statusReason'] as String?,
       stock: json['stock'] as int? ?? 0,

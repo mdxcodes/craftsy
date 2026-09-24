@@ -80,9 +80,7 @@ class AppScaffold extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: AppBackgroundPattern(
-              opacity: backgroundPatternOpacity,
-            ),
+            child: AppBackgroundPattern(opacity: backgroundPatternOpacity),
           ),
           bodyContent,
         ],

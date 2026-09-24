@@ -13,7 +13,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    final tempDir = await Directory.systemTemp.createTemp('hive_analytics_test');
+    final tempDir = await Directory.systemTemp.createTemp(
+      'hive_analytics_test',
+    );
     Hive.init(tempDir.path);
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(UserProfileAdapter());
@@ -33,59 +35,59 @@ void main() {
   });
 
   group('Artisan Performance & Revenue Analytics Screen Tests', () {
-    testWidgets('Renders all hero metrics, period selector tabs, and sales trend', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            connectivityProvider.overrideWith((ref) => Stream.value(true)),
-          ],
-          child: const MaterialApp(
-            home: MyStatsScreen(),
+    testWidgets(
+      'Renders all hero metrics, period selector tabs, and sales trend',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              connectivityProvider.overrideWith((ref) => Stream.value(true)),
+            ],
+            child: const MaterialApp(home: MyStatsScreen()),
           ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
-      // Check title / header
-      expect(find.text('my_stats_title'), findsOneWidget);
+        // Check title / header
+        expect(find.text('my_stats_title'), findsOneWidget);
 
-      // Check period tabs (This Month / Last 3 Months / All Time)
-      expect(find.text('period_this_month'), findsOneWidget);
-      expect(find.text('period_last_3_months'), findsOneWidget);
-      expect(find.text('period_all_time'), findsOneWidget);
+        // Check period tabs (This Month / Last 3 Months / All Time)
+        expect(find.text('period_this_month'), findsOneWidget);
+        expect(find.text('period_last_3_months'), findsOneWidget);
+        expect(find.text('period_all_time'), findsOneWidget);
 
-      // Check V2 hero card labels
-      expect(find.text('this_month_earnings'), findsOneWidget);
-      expect(find.text('sales_trend_title'), findsOneWidget);
-      expect(find.text('order_summary_title'), findsOneWidget);
-      expect(find.text('total_listings'), findsOneWidget);
-      expect(find.text('average_order_value'), findsOneWidget);
+        // Check V2 hero card labels
+        expect(find.text('this_month_earnings'), findsOneWidget);
+        expect(find.text('sales_trend_title'), findsOneWidget);
+        expect(find.text('order_summary_title'), findsOneWidget);
+        expect(find.text('total_listings'), findsOneWidget);
+        expect(find.text('average_order_value'), findsOneWidget);
 
-      // Verify period switching works cleanly
-      await tester.tap(find.text('period_all_time'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-    });
+        // Verify period switching works cleanly
+        await tester.tap(find.text('period_all_time'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+      },
+    );
   });
 
   group('Register Screen Help Cue Card Tests', () {
-    testWidgets('Renders Ask for Help cue card with support icon and localized text', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: RegisterScreen(),
-          ),
-        ),
-      );
-      await tester.pump(const Duration(seconds: 1));
+    testWidgets(
+      'Renders Ask for Help cue card with support icon and localized text',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(child: MaterialApp(home: RegisterScreen())),
+        );
+        await tester.pump(const Duration(seconds: 1));
 
-      // Check presence of support_agent icon
-      expect(find.byIcon(Icons.support_agent), findsOneWidget);
+        // Check presence of support_agent icon
+        expect(find.byIcon(Icons.support_agent), findsOneWidget);
 
-      // Check presence of title and body keys
-      expect(find.text('registration_help_cue_title'), findsOneWidget);
-      expect(find.text('registration_help_cue_body'), findsOneWidget);
-    });
+        // Check presence of title and body keys
+        expect(find.text('registration_help_cue_title'), findsOneWidget);
+        expect(find.text('registration_help_cue_body'), findsOneWidget);
+      },
+    );
   });
 }

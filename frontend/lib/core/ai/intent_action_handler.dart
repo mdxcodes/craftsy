@@ -11,7 +11,9 @@ import 'intent_registry.dart';
 final intentExecutorProvider = Provider<IntentExecutor>((ref) {
   // This will be overridden in the widget tree with a proper BuildContext.
   // We use a placeholder here — the actual executor is created in the widget.
-  throw UnimplementedError('IntentExecutor must be created with a BuildContext');
+  throw UnimplementedError(
+    'IntentExecutor must be created with a BuildContext',
+  );
 });
 
 /// Handles AI action execution from chat/voice input.
@@ -43,7 +45,11 @@ class IntentActionHandler {
   }
 
   /// Handle the result of an intent execution.
-  Future<void> _handleResult(IntentResult result, CraftsyIntent intent, String languageCode) async {
+  Future<void> _handleResult(
+    IntentResult result,
+    CraftsyIntent intent,
+    String languageCode,
+  ) async {
     final isHi = languageCode == 'hi';
 
     if (!result.executed) {
@@ -59,10 +65,7 @@ class IntentActionHandler {
       _showSnackBar(result.message);
 
       // Speak the result
-      await _tts.speak(
-        result.message,
-        languageCode: isHi ? 'hi' : 'en',
-      );
+      await _tts.speak(result.message, languageCode: isHi ? 'hi' : 'en');
     } else {
       // Show error message
       _showSnackBar(result.message);
@@ -85,7 +88,10 @@ class IntentActionHandler {
   /// Returns true if the user confirmed, false otherwise.
   Future<bool> confirmDestructiveAction(CraftsyIntent intent) async {
     final isHi = EasyLocalization.of(_context)?.locale.languageCode == 'hi';
-    final description = IntentRegistry.getDescription(intent.type, isHindi: isHi);
+    final description = IntentRegistry.getDescription(
+      intent.type,
+      isHindi: isHi,
+    );
 
     final result = await showDialog<bool>(
       context: _context,
@@ -115,5 +121,7 @@ class IntentActionHandler {
 
 /// Provider for the intent action handler.
 final intentActionHandlerProvider = Provider<IntentActionHandler>((ref) {
-  throw UnimplementedError('IntentActionHandler must be created with a BuildContext');
+  throw UnimplementedError(
+    'IntentActionHandler must be created with a BuildContext',
+  );
 });

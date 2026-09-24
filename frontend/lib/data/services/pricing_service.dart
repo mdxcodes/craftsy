@@ -36,14 +36,14 @@ class ComparableProduct {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'selling_price': sellingPrice,
-        'category': category,
-        'source_platform': sourcePlatform,
-        'similarity_score': similarityScore,
-        'product_url': productUrl,
-      };
+    'id': id,
+    'title': title,
+    'selling_price': sellingPrice,
+    'category': category,
+    'source_platform': sourcePlatform,
+    'similarity_score': similarityScore,
+    'product_url': productUrl,
+  };
 }
 
 /// Structured AI pricing recommendation matching backend PriceSuggestResponse.
@@ -72,7 +72,8 @@ class PriceSuggestion {
 
   factory PriceSuggestion.fromJson(Map<String, dynamic> json) {
     final rawComps = json['comparable_products'] as List<dynamic>?;
-    final comparables = rawComps
+    final comparables =
+        rawComps
             ?.map((c) => ComparableProduct.fromJson(c as Map<String, dynamic>))
             .toList() ??
         const [];
@@ -111,16 +112,17 @@ class HttpPricingService implements PricingService {
   final MockPricingService _fallback;
 
   HttpPricingService({String? baseUrl, Dio? dio})
-      : _base = baseUrl ?? ApiConfig.baseUrl,
-        _dio = dio ??
-            Dio(
-              BaseOptions(
-                connectTimeout: const Duration(seconds: 15),
-                receiveTimeout: const Duration(seconds: 45),
-                headers: {'Accept': 'application/json'},
-              ),
+    : _base = baseUrl ?? ApiConfig.baseUrl,
+      _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 45),
+              headers: {'Accept': 'application/json'},
             ),
-        _fallback = MockPricingService();
+          ),
+      _fallback = MockPricingService();
 
   @override
   Future<PriceSuggestion> suggestPrice({
@@ -140,7 +142,8 @@ class HttpPricingService implements PricingService {
       final payload = <String, dynamic>{
         'description': desc,
         'category': category,
-        if (imageUrl != null && imageUrl.trim().isNotEmpty) 'image_url': imageUrl.trim(),
+        if (imageUrl != null && imageUrl.trim().isNotEmpty)
+          'image_url': imageUrl.trim(),
         if (rawMaterialCost != null) 'raw_material_cost': rawMaterialCost,
         if (rawMaterialCost != null) 'base_cost': rawMaterialCost,
         if (laborHours != null) 'labor_hours': laborHours,
@@ -154,15 +157,20 @@ class HttpPricingService implements PricingService {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        return PriceSuggestion.fromJson(Map<String, dynamic>.from(response.data as Map));
+        return PriceSuggestion.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
+        );
       }
       throw DioException(
         requestOptions: response.requestOptions,
         response: response,
-        error: 'Invalid response status ${response.statusCode} from pricing server',
+        error:
+            'Invalid response status ${response.statusCode} from pricing server',
       );
     } catch (e) {
-      debugPrint('[HttpPricingService] API call failed: $e. Falling back to offline calculation.');
+      debugPrint(
+        '[HttpPricingService] API call failed: $e. Falling back to offline calculation.',
+      );
       return _fallback.suggestPrice(
         description: description,
         category: category,
@@ -208,45 +216,59 @@ class MockPricingService implements PricingService {
         baseMin = 1400.0;
         baseMax = 2400.0;
         baseSuggested = 1850.0;
-        reasonEn = 'Based on handloom weaving complexity (3.5 hrs), silk-cotton blend fabric market rates, and current festive demand.';
-        reasonHi = 'हथकरघा बुनाई की जटिलता, सिल्क-कॉटन फैब्रिक की बाज़ार दर और वर्तमान मांग के आधार पर विश्लेषित।';
+        reasonEn =
+            'Based on handloom weaving complexity (3.5 hrs), silk-cotton blend fabric market rates, and current festive demand.';
+        reasonHi =
+            'हथकरघा बुनाई की जटिलता, सिल्क-कॉटन फैब्रिक की बाज़ार दर और वर्तमान मांग के आधार पर विश्लेषित।';
         break;
       case 'woodwork':
         baseMin = 950.0;
         baseMax = 1600.0;
         baseSuggested = 1250.0;
-        reasonEn = 'Based on seasoned Sheesham hardwood material, detailed brass inlay craftsmanship, and e-commerce decor benchmarks.';
-        reasonHi = 'शीशम की लकड़ी की लागत, पीतल की नक्काशी और हस्तकला ई-कॉमर्स बाज़ार के आंकड़ों के अनुसार।';
+        reasonEn =
+            'Based on seasoned Sheesham hardwood material, detailed brass inlay craftsmanship, and e-commerce decor benchmarks.';
+        reasonHi =
+            'शीशम की लकड़ी की लागत, पीतल की नक्काशी और हस्तकला ई-कॉमर्स बाज़ार के आंकड़ों के अनुसार।';
         break;
       case 'jewelry':
         baseMin = 650.0;
         baseMax = 1200.0;
         baseSuggested = 890.0;
-        reasonEn = 'Calculated from brass/terracotta casting, intricate hand-finishing, and artisan jewelry trends.';
-        reasonHi = 'धातु/मिट्टी की ढलाई, बारीक पॉलिश और पारंपरिक आभूषण बाज़ार की दरों के अनुसार।';
+        reasonEn =
+            'Calculated from brass/terracotta casting, intricate hand-finishing, and artisan jewelry trends.';
+        reasonHi =
+            'धातु/मिट्टी की ढलाई, बारीक पॉलिश और पारंपरिक आभूषण बाज़ार की दरों के अनुसार।';
         break;
       case 'paintings':
         baseMin = 1200.0;
         baseMax = 2800.0;
         baseSuggested = 1950.0;
-        reasonEn = 'Evaluated using organic pigment quality, canvas size, and traditional folk art auction benchmarks.';
-        reasonHi = 'प्राकृतिक रंगों की गुणवत्ता, कैनवास का आकार और पारंपरिक लोक चित्रकला के बाज़ार मूल्य पर आधारित।';
+        reasonEn =
+            'Evaluated using organic pigment quality, canvas size, and traditional folk art auction benchmarks.';
+        reasonHi =
+            'प्राकृतिक रंगों की गुणवत्ता, कैनवास का आकार और पारंपरिक लोक चित्रकला के बाज़ार मूल्य पर आधारित।';
         break;
       case 'pottery':
       default:
         baseMin = 550.0;
         baseMax = 950.0;
         baseSuggested = 750.0;
-        reasonEn = 'Evaluated based on pure river clay sourcing, wheel sculpting time, wood-kiln firing fuel costs, and sustainable home decor trends.';
-        reasonHi = 'प्राकृतिक नदी की मिट्टी, चाक पर गढ़ने का समय, भट्टी ईंधन लागत और पर्यावरण-अनुकूल घरेलू सजावट की बाज़ार मांग के अनुसार।';
+        reasonEn =
+            'Evaluated based on pure river clay sourcing, wheel sculpting time, wood-kiln firing fuel costs, and sustainable home decor trends.';
+        reasonHi =
+            'प्राकृतिक नदी की मिट्टी, चाक पर गढ़ने का समय, भट्टी ईंधन लागत और पर्यावरण-अनुकूल घरेलू सजावट की बाज़ार मांग के अनुसार।';
         break;
     }
 
     // Floor price safeguard: minimum price and suggested price can never drop below calculatedFloor
     final finalFloor = calculatedFloor > 0 ? calculatedFloor : 300.0;
     final minPrice = baseMin < finalFloor ? finalFloor : baseMin;
-    final maxPrice = baseMax < (finalFloor * 1.3) ? (finalFloor * 1.6) : baseMax;
-    final suggested = baseSuggested < minPrice ? minPrice : (baseSuggested > maxPrice ? maxPrice : baseSuggested);
+    final maxPrice = baseMax < (finalFloor * 1.3)
+        ? (finalFloor * 1.6)
+        : baseMax;
+    final suggested = baseSuggested < minPrice
+        ? minPrice
+        : (baseSuggested > maxPrice ? maxPrice : baseSuggested);
 
     return PriceSuggestion(
       minPrice: double.parse(minPrice.toStringAsFixed(0)),

@@ -62,42 +62,63 @@ void main() {
         dio: dio,
       );
 
-      final result = await service.enhanceImage(testImageFile.path, draftId: 'draft_101');
-      expect(result, equals('http://127.0.0.1:8000/uploads/enhanced/sample_enhanced.jpg'));
-    });
-
-    test('Network failure triggers retry and lands in offline retry queue', () async {
-      final failureInterceptor = MockFailureInterceptor();
-      final dio = Dio(BaseOptions(baseUrl: 'http://127.0.0.1:8000'));
-      dio.interceptors.add(failureInterceptor);
-
-      File? queuedFile;
-      String? queuedDraftId;
-
-      final service = HttpImageEnhancerService(
-        baseUrl: 'http://127.0.0.1:8000',
-        dio: dio,
-        maxRetries: 1,
-        onFallbackQueue: (file, draftId) async {
-          queuedFile = file;
-          queuedDraftId = draftId;
-        },
+      final result = await service.enhanceImage(
+        testImageFile.path,
+        draftId: 'draft_101',
       );
-
-      final result = await service.enhanceImage(testImageFile.path, draftId: 'draft_offline_42');
-
-      // 1. Should have retried at least once (initial attempt + 1 retry = 2 calls)
-      expect(failureInterceptor.callCount, greaterThanOrEqualTo(2),
-          reason: 'Service must retry at least once before falling back');
-
-      // 2. Must NOT silently return without adding to offline queue
-      expect(queuedFile, isNotNull,
-          reason: 'Image job MUST land in the offline retry queue');
-      expect(queuedDraftId, equals('draft_offline_42'),
-          reason: 'Enqueued item must retain the product draft ID');
-
-      // 3. Fallback returns local path to keep user UI unblocked
-      expect(result, equals(testImageFile.path));
+      expect(
+        result,
+        equals('http://127.0.0.1:8000/uploads/enhanced/sample_enhanced.jpg'),
+      );
     });
+
+    test(
+      'Network failure triggers retry and lands in offline retry queue',
+      () async {
+        final failureInterceptor = MockFailureInterceptor();
+        final dio = Dio(BaseOptions(baseUrl: 'http://127.0.0.1:8000'));
+        dio.interceptors.add(failureInterceptor);
+
+        File? queuedFile;
+        String? queuedDraftId;
+
+        final service = HttpImageEnhancerService(
+          baseUrl: 'http://127.0.0.1:8000',
+          dio: dio,
+          maxRetries: 1,
+          onFallbackQueue: (file, draftId) async {
+            queuedFile = file;
+            queuedDraftId = draftId;
+          },
+        );
+
+        final result = await service.enhanceImage(
+          testImageFile.path,
+          draftId: 'draft_offline_42',
+        );
+
+        // 1. Should have retried at least once (initial attempt + 1 retry = 2 calls)
+        expect(
+          failureInterceptor.callCount,
+          greaterThanOrEqualTo(2),
+          reason: 'Service must retry at least once before falling back',
+        );
+
+        // 2. Must NOT silently return without adding to offline queue
+        expect(
+          queuedFile,
+          isNotNull,
+          reason: 'Image job MUST land in the offline retry queue',
+        );
+        expect(
+          queuedDraftId,
+          equals('draft_offline_42'),
+          reason: 'Enqueued item must retain the product draft ID',
+        );
+
+        // 3. Fallback returns local path to keep user UI unblocked
+        expect(result, equals(testImageFile.path));
+      },
+    );
   });
 }

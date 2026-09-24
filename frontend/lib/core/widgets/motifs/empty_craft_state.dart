@@ -130,8 +130,22 @@ class _PottersWheelPainter extends CustomPainter {
     // Clay top arc — M38 30 C38 20 58 20 58 30 C58 36 52 36 52 30
     final arc = Path();
     arc.moveTo(38 * scale, 30 * scale);
-    arc.cubicTo(38 * scale, 20 * scale, 58 * scale, 20 * scale, 58 * scale, 30 * scale);
-    arc.cubicTo(58 * scale, 36 * scale, 52 * scale, 36 * scale, 52 * scale, 30 * scale);
+    arc.cubicTo(
+      38 * scale,
+      20 * scale,
+      58 * scale,
+      20 * scale,
+      58 * scale,
+      30 * scale,
+    );
+    arc.cubicTo(
+      58 * scale,
+      36 * scale,
+      52 * scale,
+      36 * scale,
+      52 * scale,
+      30 * scale,
+    );
     canvas.drawPath(arc, stroke);
   }
 

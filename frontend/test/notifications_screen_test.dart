@@ -11,14 +11,14 @@ void main() {
   setUpAll(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/shared_preferences'),
-      (MethodCall methodCall) async {
-        if (methodCall.method == 'getAll') {
-          return <String, Object>{};
-        }
-        return true;
-      },
-    );
+          const MethodChannel('plugins.flutter.io/shared_preferences'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'getAll') {
+              return <String, Object>{};
+            }
+            return true;
+          },
+        );
     await EasyLocalization.ensureInitialized();
   });
 
@@ -31,9 +31,7 @@ void main() {
             path: 'assets/translations',
             fallbackLocale: const Locale('en'),
             useOnlyLangCode: true,
-            child: const MaterialApp(
-              home: NotificationsScreen(),
-            ),
+            child: const MaterialApp(home: NotificationsScreen()),
           ),
         ),
       );
@@ -58,9 +56,7 @@ void main() {
             path: 'assets/translations',
             fallbackLocale: const Locale('en'),
             useOnlyLangCode: true,
-            child: const MaterialApp(
-              home: NotificationsScreen(),
-            ),
+            child: const MaterialApp(home: NotificationsScreen()),
           ),
         ),
       );

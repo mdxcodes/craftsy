@@ -17,10 +17,7 @@ import '../../../core/theme/app_colors.dart';
 class ProductChannelSelectorScreen extends ConsumerStatefulWidget {
   final String productId;
 
-  const ProductChannelSelectorScreen({
-    super.key,
-    required this.productId,
-  });
+  const ProductChannelSelectorScreen({super.key, required this.productId});
 
   @override
   ConsumerState<ProductChannelSelectorScreen> createState() =>
@@ -116,8 +113,8 @@ class _ProductChannelSelectorScreenState
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? _buildErrorState()
-              : _buildChannelList(),
+          ? _buildErrorState()
+          : _buildChannelList(),
     );
   }
 
@@ -139,10 +136,7 @@ class _ProductChannelSelectorScreenState
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          PrimaryActionButton(
-            label: 'Retry',
-            onPressed: _loadChannelStatuses,
-          ),
+          PrimaryActionButton(label: 'Retry', onPressed: _loadChannelStatuses),
         ],
       ),
     );
@@ -159,16 +153,16 @@ class _ProductChannelSelectorScreenState
               Text(
                 'Where do you want to sell this product?',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Choose one or more channels. You can change this later.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -258,8 +252,8 @@ class _ProductChannelSelectorScreenState
                   Text(
                     status.label,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
 
@@ -289,8 +283,8 @@ class _ProductChannelSelectorScreenState
                     Text(
                       'Required Information',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     ...status.missingRequirements.map(

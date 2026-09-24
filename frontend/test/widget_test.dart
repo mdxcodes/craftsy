@@ -35,13 +35,11 @@ void main() {
     await Hive.openBox('draft_box');
   });
 
-  testWidgets('App renders SignInScreen without error', (WidgetTester tester) async {
+  testWidgets('App renders SignInScreen without error', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: SignInScreen(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: SignInScreen())),
     );
 
     await tester.pump();

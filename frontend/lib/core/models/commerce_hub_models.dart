@@ -36,7 +36,8 @@ class ChannelStatusInfo {
       color: json['color'] as String? ?? '',
       isConnected: json['is_connected'] as bool? ?? false,
       canPublish: json['can_publish'] as bool? ?? false,
-      missingRequirements: (json['missing_requirements'] as List<dynamic>?)
+      missingRequirements:
+          (json['missing_requirements'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -81,8 +82,10 @@ class CommerceSummary {
     return CommerceSummary(
       totalProducts: json['total_products'] as int? ?? 0,
       liveProducts: json['live_products'] as int? ?? 0,
-      channelCounts: (json['channel_counts'] as Map<String, dynamic>?)
-              ?.map((k, v) => MapEntry(k, v as int? ?? 0)) ??
+      channelCounts:
+          (json['channel_counts'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v as int? ?? 0),
+          ) ??
           {},
       totalOrders: json['total_orders'] as int? ?? 0,
       productsNeedingAttention: json['products_needing_attention'] as int? ?? 0,
@@ -144,12 +147,14 @@ class ProductDetailWithChannels {
       category: json['category'] as String? ?? '',
       status: json['status'] as String? ?? '',
       stock: json['stock'] as int? ?? 0,
-      tags: (json['tags'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
           [],
-      channels: (json['channels'] as List<dynamic>?)
-              ?.map((e) => ChannelStatusInfo.fromJson(e as Map<String, dynamic>))
+      channels:
+          (json['channels'] as List<dynamic>?)
+              ?.map(
+                (e) => ChannelStatusInfo.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
     );
@@ -226,9 +231,13 @@ class ProductSyncStatus {
     return ProductSyncStatus(
       productId: json['product_id'] as String? ?? '',
       productUpdated: json['product_updated'] as String? ?? '',
-      channels: (json['channels'] as Map<String, dynamic>?)
-              ?.map((k, v) => MapEntry(
-                  k, ChannelSyncStatus.fromJson(v as Map<String, dynamic>))) ??
+      channels:
+          (json['channels'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(
+              k,
+              ChannelSyncStatus.fromJson(v as Map<String, dynamic>),
+            ),
+          ) ??
           {},
     );
   }

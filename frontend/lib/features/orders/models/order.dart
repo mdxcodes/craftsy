@@ -4,22 +4,32 @@ enum OrderStatus { newOrder, packed, shipped, delivered, cancelled }
 extension OrderStatusX on OrderStatus {
   String get labelKey {
     switch (this) {
-      case OrderStatus.newOrder:   return 'order_status_new';
-      case OrderStatus.packed:     return 'order_status_packed';
-      case OrderStatus.shipped:    return 'order_status_shipped';
-      case OrderStatus.delivered:  return 'order_status_delivered';
-      case OrderStatus.cancelled:  return 'order_status_cancelled';
+      case OrderStatus.newOrder:
+        return 'order_status_new';
+      case OrderStatus.packed:
+        return 'order_status_packed';
+      case OrderStatus.shipped:
+        return 'order_status_shipped';
+      case OrderStatus.delivered:
+        return 'order_status_delivered';
+      case OrderStatus.cancelled:
+        return 'order_status_cancelled';
     }
   }
 
   /// Returns the next logical status, or null if terminal.
   OrderStatus? get next {
     switch (this) {
-      case OrderStatus.newOrder:  return OrderStatus.packed;
-      case OrderStatus.packed:    return OrderStatus.shipped;
-      case OrderStatus.shipped:   return OrderStatus.delivered;
-      case OrderStatus.delivered: return null;
-      case OrderStatus.cancelled: return null;
+      case OrderStatus.newOrder:
+        return OrderStatus.packed;
+      case OrderStatus.packed:
+        return OrderStatus.shipped;
+      case OrderStatus.shipped:
+        return OrderStatus.delivered;
+      case OrderStatus.delivered:
+        return null;
+      case OrderStatus.cancelled:
+        return null;
     }
   }
 }
@@ -61,9 +71,8 @@ class Order {
     this.externalOrderId,
   });
 
-  String get buyerCity => buyerLocation.isNotEmpty
-      ? buyerLocation.split(',').last.trim()
-      : 'India';
+  String get buyerCity =>
+      buyerLocation.isNotEmpty ? buyerLocation.split(',').last.trim() : 'India';
 
   Order copyWith({
     String? id,

@@ -34,10 +34,8 @@ class AppIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveConstraints = constraints ?? const BoxConstraints(
-      minWidth: 48,
-      minHeight: 48,
-    );
+    final effectiveConstraints =
+        constraints ?? const BoxConstraints(minWidth: 48, minHeight: 48);
 
     final button = IconButton(
       icon: icon,
@@ -56,8 +54,12 @@ class AppIconButton extends StatelessWidget {
     // Ensure minimum 48x48 touch target even with custom constraints
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minWidth: effectiveConstraints.minWidth < 48 ? 48 : effectiveConstraints.minWidth,
-        minHeight: effectiveConstraints.minHeight < 48 ? 48 : effectiveConstraints.minHeight,
+        minWidth: effectiveConstraints.minWidth < 48
+            ? 48
+            : effectiveConstraints.minWidth,
+        minHeight: effectiveConstraints.minHeight < 48
+            ? 48
+            : effectiveConstraints.minHeight,
       ),
       child: button,
     );

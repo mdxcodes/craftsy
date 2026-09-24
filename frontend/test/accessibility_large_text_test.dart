@@ -15,19 +15,14 @@ void main() {
   Widget wrapWithLargeText(Widget child, {double scale = 1.5}) {
     return MediaQuery(
       data: MediaQueryData(textScaler: TextScaler.linear(scale)),
-      child: MaterialApp(
-        home: Scaffold(body: child),
-      ),
+      child: MaterialApp(home: Scaffold(body: child)),
     );
   }
 
   testWidgets('PrimaryActionButton renders with large text', (tester) async {
     await tester.pumpWidget(
       wrapWithLargeText(
-        const PrimaryActionButton(
-          label: 'Test Action',
-          onPressed: null,
-        ),
+        const PrimaryActionButton(label: 'Test Action', onPressed: null),
       ),
     );
     await tester.pump();
@@ -70,11 +65,7 @@ void main() {
   });
 
   testWidgets('OfflineState renders with large text', (tester) async {
-    await tester.pumpWidget(
-      wrapWithLargeText(
-        const OfflineState(),
-      ),
-    );
+    await tester.pumpWidget(wrapWithLargeText(const OfflineState()));
     await tester.pump();
     // OfflineState should render without overflow
     expect(find.byType(OfflineState), findsOneWidget);

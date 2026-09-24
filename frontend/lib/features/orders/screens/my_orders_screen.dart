@@ -57,7 +57,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                 _FilterChip(
                   label: 'order_filter_all'.tr(),
                   selected: selectedFilter == null,
-                  onTap: () => ref.read(selectedOrderFilterProvider.notifier).state = null,
+                  onTap: () =>
+                      ref.read(selectedOrderFilterProvider.notifier).state =
+                          null,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 ...OrderStatus.values.map((status) {
@@ -67,7 +69,9 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                       label: status.labelKey.tr(),
                       selected: selectedFilter == status,
                       dotColor: _statusDotColor(status),
-                      onTap: () => ref.read(selectedOrderFilterProvider.notifier).state = status,
+                      onTap: () =>
+                          ref.read(selectedOrderFilterProvider.notifier).state =
+                              status,
                     ),
                   );
                 }),
@@ -99,12 +103,16 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                         onStatusAdvance: () {
                           final next = order.status.next;
                           if (next != null) {
-                            ref.read(ordersProvider.notifier).updateStatus(order.id, next);
+                            ref
+                                .read(ordersProvider.notifier)
+                                .updateStatus(order.id, next);
                             LabelMakerService.invalidateCache(order.id);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'status_updated_to'.tr(namedArgs: {'status': next.labelKey.tr()}),
+                                  'status_updated_to'.tr(
+                                    namedArgs: {'status': next.labelKey.tr()},
+                                  ),
                                 ),
                                 backgroundColor: AppColors.indigo,
                                 duration: const Duration(seconds: 2),
@@ -123,11 +131,16 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
 
   Color _statusDotColor(OrderStatus status) {
     switch (status) {
-      case OrderStatus.newOrder:  return AppColors.amber;
-      case OrderStatus.packed:    return AppColors.indigo;
-      case OrderStatus.shipped:   return AppColors.teal;
-      case OrderStatus.delivered: return AppColors.success;
-      case OrderStatus.cancelled: return AppColors.inkSoft;
+      case OrderStatus.newOrder:
+        return AppColors.amber;
+      case OrderStatus.packed:
+        return AppColors.indigo;
+      case OrderStatus.shipped:
+        return AppColors.teal;
+      case OrderStatus.delivered:
+        return AppColors.success;
+      case OrderStatus.cancelled:
+        return AppColors.inkSoft;
     }
   }
 }
@@ -171,10 +184,7 @@ class _FilterChip extends StatelessWidget {
       showCheckmark: false,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
-      labelPadding: EdgeInsets.only(
-        left: dotColor != null ? 2 : 6,
-        right: 8,
-      ),
+      labelPadding: EdgeInsets.only(left: dotColor != null ? 2 : 6, right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       backgroundColor: AppColors.cardSurface,
       selectedColor: AppColors.terracotta,
@@ -232,8 +242,7 @@ class _OrderCardState extends State<_OrderCard> {
     final order = widget.order;
     final locale = Localizations.maybeLocaleOf(context)?.languageCode ?? 'en';
     final isHindi = locale == 'hi';
-    final lead = TtsPageGuides.orderCardLead
-        .forLanguage(locale);
+    final lead = TtsPageGuides.orderCardLead.forLanguage(locale);
 
     // Built in the app language rather than always in English: the status
     // label is already translated, so an English carrier sentence around a
@@ -245,12 +254,12 @@ class _OrderCardState extends State<_OrderCard> {
 
     final summary = isHindi
         ? '$productTitle का ऑर्डर, ${order.buyerCity} से '
-            '${order.buyerName} की ओर से। राशि '
-            '${order.amount.toStringAsFixed(0)} रुपये। स्थिति: '
-            '${order.status.labelKey.tr()}।'
+              '${order.buyerName} की ओर से। राशि '
+              '${order.amount.toStringAsFixed(0)} रुपये। स्थिति: '
+              '${order.status.labelKey.tr()}।'
         : 'Order for ${order.productTitle}, from ${order.buyerName} in '
-            '${order.buyerCity}. Amount: ${order.amount.toStringAsFixed(0)} '
-            'rupees. Status: ${order.status.labelKey.tr()}.';
+              '${order.buyerCity}. Amount: ${order.amount.toStringAsFixed(0)} '
+              'rupees. Status: ${order.status.labelKey.tr()}.';
 
     final result = await _tts.speak(
       lead + summary,
@@ -261,9 +270,7 @@ class _OrderCardState extends State<_OrderCard> {
       final opened = await _tts.openVoiceDownloadScreen();
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -275,7 +282,8 @@ class _OrderCardState extends State<_OrderCard> {
     final onTap = widget.onTap;
     final onStatusAdvance = widget.onStatusAdvance;
     final canAdvance = order.status.next != null;
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
     final displayProductTitle = (isHindi && order.productTitleHi != null)
@@ -284,7 +292,9 @@ class _OrderCardState extends State<_OrderCard> {
 
     return Dismissible(
       key: ValueKey('${order.id}_${order.status}'),
-      direction: canAdvance ? DismissDirection.startToEnd : DismissDirection.none,
+      direction: canAdvance
+          ? DismissDirection.startToEnd
+          : DismissDirection.none,
       background: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.itemSpacing),
         decoration: BoxDecoration(
@@ -298,10 +308,12 @@ class _OrderCardState extends State<_OrderCard> {
             const Icon(Icons.arrow_forward, color: AppColors.terracottaDark),
             const SizedBox(width: AppSpacing.xs),
             Text(
-              'mark_as_status'.tr(namedArgs: {
-                'status': order.status.next?.labelKey.tr() ?? '',
-              }),
-              style: AppTextStyles.labelSmall.copyWith(color: AppColors.terracottaDark),
+              'mark_as_status'.tr(
+                namedArgs: {'status': order.status.next?.labelKey.tr() ?? ''},
+              ),
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.terracottaDark,
+              ),
             ),
           ],
         ),
@@ -315,10 +327,7 @@ class _OrderCardState extends State<_OrderCard> {
         decoration: BoxDecoration(
           color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(AppRadii.card),
-          border: Border.all(
-            color: AppColors.line,
-            width: 1.0,
-          ),
+          border: Border.all(color: AppColors.line, width: 1.0),
           boxShadow: AppElevation.cardShadow,
         ),
         child: InkWell(
@@ -477,13 +486,18 @@ class _OrderCardState extends State<_OrderCard> {
 
   Widget _buildCategoryThumb(String category) {
     final cat = category.toLowerCase();
-    if (cat.contains('pot') || cat.contains('clay') || cat.contains('ceramic')) {
+    if (cat.contains('pot') ||
+        cat.contains('clay') ||
+        cat.contains('ceramic')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.pottery(color: AppColors.terracottaDark),
       );
     }
-    if (cat.contains('silk') || cat.contains('saree') || cat.contains('textile') || cat.contains('cloth')) {
+    if (cat.contains('silk') ||
+        cat.contains('saree') ||
+        cat.contains('textile') ||
+        cat.contains('cloth')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.textile(color: AppColors.terracottaDark),
@@ -495,7 +509,9 @@ class _OrderCardState extends State<_OrderCard> {
         painter: CraftCategoryIcons.woodwork(color: AppColors.terracottaDark),
       );
     }
-    if (cat.contains('jewel') || cat.contains('metal') || cat.contains('brass')) {
+    if (cat.contains('jewel') ||
+        cat.contains('metal') ||
+        cat.contains('brass')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.jewelry(color: AppColors.terracottaDark),
@@ -507,7 +523,8 @@ class _OrderCardState extends State<_OrderCard> {
   String _formatDate(DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inHours < 24) return 'hours_ago'.tr(namedArgs: {'hours': '${diff.inHours}'});
+    if (diff.inHours < 24)
+      return 'hours_ago'.tr(namedArgs: {'hours': '${diff.inHours}'});
     if (diff.inDays == 1) return 'yesterday'.tr();
     return '${dt.day}/${dt.month}';
   }

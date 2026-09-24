@@ -18,20 +18,21 @@ class HttpApiService implements ApiService {
   final String? _explicitBaseUrl;
 
   HttpApiService({String? baseUrl, Dio? dio})
-      : _explicitBaseUrl = baseUrl,
-        _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? ApiConfig.baseUrl,
-                connectTimeout: const Duration(seconds: 8),
-                receiveTimeout: const Duration(seconds: 15),
-                sendTimeout: const Duration(seconds: 15),
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-              ),
-            );
+    : _explicitBaseUrl = baseUrl,
+      _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: baseUrl ?? ApiConfig.baseUrl,
+              connectTimeout: const Duration(seconds: 8),
+              receiveTimeout: const Duration(seconds: 15),
+              sendTimeout: const Duration(seconds: 15),
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            ),
+          );
 
   void _syncBaseUrl() {
     final activeUrl = _explicitBaseUrl ?? ApiConfig.baseUrl;
@@ -39,7 +40,10 @@ class HttpApiService implements ApiService {
   }
 
   @override
-  Future<List<Product>> getProducts({String? artisanId, String? category}) async {
+  Future<List<Product>> getProducts({
+    String? artisanId,
+    String? category,
+  }) async {
     _syncBaseUrl();
     try {
       final queryParams = <String, dynamic>{
@@ -48,7 +52,9 @@ class HttpApiService implements ApiService {
         'limit': 100,
       };
 
-      debugPrint('[HttpApiService] GET ${_dio.options.baseUrl}/api/v1/products');
+      debugPrint(
+        '[HttpApiService] GET ${_dio.options.baseUrl}/api/v1/products',
+      );
       final response = await _dio.get(
         '/api/v1/products',
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
@@ -57,7 +63,10 @@ class HttpApiService implements ApiService {
       if (response.statusCode == 200 && response.data != null) {
         final list = response.data as List<dynamic>;
         return list
-            .map((item) => Product.fromJson(Map<String, dynamic>.from(item as Map)))
+            .map(
+              (item) =>
+                  Product.fromJson(Map<String, dynamic>.from(item as Map)),
+            )
             .toList();
       }
       return [];
@@ -72,11 +81,16 @@ class HttpApiService implements ApiService {
     _syncBaseUrl();
     try {
       final payload = product.toBackendJson(artisanId: artisanId);
-      debugPrint('[HttpApiService] POST ${_dio.options.baseUrl}/api/v1/products: ${product.title}');
+      debugPrint(
+        '[HttpApiService] POST ${_dio.options.baseUrl}/api/v1/products: ${product.title}',
+      );
       final response = await _dio.post('/api/v1/products', data: payload);
 
-      if ((response.statusCode == 200 || response.statusCode == 201) && response.data != null) {
-        return Product.fromJson(Map<String, dynamic>.from(response.data as Map));
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data != null) {
+        return Product.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
+        );
       }
       throw DioException(
         requestOptions: response.requestOptions,
@@ -94,11 +108,18 @@ class HttpApiService implements ApiService {
     _syncBaseUrl();
     try {
       final payload = product.toBackendJson();
-      debugPrint('[HttpApiService] PUT ${_dio.options.baseUrl}/api/v1/products/${product.id}');
-      final response = await _dio.put('/api/v1/products/${product.id}', data: payload);
+      debugPrint(
+        '[HttpApiService] PUT ${_dio.options.baseUrl}/api/v1/products/${product.id}',
+      );
+      final response = await _dio.put(
+        '/api/v1/products/${product.id}',
+        data: payload,
+      );
 
       if (response.statusCode == 200 && response.data != null) {
-        return Product.fromJson(Map<String, dynamic>.from(response.data as Map));
+        return Product.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
+        );
       }
       throw DioException(
         requestOptions: response.requestOptions,
@@ -115,7 +136,9 @@ class HttpApiService implements ApiService {
   Future<bool> deleteProduct(String id) async {
     _syncBaseUrl();
     try {
-      debugPrint('[HttpApiService] DELETE ${_dio.options.baseUrl}/api/v1/products/$id');
+      debugPrint(
+        '[HttpApiService] DELETE ${_dio.options.baseUrl}/api/v1/products/$id',
+      );
       final response = await _dio.delete('/api/v1/products/$id');
       return response.statusCode == 200;
     } on DioException catch (e) {
@@ -132,10 +155,15 @@ class MockApiService implements ApiService {
   bool simulateNetworkFailure = false;
 
   @override
-  Future<List<Product>> getProducts({String? artisanId, String? category}) async {
+  Future<List<Product>> getProducts({
+    String? artisanId,
+    String? category,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 600));
     if (simulateNetworkFailure) {
-      throw Exception('Simulated network error: Unable to fetch products from backend');
+      throw Exception(
+        'Simulated network error: Unable to fetch products from backend',
+      );
     }
     return List.from(_remoteProducts);
   }
@@ -147,7 +175,9 @@ class MockApiService implements ApiService {
       throw Exception('Simulated network error: Unable to create product');
     }
     final created = product.copyWith(
-      id: product.id.isEmpty ? 'prod_${DateTime.now().millisecondsSinceEpoch}' : product.id,
+      id: product.id.isEmpty
+          ? 'prod_${DateTime.now().millisecondsSinceEpoch}'
+          : product.id,
       status: ProductStatus.live,
     );
     _remoteProducts.removeWhere((p) => p.id == created.id);

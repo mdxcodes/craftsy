@@ -38,12 +38,17 @@ class AppConfirmationDialog extends StatelessWidget {
     this.confirmColor,
     this.isDestructive = false,
     this.isLoading = false,
-  }) : assert(contentWidget != null || message != null, 'Provide either message or contentWidget');
+  }) : assert(
+         contentWidget != null || message != null,
+         'Provide either message or contentWidget',
+       );
 
   @override
   Widget build(BuildContext context) {
     final effectiveCancelLabel = cancelLabel ?? 'cancel'.tr();
-    final effectiveConfirmColor = confirmColor ?? (isDestructive ? AppColors.brick : AppColors.terracotta);
+    final effectiveConfirmColor =
+        confirmColor ??
+        (isDestructive ? AppColors.brick : AppColors.terracotta);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -68,7 +73,9 @@ class AppConfirmationDialog extends StatelessWidget {
                   height: 52,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: (iconColor ?? effectiveConfirmColor).withValues(alpha: 0.12),
+                    color: (iconColor ?? effectiveConfirmColor).withValues(
+                      alpha: 0.12,
+                    ),
                   ),
                   child: Icon(
                     icon,

@@ -116,13 +116,16 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   }
 }
 
-final ordersProvider =
-    StateNotifierProvider<OrdersNotifier, List<Order>>((ref) {
+final ordersProvider = StateNotifierProvider<OrdersNotifier, List<Order>>((
+  ref,
+) {
   return OrdersNotifier();
 });
 
 /// Currently selected filter chip (defaults to OrderStatus.newOrder at start of session, null = show all).
-final selectedOrderFilterProvider = StateProvider<OrderStatus?>((ref) => OrderStatus.newOrder);
+final selectedOrderFilterProvider = StateProvider<OrderStatus?>(
+  (ref) => OrderStatus.newOrder,
+);
 
 /// Filtered list of orders based on [selectedOrderFilterProvider].
 final filteredOrdersProvider = Provider<List<Order>>((ref) {

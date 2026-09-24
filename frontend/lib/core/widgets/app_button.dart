@@ -45,7 +45,8 @@ class AppButton extends StatelessWidget {
     if (isLoading) {
       return ConstrainedBox(
         constraints: BoxConstraints(
-          minWidth: width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
+          minWidth:
+              width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
           minHeight: minButtonHeight,
         ),
         child: Center(
@@ -72,7 +73,10 @@ class AppButton extends StatelessWidget {
       vertical: isCompact ? AppSpacing.sm : AppSpacing.md,
     );
 
-    Widget buildButtonChild({required Color textColor, required Color iconColor}) {
+    Widget buildButtonChild({
+      required Color textColor,
+      required Color iconColor,
+    }) {
       if (icon == null) {
         return Text(
           label,
@@ -84,7 +88,11 @@ class AppButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: isCompact ? 18 : AppSpacing.iconSize, color: iconColor),
+          Icon(
+            icon,
+            size: isCompact ? 18 : AppSpacing.iconSize,
+            color: iconColor,
+          ),
           const SizedBox(width: AppSpacing.sm),
           Flexible(
             child: Text(
@@ -106,20 +114,22 @@ class AppButton extends StatelessWidget {
         final Color fgColor = AppColors.textOnPrimary;
         button = ElevatedButton(
           onPressed: effectiveOnPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: bgColor,
-            foregroundColor: fgColor,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            padding: padding,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadii.button),
-            ),
-          ).copyWith(
-            // Inset bottom shadow for tactile depth (matches mockup .btn-primary)
-            overlayColor: WidgetStateProperty.all(
-              AppColors.terracottaDark.withValues(alpha: 0.18)),
-          ),
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: bgColor,
+                foregroundColor: fgColor,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                padding: padding,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.button),
+                ),
+              ).copyWith(
+                // Inset bottom shadow for tactile depth (matches mockup .btn-primary)
+                overlayColor: WidgetStateProperty.all(
+                  AppColors.terracottaDark.withValues(alpha: 0.18),
+                ),
+              ),
           child: buildButtonChild(textColor: fgColor, iconColor: fgColor),
         );
         break;
@@ -130,19 +140,21 @@ class AppButton extends StatelessWidget {
         final Color fgColor = AppColors.textOnPrimary;
         button = ElevatedButton(
           onPressed: effectiveOnPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: bgColor,
-            foregroundColor: fgColor,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            padding: padding,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadii.button),
-            ),
-          ).copyWith(
-            overlayColor: WidgetStateProperty.all(
-              AppColors.goldDark.withValues(alpha: 0.18)),
-          ),
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: bgColor,
+                foregroundColor: fgColor,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                padding: padding,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadii.button),
+                ),
+              ).copyWith(
+                overlayColor: WidgetStateProperty.all(
+                  AppColors.goldDark.withValues(alpha: 0.18),
+                ),
+              ),
           child: buildButtonChild(textColor: fgColor, iconColor: fgColor),
         );
         break;
@@ -188,7 +200,8 @@ class AppButton extends StatelessWidget {
       enabled: onPressed != null,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          minWidth: width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
+          minWidth:
+              width ?? (type == AppButtonType.text ? 0.0 : double.infinity),
           minHeight: type == AppButtonType.text ? 0.0 : minButtonHeight,
         ),
         child: button,

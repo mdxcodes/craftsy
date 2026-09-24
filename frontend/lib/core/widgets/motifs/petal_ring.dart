@@ -59,7 +59,7 @@ class _PetalRingPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     // Petal ellipse dimensions relative to overall size
-    final rx = size.width * 0.075;  // petal half-width
+    final rx = size.width * 0.075; // petal half-width
     final ry = size.height * 0.135; // petal half-height
     // Centre of each petal ellipse (offset from canvas centre)
     final offset = size.height * 0.33;
@@ -71,7 +71,8 @@ class _PetalRingPainter extends CustomPainter {
       ..isAntiAlias = true;
 
     for (int i = 0; i < 8; i++) {
-      final angle = i * math.pi / 4; // 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°
+      final angle =
+          i * math.pi / 4; // 0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°
       canvas.save();
       canvas.translate(cx, cy);
       canvas.rotate(angle);

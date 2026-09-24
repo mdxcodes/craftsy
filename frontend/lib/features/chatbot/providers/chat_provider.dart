@@ -64,18 +64,52 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     List<String> defaultSuggestions;
     final craftLower = artisanCraft.toLowerCase();
-    if (craftLower.contains('pottery') || craftLower.contains('terracotta') || craftLower.contains('clay')) {
+    if (craftLower.contains('pottery') ||
+        craftLower.contains('terracotta') ||
+        craftLower.contains('clay')) {
       defaultSuggestions = isHi
-          ? ['पीएम विश्वकर्मा योजना क्या है?', 'टेराकोटा में दरारें कैसे रोकें?', 'माय कैटलॉग खोलें', 'मेरी कमाई दिखाएं']
-          : ['What is PM Vishwakarma scheme?', 'How to avoid cracks in terracotta pottery?', 'Take me to my catalogue', 'Open my stats'];
-    } else if (craftLower.contains('textile') || craftLower.contains('handloom') || craftLower.contains('weav')) {
+          ? [
+              'पीएम विश्वकर्मा योजना क्या है?',
+              'टेराकोटा में दरारें कैसे रोकें?',
+              'माय कैटलॉग खोलें',
+              'मेरी कमाई दिखाएं',
+            ]
+          : [
+              'What is PM Vishwakarma scheme?',
+              'How to avoid cracks in terracotta pottery?',
+              'Take me to my catalogue',
+              'Open my stats',
+            ];
+    } else if (craftLower.contains('textile') ||
+        craftLower.contains('handloom') ||
+        craftLower.contains('weav')) {
       defaultSuggestions = isHi
-          ? ['पीएम विश्वकर्मा योजना क्या है?', 'हथकरघा में धागे टूटने से कैसे बचाएं?', 'माय कैटलॉग खोलें', 'मेरी कमाई दिखाएं']
-          : ['What is PM Vishwakarma scheme?', 'How to prevent thread breaks in weaving?', 'Take me to my catalogue', 'Open my stats'];
+          ? [
+              'पीएम विश्वकर्मा योजना क्या है?',
+              'हथकरघा में धागे टूटने से कैसे बचाएं?',
+              'माय कैटलॉग खोलें',
+              'मेरी कमाई दिखाएं',
+            ]
+          : [
+              'What is PM Vishwakarma scheme?',
+              'How to prevent thread breaks in weaving?',
+              'Take me to my catalogue',
+              'Open my stats',
+            ];
     } else {
       defaultSuggestions = isHi
-          ? ['पीएम विश्वकर्मा योजना क्या है?', 'शिल्प सुधार के सुझाव', 'माय कैटलॉग खोलें', 'मेरी कमाई दिखाएं']
-          : ['What is PM Vishwakarma scheme?', 'How to improve craft quality?', 'Take me to my catalogue', 'Open my stats'];
+          ? [
+              'पीएम विश्वकर्मा योजना क्या है?',
+              'शिल्प सुधार के सुझाव',
+              'माय कैटलॉग खोलें',
+              'मेरी कमाई दिखाएं',
+            ]
+          : [
+              'What is PM Vishwakarma scheme?',
+              'How to improve craft quality?',
+              'Take me to my catalogue',
+              'Open my stats',
+            ];
     }
 
     state = state.copyWith(
@@ -116,9 +150,11 @@ class ChatNotifier extends StateNotifier<ChatState> {
       await _handleIncomingAssistantReply(reply, languageCode);
     } catch (e) {
       final errorMsg = ChatMessageModel.assistant(
-        text: (languageCode == 'hi'
-            ? 'माफ़ कीजिए, उत्तर प्राप्त करने में समस्या हुई। कृपया पुनः प्रयास करें।'
-            : 'Sorry, I encountered an issue retrieving an answer. Please try again.').replaceAll('*', ''),
+        text:
+            (languageCode == 'hi'
+                    ? 'माफ़ कीजिए, उत्तर प्राप्त करने में समस्या हुई। कृपया पुनः प्रयास करें।'
+                    : 'Sorry, I encountered an issue retrieving an answer. Please try again.')
+                .replaceAll('*', ''),
       );
       state = state.copyWith(
         messages: [...state.messages, errorMsg],
@@ -164,17 +200,20 @@ class ChatNotifier extends StateNotifier<ChatState> {
             : (isHi ? '🎙️ आवाज़ संदेश' : '🎙️ Voice message'),
       );
 
-      state = state.copyWith(
-        messages: [...updatedList, realUserMsg],
-      );
+      state = state.copyWith(messages: [...updatedList, realUserMsg]);
 
-      await _handleIncomingAssistantReply(result.assistantMessage, languageCode);
+      await _handleIncomingAssistantReply(
+        result.assistantMessage,
+        languageCode,
+      );
     } catch (e) {
       debugPrint('[ChatNotifier] Voice message error: $e');
       final errorMsg = ChatMessageModel.assistant(
-        text: (isHi
-            ? 'माफ़ कीजिए, आवाज़ समझने में समस्या हुई। कृपया पुनः प्रयास करें।'
-            : 'Sorry, I encountered an issue transcribing your voice note. Please try again.').replaceAll('*', ''),
+        text:
+            (isHi
+                    ? 'माफ़ कीजिए, आवाज़ समझने में समस्या हुई। कृपया पुनः प्रयास करें।'
+                    : 'Sorry, I encountered an issue transcribing your voice note. Please try again.')
+                .replaceAll('*', ''),
       );
       state = state.copyWith(
         messages: [...state.messages, errorMsg],
@@ -194,7 +233,10 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     // 1. Direct Status Update Execution (e.g., "Mark my Chanderi Saree as sold")
     if (action != null && action.isStatusUpdate) {
-      final processedMsg = await _executeDirectStatusUpdate(cleanReply, languageCode);
+      final processedMsg = await _executeDirectStatusUpdate(
+        cleanReply,
+        languageCode,
+      );
       state = state.copyWith(
         messages: [...state.messages, processedMsg],
         isLoading: false,
@@ -235,7 +277,8 @@ class ChatNotifier extends StateNotifier<ChatState> {
       if (target.isNotEmpty) {
         // Try exact match first
         for (final p in products) {
-          if (p.title.toLowerCase() == target || p.titleHi.toLowerCase() == target) {
+          if (p.title.toLowerCase() == target ||
+              p.titleHi.toLowerCase() == target) {
             matchedProduct = p;
             break;
           }
@@ -255,7 +298,10 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
       // Default to single product if only one exists in catalogue and user said "this" / "product"
       if (matchedProduct == null && products.isNotEmpty) {
-        if (products.length == 1 || target.isEmpty || target == 'this' || target == 'it') {
+        if (products.length == 1 ||
+            target.isEmpty ||
+            target == 'this' ||
+            target == 'it') {
           matchedProduct = products.first;
         }
       }
@@ -264,10 +310,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
         final notFoundText = isHi
             ? 'कैटलॉग में "${action.targetProduct ?? 'यह'}" नाम का कोई उत्पाद नहीं मिला। कृपया उत्पाद का नाम जांचें।'
             : 'Could not find a product matching "${action.targetProduct ?? 'this'}" in your catalogue.';
-        return reply.copyWith(
-          text: notFoundText,
-          action: null,
-        );
+        return reply.copyWith(text: notFoundText, action: null);
       }
 
       final previousStatus = matchedProduct.status;
@@ -287,10 +330,14 @@ class ChatNotifier extends StateNotifier<ChatState> {
       }
 
       final updatedProduct = matchedProduct.copyWith(status: newStatus);
-      await _ref.read(productListProvider.notifier).updateProduct(updatedProduct);
+      await _ref
+          .read(productListProvider.notifier)
+          .updateProduct(updatedProduct);
 
       final statusDisplay = isHi
-          ? (newStatus == ProductStatus.sold ? 'बिक गया (Sold)' : newStatus.name)
+          ? (newStatus == ProductStatus.sold
+                ? 'बिक गया (Sold)'
+                : newStatus.name)
           : (newStatus == ProductStatus.sold ? 'Sold' : newStatus.name);
 
       final updatedAction = action.copyWith(
@@ -304,10 +351,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
           ? '✅ "${matchedProduct.title}" का स्टेटस बदलकर "$statusDisplay" कर दिया गया है।'
           : '✅ Successfully marked "${matchedProduct.title}" as $statusDisplay directly in your catalogue.';
 
-      return reply.copyWith(
-        text: confirmationText,
-        action: updatedAction,
-      );
+      return reply.copyWith(text: confirmationText, action: updatedAction);
     } catch (e) {
       debugPrint('[ChatNotifier] Direct status update error: $e');
       return reply;
@@ -336,12 +380,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
       }
 
       final revertedProduct = prod.copyWith(status: prevStatus);
-      await _ref.read(productListProvider.notifier).updateProduct(revertedProduct);
+      await _ref
+          .read(productListProvider.notifier)
+          .updateProduct(revertedProduct);
 
       final updatedMessages = state.messages.map((m) {
         if (m.id == messageId && m.action != null) {
           return m.copyWith(
-            text: '${m.text}\n\n↺ Undo successful: "${prod.title}" status restored to ${prevStatus.name.toUpperCase()}.',
+            text:
+                '${m.text}\n\n↺ Undo successful: "${prod.title}" status restored to ${prevStatus.name.toUpperCase()}.',
             action: m.action!.copyWith(
               isUndone: true,
               label: 'Restored to ${prevStatus.name.toUpperCase()}',
@@ -414,29 +461,30 @@ class ChatNotifier extends StateNotifier<ChatState> {
       final errorText = isHi
           ? 'सिंक करने में समस्या आई। कृपया पुनः प्रयास करें।'
           : 'Failed to sync offline products. Please try again.';
-      final updatedMsg = pendingMsg.copyWith(
-        text: '⚠️ $errorText',
-      );
+      final updatedMsg = pendingMsg.copyWith(text: '⚠️ $errorText');
       _updateMessageById(initialReply.id, updatedMsg);
     }
   }
 
   void _updateMessageById(String id, ChatMessageModel updated) {
-    final updatedList = state.messages.map((m) => m.id == id ? updated : m).toList();
+    final updatedList = state.messages
+        .map((m) => m.id == id ? updated : m)
+        .toList();
     state = state.copyWith(messages: updatedList);
   }
 
   void executeAction(BuildContext context, ChatActionModel action) {
-    debugPrint('[ChatNotifier] Executing action: ${action.type}, destination: ${action.destination}, route: ${action.route}, tabIndex: ${action.tabIndex}');
+    debugPrint(
+      '[ChatNotifier] Executing action: ${action.type}, destination: ${action.destination}, route: ${action.route}, tabIndex: ${action.tabIndex}',
+    );
 
     // 1. Pre-filtered catalogue navigation
     if (action.isCatalogueFilter) {
       final query = action.filterQuery ?? '';
       final category = action.filterCategory;
-      _ref.read(catalogueFilterProvider.notifier).setFilter(
-        query: query,
-        category: category,
-      );
+      _ref
+          .read(catalogueFilterProvider.notifier)
+          .setFilter(query: query, category: category);
       context.push('/catalogue');
       if (Navigator.of(context, rootNavigator: true).canPop()) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -507,14 +555,16 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 }
 
-final chatNotifierProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
+final chatNotifierProvider = StateNotifierProvider<ChatNotifier, ChatState>((
+  ref,
+) {
   final service = ref.watch(chatServiceProvider);
   final notifier = ChatNotifier(service, ref);
   ref.listen<UserProfile>(userProfileProvider, (previous, next) {
-    if (previous?.preferredLanguage != next.preferredLanguage && next.preferredLanguage.isNotEmpty) {
+    if (previous?.preferredLanguage != next.preferredLanguage &&
+        next.preferredLanguage.isNotEmpty) {
       notifier.syncLanguage(next.preferredLanguage);
     }
   });
   return notifier;
 });
-

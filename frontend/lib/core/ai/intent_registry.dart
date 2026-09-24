@@ -219,8 +219,9 @@ class IntentRegistry {
       _intents.values.where((i) => i.safety == IntentSafety.safe).toList();
 
   /// Get all intents requiring confirmation.
-  static List<IntentMetadata> get confirmRequiredIntents =>
-      _intents.values.where((i) => i.safety == IntentSafety.confirmRequired).toList();
+  static List<IntentMetadata> get confirmRequiredIntents => _intents.values
+      .where((i) => i.safety == IntentSafety.confirmRequired)
+      .toList();
 
   /// Get description in the appropriate language.
   static String getDescription(String type, {bool isHindi = false}) {

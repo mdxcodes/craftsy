@@ -12,49 +12,49 @@ class AppTheme {
 
       // Color scheme — v4 Indigo Loom palette
       colorScheme: ColorScheme.light(
-        primary:            AppColors.indigo,
-        onPrimary:          AppColors.textOnPrimary,
-        primaryContainer:   AppColors.indigoLight,
+        primary: AppColors.indigo,
+        onPrimary: AppColors.textOnPrimary,
+        primaryContainer: AppColors.indigoLight,
         onPrimaryContainer: AppColors.indigoDark,
 
-        secondary:            AppColors.amber,
-        onSecondary:          AppColors.textOnPrimary,
-        secondaryContainer:   AppColors.amberLight,
+        secondary: AppColors.amber,
+        onSecondary: AppColors.textOnPrimary,
+        secondaryContainer: AppColors.amberLight,
         onSecondaryContainer: AppColors.amberDark,
 
-        tertiary:             AppColors.teal,      // accent — rarely used
-        onTertiary:           AppColors.textOnPrimary,
-        tertiaryContainer:    AppColors.tealLight,
-        onTertiaryContainer:  AppColors.tealDark,
+        tertiary: AppColors.teal, // accent — rarely used
+        onTertiary: AppColors.textOnPrimary,
+        tertiaryContainer: AppColors.tealLight,
+        onTertiaryContainer: AppColors.tealDark,
 
-        error:    AppColors.coral,
-        onError:  AppColors.textOnPrimary,
+        error: AppColors.coral,
+        onError: AppColors.textOnPrimary,
 
-        surface:                   AppColors.cardSurface,
-        onSurface:                 AppColors.textPrimary,
-        surfaceContainerHighest:   AppColors.parchmentDeep,
+        surface: AppColors.cardSurface,
+        onSurface: AppColors.textPrimary,
+        surfaceContainerHighest: AppColors.parchmentDeep,
 
-        outline:        AppColors.dottedBorder,
+        outline: AppColors.dottedBorder,
         outlineVariant: AppColors.line,
-        shadow:         AppColors.shadow,
+        shadow: AppColors.shadow,
       ),
 
       scaffoldBackgroundColor: AppColors.parchment,
 
       // Typography — Fraunces + Manrope (bundled assets, no GoogleFonts)
       textTheme: TextTheme(
-        displayLarge:   AppTextStyles.displayLarge,
-        displayMedium:  AppTextStyles.displayMedium,
-        displaySmall:   AppTextStyles.displaySmall,
-        headlineLarge:  AppTextStyles.headlineLarge,
+        displayLarge: AppTextStyles.displayLarge,
+        displayMedium: AppTextStyles.displayMedium,
+        displaySmall: AppTextStyles.displaySmall,
+        headlineLarge: AppTextStyles.headlineLarge,
         headlineMedium: AppTextStyles.headlineMedium,
-        headlineSmall:  AppTextStyles.headlineSmall,
-        bodyLarge:      AppTextStyles.bodyLarge,
-        bodyMedium:     AppTextStyles.bodyMedium,
-        bodySmall:      AppTextStyles.bodySmall,
-        labelLarge:     AppTextStyles.labelLarge,
-        labelMedium:    AppTextStyles.labelMedium,
-        labelSmall:     AppTextStyles.labelSmall,
+        headlineSmall: AppTextStyles.headlineSmall,
+        bodyLarge: AppTextStyles.bodyLarge,
+        bodyMedium: AppTextStyles.bodyMedium,
+        bodySmall: AppTextStyles.bodySmall,
+        labelLarge: AppTextStyles.labelLarge,
+        labelMedium: AppTextStyles.labelMedium,
+        labelSmall: AppTextStyles.labelSmall,
       ),
 
       // AppBar — flat parchment background
@@ -160,8 +160,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadii.inputField),
           borderSide: const BorderSide(color: AppColors.coral, width: 2),
         ),
-        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
+        labelStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textTertiary,
+        ),
         errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.coral),
       ),
 
@@ -171,9 +175,12 @@ class AppTheme {
         backgroundColor: AppColors.parchmentDeep,
         selectedColor: AppColors.indigo,
         disabledColor: AppColors.parchmentDeep,
-        labelStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.textPrimary),
+        labelStyle: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.textPrimary,
+        ),
         secondaryLabelStyle: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.textOnPrimary),
+          color: AppColors.textOnPrimary,
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
@@ -234,8 +241,9 @@ class AppTheme {
       // Snackbar
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.ink,
-        contentTextStyle:
-            AppTextStyles.bodyMedium.copyWith(color: AppColors.textOnPrimary),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textOnPrimary,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.sm),
         ),

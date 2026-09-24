@@ -25,37 +25,34 @@ void main() {
     }
   });
 
-  testWidgets('Sign-in screen renders phone entry, register option, and action buttons', (WidgetTester tester) async {
+  testWidgets(
+    'Sign-in screen renders phone entry, register option, and action buttons',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(child: MaterialApp(home: SignInScreen())),
+      );
+
+      await tester.pump(const Duration(seconds: 1));
+
+      // Verify phone input field is present
+      final phoneField = find.byType(TextField);
+      expect(phoneField, findsOneWidget);
+
+      // Enter phone number
+      await tester.enterText(phoneField, '9876543210');
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // Verify multiple action buttons exist (Continue, Register, NGO assist)
+      expect(find.byType(ElevatedButton), findsWidgets);
+      expect(find.byType(OutlinedButton), findsWidgets);
+    },
+  );
+
+  testWidgets('Register screen renders all required artisan profile fields', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: SignInScreen(),
-        ),
-      ),
-    );
-
-    await tester.pump(const Duration(seconds: 1));
-
-    // Verify phone input field is present
-    final phoneField = find.byType(TextField);
-    expect(phoneField, findsOneWidget);
-
-    // Enter phone number
-    await tester.enterText(phoneField, '9876543210');
-    await tester.pump(const Duration(milliseconds: 500));
-
-    // Verify multiple action buttons exist (Continue, Register, NGO assist)
-    expect(find.byType(ElevatedButton), findsWidgets);
-    expect(find.byType(OutlinedButton), findsWidgets);
-  });
-
-  testWidgets('Register screen renders all required artisan profile fields', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: RegisterScreen(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: RegisterScreen())),
     );
 
     await tester.pump(const Duration(seconds: 1));
@@ -69,13 +66,25 @@ void main() {
     final textFields = find.byType(TextFormField);
     await tester.enterText(textFields.at(0), 'Shanti Devi'); // Name
     await tester.enterText(textFields.at(1), '9876543210'); // Phone
-    await tester.enterText(textFields.at(2), 'Madhubani Art Cluster'); // Cluster
+    await tester.enterText(
+      textFields.at(2),
+      'Madhubani Art Cluster',
+    ); // Cluster
     await tester.enterText(textFields.at(3), '12'); // Experience
     await tester.enterText(textFields.at(4), 'PEH1234567890'); // Pehchan ID
-    await tester.enterText(textFields.at(5), 'Shanti Devi'); // Bank Account Holder
-    await tester.enterText(textFields.at(6), '012345678901'); // Bank Account Number
+    await tester.enterText(
+      textFields.at(5),
+      'Shanti Devi',
+    ); // Bank Account Holder
+    await tester.enterText(
+      textFields.at(6),
+      '012345678901',
+    ); // Bank Account Number
     await tester.enterText(textFields.at(7), 'SBIN0001234'); // IFSC Code
-    await tester.enterText(textFields.at(8), 'State Bank of India'); // Bank Name
+    await tester.enterText(
+      textFields.at(8),
+      'State Bank of India',
+    ); // Bank Name
     await tester.pump();
 
     // Verify Register Button is rendered

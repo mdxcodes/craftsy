@@ -44,7 +44,10 @@ class TutorialCardWidget extends StatelessWidget {
 
               // --- Badge / Category Pill ---
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: slide.accentColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(AppRadii.full),
@@ -56,11 +59,7 @@ class TutorialCardWidget extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      slide.icon,
-                      size: 16,
-                      color: slide.accentColor,
-                    ),
+                    Icon(slide.icon, size: 16, color: slide.accentColor),
                     const SizedBox(width: 6),
                     Text(
                       slide.badgeKey.tr(),
@@ -187,13 +186,17 @@ class _AnimatedGlowHeroState extends State<_AnimatedGlowHero>
                   boxShadow: [
                     // Blooming radiant glow
                     BoxShadow(
-                      color: widget.accentColor.withValues(alpha: 0.25 + 0.25 * t),
+                      color: widget.accentColor.withValues(
+                        alpha: 0.25 + 0.25 * t,
+                      ),
                       blurRadius: 20.0 + 16.0 * t,
                       spreadRadius: 2.0 + 6.0 * t,
                     ),
                     // Inner luminous warmth
                     BoxShadow(
-                      color: widget.accentColor.withValues(alpha: 0.15 + 0.15 * t),
+                      color: widget.accentColor.withValues(
+                        alpha: 0.15 + 0.15 * t,
+                      ),
                       blurRadius: 8.0 + 6.0 * t,
                       spreadRadius: 0,
                     ),
@@ -205,16 +208,14 @@ class _AnimatedGlowHeroState extends State<_AnimatedGlowHero>
                     ),
                   ],
                   border: Border.all(
-                    color: widget.accentColor.withValues(alpha: 0.35 + 0.20 * t),
+                    color: widget.accentColor.withValues(
+                      alpha: 0.35 + 0.20 * t,
+                    ),
                     width: 2,
                   ),
                 ),
                 child: Center(
-                  child: Icon(
-                    widget.icon,
-                    size: 48,
-                    color: widget.accentColor,
-                  ),
+                  child: Icon(widget.icon, size: 48, color: widget.accentColor),
                 ),
               ),
 
@@ -231,7 +232,9 @@ class _AnimatedGlowHeroState extends State<_AnimatedGlowHero>
                       duration: const Duration(milliseconds: 250),
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: widget.isSpeaking ? AppColors.terracotta : AppColors.cardSurface,
+                        color: widget.isSpeaking
+                            ? AppColors.terracotta
+                            : AppColors.cardSurface,
                         shape: BoxShape.circle,
                         boxShadow: const [
                           BoxShadow(

@@ -46,7 +46,9 @@ class OfflineSyncService {
 
     _db = db ?? OfflineSyncDatabase();
 
-    final connectivityService = ConnectivityService(healthCheckUrl: healthCheckUrl);
+    final connectivityService = ConnectivityService(
+      healthCheckUrl: healthCheckUrl,
+    );
     _syncManager = SyncManager(
       db: _db,
       uploadApi: uploadApi,

@@ -30,7 +30,8 @@ class QueueItems extends Table {
 
 extension QueueItemExtensions on QueueItem {
   static const int maxRetries = kMaxQueueItemRetries;
-  bool get isRetryable => status == QueueStatus.failed && retryCount < kMaxQueueItemRetries;
+  bool get isRetryable =>
+      status == QueueStatus.failed && retryCount < kMaxQueueItemRetries;
 }
 
 LazyDatabase _openConnection() {
@@ -50,42 +51,46 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
 
   /// Watch all items ordered by creation time (fire immediately by default in Drift)
   Stream<List<QueueItem>> watchQueue() {
-    return (select(queueItems)
-          ..orderBy([(t) => OrderingTerm(expression: t.createdAt)]))
-        .watch();
+    return (select(
+      queueItems,
+    )..orderBy([(t) => OrderingTerm(expression: t.createdAt)])).watch();
   }
 
   /// Watch a single item by localId
   Stream<QueueItem?> watchItem(String localId) {
-    return (select(queueItems)..where((t) => t.localId.equals(localId)))
-        .watchSingleOrNull();
+    return (select(
+      queueItems,
+    )..where((t) => t.localId.equals(localId))).watchSingleOrNull();
   }
 
   /// Get all items
   Future<List<QueueItem>> getAllQueueItems() {
-    return (select(queueItems)
-          ..orderBy([(t) => OrderingTerm(expression: t.createdAt)]))
-        .get();
+    return (select(
+      queueItems,
+    )..orderBy([(t) => OrderingTerm(expression: t.createdAt)])).get();
   }
 
   /// Get pending and failed items for upload pass
   Future<List<QueueItem>> getPendingAndFailedItems() {
     return (select(queueItems)
-          ..where((t) =>
-              t.status.equalsValue(QueueStatus.pending) |
-              t.status.equalsValue(QueueStatus.failed))
+          ..where(
+            (t) =>
+                t.status.equalsValue(QueueStatus.pending) |
+                t.status.equalsValue(QueueStatus.failed),
+          )
           ..orderBy([
             (t) => OrderingTerm(expression: t.status),
-            (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+            (t) =>
+                OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
           ]))
         .get();
   }
 
   /// Get in-progress processing items
   Future<List<QueueItem>> getProcessingItems() {
-    return (select(queueItems)
-          ..where((t) => t.status.equalsValue(QueueStatus.processing)))
-        .get();
+    return (select(
+      queueItems,
+    )..where((t) => t.status.equalsValue(QueueStatus.processing))).get();
   }
 
   /// Count items currently in queue (pending, uploading, processing)
@@ -95,8 +100,8 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
       ..addColumns([countExp])
       ..where(
         queueItems.status.equalsValue(QueueStatus.pending) |
-        queueItems.status.equalsValue(QueueStatus.uploading) |
-        queueItems.status.equalsValue(QueueStatus.processing),
+            queueItems.status.equalsValue(QueueStatus.uploading) |
+            queueItems.status.equalsValue(QueueStatus.processing),
       );
     final row = await query.getSingle();
     return row.read(countExp) ?? 0;
@@ -114,8 +119,9 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
 
   /// Find item by localId
   Future<QueueItem?> findItemByLocalId(String localId) {
-    return (select(queueItems)..where((t) => t.localId.equals(localId)))
-        .getSingleOrNull();
+    return (select(
+      queueItems,
+    )..where((t) => t.localId.equals(localId))).getSingleOrNull();
   }
 
   /// Insert a new queue item
@@ -141,9 +147,9 @@ class OfflineSyncDatabase extends _$OfflineSyncDatabase {
 
   /// Reset all failed items to pending
   Future<void> retryAllFailed() async {
-    await (update(queueItems)
-          ..where((t) => t.status.equalsValue(QueueStatus.failed)))
-        .write(
+    await (update(
+      queueItems,
+    )..where((t) => t.status.equalsValue(QueueStatus.failed))).write(
       const QueueItemsCompanion(
         status: Value(QueueStatus.pending),
         retryCount: Value(0),

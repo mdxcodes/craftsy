@@ -30,8 +30,10 @@ import '../offline_sync/offline_sync_service.dart';
 // backend, so Step 2 → 3 (and the pricing step, if you extend the same
 // pattern to PricingService) resolve instantly regardless of whether a
 // server is reachable.
-const bool kMockAiBackend =
-    bool.fromEnvironment('MOCK_AI_BACKEND', defaultValue: false);
+const bool kMockAiBackend = bool.fromEnvironment(
+  'MOCK_AI_BACKEND',
+  defaultValue: false,
+);
 
 // --- Language Selection Provider ---
 class HasSelectedLanguageNotifier extends StateNotifier<bool> {
@@ -101,8 +103,8 @@ class ListingTutorialNotifier extends StateNotifier<bool> {
 
 final listingTutorialProvider =
     StateNotifierProvider<ListingTutorialNotifier, bool>((ref) {
-  return ListingTutorialNotifier();
-});
+      return ListingTutorialNotifier();
+    });
 
 // --- Services Providers ---
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -343,7 +345,8 @@ class AddProductDraft {
   final List<ComparableProduct> comparableProducts;
   final bool isAiProcessing;
   final bool isPricingProcessing;
-  final bool isRegenerating; // true only during an in-place Regenerate on Step 3
+  final bool
+  isRegenerating; // true only during an in-place Regenerate on Step 3
   final List<String> additionalImagePaths;
   final bool isRetakeFlow;
   final bool hasExistingDraft;
@@ -514,15 +517,18 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
   // screen behind it). Instead, isAiProcessing is now always derived from
   // the full set of "is anything still pending" signals in one place.
   void _recomputeAiProcessing() {
-    final imageQueuePending = state.imageQueueItemId != null &&
+    final imageQueuePending =
+        state.imageQueueItemId != null &&
         state.imageQueueItemId!.isNotEmpty &&
         state.imageQueueStatus != QueueStatus.completed &&
         state.imageQueueStatus != QueueStatus.failed;
-    final voiceQueuePending = state.voiceQueueItemId != null &&
+    final voiceQueuePending =
+        state.voiceQueueItemId != null &&
         state.voiceQueueItemId!.isNotEmpty &&
         state.voiceQueueStatus != QueueStatus.completed &&
         state.voiceQueueStatus != QueueStatus.failed;
-    final stillProcessing = _imageEnhancementInFlight ||
+    final stillProcessing =
+        _imageEnhancementInFlight ||
         _listingGenerationInFlight ||
         imageQueuePending ||
         voiceQueuePending;
@@ -747,7 +753,8 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
         finalPrice: (pending['draft_final_price'] as num?)?.toDouble(),
         pricingReasoning: pending['draft_pricing_reasoning'] as String?,
         pricingReasoningHi: pending['draft_pricing_reasoning_hi'] as String?,
-        confidenceScore: (pending['draft_confidence_score'] as num?)?.toDouble(),
+        confidenceScore: (pending['draft_confidence_score'] as num?)
+            ?.toDouble(),
         marketPosition: pending['draft_market_position'] as String?,
         imageQueueItemId: pending['draft_image_queue_id'] as String?,
         voiceQueueItemId: pending['draft_voice_queue_id'] as String?,
@@ -978,7 +985,9 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
         if (state.titleEn.isEmpty &&
             state.manualDescription.isNotEmpty &&
             state.recordedAudioPath.isEmpty) {
-          unawaited(_generateListingFromManualDescription(languageCode, gen: gen));
+          unawaited(
+            _generateListingFromManualDescription(languageCode, gen: gen),
+          );
         }
       } else {
         // Offline: keep items saved in draft and queue, wait for connectivity
@@ -1046,7 +1055,9 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
           .timeout(
             const Duration(seconds: 30),
             onTimeout: () {
-              debugPrint('[AddProductFlow] Image enhancement timed out — proceeding offline.');
+              debugPrint(
+                '[AddProductFlow] Image enhancement timed out — proceeding offline.',
+              );
               return imageFile.path;
             },
           );
@@ -1127,14 +1138,16 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       final enhancedUrl =
           result?['enhancedImageUrl'] as String? ??
           result?['enhanced_url'] as String?;
-      final hasNewEnhancedUrl = enhancedUrl != null &&
+      final hasNewEnhancedUrl =
+          enhancedUrl != null &&
           enhancedUrl.isNotEmpty &&
           enhancedUrl != state.originalImagePath;
       state = state.copyWith(
         imageQueueItemId: item.localId,
         imageQueueStatus: item.status,
-        enhancedImagePath:
-            hasNewEnhancedUrl ? enhancedUrl : state.enhancedImagePath,
+        enhancedImagePath: hasNewEnhancedUrl
+            ? enhancedUrl
+            : state.enhancedImagePath,
         isEnhanced: state.isEnhanced || hasNewEnhancedUrl,
       );
       _recomputeAiProcessing();
@@ -1151,20 +1164,27 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       state = state.copyWith(
         voiceQueueItemId: item.localId,
         voiceQueueStatus: item.status,
-        voiceTranscript: (result?['transcript'] is String &&
-                !HttpSpeechService.isSilenceHallucination(result!['transcript'] as String))
+        voiceTranscript:
+            (result?['transcript'] is String &&
+                !HttpSpeechService.isSilenceHallucination(
+                  result!['transcript'] as String,
+                ))
             ? (result['transcript'] as String)
             : state.voiceTranscript,
-        titleEn: result?['titleEn'] as String? ??
+        titleEn:
+            result?['titleEn'] as String? ??
             result?['title_en'] as String? ??
             state.titleEn,
-        titleHi: result?['titleHi'] as String? ??
+        titleHi:
+            result?['titleHi'] as String? ??
             result?['title_hi'] as String? ??
             state.titleHi,
-        descriptionEn: result?['descriptionEn'] as String? ??
+        descriptionEn:
+            result?['descriptionEn'] as String? ??
             result?['description_en'] as String? ??
             state.descriptionEn,
-        descriptionHi: result?['descriptionHi'] as String? ??
+        descriptionHi:
+            result?['descriptionHi'] as String? ??
             result?['description_hi'] as String? ??
             state.descriptionHi,
         category: result?['category'] as String? ?? state.category,
@@ -1194,10 +1214,13 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       if (gen != null && gen != _aiProcessingGen) return;
       state = state.copyWith(
         titleEn: state.manualDescription,
-        titleHi: state.titleHi.isNotEmpty ? state.titleHi : state.manualDescription,
+        titleHi: state.titleHi.isNotEmpty
+            ? state.titleHi
+            : state.manualDescription,
         descriptionEn: state.manualDescription,
-        descriptionHi:
-            state.descriptionHi.isNotEmpty ? state.descriptionHi : state.manualDescription,
+        descriptionHi: state.descriptionHi.isNotEmpty
+            ? state.descriptionHi
+            : state.manualDescription,
       );
       _recomputeAiProcessing();
       _persistDraft();
@@ -1212,7 +1235,10 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
           .generateListingFromTranscript(
             transcript: state.manualDescription,
             languageCode: languageCode,
-            categoryHint: (state.category.isNotEmpty && state.category != 'Handicrafts') ? state.category : null,
+            categoryHint:
+                (state.category.isNotEmpty && state.category != 'Handicrafts')
+                ? state.category
+                : null,
           )
           .timeout(
             const Duration(seconds: 25),
@@ -1239,16 +1265,21 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
         descriptionHi: suggestion.descriptionHi,
         category: suggestion.category,
         tags: suggestion.tags,
-        rawMaterialCost: (suggestion.rawMaterialCost != null && suggestion.rawMaterialCost! > 0)
+        rawMaterialCost:
+            (suggestion.rawMaterialCost != null &&
+                suggestion.rawMaterialCost! > 0)
             ? suggestion.rawMaterialCost!
             : state.rawMaterialCost,
-        laborHours: (suggestion.laborHours != null && suggestion.laborHours! > 0)
+        laborHours:
+            (suggestion.laborHours != null && suggestion.laborHours! > 0)
             ? suggestion.laborHours!
             : state.laborHours,
-        hourlyRate: (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
+        hourlyRate:
+            (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
             ? suggestion.hourlyRate!
             : state.hourlyRate,
-        floorPrice: (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
+        floorPrice:
+            (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
             ? suggestion.floorPrice!
             : state.floorPrice,
       );
@@ -1355,12 +1386,19 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
     return '';
   }
 
-  Future<void> transcribeVoiceDirectly(File audioFile, {String languageCode = 'auto'}) async {
+  Future<void> transcribeVoiceDirectly(
+    File audioFile, {
+    String languageCode = 'auto',
+  }) async {
     if (kMockAiBackend) {
       await Future.delayed(const Duration(milliseconds: 700));
-      const fakeTranscript = 'Mock transcription (backend bypassed for testing)';
+      const fakeTranscript =
+          'Mock transcription (backend bypassed for testing)';
       _listingGenerationInFlight = true;
-      state = state.copyWith(voiceTranscript: fakeTranscript, transcriptionConfidence: 1.0);
+      state = state.copyWith(
+        voiceTranscript: fakeTranscript,
+        transcriptionConfidence: 1.0,
+      );
       _recomputeAiProcessing();
       _persistDraft();
       await Future.delayed(const Duration(milliseconds: 700));
@@ -1394,7 +1432,9 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
 
       if (transcript.isEmpty ||
           HttpSpeechService.isSilenceHallucination(transcript)) {
-        debugPrint('[AddProductFlow] Transcription empty or hallucination — skipping listing generation.');
+        debugPrint(
+          '[AddProductFlow] Transcription empty or hallucination — skipping listing generation.',
+        );
         _recomputeAiProcessing();
         return;
       }
@@ -1409,17 +1449,24 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
 
       // Step 2: Generate bilingual SEO listing from transcript via Gemini.
       // Cap at 25 s for the same reason as above.
-      debugPrint('[AddProductFlow] Transcript ready — calling generate-listing...');
+      debugPrint(
+        '[AddProductFlow] Transcript ready — calling generate-listing...',
+      );
       final suggestion = await speechService
           .generateListingFromTranscript(
             transcript: transcript,
             languageCode: languageCode,
-            categoryHint: (state.category.isNotEmpty && state.category != 'Handicrafts') ? state.category : null,
+            categoryHint:
+                (state.category.isNotEmpty && state.category != 'Handicrafts')
+                ? state.category
+                : null,
           )
           .timeout(
             const Duration(seconds: 25),
             onTimeout: () {
-              debugPrint('[AddProductFlow] Direct listing generation timed out.');
+              debugPrint(
+                '[AddProductFlow] Direct listing generation timed out.',
+              );
               return AiListingSuggestion(
                 titleEn: transcript,
                 titleHi: state.titleHi,
@@ -1439,24 +1486,33 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
         descriptionHi: suggestion.descriptionHi,
         category: suggestion.category,
         tags: suggestion.tags,
-        rawMaterialCost: (suggestion.rawMaterialCost != null && suggestion.rawMaterialCost! > 0)
+        rawMaterialCost:
+            (suggestion.rawMaterialCost != null &&
+                suggestion.rawMaterialCost! > 0)
             ? suggestion.rawMaterialCost!
             : state.rawMaterialCost,
-        laborHours: (suggestion.laborHours != null && suggestion.laborHours! > 0)
+        laborHours:
+            (suggestion.laborHours != null && suggestion.laborHours! > 0)
             ? suggestion.laborHours!
             : state.laborHours,
-        hourlyRate: (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
+        hourlyRate:
+            (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
             ? suggestion.hourlyRate!
             : state.hourlyRate,
-        floorPrice: (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
+        floorPrice:
+            (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
             ? suggestion.floorPrice!
             : state.floorPrice,
       );
       _recomputeAiProcessing();
       _persistDraft();
-      debugPrint('[AddProductFlow] Listing generation complete: "${suggestion.titleEn}"');
+      debugPrint(
+        '[AddProductFlow] Listing generation complete: "${suggestion.titleEn}"',
+      );
     } catch (e) {
-      debugPrint('[AddProductFlow] Error during voice transcription/listing: $e');
+      debugPrint(
+        '[AddProductFlow] Error during voice transcription/listing: $e',
+      );
       _listingGenerationInFlight = false;
       _recomputeAiProcessing();
     }
@@ -1544,22 +1600,30 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
                   const Duration(seconds: 20),
                   onTimeout: () {
                     debugPrint('[AddProductFlow] Transcription timed out.');
-                    return const TranscriptionResult(transcript: '', confidence: 0);
+                    return const TranscriptionResult(
+                      transcript: '',
+                      confidence: 0,
+                    );
                   },
                 );
             if (transResult.transcript.isNotEmpty &&
-                !HttpSpeechService.isSilenceHallucination(transResult.transcript)) {
+                !HttpSpeechService.isSilenceHallucination(
+                  transResult.transcript,
+                )) {
               transcript = transResult.transcript;
               state = state.copyWith(voiceTranscript: transcript);
             }
           } catch (e) {
-            debugPrint('[AddProductFlow] Error transcribing in generateAiListing: $e');
+            debugPrint(
+              '[AddProductFlow] Error transcribing in generateAiListing: $e',
+            );
           }
         }
       }
 
       if (transcript.isEmpty) {
-        transcript = (state.category.isNotEmpty && state.category != 'Handicrafts')
+        transcript =
+            (state.category.isNotEmpty && state.category != 'Handicrafts')
             ? 'Handcrafted ${state.category} artisan product made with traditional techniques'
             : 'Handcrafted traditional artisan product';
       }
@@ -1569,16 +1633,23 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
           .generateListingFromTranscript(
             transcript: transcript,
             languageCode: languageCode,
-            categoryHint: (state.category.isNotEmpty && state.category != 'Handicrafts') ? state.category : null,
+            categoryHint:
+                (state.category.isNotEmpty && state.category != 'Handicrafts')
+                ? state.category
+                : null,
           )
           .timeout(
             const Duration(seconds: 25),
             onTimeout: () {
-              debugPrint('[AddProductFlow] Listing generation timed out — using placeholder.');
+              debugPrint(
+                '[AddProductFlow] Listing generation timed out — using placeholder.',
+              );
               return AiListingSuggestion(
                 titleEn: state.titleEn.isNotEmpty ? state.titleEn : transcript,
                 titleHi: state.titleHi,
-                descriptionEn: state.descriptionEn.isNotEmpty ? state.descriptionEn : transcript,
+                descriptionEn: state.descriptionEn.isNotEmpty
+                    ? state.descriptionEn
+                    : transcript,
                 descriptionHi: state.descriptionHi,
                 category: state.category,
                 tags: state.tags,
@@ -1591,18 +1662,25 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
         titleHi: suggestion.titleHi,
         descriptionEn: suggestion.descriptionEn,
         descriptionHi: suggestion.descriptionHi,
-        category: suggestion.category.isNotEmpty ? suggestion.category : state.category,
+        category: suggestion.category.isNotEmpty
+            ? suggestion.category
+            : state.category,
         tags: suggestion.tags.isNotEmpty ? suggestion.tags : state.tags,
-        rawMaterialCost: (suggestion.rawMaterialCost != null && suggestion.rawMaterialCost! > 0)
+        rawMaterialCost:
+            (suggestion.rawMaterialCost != null &&
+                suggestion.rawMaterialCost! > 0)
             ? suggestion.rawMaterialCost!
             : state.rawMaterialCost,
-        laborHours: (suggestion.laborHours != null && suggestion.laborHours! > 0)
+        laborHours:
+            (suggestion.laborHours != null && suggestion.laborHours! > 0)
             ? suggestion.laborHours!
             : state.laborHours,
-        hourlyRate: (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
+        hourlyRate:
+            (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
             ? suggestion.hourlyRate!
             : state.hourlyRate,
-        floorPrice: (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
+        floorPrice:
+            (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
             ? suggestion.floorPrice!
             : state.floorPrice,
         isAiProcessing: false,
@@ -1681,23 +1759,27 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
     final desc = state.descriptionEn.isNotEmpty
         ? state.descriptionEn
         : (state.titleEn.isNotEmpty
-            ? state.titleEn
-            : (state.manualDescription.isNotEmpty
-                ? state.manualDescription
-                : state.voiceTranscript));
+              ? state.titleEn
+              : (state.manualDescription.isNotEmpty
+                    ? state.manualDescription
+                    : state.voiceTranscript));
 
     final imagePath = state.enhancedImagePath.isNotEmpty
         ? state.enhancedImagePath
         : state.originalImagePath;
 
     final suggestion = await pricingService.suggestPrice(
-      description: desc.isNotEmpty ? desc : '${state.category} handcrafted product',
+      description: desc.isNotEmpty
+          ? desc
+          : '${state.category} handcrafted product',
       category: state.category,
       tags: state.tags,
       imageUrl: imagePath,
       rawMaterialCost: state.rawMaterialCost > 0 ? state.rawMaterialCost : null,
       laborHours: state.laborHours > 0 ? state.laborHours : null,
-      hourlyWage: (state.laborHours > 0 && state.hourlyRate > 0) ? state.hourlyRate : null,
+      hourlyWage: (state.laborHours > 0 && state.hourlyRate > 0)
+          ? state.hourlyRate
+          : null,
     );
 
     state = state.copyWith(
@@ -1724,10 +1806,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
     } catch (e) {
       debugPrint('[AddProductFlow] Error calculating price: $e');
     } finally {
-      state = state.copyWith(
-        isPricingProcessing: false,
-        currentStep: 3,
-      );
+      state = state.copyWith(isPricingProcessing: false, currentStep: 3);
       _persistDraft();
     }
   }
@@ -1796,7 +1875,13 @@ final addProductFlowProvider =
     });
 
 // --- Notifications Provider ---
-enum NotificationType { listingLive, pendingSync, buyerView, priceSuggestion, newOrder }
+enum NotificationType {
+  listingLive,
+  pendingSync,
+  buyerView,
+  priceSuggestion,
+  newOrder,
+}
 
 class NotificationItem {
   final String id;
@@ -1814,12 +1899,12 @@ class NotificationItem {
   });
 
   NotificationItem copyWith({bool? isRead}) => NotificationItem(
-        id: id,
-        type: type,
-        messageKey: messageKey,
-        timestamp: timestamp,
-        isRead: isRead ?? this.isRead,
-      );
+    id: id,
+    type: type,
+    messageKey: messageKey,
+    timestamp: timestamp,
+    isRead: isRead ?? this.isRead,
+  );
 }
 
 class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
@@ -1879,11 +1964,10 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
 
 final notificationsProvider =
     StateNotifierProvider<NotificationsNotifier, List<NotificationItem>>((ref) {
-  return NotificationsNotifier();
-});
+      return NotificationsNotifier();
+    });
 
 /// Derived provider — number of unread notifications (drives the bell badge).
 final unreadNotificationCountProvider = Provider<int>((ref) {
   return ref.watch(notificationsProvider).where((n) => !n.isRead).length;
 });
-

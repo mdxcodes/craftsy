@@ -33,7 +33,9 @@ class OrderChannelSummaryCard extends ConsumerWidget {
                   return Text('No orders yet'.tr());
                 }
                 return Column(
-                  children: summaries.map((s) => _buildChannelRow(context, s)).toList(),
+                  children: summaries
+                      .map((s) => _buildChannelRow(context, s))
+                      .toList(),
                 );
               },
             ),

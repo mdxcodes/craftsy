@@ -97,8 +97,7 @@ class UserProfile extends HiveObject {
       'state': state,
       if (experienceYears != null && experienceYears!.isNotEmpty)
         'experience_years': experienceYears,
-      if (pehchanId != null && pehchanId!.isNotEmpty)
-        'pehchan_id': pehchanId,
+      if (pehchanId != null && pehchanId!.isNotEmpty) 'pehchan_id': pehchanId,
       'preferred_language': preferredLanguage,
     };
   }
@@ -109,11 +108,19 @@ class UserProfile extends HiveObject {
       name: json['name'] as String? ?? '',
       phone: json['phone'] as String? ?? '',
       avatarUrl: json['avatarUrl'] as String? ?? json['avatar_url'] as String?,
-      craftType: json['craftType'] as String? ?? (json['craft_type'] as String? ?? 'Handicraft'),
-      locationCluster: json['locationCluster'] as String? ?? (json['location_cluster'] as String? ?? 'Rural Cluster'),
-      preferredLanguage: json['preferredLanguage'] as String? ?? (json['preferred_language'] as String? ?? 'en'),
+      craftType:
+          json['craftType'] as String? ??
+          (json['craft_type'] as String? ?? 'Handicraft'),
+      locationCluster:
+          json['locationCluster'] as String? ??
+          (json['location_cluster'] as String? ?? 'Rural Cluster'),
+      preferredLanguage:
+          json['preferredLanguage'] as String? ??
+          (json['preferred_language'] as String? ?? 'en'),
       state: json['state'] as String? ?? '',
-      experienceYears: json['experienceYears'] as String? ?? json['experience_years'] as String?,
+      experienceYears:
+          json['experienceYears'] as String? ??
+          json['experience_years'] as String?,
       pehchanId: json['pehchanId'] as String? ?? json['pehchan_id'] as String?,
     );
   }

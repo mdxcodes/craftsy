@@ -29,7 +29,8 @@ class ChannelStatus {
       color: json['color'] as String? ?? 'grey',
       isConnected: json['is_connected'] as bool? ?? false,
       canPublish: json['can_publish'] as bool? ?? false,
-      missingRequirements: (json['missing_requirements'] as List<dynamic>?)
+      missingRequirements:
+          (json['missing_requirements'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -56,7 +57,8 @@ class ChannelStatus {
   bool get needsInfo => status == 'needs_information';
 
   /// Whether this channel is not yet connected.
-  bool get isNotConnected => status == 'not_connected' || status == 'disconnected';
+  bool get isNotConnected =>
+      status == 'not_connected' || status == 'disconnected';
 
   /// Whether this channel has failed.
   bool get hasFailed => status == 'failed' || status == 'rejected';
@@ -89,7 +91,11 @@ class ChannelStatus {
       case 'eligibility_required':
         return 'Eligibility Required';
       default:
-        return status.replaceAll('_', ' ').split(' ').map((w) => w[0].toUpperCase() + w.substring(1)).join(' ');
+        return status
+            .replaceAll('_', ' ')
+            .split(' ')
+            .map((w) => w[0].toUpperCase() + w.substring(1))
+            .join(' ');
     }
   }
 }

@@ -22,7 +22,9 @@ void main() {
       ),
     ];
 
-    testWidgets('renders first cue initially with header and affordances', (tester) async {
+    testWidgets('renders first cue initially with header and affordances', (
+      tester,
+    ) async {
       GuidanceCue? tappedCue;
       await tester.pumpWidget(
         MaterialApp(
@@ -87,7 +89,9 @@ void main() {
       expect(find.text('First Tip'), findsOneWidget);
     });
 
-    testWidgets('manual chevron navigation works back and forth', (tester) async {
+    testWidgets('manual chevron navigation works back and forth', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(

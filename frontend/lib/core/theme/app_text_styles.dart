@@ -17,8 +17,9 @@ class AppTextStyles {
   static const _fraunces = 'Fraunces';
 
   /// Fraunces at "expressive" display opsz (9 = most swashy)
-  static List<FontVariation> _displayOpsz(double opsz) =>
-      [FontVariation('opsz', opsz)];
+  static List<FontVariation> _displayOpsz(double opsz) => [
+    FontVariation('opsz', opsz),
+  ];
 
   // ---------------------------------------------------------------------------
   // Display  — Fraunces, large, opsz=9 (expressive optical size)

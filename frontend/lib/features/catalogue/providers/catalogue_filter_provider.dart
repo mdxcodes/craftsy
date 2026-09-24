@@ -45,5 +45,5 @@ class CatalogueFilterNotifier extends StateNotifier<CatalogueFilterState> {
 
 final catalogueFilterProvider =
     StateNotifierProvider<CatalogueFilterNotifier, CatalogueFilterState>((ref) {
-  return CatalogueFilterNotifier();
-});
+      return CatalogueFilterNotifier();
+    });

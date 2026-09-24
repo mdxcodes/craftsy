@@ -36,7 +36,10 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
         if (val != null) {
           final draft = ref.read(addProductFlowProvider);
           final minBound = (draft.floorPrice * 0.5).clamp(100.0, 5000.0);
-          final maxBound = (draft.suggestedPrice * 1.8).clamp(minBound + 200.0, 15000.0);
+          final maxBound = (draft.suggestedPrice * 1.8).clamp(
+            minBound + 200.0,
+            15000.0,
+          );
           final clamped = val.clamp(minBound, maxBound);
           ref.read(addProductFlowProvider.notifier).setFinalPrice(clamped);
           _customPriceController.text = clamped.toStringAsFixed(0);
@@ -62,16 +65,23 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
   // since the reasoning text does not reliably repeat the number in a
   // form that reads naturally aloud, and the ₹ figure on screen is not
   // something a non-reading artisan can otherwise access.
-  Future<void> _speakReasoning(double price, String reasoningEn, String reasoningHi) async {
+  Future<void> _speakReasoning(
+    double price,
+    String reasoningEn,
+    String reasoningHi,
+  ) async {
     if (_tts.isSpeaking) {
       await _tts.stop();
       return;
     }
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
     final langCode = isHindi ? 'hi' : 'en';
-    final reasoning = isHindi && reasoningHi.isNotEmpty ? reasoningHi : reasoningEn;
+    final reasoning = isHindi && reasoningHi.isNotEmpty
+        ? reasoningHi
+        : reasoningEn;
     final guide = TtsPageGuides.pricing.forLanguage(langCode);
     final priceStatement = isHindi
         ? 'सुझाया गया मूल्य ${price.toStringAsFixed(0)} रुपये है। '
@@ -84,9 +94,7 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
       final opened = await _tts.openVoiceDownloadScreen();
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -97,7 +105,10 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
     final draft = ref.watch(addProductFlowProvider);
 
     final minBound = (draft.floorPrice * 0.5).clamp(100.0, 5000.0);
-    final maxBound = (draft.suggestedPrice * 1.8).clamp(minBound + 200.0, 15000.0);
+    final maxBound = (draft.suggestedPrice * 1.8).clamp(
+      minBound + 200.0,
+      15000.0,
+    );
     final currentPrice = draft.finalPrice.clamp(minBound, maxBound);
 
     if (!_customPriceFocusNode.hasFocus) {
@@ -115,10 +126,17 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
         children: [
           Row(
             children: [
-              const Icon(Icons.sell_outlined, color: AppColors.indigo, size: 24),
+              const Icon(
+                Icons.sell_outlined,
+                color: AppColors.indigo,
+                size: 24,
+              ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text('pricing_title'.tr(), style: AppTextStyles.headlineLarge),
+                child: Text(
+                  'pricing_title'.tr(),
+                  style: AppTextStyles.headlineLarge,
+                ),
               ),
             ],
           ),
@@ -131,18 +149,20 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
 
           // ── PRICE HERO: Big, obvious suggested price ──────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl, horizontal: AppSpacing.lg),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.xl,
+              horizontal: AppSpacing.lg,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppColors.indigoLight,
-                  AppColors.cardSurface,
-                ],
+                colors: [AppColors.indigoLight, AppColors.cardSurface],
               ),
               borderRadius: BorderRadius.circular(AppRadii.card),
-              border: Border.all(color: AppColors.indigo.withValues(alpha: 0.2)),
+              border: Border.all(
+                color: AppColors.indigo.withValues(alpha: 0.2),
+              ),
               boxShadow: AppElevation.cardShadow,
             ),
             child: Column(
@@ -177,7 +197,10 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   runSpacing: AppSpacing.xs,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.amberLight,
                         borderRadius: BorderRadius.circular(AppRadii.button),
@@ -185,12 +208,19 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.auto_awesome, size: 14, color: AppColors.amberDark),
+                          const Icon(
+                            Icons.auto_awesome,
+                            size: 14,
+                            color: AppColors.amberDark,
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            'score_match'.tr(namedArgs: {
-                              'score': (draft.confidenceScore * 100).toStringAsFixed(0),
-                            }),
+                            'score_match'.tr(
+                              namedArgs: {
+                                'score': (draft.confidenceScore * 100)
+                                    .toStringAsFixed(0),
+                              },
+                            ),
                             style: AppTextStyles.labelSmall.copyWith(
                               fontWeight: FontWeight.bold,
                               color: AppColors.amberDark,
@@ -200,7 +230,10 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.teal.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(AppRadii.button),
@@ -233,8 +266,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   gradient: const LinearGradient(
                     colors: [
                       AppColors.coralLight, // Below fair floor
-                      AppColors.teal,        // Fair pricing sweet spot
-                      AppColors.amber,       // Premium margin
+                      AppColors.teal, // Fair pricing sweet spot
+                      AppColors.amber, // Premium margin
                     ],
                   ),
                 ),
@@ -245,8 +278,12 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   activeTrackColor: Colors.transparent,
                   inactiveTrackColor: Colors.transparent,
                   thumbColor: AppColors.ink,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 12,
+                  ),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 12,
+                  ),
                   overlayColor: AppColors.ink.withValues(alpha: 0.12),
                 ),
                 child: Slider(
@@ -255,7 +292,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                   max: maxBound,
                   divisions: 50,
                   onChanged: (val) {
-                    ref.read(addProductFlowProvider.notifier).setFinalPrice(val);
+                    ref
+                        .read(addProductFlowProvider.notifier)
+                        .setFinalPrice(val);
                   },
                 ),
               ),
@@ -272,7 +311,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                     '${'calculated_floor_price'.tr()}: ₹${draft.floorPrice.toStringAsFixed(0)}',
                     style: AppTextStyles.labelSmall.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: currentPrice < draft.floorPrice ? AppColors.coral : AppColors.inkSoft,
+                      color: currentPrice < draft.floorPrice
+                          ? AppColors.coral
+                          : AppColors.inkSoft,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -280,7 +321,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                 const SizedBox(width: 8),
                 Text(
                   'Max: ₹${maxBound.toStringAsFixed(0)}',
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.inkSoft),
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                 ),
               ],
             ),
@@ -301,12 +344,18 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.psychology_outlined, size: 18, color: AppColors.terracotta),
+                    const Icon(
+                      Icons.psychology_outlined,
+                      size: 18,
+                      color: AppColors.terracotta,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'ai_reasoning'.tr(),
-                        style: AppTextStyles.headlineSmall.copyWith(color: AppColors.ink),
+                        style: AppTextStyles.headlineSmall.copyWith(
+                          color: AppColors.ink,
+                        ),
                       ),
                     ),
                     SpeakerAffordance(
@@ -322,8 +371,11 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                 const SizedBox(height: 8),
                 Builder(
                   builder: (context) {
-                    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
-                            EasyLocalization.of(context)?.locale.languageCode) ==
+                    final isHindi =
+                        (Localizations.maybeLocaleOf(context)?.languageCode ??
+                            EasyLocalization.of(
+                              context,
+                            )?.locale.languageCode) ==
                         'hi';
                     return Text(
                       isHindi && draft.pricingReasoningHi.isNotEmpty
@@ -343,10 +395,14 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
 
           // ── COST BREAKDOWN: Visual cost breakdown ──────────────────────
           InkWell(
-            onTap: () => setState(() => _showCostBreakdown = !_showCostBreakdown),
+            onTap: () =>
+                setState(() => _showCostBreakdown = !_showCostBreakdown),
             borderRadius: BorderRadius.circular(AppRadii.card),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -355,7 +411,11 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.shield_outlined, size: 18, color: AppColors.indigo),
+                  const Icon(
+                    Icons.shield_outlined,
+                    size: 18,
+                    color: AppColors.indigo,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -367,7 +427,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                     ),
                   ),
                   Icon(
-                    _showCostBreakdown ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    _showCostBreakdown
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
                     color: AppColors.inkSoft,
                     size: 22,
                   ),
@@ -419,10 +481,14 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
 
           // ── MARKET BENCHMARKS ─────────────────────────────────────────
           InkWell(
-            onTap: () => setState(() => _showMarketBenchmarks = !_showMarketBenchmarks),
+            onTap: () =>
+                setState(() => _showMarketBenchmarks = !_showMarketBenchmarks),
             borderRadius: BorderRadius.circular(AppRadii.card),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -431,14 +497,20 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.storefront_outlined, size: 18, color: AppColors.indigo),
+                  const Icon(
+                    Icons.storefront_outlined,
+                    size: 18,
+                    color: AppColors.indigo,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       draft.comparableProducts.isNotEmpty
-                          ? 'market_benchmarks_with_count'.tr(namedArgs: {
-                              'count': '${draft.comparableProducts.length}',
-                            })
+                          ? 'market_benchmarks_with_count'.tr(
+                              namedArgs: {
+                                'count': '${draft.comparableProducts.length}',
+                              },
+                            )
                           : 'market_benchmarks_title'.tr(),
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.ink,
@@ -447,7 +519,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                     ),
                   ),
                   Icon(
-                    _showMarketBenchmarks ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    _showMarketBenchmarks
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
                     color: AppColors.inkSoft,
                     size: 22,
                   ),
@@ -468,7 +542,9 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                 ),
                 child: Text(
                   'offline_benchmarks_notice'.tr(),
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                 ),
               )
             else
@@ -501,21 +577,31 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.amberLight,
-                                    borderRadius: BorderRadius.circular(AppRadii.button),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.button,
+                                    ),
                                   ),
                                   child: Text(
                                     comp.sourcePlatform,
-                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.amberDark),
+                                    style: AppTextStyles.labelSmall.copyWith(
+                                      color: AppColors.amberDark,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'score_match'.tr(namedArgs: {
-                                    'score': (comp.similarityScore * 100).toStringAsFixed(0),
-                                  }),
+                                  'score_match'.tr(
+                                    namedArgs: {
+                                      'score': (comp.similarityScore * 100)
+                                          .toStringAsFixed(0),
+                                    },
+                                  ),
                                   style: AppTextStyles.labelSmall.copyWith(
                                     color: AppColors.teal,
                                     fontWeight: FontWeight.w600,
@@ -556,7 +642,11 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.edit_note_outlined, size: 18, color: AppColors.indigo),
+                    const Icon(
+                      Icons.edit_note_outlined,
+                      size: 18,
+                      color: AppColors.indigo,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
@@ -576,8 +666,12 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                       child: TextField(
                         controller: _customPriceController,
                         focusNode: _customPriceFocusNode,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: false,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         style: AppTextStyles.headlineSmall.copyWith(
                           color: AppColors.ink,
                           fontWeight: FontWeight.bold,
@@ -597,21 +691,38 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                               ),
                             ),
                           ),
-                          prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 0),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 0,
+                          ),
                           hintText: 'custom_price_hint'.tr(),
-                          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkFaint),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          hintStyle: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.inkFaint,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadii.button),
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.button,
+                            ),
                             borderSide: const BorderSide(color: AppColors.line),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadii.button),
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.button,
+                            ),
                             borderSide: const BorderSide(color: AppColors.line),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppRadii.button),
-                            borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.button,
+                            ),
+                            borderSide: const BorderSide(
+                              color: AppColors.indigo,
+                              width: 1.5,
+                            ),
                           ),
                           isDense: true,
                         ),
@@ -619,15 +730,20 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                           final val = double.tryParse(text);
                           if (val != null) {
                             final clamped = val.clamp(minBound, maxBound);
-                            ref.read(addProductFlowProvider.notifier).setFinalPrice(clamped);
+                            ref
+                                .read(addProductFlowProvider.notifier)
+                                .setFinalPrice(clamped);
                           }
                         },
                         onSubmitted: (text) {
                           final val = double.tryParse(text);
                           if (val != null) {
                             final clamped = val.clamp(minBound, maxBound);
-                            ref.read(addProductFlowProvider.notifier).setFinalPrice(clamped);
-                            _customPriceController.text = clamped.toStringAsFixed(0);
+                            ref
+                                .read(addProductFlowProvider.notifier)
+                                .setFinalPrice(clamped);
+                            _customPriceController.text = clamped
+                                .toStringAsFixed(0);
                           }
                         },
                       ),
@@ -636,11 +752,15 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'custom_price_range_note'.tr(namedArgs: {
-                    'min': minBound.toStringAsFixed(0),
-                    'max': maxBound.toStringAsFixed(0),
-                  }),
-                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.inkSoft),
+                  'custom_price_range_note'.tr(
+                    namedArgs: {
+                      'min': minBound.toStringAsFixed(0),
+                      'max': maxBound.toStringAsFixed(0),
+                    },
+                  ),
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                 ),
               ],
             ),
@@ -652,7 +772,8 @@ class _Step4PricingWidgetState extends ConsumerState<Step4PricingWidget> {
           PrimaryActionButton(
             label: 'next'.tr(),
             icon: Icons.arrow_forward,
-            onPressed: () => ref.read(addProductFlowProvider.notifier).nextStep(),
+            onPressed: () =>
+                ref.read(addProductFlowProvider.notifier).nextStep(),
           ),
           const SizedBox(height: AppSpacing.md),
         ],
@@ -682,7 +803,9 @@ class _CostItem extends StatelessWidget {
               Flexible(
                 child: Text(
                   label,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -690,7 +813,10 @@ class _CostItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(value, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.ink)),
+        Text(
+          value,
+          style: AppTextStyles.headlineSmall.copyWith(color: AppColors.ink),
+        ),
       ],
     );
   }

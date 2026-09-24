@@ -130,7 +130,9 @@ class AppImage extends StatelessWidget {
             width: width,
             height: height,
             color: AppColors.surfaceVariant,
-            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
           ),
           errorWidget: (context, url, error) => fallback,
         ),

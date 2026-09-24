@@ -127,7 +127,10 @@ class LabelMakerService {
   }
 
   /// Checks if a valid cached label exists for this order.
-  static Future<File?> getCachedLabel(String orderId, OrderStatus status) async {
+  static Future<File?> getCachedLabel(
+    String orderId,
+    OrderStatus status,
+  ) async {
     try {
       final file = await _getCacheFile(orderId, status);
       if (await file.exists()) {
@@ -159,7 +162,9 @@ class LabelMakerService {
         debugPrint('[LabelMaker] Serving label from cache: ${cacheFile.path}');
         bytes = await cacheFile.readAsBytes();
       } else {
-        debugPrint('[LabelMaker] Generating fresh label for order: ${order.id}');
+        debugPrint(
+          '[LabelMaker] Generating fresh label for order: ${order.id}',
+        );
         if (isCustomStory) {
           // Cache is invalidated whenever the story text is edited
           await invalidateCache(order.id);
@@ -209,8 +214,12 @@ class LabelMakerService {
       final fonts = await _loadFonts();
 
       for (final order in orders) {
-        final (defaultStoryEn, defaultStoryHi) = defaultCraftStoryFor(order.productCategory);
-        final (defaultWashEn, defaultWashHi) = defaultWashCareFor(order.productCategory);
+        final (defaultStoryEn, defaultStoryHi) = defaultCraftStoryFor(
+          order.productCategory,
+        );
+        final (defaultWashEn, defaultWashHi) = defaultWashCareFor(
+          order.productCategory,
+        );
 
         doc.addPage(
           pw.Page(
@@ -220,7 +229,8 @@ class LabelMakerService {
               order: order,
               artisanName: artisanName,
               artisanId: artisanId,
-              artisanCluster: (artisanCluster != null && artisanCluster.isNotEmpty)
+              artisanCluster:
+                  (artisanCluster != null && artisanCluster.isNotEmpty)
                   ? artisanCluster
                   : 'Kumhar Gram, Delhi NCR',
               craftType: craftType ?? order.productCategory,
@@ -236,7 +246,8 @@ class LabelMakerService {
 
       await Printing.sharePdf(
         bytes: await doc.save(),
-        filename: 'packaging_labels_batch_${DateTime.now().millisecondsSinceEpoch}.pdf',
+        filename:
+            'packaging_labels_batch_${DateTime.now().millisecondsSinceEpoch}.pdf',
       );
       return true;
     } catch (e, st) {
@@ -288,8 +299,12 @@ class LabelMakerService {
     final doc = pw.Document();
     final fonts = await _loadFonts();
 
-    final (defaultStoryEn, defaultStoryHi) = defaultCraftStoryFor(order.productCategory);
-    final (defaultWashEn, defaultWashHi) = defaultWashCareFor(order.productCategory);
+    final (defaultStoryEn, defaultStoryHi) = defaultCraftStoryFor(
+      order.productCategory,
+    );
+    final (defaultWashEn, defaultWashHi) = defaultWashCareFor(
+      order.productCategory,
+    );
 
     doc.addPage(
       pw.Page(
@@ -331,7 +346,9 @@ class LabelMakerService {
     final borderCol = PdfColor.fromHex('#E6DDD0');
 
     // Dynamic URL for ONDC artisan profile
-    final effectiveId = (artisanId != null && artisanId.isNotEmpty) ? artisanId : 'artisan_01';
+    final effectiveId = (artisanId != null && artisanId.isNotEmpty)
+        ? artisanId
+        : 'artisan_01';
     final ondcUrl = '$_ondcProfileBaseUrl/$effectiveId';
 
     return pw.Container(
@@ -460,11 +477,17 @@ class LabelMakerService {
                   ),
                 ),
                 pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: pw.BoxDecoration(
                     color: PdfColor.fromHex('#E7F4E8'),
                     borderRadius: pw.BorderRadius.circular(4),
-                    border: pw.Border.all(color: PdfColor.fromHex('#A3D9A5'), width: 0.5),
+                    border: pw.Border.all(
+                      color: PdfColor.fromHex('#A3D9A5'),
+                      width: 0.5,
+                    ),
                   ),
                   child: pw.Text(
                     'ONDC VERIFIED ARTISAN',

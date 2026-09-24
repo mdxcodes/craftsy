@@ -48,7 +48,8 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
     final draft = ref.read(addProductFlowProvider);
     final isOnline = ref.read(connectivityProvider).value ?? true;
 
-    final fallbackCategory = ref.read(userProfileProvider).craftType.trim().isNotEmpty
+    final fallbackCategory =
+        ref.read(userProfileProvider).craftType.trim().isNotEmpty
         ? ref.read(userProfileProvider).craftType.trim()
         : 'craft_category_handicraft'.tr();
 
@@ -61,12 +62,18 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
 
     final newProduct = Product(
       id: 'prod_${DateTime.now().millisecondsSinceEpoch}',
-      title: draft.titleEn.isNotEmpty ? draft.titleEn : 'Handcrafted $effectiveCategory',
+      title: draft.titleEn.isNotEmpty
+          ? draft.titleEn
+          : 'Handcrafted $effectiveCategory',
       titleHi: draft.titleHi,
-      description: draft.descriptionEn.isNotEmpty ? draft.descriptionEn : draft.voiceTranscript,
+      description: draft.descriptionEn.isNotEmpty
+          ? draft.descriptionEn
+          : draft.voiceTranscript,
       descriptionHi: draft.descriptionHi,
       price: draft.finalPrice,
-      photoPath: draft.originalImagePath.isNotEmpty ? draft.originalImagePath : fallbackPhoto,
+      photoPath: draft.originalImagePath.isNotEmpty
+          ? draft.originalImagePath
+          : fallbackPhoto,
       aiEnhancedPhotoPath: draft.isEnhanced ? draft.enhancedImagePath : '',
       additionalPhotoPaths: draft.additionalImagePaths,
       category: effectiveCategory,
@@ -75,7 +82,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
       createdAt: DateTime.now(),
     );
 
-    final createdProduct = await ref.read(productListProvider.notifier).addProduct(newProduct);
+    final createdProduct = await ref
+        .read(productListProvider.notifier)
+        .addProduct(newProduct);
 
     if (isOnline && draft.draftId.isNotEmpty) {
       try {
@@ -103,7 +112,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         builder: (dialogCtx) {
           return AlertDialog(
             backgroundColor: AppColors.parchment,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.card)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.card),
+            ),
             title: Row(
               children: [
                 Icon(
@@ -114,7 +125,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    isOnline ? 'listing_online_success'.tr() : 'queued_offline_success'.tr(),
+                    isOnline
+                        ? 'listing_online_success'.tr()
+                        : 'queued_offline_success'.tr(),
                     style: AppTextStyles.headlineMedium,
                   ),
                 ),
@@ -129,7 +142,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                     isOnline
                         ? 'listing_online_desc'.tr()
                         : 'listing_offline_desc'.tr(),
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.ink,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Container(
@@ -145,7 +160,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.savings_outlined, size: 18, color: AppColors.terracotta),
+                            const Icon(
+                              Icons.savings_outlined,
+                              size: 18,
+                              color: AppColors.terracotta,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -166,7 +185,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                             Expanded(
                               child: Text(
                                 'final_selling_price_label'.tr(),
-                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.inkSoft,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -176,7 +197,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 alignment: Alignment.centerRight,
                                 child: Text(
                                   '₹${finalPrice.toStringAsFixed(0)}',
-                                  style: AppTextStyles.headlineSmall.copyWith(color: AppColors.ink),
+                                  style: AppTextStyles.headlineSmall.copyWith(
+                                    color: AppColors.ink,
+                                  ),
                                   maxLines: 1,
                                 ),
                               ),
@@ -191,7 +214,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                             Expanded(
                               child: Text(
                                 'floor_cost_label'.tr(),
-                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.inkSoft,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -201,7 +226,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 alignment: Alignment.centerRight,
                                 child: Text(
                                   '₹${floorCost.toStringAsFixed(0)}',
-                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.inkSoft,
+                                  ),
                                   maxLines: 1,
                                 ),
                               ),
@@ -220,7 +247,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.trending_up, size: 16, color: AppColors.success),
+                                  const Icon(
+                                    Icons.trending_up,
+                                    size: 16,
+                                    color: AppColors.success,
+                                  ),
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
@@ -256,20 +287,31 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.goldLight,
                       borderRadius: BorderRadius.circular(AppRadii.sm),
-                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
+                      border: Border.all(
+                        color: AppColors.gold.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.auto_awesome, size: 14, color: AppColors.goldDark),
+                        const Icon(
+                          Icons.auto_awesome,
+                          size: 14,
+                          color: AppColors.goldDark,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            'profit_encouragement_msg'.tr(namedArgs: {'profit': profit.toStringAsFixed(0)}),
+                            'profit_encouragement_msg'.tr(
+                              namedArgs: {'profit': profit.toStringAsFixed(0)},
+                            ),
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.inkSoft,
                               fontSize: 11.5,
@@ -303,13 +345,17 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
   Widget build(BuildContext context) {
     final draft = ref.watch(addProductFlowProvider);
     final isOnline = ref.watch(connectivityProvider).value ?? true;
-    final displayImage = draft.isEnhanced ? draft.enhancedImagePath : draft.originalImagePath;
+    final displayImage = draft.isEnhanced
+        ? draft.enhancedImagePath
+        : draft.originalImagePath;
 
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
-    final defaultTitleEn =
-        draft.titleEn.isNotEmpty ? draft.titleEn : 'Handcrafted ${draft.category}';
+    final defaultTitleEn = draft.titleEn.isNotEmpty
+        ? draft.titleEn
+        : 'Handcrafted ${draft.category}';
     final primaryTitle = (isHindi && draft.titleHi.trim().isNotEmpty)
         ? draft.titleHi
         : defaultTitleEn;
@@ -317,9 +363,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         ? defaultTitleEn
         : (draft.titleHi.trim().isNotEmpty ? draft.titleHi : null);
 
-    final defaultDescEn =
-        draft.descriptionEn.isNotEmpty ? draft.descriptionEn : draft.voiceTranscript;
-    final displayDescription = (isHindi && draft.descriptionHi.trim().isNotEmpty)
+    final defaultDescEn = draft.descriptionEn.isNotEmpty
+        ? draft.descriptionEn
+        : draft.voiceTranscript;
+    final displayDescription =
+        (isHindi && draft.descriptionHi.trim().isNotEmpty)
         ? draft.descriptionHi
         : defaultDescEn;
 
@@ -331,10 +379,17 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         children: [
           Row(
             children: [
-              const Icon(Icons.fact_check_outlined, color: AppColors.indigo, size: 24),
+              const Icon(
+                Icons.fact_check_outlined,
+                color: AppColors.indigo,
+                size: 24,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text('confirm_title'.tr(), style: AppTextStyles.headlineLarge),
+                child: Text(
+                  'confirm_title'.tr(),
+                  style: AppTextStyles.headlineLarge,
+                ),
               ),
             ],
           ),
@@ -358,7 +413,9 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
               children: [
                 // Hero Image
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadii.card)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppRadii.card),
+                  ),
                   child: Container(
                     height: 220,
                     width: double.infinity,
@@ -379,11 +436,16 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(AppRadii.sm),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.sm,
+                                ),
                                 child: SizedBox(
                                   width: 56,
                                   height: 56,
-                                  child: AppImage(imageUrl: path, fit: BoxFit.cover),
+                                  child: AppImage(
+                                    imageUrl: path,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -403,10 +465,15 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         children: [
                           Flexible(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.parchmentDeep,
-                                borderRadius: BorderRadius.circular(AppRadii.button),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.button,
+                                ),
                                 border: Border.all(color: AppColors.line),
                               ),
                               child: Text(
@@ -422,10 +489,17 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: isOnline ? AppColors.statusSuccessBg : AppColors.statusPendingBg,
-                              borderRadius: BorderRadius.circular(AppRadii.button),
+                              color: isOnline
+                                  ? AppColors.statusSuccessBg
+                                  : AppColors.statusPendingBg,
+                              borderRadius: BorderRadius.circular(
+                                AppRadii.button,
+                              ),
                             ),
                             child: Row(
                               children: [
@@ -434,14 +508,20 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                   height: 6,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: isOnline ? AppColors.statusSuccessFg : AppColors.statusPendingFg,
+                                    color: isOnline
+                                        ? AppColors.statusSuccessFg
+                                        : AppColors.statusPendingFg,
                                   ),
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  isOnline ? 'status_live'.tr() : 'status_pending_sync'.tr(),
+                                  isOnline
+                                      ? 'status_live'.tr()
+                                      : 'status_pending_sync'.tr(),
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: isOnline ? AppColors.statusSuccessFg : AppColors.statusPendingFg,
+                                    color: isOnline
+                                        ? AppColors.statusSuccessFg
+                                        : AppColors.statusPendingFg,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -457,7 +537,8 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: SpeakButton(
-                          text: '$primaryTitle. ₹${draft.finalPrice.toStringAsFixed(0)}',
+                          text:
+                              '$primaryTitle. ₹${draft.finalPrice.toStringAsFixed(0)}',
                           compact: true,
                           color: AppColors.indigo,
                         ),
@@ -466,15 +547,15 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                       const SizedBox(height: AppSpacing.xs),
 
                       // Product title
-                      Text(
-                        primaryTitle,
-                        style: AppTextStyles.headlineMedium,
-                      ),
-                      if (secondaryTitle != null && secondaryTitle.isNotEmpty) ...[
+                      Text(primaryTitle, style: AppTextStyles.headlineMedium),
+                      if (secondaryTitle != null &&
+                          secondaryTitle.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
                           secondaryTitle,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.inkSoft,
+                          ),
                         ),
                       ],
 
@@ -510,11 +591,17 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         decoration: BoxDecoration(
                           color: AppColors.successLight,
                           borderRadius: BorderRadius.circular(AppRadii.sm),
-                          border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
+                          border: Border.all(
+                            color: AppColors.success.withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.verified, color: AppColors.success, size: 18),
+                            const Icon(
+                              Icons.verified,
+                              color: AppColors.success,
+                              size: 18,
+                            ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Text(
@@ -538,7 +625,8 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
           const SizedBox(height: AppSpacing.lg),
 
           // ── SOCIAL MEDIA HELPER ─────────────────────────────────────
-          if (draft.originalImagePath.isNotEmpty || draft.additionalImagePaths.isNotEmpty) ...[
+          if (draft.originalImagePath.isNotEmpty ||
+              draft.additionalImagePaths.isNotEmpty) ...[
             SecondaryActionButton(
               label: 'social_media_helper'.tr(),
               icon: Icons.share,
@@ -560,9 +648,13 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                     title: draft.titleEn,
                     category: draft.category.trim().isNotEmpty
                         ? draft.category.trim()
-                        : (ref.read(userProfileProvider).craftType.trim().isNotEmpty
-                            ? ref.read(userProfileProvider).craftType.trim()
-                            : 'craft_category_handicraft'.tr()),
+                        : (ref
+                                  .read(userProfileProvider)
+                                  .craftType
+                                  .trim()
+                                  .isNotEmpty
+                              ? ref.read(userProfileProvider).craftType.trim()
+                              : 'craft_category_handicraft'.tr()),
                     description: draft.descriptionEn.isNotEmpty
                         ? draft.descriptionEn
                         : draft.voiceTranscript,

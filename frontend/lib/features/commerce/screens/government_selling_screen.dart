@@ -25,10 +25,7 @@ class _GemStep {
 class GovernmentSellingScreen extends ConsumerStatefulWidget {
   final String? productId;
 
-  const GovernmentSellingScreen({
-    super.key,
-    this.productId,
-  });
+  const GovernmentSellingScreen({super.key, this.productId});
 
   @override
   ConsumerState<GovernmentSellingScreen> createState() =>
@@ -87,10 +84,7 @@ class _GovernmentSellingScreenState
                 Expanded(
                   child: Text(
                     'gem_info_banner'.tr(),
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.amberDark,
-                    ),
+                    style: TextStyle(fontSize: 13, color: AppColors.amberDark),
                   ),
                 ),
               ],
@@ -98,10 +92,7 @@ class _GovernmentSellingScreenState
           ),
 
           // Stepper
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: _buildStepper(),
-          ),
+          Padding(padding: const EdgeInsets.all(24), child: _buildStepper()),
 
           // Step content
           Expanded(
@@ -160,8 +151,8 @@ class _GovernmentSellingScreenState
                   color: isCompleted
                       ? AppColors.success
                       : isActive
-                          ? AppColors.indigo
-                          : AppColors.inkFaint.withValues(alpha: 0.2),
+                      ? AppColors.indigo
+                      : AppColors.inkFaint.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -214,9 +205,9 @@ class _GovernmentSellingScreenState
             Expanded(
               child: Text(
                 step.titleKey.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -224,9 +215,9 @@ class _GovernmentSellingScreenState
         const SizedBox(height: 16),
         Text(
           step.descKey.tr(),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: 24),
         ..._buildStepSpecificContent(),
@@ -257,11 +248,7 @@ class _GovernmentSellingScreenState
         Icons.business,
       ),
       const SizedBox(height: 12),
-      _buildInfoCard(
-        'gem_make_in_india',
-        'gem_make_in_india_desc',
-        Icons.flag,
-      ),
+      _buildInfoCard('gem_make_in_india', 'gem_make_in_india_desc', Icons.flag),
       const SizedBox(height: 12),
       _buildInfoCard(
         'gem_category_match',
@@ -295,14 +282,14 @@ class _GovernmentSellingScreenState
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
-              const Icon(Icons.check_circle_outline,
-                  size: 20, color: AppColors.indigo),
+              const Icon(
+                Icons.check_circle_outline,
+                size: 20,
+                color: AppColors.indigo,
+              ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  docKey.tr(),
-                  style: const TextStyle(fontSize: 14),
-                ),
+                child: Text(docKey.tr(), style: const TextStyle(fontSize: 14)),
               ),
             ],
           ),
@@ -331,11 +318,7 @@ class _GovernmentSellingScreenState
         Icons.image_outlined,
       ),
       const SizedBox(height: 12),
-      _buildInfoCard(
-        'gem_pricing',
-        'gem_pricing_desc',
-        Icons.currency_rupee,
-      ),
+      _buildInfoCard('gem_pricing', 'gem_pricing_desc', Icons.currency_rupee),
     ];
   }
 
@@ -373,10 +356,7 @@ class _GovernmentSellingScreenState
             Expanded(
               child: Text(
                 'gem_proceed_dialog_msg'.tr(),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.amberDark,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.amberDark),
               ),
             ),
           ],
@@ -454,7 +434,11 @@ class _GovernmentSellingScreenState
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
-                        const Icon(Icons.circle, size: 8, color: AppColors.indigo),
+                        const Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: AppColors.indigo,
+                        ),
                         const SizedBox(width: 12),
                         Text(item, style: const TextStyle(fontSize: 14)),
                       ],

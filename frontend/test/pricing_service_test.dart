@@ -31,8 +31,8 @@ void main() {
             'category': 'pottery',
             'source_platform': 'CraftsVilla',
             'similarity_score': 0.83,
-          }
-        ]
+          },
+        ],
       };
 
       final suggestion = PriceSuggestion.fromJson(json);
@@ -101,7 +101,10 @@ void main() {
 
       // Verify that the fallback kicked in and calculated an ethical floor price
       expect(suggestion.floorPrice, equals(450.0)); // 150 + 3*100
-      expect(suggestion.suggestedPrice, greaterThanOrEqualTo(suggestion.floorPrice));
+      expect(
+        suggestion.suggestedPrice,
+        greaterThanOrEqualTo(suggestion.floorPrice),
+      );
       expect(suggestion.reasoning, isNotEmpty);
       expect(suggestion.reasoningHi, isNotEmpty);
     });

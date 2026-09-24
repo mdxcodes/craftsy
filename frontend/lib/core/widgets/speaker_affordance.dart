@@ -124,7 +124,10 @@ class VoiceUnavailableNotice extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               minimumSize: const Size(0, 48),
             ),
-            child: Text('download_voice_btn'.tr(), style: TextStyle(fontSize: 12)),
+            child: Text(
+              'download_voice_btn'.tr(),
+              style: TextStyle(fontSize: 12),
+            ),
           ),
         ],
       ),

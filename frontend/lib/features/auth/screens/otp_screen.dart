@@ -149,9 +149,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               label: 'resend_otp'.tr(),
               type: AppButtonType.text,
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('otp_resent_mock'.tr())),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('otp_resent_mock'.tr())));
               },
             ),
 

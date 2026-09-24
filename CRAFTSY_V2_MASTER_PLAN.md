@@ -1950,6 +1950,90 @@ The goals are:
 
 ---
 
+## Phase 10: Bhashini + Voice-First Language Infrastructure
+
+**Status:** Partial (scaffolding complete, no live Bhashini integration)
+
+### Objective
+Centralize all voice/language operations behind a single abstraction layer so Bhashini can be swapped in without touching UI code.
+
+### What Was Implemented
+
+**Backend:**
+- `backend/routers/bhashini.py` — 4 API endpoints (transcribe, translate, synthesize, detect-language)
+- `GET /api/v1/bhashini/languages` — 24 languages with capability flags
+- Credentials via `BHASHINI_API_KEY` + `BHASHINI_USER_ID` env vars
+- Returns 503 when not configured — no fake success
+
+**Flutter:**
+- `lib/core/services/language_service.dart` — Centralized abstraction:
+  - `LanguageService` interface with provider chain
+  - `BhashiniLanguageProvider` (scaffold, returns null until configured)
+  - `FallbackLanguageProvider` (no-op)
+  - `CraftsyLanguageService` — 10 languages with per-language capability flags
+  - `VoiceState` enum with 8 states + labels/icons/colors
+- `lib/core/widgets/voice_state_widget.dart` — UI components:
+  - `VoiceInteractionButton` — 56dp touch target, animated state display
+  - `VoiceStateDisplay` — state card with icon, label, message
+  - `VoiceTranscriptDisplay` — transcript with confidence bar
+  - `VoiceConfirmationDialog` — action confirmation
+- 26 voice state translation keys added to all 4 locales
+
+### Live Integration Status
+- **Live:** Nothing (no Bhashini credentials)
+- **Configured:** No — returns 503 with clear message
+- **Mocked:** No
+- **Scaffolded:** Full provider interface, endpoints, language configs
+- **Blocked:** Requires BHASHINI_API_KEY + BHASHINI_USER_ID
+
+### Security
+- No credentials in Flutter source
+- No credentials in git
+- All credentials server-side via environment variables
+
+---
+
+## Phase 11: End-to-End Artisan Workflow + UX Polish
+
+**Status:** In Progress (~40%)
+
+### Objective
+Make Craftsy feel like ONE complete, coherent application. Connect and polish what already exists — do NOT add random new features.
+
+### Application Audit Results
+
+**Screens Audited:** 15+ screens across auth, home, product creation, catalogue, detail, commerce, orders, profile, notifications, chatbot, stats
+
+**Major Problems Found & Fixed:**
+1. **Add Product Flow** — Used old terracotta palette (Color(0xFFC86D51)) → migrated to V2 indigo
+2. **Chatbot Sheet** — Used AppColors.terracotta throughout → migrated to indigo
+3. **Chatbot Sheet** — 15+ hardcoded English/Hindi strings → localized with .tr() keys
+4. **Notifications Screen** — Used old palette (terracotta, mustard, online, syncing) → migrated to V2
+5. **Stats Screen** — Hardcoded "Terracotta Pottery" fallback → localized
+6. **Product Detail** — Hardcoded "Craft Product" / "No product details found" → localized
+7. **Voice State Display** — Not shown in chatbot → added VoiceStateDisplay widget
+
+**Problems Remaining (lower priority):**
+- Some screens still use FittedBox for nav labels (potential large-text overflow)
+- Home screen {name}/{date} placeholders not interpolated (mock data issue)
+- Notification bell tap doesn't navigate from home screen
+- Camera opens gallery picker instead of native camera (device-level issue)
+
+### Artisan Journey Status
+- **Onboarding → Language → Profile → Home:** ✅ Works
+- **Create Product → Add Photos → Price/Stock → Preview → Save:** ✅ Works (5-step flow)
+- **Choose Selling Channel → Craftsy/ONDC/Government:** ✅ Works (WhereISellSection)
+- **Readiness Check → Publish/Prepare:** ✅ Works (honest status, no fake success)
+- **Order Received → Fulfilment → Completion:** ✅ Works (unified orders screen)
+- **Voice/CraftMitra → Action Execution:** ⚠️ Partial (voice UI added, backend pipeline exists, end-to-end not tested on device)
+
+### Test Suite
+- Frontend: 102/102 pass
+- Backend: 49/53 pass (2 pre-existing)
+- Analyzer: Clean (info only)
+
+---
+
 ## Unified Commerce Hub
 
 **Status:** Complete

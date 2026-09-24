@@ -79,18 +79,19 @@ class MockUploadApi implements UploadApi {
     required File file,
     required String idempotencyKey,
     required String productDraftId,
-    }) =>
-      _fakeUpload(idempotencyKey, QueueItemType.imageEnhance);
+  }) => _fakeUpload(idempotencyKey, QueueItemType.imageEnhance);
 
   @override
   Future<UploadResult> uploadVoiceNote({
     required File file,
     required String idempotencyKey,
     required String productDraftId,
-    }) =>
-      _fakeUpload(idempotencyKey, QueueItemType.voiceCatalog);
+  }) => _fakeUpload(idempotencyKey, QueueItemType.voiceCatalog);
 
-    Future<UploadResult> _fakeUpload(String idempotencyKey, QueueItemType type) async {
+  Future<UploadResult> _fakeUpload(
+    String idempotencyKey,
+    QueueItemType type,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 800));
     if (_rng.nextDouble() < failureRate) {
       throw DioException(
@@ -111,11 +112,14 @@ class MockUploadApi implements UploadApi {
       immediatelyCompleted: type == QueueItemType.voiceCatalog,
       resultPayload: type == QueueItemType.voiceCatalog
           ? {
-              'transcript': 'This is an authentic handcrafted artisan product made using traditional techniques.',
+              'transcript':
+                  'This is an authentic handcrafted artisan product made using traditional techniques.',
               'titleEn': 'Handcrafted Traditional Artisan Item',
               'titleHi': 'प्रामाणिक हस्तशिल्प उत्पाद',
-              'descriptionEn': 'An authentic artisan craft shaped by hand using traditional regional techniques.',
-              'descriptionHi': 'पारंपरिक तकनीक से हाथ से बनाया गया प्रामाणिक हस्तशिल्प उत्पाद।',
+              'descriptionEn':
+                  'An authentic artisan craft shaped by hand using traditional regional techniques.',
+              'descriptionHi':
+                  'पारंपरिक तकनीक से हाथ से बनाया गया प्रामाणिक हस्तशिल्प उत्पाद।',
               'category': 'Handicrafts',
               'tags': ['handcrafted', 'artisan', 'made-in-india'],
             }
@@ -128,7 +132,11 @@ class MockUploadApi implements UploadApi {
     await Future.delayed(const Duration(milliseconds: 300));
     final startedAt = _jobStartedAt[jobId];
     if (startedAt == null) {
-      return JobStatusResult(isComplete: false, isFailed: true, errorMessage: 'Unknown job');
+      return JobStatusResult(
+        isComplete: false,
+        isFailed: true,
+        errorMessage: 'Unknown job',
+      );
     }
 
     final elapsed = DateTime.now().difference(startedAt);
@@ -147,11 +155,14 @@ class MockUploadApi implements UploadApi {
     return JobStatusResult(
       isComplete: true,
       resultPayload: {
-        'transcript': 'This is an authentic handcrafted artisan product made using traditional techniques.',
+        'transcript':
+            'This is an authentic handcrafted artisan product made using traditional techniques.',
         'titleEn': 'Handcrafted Traditional Artisan Item',
         'titleHi': 'प्रामाणिक हस्तशिल्प उत्पाद',
-        'descriptionEn': 'An authentic artisan craft shaped by hand using traditional regional techniques.',
-        'descriptionHi': 'पारंपरिक तकनीक से हाथ से बनाया गया प्रामाणिक हस्तशिल्प उत्पाद।',
+        'descriptionEn':
+            'An authentic artisan craft shaped by hand using traditional regional techniques.',
+        'descriptionHi':
+            'पारंपरिक तकनीक से हाथ से बनाया गया प्रामाणिक हस्तशिल्प उत्पाद।',
         'category': 'Handicrafts',
         'tags': ['handcrafted', 'artisan', 'made-in-india'],
       },
@@ -163,13 +174,18 @@ class MockUploadApi implements UploadApi {
 /// [MockUploadApi] with zero changes anywhere else in the app.
 class RealUploadApi implements UploadApi {
   RealUploadApi({required this.baseUrl, Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
               baseUrl: baseUrl,
               connectTimeout: const Duration(seconds: 15),
-              sendTimeout: const Duration(minutes: 2), // large images on slow uplinks
+              sendTimeout: const Duration(
+                minutes: 2,
+              ), // large images on slow uplinks
               receiveTimeout: const Duration(minutes: 3),
-            ));
+            ),
+          );
 
   final String baseUrl;
   final Dio _dio;
@@ -189,11 +205,18 @@ class RealUploadApi implements UploadApi {
       'product_draft_id': productDraftId,
     });
 
-    final response = await _dio.post('/api/v1/catalog/enhance-image', data: formData);
+    final response = await _dio.post(
+      '/api/v1/catalog/enhance-image',
+      data: formData,
+    );
     final data = response.data as Map<String, dynamic>;
-    final enhancedUrl = data['enhanced_url'] as String? ?? data['enhanced_image_url'] as String?;
+    final enhancedUrl =
+        data['enhanced_url'] as String? ??
+        data['enhanced_image_url'] as String?;
 
-    final cleanPrefix = activeUrl.endsWith('/') ? activeUrl.substring(0, activeUrl.length - 1) : activeUrl;
+    final cleanPrefix = activeUrl.endsWith('/')
+        ? activeUrl.substring(0, activeUrl.length - 1)
+        : activeUrl;
     final resolvedUrl = (enhancedUrl != null && !enhancedUrl.startsWith('http'))
         ? '$cleanPrefix${enhancedUrl.startsWith('/') ? enhancedUrl : '/$enhancedUrl'}'
         : (enhancedUrl ?? file.path);
@@ -227,11 +250,15 @@ class RealUploadApi implements UploadApi {
     });
 
     try {
-      final response = await _dio.post('/api/v1/voice/transcribe', data: formData);
+      final response = await _dio.post(
+        '/api/v1/voice/transcribe',
+        data: formData,
+      );
       final data = response.data as Map<String, dynamic>;
 
       final rawTranscript = (data['transcript'] as String? ?? '').trim();
-      final cleanTranscript = HttpSpeechService.isSilenceHallucination(rawTranscript)
+      final cleanTranscript =
+          HttpSpeechService.isSilenceHallucination(rawTranscript)
           ? ''
           : rawTranscript;
 
@@ -247,7 +274,10 @@ class RealUploadApi implements UploadApi {
     } catch (e) {
       // Fallback to /api/v1/voice/process if transcribe endpoint differs
       try {
-        final fallbackResponse = await _dio.post('/api/v1/voice/process', data: formData);
+        final fallbackResponse = await _dio.post(
+          '/api/v1/voice/process',
+          data: formData,
+        );
         final data = fallbackResponse.data as Map<String, dynamic>;
         return UploadResult(
           jobId: idempotencyKey,

@@ -13,12 +13,15 @@ class ConnectivityService {
     required this.healthCheckUrl,
     Dio? dio,
     this.pingTimeout = const Duration(seconds: 5),
-  }) : _pingDio = dio ??
-            Dio(BaseOptions(
-              connectTimeout: pingTimeout,
-              receiveTimeout: pingTimeout,
-              sendTimeout: pingTimeout,
-            ));
+  }) : _pingDio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: pingTimeout,
+               receiveTimeout: pingTimeout,
+               sendTimeout: pingTimeout,
+             ),
+           );
 
   final String? healthCheckUrl;
   final Duration pingTimeout;

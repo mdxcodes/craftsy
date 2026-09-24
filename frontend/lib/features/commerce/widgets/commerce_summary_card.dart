@@ -45,7 +45,12 @@ class CommerceSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(BuildContext context, String label, String value, {Color? color}) {
+  Widget _buildRow(
+    BuildContext context,
+    String label,
+    String value, {
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

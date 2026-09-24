@@ -28,9 +28,9 @@ class InventoryOverviewCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   'Some products are running low on stock'.tr(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.amber,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.amber),
                 ),
               ),
           ],

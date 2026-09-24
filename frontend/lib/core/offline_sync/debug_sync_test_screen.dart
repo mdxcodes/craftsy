@@ -74,7 +74,8 @@ class _DebugSyncTestScreenState extends State<DebugSyncTestScreen> {
     final appDir = await getApplicationDocumentsDirectory();
     final recordingDir = Directory('${appDir.path}/offline_sync_recordings');
     await recordingDir.create(recursive: true);
-    final path = '${recordingDir.path}/voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+    final path =
+        '${recordingDir.path}/voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
     await _recorder.start(
       const RecordConfig(encoder: AudioEncoder.aacLc),
       path: path,
@@ -120,7 +121,11 @@ class _DebugSyncTestScreenState extends State<DebugSyncTestScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ElevatedButton.icon(
               icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-              label: Text(_isRecording ? 'Stop and queue voice note' : 'Record voice note'),
+              label: Text(
+                _isRecording
+                    ? 'Stop and queue voice note'
+                    : 'Record voice note',
+              ),
               onPressed: () => _toggleVoiceRecording(context),
             ),
           ),
@@ -135,7 +140,9 @@ class _DebugSyncTestScreenState extends State<DebugSyncTestScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: StreamBuilder<List<QueueItem>>(
-              stream: widget.queueStream ?? OfflineSyncService.instance.watchQueue(),
+              stream:
+                  widget.queueStream ??
+                  OfflineSyncService.instance.watchQueue(),
               builder: (context, snapshot) {
                 final items = snapshot.data ?? [];
                 if (items.isEmpty) {
@@ -146,7 +153,9 @@ class _DebugSyncTestScreenState extends State<DebugSyncTestScreen> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return ListTile(
-                      leading: CircleAvatar(backgroundColor: _statusColor(item.status)),
+                      leading: CircleAvatar(
+                        backgroundColor: _statusColor(item.status),
+                      ),
                       title: Text(item.type.name),
                       subtitle: Text(
                         '${item.status.name}'
@@ -157,8 +166,8 @@ class _DebugSyncTestScreenState extends State<DebugSyncTestScreen> {
                       trailing: item.status == QueueStatus.failed
                           ? IconButton(
                               icon: const Icon(Icons.refresh),
-                              onPressed: () =>
-                                  OfflineSyncService.instance.retryItem(item.localId),
+                              onPressed: () => OfflineSyncService.instance
+                                  .retryItem(item.localId),
                             )
                           : null,
                     );

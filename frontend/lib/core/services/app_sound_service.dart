@@ -36,7 +36,8 @@ class AppSoundService {
       if (Hive.isBoxOpen(_settingsBox)) {
         final box = Hive.box(_settingsBox);
         _isSoundEnabled = box.get(_keySoundEnabled, defaultValue: true) as bool;
-        _isHapticsEnabled = box.get(_keyHapticsEnabled, defaultValue: true) as bool;
+        _isHapticsEnabled =
+            box.get(_keyHapticsEnabled, defaultValue: true) as bool;
         _volume = (box.get(_keyVolume, defaultValue: 0.35) as num).toDouble();
       }
 

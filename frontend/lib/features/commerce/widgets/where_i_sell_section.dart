@@ -13,11 +13,7 @@ class WhereISellSection extends ConsumerWidget {
   final String productId;
   final VoidCallback? onRefresh;
 
-  const WhereISellSection({
-    super.key,
-    required this.productId,
-    this.onRefresh,
-  });
+  const WhereISellSection({super.key, required this.productId, this.onRefresh});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,9 +27,9 @@ class WhereISellSection extends ConsumerWidget {
           children: [
             Text(
               'where_i_sell'.tr(),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             if (onRefresh != null)
               IconButton(

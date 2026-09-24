@@ -90,15 +90,16 @@ abstract class SocialMediaService {
 
 class HttpSocialMediaService implements SocialMediaService {
   HttpSocialMediaService({String? baseUrl, Dio? dio})
-      : _base = baseUrl ?? ApiConfig.baseUrl,
-        _dio = dio ??
-            Dio(
-              BaseOptions(
-                connectTimeout: const Duration(seconds: 15),
-                receiveTimeout: const Duration(seconds: 60),
-                headers: {'Accept': 'application/json'},
-              ),
-            );
+    : _base = baseUrl ?? ApiConfig.baseUrl,
+      _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 60),
+              headers: {'Accept': 'application/json'},
+            ),
+          );
 
   final String _base;
   final Dio _dio;
@@ -243,7 +244,8 @@ class HttpSocialMediaService implements SocialMediaService {
           ),
         }),
       );
-      final imageUrl = (response.data as Map<String, dynamic>)['image_url'] as String;
+      final imageUrl =
+          (response.data as Map<String, dynamic>)['image_url'] as String;
       return imageUrl.startsWith('http') ? imageUrl : '$_base$imageUrl';
     } on DioException catch (e) {
       throw _mapDioError(e);

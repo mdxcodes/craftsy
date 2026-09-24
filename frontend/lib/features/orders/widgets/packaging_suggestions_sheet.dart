@@ -23,7 +23,9 @@ class _PackagingStep {
 
 Map<String, List<_PackagingStep>> _guideForCategory(String category) {
   final cat = category.toLowerCase();
-  if (cat.contains('pottery') || cat.contains('ceramic') || cat.contains('clay')) {
+  if (cat.contains('pottery') ||
+      cat.contains('ceramic') ||
+      cat.contains('clay')) {
     return {
       'pottery': [
         _PackagingStep(
@@ -49,7 +51,11 @@ Map<String, List<_PackagingStep>> _guideForCategory(String category) {
         ),
       ],
     };
-  } else if (cat.contains('textile') || cat.contains('fabric') || cat.contains('saree') || cat.contains('silk') || cat.contains('cloth')) {
+  } else if (cat.contains('textile') ||
+      cat.contains('fabric') ||
+      cat.contains('saree') ||
+      cat.contains('silk') ||
+      cat.contains('cloth')) {
     return {
       'textile': [
         _PackagingStep(
@@ -74,7 +80,10 @@ Map<String, List<_PackagingStep>> _guideForCategory(String category) {
         ),
       ],
     };
-  } else if (cat.contains('jewel') || cat.contains('silver') || cat.contains('gold') || cat.contains('brass')) {
+  } else if (cat.contains('jewel') ||
+      cat.contains('silver') ||
+      cat.contains('gold') ||
+      cat.contains('brass')) {
     return {
       'jewelry': [
         _PackagingStep(
@@ -100,7 +109,10 @@ Map<String, List<_PackagingStep>> _guideForCategory(String category) {
         ),
       ],
     };
-  } else if (cat.contains('wood') || cat.contains('toy') || cat.contains('cane') || cat.contains('bamboo')) {
+  } else if (cat.contains('wood') ||
+      cat.contains('toy') ||
+      cat.contains('cane') ||
+      cat.contains('bamboo')) {
     return {
       'woodwork': [
         _PackagingStep(
@@ -234,26 +246,37 @@ class _PackagingSuggestionsSheetState extends State<PackagingSuggestionsSheet> {
     final opened = await _tts.openVoiceDownloadScreen();
     if (!opened && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('voice_download_settings_hint'.tr()),
-        ),
+        SnackBar(content: Text('voice_download_settings_hint'.tr())),
       );
     }
   }
 
   String _localizedCategory(BuildContext context, String cat) {
-    final isHi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
     if (!isHi) return cat;
     final lower = cat.toLowerCase();
-    if (lower.contains('pottery') || lower.contains('clay') || lower.contains('ceramic')) {
+    if (lower.contains('pottery') ||
+        lower.contains('clay') ||
+        lower.contains('ceramic')) {
       return 'filter_pottery'.tr();
-    } else if (lower.contains('textile') || lower.contains('saree') || lower.contains('silk') || lower.contains('fabric') || lower.contains('handloom')) {
+    } else if (lower.contains('textile') ||
+        lower.contains('saree') ||
+        lower.contains('silk') ||
+        lower.contains('fabric') ||
+        lower.contains('handloom')) {
       return 'filter_textiles'.tr();
-    } else if (lower.contains('jewel') || lower.contains('silver') || lower.contains('gold') || lower.contains('brass')) {
+    } else if (lower.contains('jewel') ||
+        lower.contains('silver') ||
+        lower.contains('gold') ||
+        lower.contains('brass')) {
       return 'filter_jewelry'.tr();
-    } else if (lower.contains('wood') || lower.contains('toy') || lower.contains('bamboo') || lower.contains('cane')) {
+    } else if (lower.contains('wood') ||
+        lower.contains('toy') ||
+        lower.contains('bamboo') ||
+        lower.contains('cane')) {
       return 'filter_woodwork'.tr();
     } else if (lower.contains('paint') || lower.contains('art')) {
       return 'filter_paintings'.tr();
@@ -376,11 +399,7 @@ class _PackagingSuggestionsSheetState extends State<PackagingSuggestionsSheet> {
                     ),
                     child: Center(
                       child: isWarning
-                          ? Icon(
-                              step.icon,
-                              size: 13,
-                              color: AppColors.goldDark,
-                            )
+                          ? Icon(step.icon, size: 13, color: AppColors.goldDark)
                           : Icon(
                               step.icon,
                               size: 13,

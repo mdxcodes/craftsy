@@ -19,10 +19,7 @@ import '../../orders/screens/unified_orders_screen.dart';
 class UnifiedCommerceHubScreen extends ConsumerStatefulWidget {
   final String artisanId;
 
-  const UnifiedCommerceHubScreen({
-    super.key,
-    required this.artisanId,
-  });
+  const UnifiedCommerceHubScreen({super.key, required this.artisanId});
 
   @override
   ConsumerState<UnifiedCommerceHubScreen> createState() =>
@@ -108,9 +105,7 @@ class _UnifiedCommerceHubScreenState
   }
 
   Widget _buildProductsTab() {
-    return const Center(
-      child: Text('Products list with channel statuses'),
-    );
+    return const Center(child: Text('Products list with channel statuses'));
   }
 
   Widget _buildOrdersTab() {
@@ -118,8 +113,6 @@ class _UnifiedCommerceHubScreenState
   }
 
   Widget _buildInventoryTab() {
-    return const Center(
-      child: Text('Inventory overview'),
-    );
+    return const Center(child: Text('Inventory overview'));
   }
 }

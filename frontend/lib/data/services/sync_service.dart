@@ -9,15 +9,13 @@ class SyncService {
   final ProductRepository productRepository;
   final Connectivity _connectivity;
   StreamSubscription<List<ConnectivityResult>>? _subscription;
-  
+
   final ValueNotifier<SyncState> syncState = ValueNotifier(SyncState.idle);
   final ValueNotifier<bool> isOnline = ValueNotifier(true);
   bool _isSyncing = false;
 
-  SyncService({
-    required this.productRepository,
-    Connectivity? connectivity,
-  })  : _connectivity = connectivity ?? Connectivity() {
+  SyncService({required this.productRepository, Connectivity? connectivity})
+    : _connectivity = connectivity ?? Connectivity() {
     _initConnectivityListener();
   }
 
@@ -28,7 +26,9 @@ class SyncService {
         await triggerSync();
       }
     });
-    _subscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _subscription = _connectivity.onConnectivityChanged.listen(
+      _updateConnectionStatus,
+    );
   }
 
   void _updateConnectionStatus(List<ConnectivityResult> results) {

@@ -26,7 +26,8 @@ class UnifiedOrdersScreen extends ConsumerStatefulWidget {
   const UnifiedOrdersScreen({super.key, this.artisanId});
 
   @override
-  ConsumerState<UnifiedOrdersScreen> createState() => _UnifiedOrdersScreenState();
+  ConsumerState<UnifiedOrdersScreen> createState() =>
+      _UnifiedOrdersScreenState();
 }
 
 class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
@@ -65,7 +66,8 @@ class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
                 _FilterChip(
                   label: 'unified_orders_craftsy'.tr(),
                   selected: _selectedChannelFilter == 'craftsy',
-                  onTap: () => setState(() => _selectedChannelFilter = 'craftsy'),
+                  onTap: () =>
+                      setState(() => _selectedChannelFilter = 'craftsy'),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 _FilterChip(
@@ -84,9 +86,7 @@ class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
           ),
 
           // Orders list
-          Expanded(
-            child: _buildOrdersList(orders, selectedFilter),
-          ),
+          Expanded(child: _buildOrdersList(orders, selectedFilter)),
         ],
       ),
     );
@@ -102,9 +102,7 @@ class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
     }
 
     if (filteredOrders.isEmpty) {
-      return _EmptyOrders(
-        channel: _selectedChannelFilter,
-      );
+      return _EmptyOrders(channel: _selectedChannelFilter);
     }
 
     return ListView.builder(
@@ -132,7 +130,9 @@ class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'status_updated_to'.tr(namedArgs: {'status': next.labelKey.tr()}),
+                    'status_updated_to'.tr(
+                      namedArgs: {'status': next.labelKey.tr()},
+                    ),
                   ),
                   backgroundColor: AppColors.indigo,
                   duration: const Duration(seconds: 2),
@@ -237,12 +237,12 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
 
     final summary = isHindi
         ? '$productTitle का ऑर्डर, ${order.buyerCity} से '
-            '${order.buyerName} की ओर से। राशि '
-            '${order.amount.toStringAsFixed(0)} रुपये। चैनल: $channelLabel। '
-            'स्थिति: ${order.status.labelKey.tr()}।'
+              '${order.buyerName} की ओर से। राशि '
+              '${order.amount.toStringAsFixed(0)} रुपये। चैनल: $channelLabel। '
+              'स्थिति: ${order.status.labelKey.tr()}।'
         : 'Order for ${order.productTitle}, from ${order.buyerName} in '
-            '${order.buyerCity}. Amount: ${order.amount.toStringAsFixed(0)} '
-            'rupees. Channel: $channelLabel. Status: ${order.status.labelKey.tr()}.';
+              '${order.buyerCity}. Amount: ${order.amount.toStringAsFixed(0)} '
+              'rupees. Channel: $channelLabel. Status: ${order.status.labelKey.tr()}.';
 
     final result = await _tts.speak(
       lead + summary,
@@ -253,9 +253,7 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
       final opened = await _tts.openVoiceDownloadScreen();
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -279,16 +277,17 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
     final onTap = widget.onTap;
     final onStatusAdvance = widget.onStatusAdvance;
     final canAdvance = order.status.next != null;
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
-            'en') ==
-        'hi';
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ?? 'en') == 'hi';
     final displayProductTitle = (isHindi && order.productTitleHi != null)
         ? order.productTitleHi!
         : order.productTitle;
 
     return Dismissible(
       key: ValueKey('${order.id}_${order.status}_${order.channel}'),
-      direction: canAdvance ? DismissDirection.startToEnd : DismissDirection.none,
+      direction: canAdvance
+          ? DismissDirection.startToEnd
+          : DismissDirection.none,
       background: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.itemSpacing),
         decoration: BoxDecoration(
@@ -302,10 +301,12 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
             const Icon(Icons.arrow_forward, color: AppColors.indigoDark),
             const SizedBox(width: AppSpacing.xs),
             Text(
-              'mark_as_status'.tr(namedArgs: {
-                'status': order.status.next?.labelKey.tr() ?? '',
-              }),
-              style: AppTextStyles.labelSmall.copyWith(color: AppColors.indigoDark),
+              'mark_as_status'.tr(
+                namedArgs: {'status': order.status.next?.labelKey.tr() ?? ''},
+              ),
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.indigoDark,
+              ),
             ),
           ],
         ),
@@ -389,8 +390,11 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
                       // Meta row: User + Location
                       Row(
                         children: [
-                          const Icon(Icons.person_outline,
-                              size: 14, color: AppColors.inkSoft),
+                          const Icon(
+                            Icons.person_outline,
+                            size: 14,
+                            color: AppColors.inkSoft,
+                          ),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
@@ -404,9 +408,13 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text('•',
-                              style: TextStyle(
-                                  color: AppColors.inkFaint, fontSize: 11)),
+                          Text(
+                            '•',
+                            style: TextStyle(
+                              color: AppColors.inkFaint,
+                              fontSize: 11,
+                            ),
+                          ),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -473,13 +481,17 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
 
   Widget _buildCategoryThumb(String category) {
     final cat = category.toLowerCase();
-    if (cat.contains('pot') || cat.contains('clay') || cat.contains('ceramic')) {
+    if (cat.contains('pot') ||
+        cat.contains('clay') ||
+        cat.contains('ceramic')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.pottery(color: AppColors.terracottaDark),
       );
     }
-    if (cat.contains('silk') || cat.contains('saree') || cat.contains('textile')) {
+    if (cat.contains('silk') ||
+        cat.contains('saree') ||
+        cat.contains('textile')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.textile(color: AppColors.terracottaDark),
@@ -491,7 +503,9 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
         painter: CraftCategoryIcons.woodwork(color: AppColors.terracottaDark),
       );
     }
-    if (cat.contains('jewel') || cat.contains('metal') || cat.contains('brass')) {
+    if (cat.contains('jewel') ||
+        cat.contains('metal') ||
+        cat.contains('brass')) {
       return CustomPaint(
         size: const Size(22, 22),
         painter: CraftCategoryIcons.jewelry(color: AppColors.terracottaDark),
@@ -655,10 +669,7 @@ class _EmptyOrders extends StatelessWidget {
       subtitle = '${'unified_orders_empty_desc'.tr()} $channelLabel';
     }
 
-    return EmptyCraftState(
-      title: title,
-      subtitle: subtitle,
-    );
+    return EmptyCraftState(title: title, subtitle: subtitle);
   }
 
   String _channelLabel(String channel) {

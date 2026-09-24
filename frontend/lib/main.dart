@@ -73,9 +73,7 @@ void main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       useOnlyLangCode: true,
-      child: const ProviderScope(
-        child: CraftsyApp(),
-      ),
+      child: const ProviderScope(child: CraftsyApp()),
     ),
   );
 }

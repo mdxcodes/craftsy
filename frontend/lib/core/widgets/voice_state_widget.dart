@@ -37,10 +37,7 @@ class VoiceInteractionButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: _backgroundColor(context),
-            border: Border.all(
-              color: _borderColor(context),
-              width: 2,
-            ),
+            border: Border.all(color: _borderColor(context), width: 2),
             boxShadow: [
               BoxShadow(
                 color: state.color.withValues(alpha: 0.3),
@@ -66,10 +63,7 @@ class VoiceInteractionButton extends StatelessWidget {
         key: const ValueKey('processing'),
         width: size * 0.4,
         height: size * 0.4,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          color: state.color,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: state.color),
       );
     }
 
@@ -126,11 +120,7 @@ class VoiceStateDisplay extends StatelessWidget {
       ),
       child: Row(
         children: [
-          VoiceInteractionButton(
-            state: state,
-            onTap: onDismiss,
-            size: 48,
-          ),
+          VoiceInteractionButton(state: state, onTap: onDismiss, size: 48),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -139,17 +129,17 @@ class VoiceStateDisplay extends StatelessWidget {
                 Text(
                   state.labelKey.tr(),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: state.color,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: state.color,
+                  ),
                 ),
                 if (message != null && message!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     message!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade700,
-                        ),
+                      color: Colors.grey.shade700,
+                    ),
                   ),
                 ],
               ],
@@ -205,14 +195,17 @@ class VoiceTranscriptDisplay extends StatelessWidget {
               Text(
                 'You said:',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.blue.shade700,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: Colors.blue.shade700,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               if (languageCode != null) ...[
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade100,
                     borderRadius: BorderRadius.circular(4),
@@ -230,10 +223,7 @@ class VoiceTranscriptDisplay extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            transcript,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(transcript, style: Theme.of(context).textTheme.bodyMedium),
           if (confidence != null) ...[
             const SizedBox(height: 4),
             LinearProgressIndicator(
@@ -290,10 +280,7 @@ class VoiceConfirmationDialog extends StatelessWidget {
       ),
       content: Text(message),
       actions: [
-        TextButton(
-          onPressed: onCancel,
-          child: Text(cancelLabel),
-        ),
+        TextButton(onPressed: onCancel, child: Text(cancelLabel)),
         FilledButton(
           onPressed: onConfirm,
           style: FilledButton.styleFrom(

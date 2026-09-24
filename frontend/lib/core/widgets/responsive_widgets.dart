@@ -23,12 +23,10 @@ class ResponsiveContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final responsivePadding =
-        padding ?? EdgeInsets.symmetric(horizontal: AppSpacing.getScreenPadding(context));
+        padding ??
+        EdgeInsets.symmetric(horizontal: AppSpacing.getScreenPadding(context));
 
-    Widget content = Padding(
-      padding: responsivePadding,
-      child: child,
-    );
+    Widget content = Padding(padding: responsivePadding, child: child);
 
     if (maxWidth != null && width > maxWidth!) {
       content = Center(
@@ -67,7 +65,8 @@ class ResponsiveCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final responsivePadding = padding ?? const EdgeInsets.all(AppSpacing.cardPadding);
+    final responsivePadding =
+        padding ?? const EdgeInsets.all(AppSpacing.cardPadding);
     final responsiveRadius =
         borderRadius ?? BorderRadius.circular(AppRadii.getCardRadius(context));
 
@@ -86,10 +85,7 @@ class ResponsiveCard extends StatelessWidget {
                   : BorderSide.none,
             ),
             color: backgroundColor ?? AppColors.surface,
-            child: Padding(
-              padding: responsivePadding,
-              child: child,
-            ),
+            child: Padding(padding: responsivePadding, child: child),
           ),
         ),
       );
@@ -104,10 +100,7 @@ class ResponsiveCard extends StatelessWidget {
             : BorderSide.none,
       ),
       color: backgroundColor ?? AppColors.surface,
-      child: Padding(
-        padding: responsivePadding,
-        child: child,
-      ),
+      child: Padding(padding: responsivePadding, child: child),
     );
   }
 }

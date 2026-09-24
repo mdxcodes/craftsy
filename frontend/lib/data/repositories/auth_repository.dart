@@ -16,20 +16,21 @@ class AuthRepository {
   final String? _explicitBaseUrl;
 
   AuthRepository({String? baseUrl, Dio? dio})
-      : _explicitBaseUrl = baseUrl,
-        _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: baseUrl ?? ApiConfig.baseUrl,
-                connectTimeout: const Duration(seconds: 8),
-                receiveTimeout: const Duration(seconds: 15),
-                sendTimeout: const Duration(seconds: 15),
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-              ),
-            );
+    : _explicitBaseUrl = baseUrl,
+      _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: baseUrl ?? ApiConfig.baseUrl,
+              connectTimeout: const Duration(seconds: 8),
+              receiveTimeout: const Duration(seconds: 15),
+              sendTimeout: const Duration(seconds: 15),
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            ),
+          );
 
   void _syncBaseUrl() {
     _dio.options.baseUrl = _explicitBaseUrl ?? ApiConfig.baseUrl;
@@ -67,7 +68,11 @@ class AuthRepository {
     await box.put(_keyPhoneNumber, phoneNumber);
   }
 
-  Future<void> saveAuthData(String userId, String phoneNumber, {String? token}) async {
+  Future<void> saveAuthData(
+    String userId,
+    String phoneNumber, {
+    String? token,
+  }) async {
     final box = await _getBox();
     await box.put(_keyUserId, userId);
     await box.put(_keyPhoneNumber, phoneNumber);
@@ -90,17 +95,25 @@ class AuthRepository {
     _syncBaseUrl();
     try {
       final payload = profile.toBackendJson();
-      debugPrint('[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/register');
+      debugPrint(
+        '[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/register',
+      );
       final response = await _dio.post('/api/v1/auth/register', data: payload);
       if (response.statusCode == 201 && response.data != null) {
-        return UserProfile.fromJson(Map<String, dynamic>.from(response.data as Map));
+        return UserProfile.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
+        );
       }
     } on DioException catch (e) {
       // 409 Conflict means phone is already registered on backend — continue
       if (e.response?.statusCode == 409) {
-        debugPrint('[AuthRepository] Phone already registered on backend, proceeding to login.');
+        debugPrint(
+          '[AuthRepository] Phone already registered on backend, proceeding to login.',
+        );
       } else {
-        debugPrint('[AuthRepository] registerArtisan network error: ${e.message}');
+        debugPrint(
+          '[AuthRepository] registerArtisan network error: ${e.message}',
+        );
       }
     } catch (e) {
       debugPrint('[AuthRepository] registerArtisan unexpected error: $e');
@@ -113,8 +126,13 @@ class AuthRepository {
     _syncBaseUrl();
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
     try {
-      debugPrint('[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/login');
-      final response = await _dio.post('/api/v1/auth/login', data: {'phone': cleanPhone});
+      debugPrint(
+        '[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/login',
+      );
+      final response = await _dio.post(
+        '/api/v1/auth/login',
+        data: {'phone': cleanPhone},
+      );
       if (response.statusCode == 200 && response.data != null) {
         return Map<String, dynamic>.from(response.data as Map);
       }
@@ -127,15 +145,20 @@ class AuthRepository {
   }
 
   /// Verifies OTP with backend `/api/v1/auth/verify-otp`
-  Future<(UserProfile?, String?)> verifyOtpWithBackend(String phoneNumber, String otp) async {
+  Future<(UserProfile?, String?)> verifyOtpWithBackend(
+    String phoneNumber,
+    String otp,
+  ) async {
     _syncBaseUrl();
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
     try {
-      debugPrint('[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/verify-otp');
-      final response = await _dio.post('/api/v1/auth/verify-otp', data: {
-        'phone': cleanPhone,
-        'otp': otp,
-      });
+      debugPrint(
+        '[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/verify-otp',
+      );
+      final response = await _dio.post(
+        '/api/v1/auth/verify-otp',
+        data: {'phone': cleanPhone, 'otp': otp},
+      );
 
       if (response.statusCode == 200 && response.data != null) {
         final data = Map<String, dynamic>.from(response.data as Map);
@@ -144,7 +167,9 @@ class AuthRepository {
             ? Map<String, dynamic>.from(data['artisan'] as Map)
             : null;
 
-        final profile = artisanMap != null ? UserProfile.fromJson(artisanMap) : null;
+        final profile = artisanMap != null
+            ? UserProfile.fromJson(artisanMap)
+            : null;
         return (profile, token);
       }
     } on DioException catch (e) {

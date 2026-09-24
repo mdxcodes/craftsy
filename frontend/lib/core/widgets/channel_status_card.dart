@@ -53,11 +53,7 @@ class ChannelStatusCard extends StatelessWidget {
                     color: _statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    _channelIcon,
-                    color: _statusColor,
-                    size: 24,
-                  ),
+                  child: Icon(_channelIcon, color: _statusColor, size: 24),
                 ),
                 const SizedBox(width: 12),
 
@@ -105,10 +101,7 @@ class ChannelStatusCard extends StatelessWidget {
                     child: const Text('Publish'),
                   )
                 else if (status.needsInfo)
-                  TextButton(
-                    onPressed: onTap,
-                    child: const Text('Set up'),
-                  ),
+                  TextButton(onPressed: onTap, child: const Text('Set up')),
               ],
             ),
           ),

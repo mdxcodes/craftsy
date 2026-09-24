@@ -34,7 +34,9 @@ class SyncManager {
   static const _uuid = Uuid();
 
   void startListening() {
-    _connectivitySub = connectivityService.onConnectivityChanged.listen((isOnline) {
+    _connectivitySub = connectivityService.onConnectivityChanged.listen((
+      isOnline,
+    ) {
       if (isOnline) unawaited(triggerSyncIfOnline());
     });
     // Catch anything that was queued while the app was fully closed.
@@ -169,7 +171,9 @@ class SyncManager {
       );
 
       if (currentItem.isRetryable) {
-        final delay = Duration(seconds: min(pow(2, currentItem.retryCount).toInt(), 60));
+        final delay = Duration(
+          seconds: min(pow(2, currentItem.retryCount).toInt(), 60),
+        );
         Timer(delay, () => unawaited(triggerSyncIfOnline()));
       }
     }
@@ -197,7 +201,9 @@ class SyncManager {
             item.copyWith(
               retryCount: item.retryCount + 1,
               status: QueueStatus.failed,
-              errorMessage: Value(status.errorMessage ?? 'Processing failed on the server'),
+              errorMessage: Value(
+                status.errorMessage ?? 'Processing failed on the server',
+              ),
             ),
           );
         }

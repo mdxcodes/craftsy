@@ -15,7 +15,9 @@ void main() {
   setUpAll(() async {
     HttpOverrides.global = MockHttpOverrides();
 
-    final tempDir = await Directory.systemTemp.createTemp('hive_add_product_test');
+    final tempDir = await Directory.systemTemp.createTemp(
+      'hive_add_product_test',
+    );
     Hive.init(tempDir.path);
 
     if (!Hive.isAdapterRegistered(1)) {
@@ -39,13 +41,11 @@ void main() {
     }
   });
 
-  testWidgets('Add Product flow loads step 1 capture screen', (WidgetTester tester) async {
+  testWidgets('Add Product flow loads step 1 capture screen', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: AddProductFlowScreen(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: AddProductFlowScreen())),
     );
 
     await tester.pump();

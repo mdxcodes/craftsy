@@ -98,10 +98,7 @@ class _GreetingHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.indigo,
-            AppColors.indigoLight,
-          ],
+          colors: [AppColors.indigo, AppColors.indigoLight],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
@@ -173,10 +170,7 @@ class _QuickActions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'home_quick_actions'.tr(),
-            style: AppTextStyles.headlineSmall,
-          ),
+          Text('home_quick_actions'.tr(), style: AppTextStyles.headlineSmall),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -258,7 +252,8 @@ class _RecentOrdersSection extends StatelessWidget {
               ),
               if (orders.isNotEmpty)
                 TextButton(
-                  onPressed: () => context.pushNamed(AppRouteConstants.myOrders),
+                  onPressed: () =>
+                      context.pushNamed(AppRouteConstants.myOrders),
                   child: Text('home_view_all'.tr()),
                 ),
             ],
@@ -291,71 +286,73 @@ class _OrderCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Semantics(
         button: true,
-        label: 'order_card'.tr(namedArgs: {
-          'product': order.productTitle,
-          'status': order.status.labelKey.tr(),
-        }),
+        label: 'order_card'.tr(
+          namedArgs: {
+            'product': order.productTitle,
+            'status': order.status.labelKey.tr(),
+          },
+        ),
         child: InkWell(
-          onTap: () => context.pushNamed(
-            AppRouteConstants.orderDetail,
-            extra: order,
-          ),
+          onTap: () =>
+              context.pushNamed(AppRouteConstants.orderDetail, extra: order),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Row(
               children: [
-              // Product image placeholder
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.parchmentDeep,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: order.productImagePath.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: AppImage(
-                          imageUrl: order.productImagePath,
-                          fit: BoxFit.cover,
+                // Product image placeholder
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.parchmentDeep,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: order.productImagePath.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: AppImage(
+                            imageUrl: order.productImagePath,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Icon(
+                          Icons.inventory_2,
+                          color: AppColors.inkFaint,
+                          size: 28,
                         ),
-                      )
-                    : Icon(
-                        Icons.inventory_2,
-                        color: AppColors.inkFaint,
-                        size: 28,
-                      ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      order.productTitle,
-                      style: AppTextStyles.headlineSmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'order_placed_on'.tr(args: [_formatDate(order.placedAt)]),
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.inkFaint,
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-              VisualStatusChip(
-                type: _mapOrderStatus(order.status),
-                label: _mapOrderStatusLabel(order.status),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.productTitle,
+                        style: AppTextStyles.headlineSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'order_placed_on'.tr(
+                          args: [_formatDate(order.placedAt)],
+                        ),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.inkFaint,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                VisualStatusChip(
+                  type: _mapOrderStatus(order.status),
+                  label: _mapOrderStatusLabel(order.status),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -504,9 +501,7 @@ class _EarningsMetric extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               label,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.inkSoft,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
             ),
           ],
         ),

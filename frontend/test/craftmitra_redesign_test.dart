@@ -16,15 +16,19 @@ import 'package:craftsy/features/chatbot/widgets/craftmitra_fab.dart';
 
 class _FakeChatService implements ChatService {
   @override
-  Future<List<Map<String, dynamic>>> getQuickTopics({String languageCode = 'en'}) async {
+  Future<List<Map<String, dynamic>>> getQuickTopics({
+    String languageCode = 'en',
+  }) async {
     return [
       {
         'id': 'schemes',
         'label': languageCode == 'hi' ? 'सरकारी योजनाएं' : 'Govt Schemes',
         'label_hi': 'सरकारी योजनाएं',
-        'query': languageCode == 'hi' ? 'पीएम विश्वकर्मा योजना क्या है?' : 'What is PM Vishwakarma scheme?',
+        'query': languageCode == 'hi'
+            ? 'पीएम विश्वकर्मा योजना क्या है?'
+            : 'What is PM Vishwakarma scheme?',
         'query_hi': 'पीएम विश्वकर्मा योजना क्या है?',
-      }
+      },
     ];
   }
 
@@ -68,16 +72,18 @@ void main() {
   setUpAll(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/shared_preferences'),
-      (MethodCall methodCall) async {
-        if (methodCall.method == 'getAll') {
-          return <String, Object>{};
-        }
-        return true;
-      },
-    );
+          const MethodChannel('plugins.flutter.io/shared_preferences'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'getAll') {
+              return <String, Object>{};
+            }
+            return true;
+          },
+        );
 
-    final tempDir = await Directory.systemTemp.createTemp('hive_craftmitra_test');
+    final tempDir = await Directory.systemTemp.createTemp(
+      'hive_craftmitra_test',
+    );
     Hive.init(tempDir.path);
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(UserProfileAdapter());
@@ -97,134 +103,153 @@ void main() {
   });
 
   group('CraftMitra FAB & Scalloped Bottom Sheet Tests', () {
-    testWidgets('CraftMitraFab renders with consistent dimensions and triggers Mehrab sheet', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            chatServiceProvider.overrideWithValue(_FakeChatService()),
-            userProfileProvider.overrideWith((ref) => _FakeUserProfileNotifier(
-              UserProfile(
-                id: 'artisan-1',
-                name: 'Meera Devi',
-                phone: '+91 98765 43210',
-                craftType: 'Blue Pottery',
-                locationCluster: 'Jaipur',
-                state: 'Rajasthan',
-                preferredLanguage: 'en',
+    testWidgets(
+      'CraftMitraFab renders with consistent dimensions and triggers Mehrab sheet',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              chatServiceProvider.overrideWithValue(_FakeChatService()),
+              userProfileProvider.overrideWith(
+                (ref) => _FakeUserProfileNotifier(
+                  UserProfile(
+                    id: 'artisan-1',
+                    name: 'Meera Devi',
+                    phone: '+91 98765 43210',
+                    craftType: 'Blue Pottery',
+                    locationCluster: 'Jaipur',
+                    state: 'Rajasthan',
+                    preferredLanguage: 'en',
+                  ),
+                ),
               ),
-            )),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              floatingActionButton: CraftMitraFab(),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(floatingActionButton: CraftMitraFab()),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Verify FAB renders
-      expect(find.byType(CraftMitraFab), findsOneWidget);
-      expect(find.text('craftmitra_title'), findsOneWidget);
+        // Verify FAB renders
+        expect(find.byType(CraftMitraFab), findsOneWidget);
+        expect(find.text('craftmitra_title'), findsOneWidget);
 
-      // Tap FAB to open bottom sheet
-      await tester.tap(find.byType(CraftMitraFab));
-      await tester.pumpAndSettle();
+        // Tap FAB to open bottom sheet
+        await tester.tap(find.byType(CraftMitraFab));
+        await tester.pumpAndSettle();
 
-      // Verify MehrabSheetContainer & MehrabClipper were used (scalloped top border treatment)
-      expect(find.byType(MehrabSheetContainer), findsOneWidget);
-      expect(find.byType(ChatbotSheet), findsOneWidget);
-      expect(find.byType(ClipPath), findsWidgets);
-    });
+        // Verify MehrabSheetContainer & MehrabClipper were used (scalloped top border treatment)
+        expect(find.byType(MehrabSheetContainer), findsOneWidget);
+        expect(find.byType(ChatbotSheet), findsOneWidget);
+        expect(find.byType(ClipPath), findsWidgets);
+      },
+    );
 
-    testWidgets('Chatbot initial state localizes greeting and suggestion chips in Hindi', (tester) async {
-      final fakeService = _FakeChatService();
+    testWidgets(
+      'Chatbot initial state localizes greeting and suggestion chips in Hindi',
+      (tester) async {
+        final fakeService = _FakeChatService();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            chatServiceProvider.overrideWithValue(fakeService),
-            userProfileProvider.overrideWith((ref) => _FakeUserProfileNotifier(
-              UserProfile(
-                id: 'artisan-1',
-                name: 'Meera Devi',
-                phone: '+91 98765 43210',
-                craftType: 'Terracotta Pottery',
-                locationCluster: 'Gorakhpur',
-                state: 'Uttar Pradesh',
-                preferredLanguage: 'hi',
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              chatServiceProvider.overrideWithValue(fakeService),
+              userProfileProvider.overrideWith(
+                (ref) => _FakeUserProfileNotifier(
+                  UserProfile(
+                    id: 'artisan-1',
+                    name: 'Meera Devi',
+                    phone: '+91 98765 43210',
+                    craftType: 'Terracotta Pottery',
+                    locationCluster: 'Gorakhpur',
+                    state: 'Uttar Pradesh',
+                    preferredLanguage: 'hi',
+                  ),
+                ),
               ),
-            )),
-          ],
-          child: MaterialApp(
-            locale: const Locale('hi'),
-            home: Builder(
-              builder: (context) => Scaffold(
-                body: ElevatedButton(
-                  onPressed: () => ChatbotSheet.show(context),
-                  child: const Text('Open'),
+            ],
+            child: MaterialApp(
+              locale: const Locale('hi'),
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: ElevatedButton(
+                    onPressed: () => ChatbotSheet.show(context),
+                    child: const Text('Open'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Open sheet
-      await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+        // Open sheet
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
 
-      // Check Hindi welcome message and Hindi suggestions
-      expect(find.textContaining('शिल्प व बाज़ार सहायक'), findsOneWidget);
-      expect(find.text('पीएम विश्वकर्मा योजना क्या है?'), findsOneWidget);
-      expect(find.text('टेराकोटा में दरारें कैसे रोकें?'), findsOneWidget);
-      expect(find.text('माय कैटलॉग खोलें'), findsOneWidget);
-    });
+        // Check Hindi welcome message and Hindi suggestions
+        expect(find.textContaining('शिल्प व बाज़ार सहायक'), findsOneWidget);
+        expect(find.text('पीएम विश्वकर्मा योजना क्या है?'), findsOneWidget);
+        expect(find.text('टेराकोटा में दरारें कैसे रोकें?'), findsOneWidget);
+        expect(find.text('माय कैटलॉग खोलें'), findsOneWidget);
+      },
+    );
 
-    testWidgets('Chatbot initial state localizes greeting and suggestion chips in English', (tester) async {
-      final fakeService = _FakeChatService();
+    testWidgets(
+      'Chatbot initial state localizes greeting and suggestion chips in English',
+      (tester) async {
+        final fakeService = _FakeChatService();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            chatServiceProvider.overrideWithValue(fakeService),
-            userProfileProvider.overrideWith((ref) => _FakeUserProfileNotifier(
-              UserProfile(
-                id: 'artisan-1',
-                name: 'Meera Devi',
-                phone: '+91 98765 43210',
-                craftType: 'Terracotta Pottery',
-                locationCluster: 'Gorakhpur',
-                state: 'Uttar Pradesh',
-                preferredLanguage: 'en',
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              chatServiceProvider.overrideWithValue(fakeService),
+              userProfileProvider.overrideWith(
+                (ref) => _FakeUserProfileNotifier(
+                  UserProfile(
+                    id: 'artisan-1',
+                    name: 'Meera Devi',
+                    phone: '+91 98765 43210',
+                    craftType: 'Terracotta Pottery',
+                    locationCluster: 'Gorakhpur',
+                    state: 'Uttar Pradesh',
+                    preferredLanguage: 'en',
+                  ),
+                ),
               ),
-            )),
-          ],
-          child: MaterialApp(
-            locale: const Locale('en'),
-            home: Builder(
-              builder: (context) => Scaffold(
-                body: ElevatedButton(
-                  onPressed: () => ChatbotSheet.show(context),
-                  child: const Text('Open'),
+            ],
+            child: MaterialApp(
+              locale: const Locale('en'),
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: ElevatedButton(
+                    onPressed: () => ChatbotSheet.show(context),
+                    child: const Text('Open'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Open sheet
-      await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+        // Open sheet
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
 
-      // Check English welcome message and English suggestions
-      expect(find.textContaining('artisan assistant and market guide'), findsOneWidget);
-      expect(find.text('What is PM Vishwakarma scheme?'), findsOneWidget);
-      expect(find.text('How to avoid cracks in terracotta pottery?'), findsOneWidget);
-      expect(find.text('Take me to my catalogue'), findsOneWidget);
-    });
+        // Check English welcome message and English suggestions
+        expect(
+          find.textContaining('artisan assistant and market guide'),
+          findsOneWidget,
+        );
+        expect(find.text('What is PM Vishwakarma scheme?'), findsOneWidget);
+        expect(
+          find.text('How to avoid cracks in terracotta pottery?'),
+          findsOneWidget,
+        );
+        expect(find.text('Take me to my catalogue'), findsOneWidget);
+      },
+    );
   });
 }
