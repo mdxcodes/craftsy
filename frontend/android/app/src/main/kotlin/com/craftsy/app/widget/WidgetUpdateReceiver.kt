@@ -37,25 +37,24 @@ class WidgetUpdateReceiver : BroadcastReceiver() {
     private fun refreshAllWidgets(context: Context) {
         val appWidgetManager = AppWidgetManager.getInstance(context)
 
-        // Refresh each widget type
+        // Refresh each widget type that exists
+        // Future widgets (Orders, StockAlerts, etc.) will be added in later phases
         val widgetClasses = listOf(
             CraftsyTodayWidget::class.java,
-            OrdersWidget::class.java,
-            StockAlertsWidget::class.java,
-            CraftMitraWidget::class.java,
-            SellingChannelsWidget::class.java,
         )
 
         for (widgetClass in widgetClasses) {
             val componentName = ComponentName(context, widgetClass)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
             if (appWidgetIds.isNotEmpty()) {
-                // Trigger update for this widget type
+                // For Glance widgets, trigger update via AppWidgetManager
+                // The GlanceAppWidget's provideGlance will read the latest snapshot
                 val updateIntent = Intent(context, widgetClass).apply {
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
                 }
                 context.sendBroadcast(updateIntent)
+                Log.d(TAG, "Triggered update for ${widgetClass.simpleName}: ${appWidgetIds.size} instances")
             }
         }
     }

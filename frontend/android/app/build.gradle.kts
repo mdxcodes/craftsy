@@ -50,4 +50,10 @@ flutter {
     source = "../.."
 }
 
+dependencies {
+    // Jetpack Glance for App Widgets
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
+}
+
 
