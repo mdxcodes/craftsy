@@ -11,6 +11,8 @@ import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
 import '../../../core/widgets/visual_status_chip.dart';
 import '../../../core/widgets/motifs/craft_category_badge.dart';
+import '../../commerce/widgets/where_i_sell_section.dart';
+import '../../../core/providers/commerce_hub_provider.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
 import '../../social_media/providers/social_media_provider.dart';
@@ -805,6 +807,16 @@ class ProductDetailScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Where I Sell — Channel Status Section
+                    WhereISellSection(
+                      productId: product.id,
+                      onRefresh: () {
+                        ref.invalidate(productChannelsProvider(product.id));
+                      },
                     ),
 
                     const SizedBox(height: AppSpacing.md),

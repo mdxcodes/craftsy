@@ -38,6 +38,9 @@ class Order {
   final DateTime placedAt;
   final DateTime? shippedAt;
   final String? trackingId;
+  final String channel;
+  final String? channelLabel;
+  final String? externalOrderId;
 
   const Order({
     required this.id,
@@ -53,6 +56,9 @@ class Order {
     required this.placedAt,
     this.shippedAt,
     this.trackingId,
+    this.channel = 'craftsy',
+    this.channelLabel,
+    this.externalOrderId,
   });
 
   String get buyerCity => buyerLocation.isNotEmpty
@@ -73,6 +79,9 @@ class Order {
     DateTime? placedAt,
     DateTime? shippedAt,
     String? trackingId,
+    String? channel,
+    String? channelLabel,
+    String? externalOrderId,
   }) {
     return Order(
       id: id ?? this.id,
@@ -87,6 +96,9 @@ class Order {
       placedAt: placedAt ?? this.placedAt,
       shippedAt: shippedAt ?? this.shippedAt,
       trackingId: trackingId ?? this.trackingId,
+      channel: channel ?? this.channel,
+      channelLabel: channelLabel ?? this.channelLabel,
+      externalOrderId: externalOrderId ?? this.externalOrderId,
     );
   }
 }

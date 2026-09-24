@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../widgets/commerce_summary_card.dart';
 import '../widgets/inventory_overview_card.dart';
 import '../widgets/order_channel_summary_card.dart';
+import '../../orders/screens/unified_orders_screen.dart';
 
 /// Unified Commerce Hub Dashboard.
 ///
@@ -113,9 +114,7 @@ class _UnifiedCommerceHubScreenState
   }
 
   Widget _buildOrdersTab() {
-    return Center(
-      child: Text('commerce_hub_orders'.tr()),
-    );
+    return UnifiedOrdersScreen(artisanId: widget.artisanId);
   }
 
   Widget _buildInventoryTab() {
