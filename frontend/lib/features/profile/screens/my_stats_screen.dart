@@ -54,8 +54,11 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
 
     final products = productsAsync.value ?? const <Product>[];
     final totalListings = products.length;
-    final topCategory = _topCategory(products) ??
-        (profile.craftType.isNotEmpty ? profile.craftType : 'Terracotta Pottery');
+    final topCategory =
+        _topCategory(products) ??
+        (profile.craftType.isNotEmpty
+            ? profile.craftType
+            : 'stats_general_category'.tr());
 
     // Filter orders by selected period
     final now = DateTime.now();
@@ -63,12 +66,16 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
     switch (_selectedPeriod) {
       case AnalyticsPeriod.thisMonth:
         filteredOrders = allOrders
-            .where((o) => o.placedAt.isAfter(now.subtract(const Duration(days: 30))))
+            .where(
+              (o) => o.placedAt.isAfter(now.subtract(const Duration(days: 30))),
+            )
             .toList();
         break;
       case AnalyticsPeriod.last3Months:
         filteredOrders = allOrders
-            .where((o) => o.placedAt.isAfter(now.subtract(const Duration(days: 90))))
+            .where(
+              (o) => o.placedAt.isAfter(now.subtract(const Duration(days: 90))),
+            )
             .toList();
         break;
       case AnalyticsPeriod.allTime:
@@ -77,21 +84,33 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
     }
 
     // Revenue calculations
-    final activeOrders = filteredOrders.where((o) => o.status != OrderStatus.cancelled).toList();
+    final activeOrders = filteredOrders
+        .where((o) => o.status != OrderStatus.cancelled)
+        .toList();
     final double calculatedSales = activeOrders.fold<double>(
       0.0,
       (sum, o) => sum + (o.amount * o.quantity),
     );
     final totalSalesRevenue = calculatedSales > 0 ? calculatedSales : 11730.0;
-    final aov = activeOrders.isNotEmpty ? (totalSalesRevenue / activeOrders.length) : totalSalesRevenue;
+    final aov = activeOrders.isNotEmpty
+        ? (totalSalesRevenue / activeOrders.length)
+        : totalSalesRevenue;
 
     // Order Fulfillment metrics
-    final deliveredCount = filteredOrders.where((o) => o.status == OrderStatus.delivered).length;
-    final inProgressCount = filteredOrders.where((o) =>
-        o.status == OrderStatus.newOrder ||
-        o.status == OrderStatus.packed ||
-        o.status == OrderStatus.shipped).length;
-    final cancelledCount = filteredOrders.where((o) => o.status == OrderStatus.cancelled).length;
+    final deliveredCount = filteredOrders
+        .where((o) => o.status == OrderStatus.delivered)
+        .length;
+    final inProgressCount = filteredOrders
+        .where(
+          (o) =>
+              o.status == OrderStatus.newOrder ||
+              o.status == OrderStatus.packed ||
+              o.status == OrderStatus.shipped,
+        )
+        .length;
+    final cancelledCount = filteredOrders
+        .where((o) => o.status == OrderStatus.cancelled)
+        .length;
 
     return AppScaffold(
       title: 'my_stats_title'.tr(),
@@ -119,7 +138,11 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
             const SizedBox(height: AppSpacing.md),
 
             // Order Summary Row
-            _buildOrderSummaryCard(deliveredCount, inProgressCount, cancelledCount),
+            _buildOrderSummaryCard(
+              deliveredCount,
+              inProgressCount,
+              cancelledCount,
+            ),
 
             const SizedBox(height: AppSpacing.md),
 
@@ -159,11 +182,17 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.insights_rounded, color: AppColors.indigo, size: 24),
+                  const Icon(
+                    Icons.insights_rounded,
+                    color: AppColors.indigo,
+                    size: 24,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
-                      'stats_top_category_insight'.tr(namedArgs: {'category': topCategory}),
+                      'stats_top_category_insight'.tr(
+                        namedArgs: {'category': topCategory},
+                      ),
                       style: AppTextStyles.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.ink,
@@ -215,7 +244,9 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                         const SizedBox(height: 2),
                         Text(
                           'floor_price_guarantee_desc'.tr(),
-                          style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft),
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.inkSoft,
+                          ),
                         ),
                       ],
                     ),
@@ -243,8 +274,14 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPeriodTab(AnalyticsPeriod.thisMonth, 'period_this_month'.tr()),
-            _buildPeriodTab(AnalyticsPeriod.last3Months, 'period_last_3_months'.tr()),
+            _buildPeriodTab(
+              AnalyticsPeriod.thisMonth,
+              'period_this_month'.tr(),
+            ),
+            _buildPeriodTab(
+              AnalyticsPeriod.last3Months,
+              'period_last_3_months'.tr(),
+            ),
             _buildPeriodTab(AnalyticsPeriod.allTime, 'period_all_time'.tr()),
           ],
         ),
@@ -303,7 +340,11 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.trending_up_rounded, size: 18, color: Colors.white),
+              const Icon(
+                Icons.trending_up_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
@@ -348,7 +389,10 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
     for (int i = 6; i >= 0; i--) {
       final day = now.subtract(Duration(days: i));
       final dayOrders = _getOrdersForDay(day);
-      final dayRevenue = dayOrders.fold<double>(0, (sum, o) => sum + (o.amount * o.quantity));
+      final dayRevenue = dayOrders.fold<double>(
+        0,
+        (sum, o) => sum + (o.amount * o.quantity),
+      );
       salesByDay.add(dayRevenue);
       labels.add('${day.day}');
     }
@@ -382,7 +426,9 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: List.generate(salesByDay.length, (i) {
-                      final height = maxVal > 0 ? (salesByDay[i] / maxVal) * 80.0 : 0.0;
+                      final height = maxVal > 0
+                          ? (salesByDay[i] / maxVal) * 80.0
+                          : 0.0;
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -409,7 +455,9 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                 : Center(
                     child: Text(
                       'no_sales_data'.tr(),
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.inkSoft,
+                      ),
                     ),
                   ),
           ),
@@ -444,7 +492,11 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
             alignment: WrapAlignment.center,
             children: [
               _buildSummaryItem('delivered'.tr(), delivered, AppColors.success),
-              _buildSummaryItem('in_progress'.tr(), inProgress, AppColors.amber),
+              _buildSummaryItem(
+                'in_progress'.tr(),
+                inProgress,
+                AppColors.amber,
+              ),
               _buildSummaryItem('cancelled'.tr(), cancelled, AppColors.coral),
             ],
           ),

@@ -79,10 +79,17 @@ class ProfileScreen extends ConsumerWidget {
                         if (profile.craftType.isNotEmpty) ...[
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppColors.indigoLight.withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(AppRadii.chip),
+                              color: AppColors.indigoLight.withValues(
+                                alpha: 0.25,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppRadii.chip,
+                              ),
                               border: Border.all(
                                 color: AppColors.indigo.withValues(alpha: 0.3),
                               ),
@@ -117,8 +124,11 @@ class ProfileScreen extends ConsumerWidget {
             _MenuTile(
               icon: Icons.language,
               title: 'language_settings_title'.tr(),
-              subtitle: 'lang_${EasyLocalization.of(context)?.locale.languageCode ?? 'en'}'.tr(),
-              onTap: () => context.pushNamed(AppRouteConstants.languageSettings),
+              subtitle:
+                  'lang_${EasyLocalization.of(context)?.locale.languageCode ?? 'en'}'
+                      .tr(),
+              onTap: () =>
+                  context.pushNamed(AppRouteConstants.languageSettings),
             ),
             _MenuTile(
               icon: Icons.trending_up,
@@ -151,18 +161,33 @@ class ProfileScreen extends ConsumerWidget {
                 showDialog(
                   context: context,
                   builder: (ctx) => Dialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.dialog)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadii.dialog),
+                    ),
                     backgroundColor: AppColors.surface,
-                    insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding, vertical: AppSpacing.lg),
+                    insetPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.screenPadding,
+                      vertical: AppSpacing.lg,
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(AppSpacing.cardPadding),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('about_craftsy'.tr(), style: AppTextStyles.headlineMedium.copyWith(fontSize: 19), textAlign: TextAlign.center),
+                          Text(
+                            'about_craftsy'.tr(),
+                            style: AppTextStyles.headlineMedium.copyWith(
+                              fontSize: 19,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                           const SizedBox(height: AppSpacing.sm),
-                          Text('about_desc'.tr(), style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+                          Text(
+                            'about_desc'.tr(),
+                            style: AppTextStyles.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
                           const SizedBox(height: AppSpacing.lg),
                           AppButton(
                             label: 'close'.tr(),
@@ -194,7 +219,8 @@ class ProfileScreen extends ConsumerWidget {
                   isDestructive: true,
                   onConfirm: () async {
                     Navigator.of(context, rootNavigator: true).pop();
-                    ref.read(selectedOrderFilterProvider.notifier).state = OrderStatus.newOrder;
+                    ref.read(selectedOrderFilterProvider.notifier).state =
+                        OrderStatus.newOrder;
                     await ref.read(authStateProvider.notifier).signOut();
                     if (context.mounted) {
                       context.goNamed(AppRouteConstants.signIn);

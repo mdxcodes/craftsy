@@ -1,5 +1,6 @@
 class ChatActionModel {
-  final String type; // 'navigate' | 'update_product_status' | 'filter_catalogue' | 'sync_pending'
+  final String
+  type; // 'navigate' | 'update_product_status' | 'filter_catalogue' | 'sync_pending'
   final String destination; // 'add_product', 'catalogue', 'my_stats', etc.
   final String? route; // '/add-product', '/my-stats'
   final int? tabIndex; // 0, 1, 2, 3
@@ -135,7 +136,9 @@ class ChatMessageModel {
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
     return ChatMessageModel(
-      id: json['id'] as String? ?? 'msg_${DateTime.now().microsecondsSinceEpoch}',
+      id:
+          json['id'] as String? ??
+          'msg_${DateTime.now().microsecondsSinceEpoch}',
       text: json['reply'] as String? ?? json['text'] as String? ?? '',
       isUser: json['is_user'] as bool? ?? false,
       timestamp: json['timestamp'] != null
@@ -144,7 +147,8 @@ class ChatMessageModel {
       action: json['action'] != null
           ? ChatActionModel.fromJson(json['action'] as Map<String, dynamic>)
           : null,
-      suggestedQueries: (json['suggested_queries'] as List<dynamic>?)
+      suggestedQueries:
+          (json['suggested_queries'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],

@@ -9,8 +9,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SocialSharingService {
-  static const MethodChannel _whatsappChannel =
-      MethodChannel('com.craftsy.app/whatsapp_share');
+  static const MethodChannel _whatsappChannel = MethodChannel(
+    'com.craftsy.app/whatsapp_share',
+  );
 
   final Dio _dio;
 
@@ -80,10 +81,7 @@ class SocialSharingService {
     required String imagePath,
     required String text,
   }) async {
-    await Share.shareXFiles(
-      [XFile(imagePath)],
-      text: text,
-    );
+    await Share.shareXFiles([XFile(imagePath)], text: text);
   }
 
   /// Downloads/writes the product photo directly to the device's gallery.

@@ -41,7 +41,9 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
   @override
   void initState() {
     super.initState();
-    final (defEn, defHi) = LabelMakerService.defaultCraftStoryFor(widget.order.productCategory);
+    final (defEn, defHi) = LabelMakerService.defaultCraftStoryFor(
+      widget.order.productCategory,
+    );
     _storyEnCtrl = TextEditingController(text: defEn);
     _storyHiCtrl = TextEditingController(text: defHi);
   }
@@ -93,7 +95,9 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider);
-    final (washEn, washHi) = LabelMakerService.defaultWashCareFor(widget.order.productCategory);
+    final (washEn, washHi) = LabelMakerService.defaultWashCareFor(
+      widget.order.productCategory,
+    );
 
     final effectiveId = profile.id.isNotEmpty ? profile.id : 'artisan_01';
     final ondcProfileStub = 'https://craftsy.ondc.org/artisan/$effectiveId';
@@ -114,372 +118,439 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
               const SizedBox(height: 20),
               // Handle bar
               Container(
-                margin: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.xs),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.line,
-                borderRadius: BorderRadius.circular(2),
+                margin: const EdgeInsets.only(
+                  top: AppSpacing.sm,
+                  bottom: AppSpacing.xs,
+                ),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
 
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Artisan Story & Label',
-                          style: AppTextStyles.headlineSmall.copyWith(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.ink,
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenPadding,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Artisan Story & Label',
+                            style: AppTextStyles.headlineSmall.copyWith(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Preview for Order ${widget.order.id}',
-                          style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            'Preview for Order ${widget.order.id}',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.inkSoft,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Semantics(
-                    button: true,
-                    label: 'close'.tr(),
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: const BoxDecoration(
-                          color: AppColors.parchmentDeep,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.close, size: 18, color: AppColors.inkSoft),
+                    Semantics(
+                      button: true,
+                      label: 'close'.tr(),
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            color: AppColors.parchmentDeep,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: AppColors.inkSoft,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Divider(height: 1, color: AppColors.line),
+              const Divider(height: 1, color: AppColors.line),
 
-            // Preview Scrollable Body
-            Expanded(
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                children: [
-                  // Label Card Preview
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.cardPadding),
-                    decoration: BoxDecoration(
-                      color: AppColors.parchment,
-                      borderRadius: BorderRadius.circular(AppRadii.card),
-                      border: Border.all(color: AppColors.line, width: 1.5),
-                      boxShadow: AppElevation.cardShadow,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header Bar Preview
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.terracotta,
-                            borderRadius: BorderRadius.circular(AppRadii.sm),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Craftsy',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+              // Preview Scrollable Body
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                  children: [
+                    // Label Card Preview
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+                      decoration: BoxDecoration(
+                        color: AppColors.parchment,
+                        borderRadius: BorderRadius.circular(AppRadii.card),
+                        border: Border.all(color: AppColors.line, width: 1.5),
+                        boxShadow: AppElevation.cardShadow,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header Bar Preview
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.terracotta,
+                              borderRadius: BorderRadius.circular(AppRadii.sm),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Craftsy',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'ARTISAN PACKAGING & STORY LABEL',
-                                    style: TextStyle(color: Colors.white70, fontSize: 8, letterSpacing: 0.8),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                widget.order.id,
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Artisan block
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: AppColors.terracotta,
-                              radius: 18,
-                              child: Text(
-                                profile.name.isNotEmpty ? profile.name[0].toUpperCase() : 'A',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(profile.name, style: AppTextStyles.labelMedium),
-                                  Text(
-                                    '${profile.craftType} • ${profile.locationCluster}',
-                                    style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppColors.statusSuccessBg,
-                                borderRadius: BorderRadius.circular(AppRadii.chip),
-                              ),
-                              child: Text(
-                                'ONDC Verified',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.statusSuccessFg,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
+                                    Text(
+                                      'ARTISAN PACKAGING & STORY LABEL',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 8,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: AppSpacing.md),
-
-                        // Bilingual Craft Story Box
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardSurface,
-                            borderRadius: BorderRadius.circular(AppRadii.sm),
-                            border: Border.all(color: AppColors.line),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'CRAFT STORY',
-                                    style: AppTextStyles.labelSmall.copyWith(
-                                      color: AppColors.terracottaDark,
-                                      letterSpacing: 0.8,
-                                      fontSize: 10.5,
-                                    ),
-                                  ),
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: const Size(50, 24),
-                                      foregroundColor: AppColors.terracotta,
-                                    ),
-                                    onPressed: () {
-                                      setState(() => _isEditingStory = !_isEditingStory);
-                                    },
-                                    icon: Icon(_isEditingStory ? Icons.check : Icons.edit, size: 14),
-                                    label: Text(
-                                      _isEditingStory ? 'Done' : 'Edit',
-                                      style: const TextStyle(fontSize: 11),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (!_isEditingStory) ...[
-                                const SizedBox(height: 4),
                                 Text(
-                                  _storyEnCtrl.text,
-                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.ink),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _storyHiCtrl.text,
-                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
-                                ),
-                              ] else ...[
-                                const SizedBox(height: 6),
-                                TextField(
-                                  controller: _storyEnCtrl,
-                                  maxLines: 2,
-                                  style: AppTextStyles.bodySmall,
-                                  decoration: const InputDecoration(
-                                    labelText: 'English Story',
-                                    isDense: true,
+                                  widget.order.id,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  onChanged: (_) => _hasCustomizedStory = true,
-                                ),
-                                const SizedBox(height: 8),
-                                TextField(
-                                  controller: _storyHiCtrl,
-                                  maxLines: 2,
-                                  style: AppTextStyles.bodySmall,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Hindi Story',
-                                    isDense: true,
-                                  ),
-                                  onChanged: (_) => _hasCustomizedStory = true,
                                 ),
                               ],
-                            ],
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: AppSpacing.md),
+                          const SizedBox(height: AppSpacing.md),
 
-                        // Care & QR row
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                padding: const EdgeInsets.all(AppSpacing.sm),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardSurface,
-                                  borderRadius: BorderRadius.circular(AppRadii.sm),
-                                  border: Border.all(color: AppColors.line),
+                          // Artisan block
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: AppColors.terracotta,
+                                radius: 18,
+                                child: Text(
+                                  profile.name.isNotEmpty
+                                      ? profile.name[0].toUpperCase()
+                                      : 'A',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'CARE & HANDLING',
+                                      profile.name,
+                                      style: AppTextStyles.labelMedium,
+                                    ),
+                                    Text(
+                                      '${profile.craftType} • ${profile.locationCluster}',
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.inkSoft,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.statusSuccessBg,
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.chip,
+                                  ),
+                                ),
+                                child: Text(
+                                  'ONDC Verified',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.statusSuccessFg,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AppSpacing.md),
+
+                          // Bilingual Craft Story Box
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.sm),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardSurface,
+                              borderRadius: BorderRadius.circular(AppRadii.sm),
+                              border: Border.all(color: AppColors.line),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'CRAFT STORY',
                                       style: AppTextStyles.labelSmall.copyWith(
                                         color: AppColors.terracottaDark,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.8,
+                                        fontSize: 10.5,
                                       ),
                                     ),
-                                    const SizedBox(height: 3),
-                                    Text(washEn, style: AppTextStyles.caption.copyWith(color: AppColors.ink)),
-                                    const SizedBox(height: 3),
-                                    Text(washHi, style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              flex: 2,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardSurface,
-                                  borderRadius: BorderRadius.circular(AppRadii.sm),
-                                  border: Border.all(color: AppColors.line),
-                                ),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 58,
-                                      height: 58,
-                                      child: QrImageView(
-                                        data: ondcProfileStub,
-                                        version: QrVersions.auto,
-                                        size: 58.0,
+                                    TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: const Size(50, 24),
+                                        foregroundColor: AppColors.terracotta,
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Scan for ONDC',
-                                      style: AppTextStyles.caption.copyWith(
-                                        fontSize: 9,
-                                        color: AppColors.terracottaDark,
-                                        fontWeight: FontWeight.bold,
+                                      onPressed: () {
+                                        setState(
+                                          () => _isEditingStory =
+                                              !_isEditingStory,
+                                        );
+                                      },
+                                      icon: Icon(
+                                        _isEditingStory
+                                            ? Icons.check
+                                            : Icons.edit,
+                                        size: 14,
+                                      ),
+                                      label: Text(
+                                        _isEditingStory ? 'Done' : 'Edit',
+                                        style: const TextStyle(fontSize: 11),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
+                                if (!_isEditingStory) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _storyEnCtrl.text,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.ink,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _storyHiCtrl.text,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.inkSoft,
+                                    ),
+                                  ),
+                                ] else ...[
+                                  const SizedBox(height: 6),
+                                  TextField(
+                                    controller: _storyEnCtrl,
+                                    maxLines: 2,
+                                    style: AppTextStyles.bodySmall,
+                                    decoration: const InputDecoration(
+                                      labelText: 'English Story',
+                                      isDense: true,
+                                    ),
+                                    onChanged: (_) =>
+                                        _hasCustomizedStory = true,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextField(
+                                    controller: _storyHiCtrl,
+                                    maxLines: 2,
+                                    style: AppTextStyles.bodySmall,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Hindi Story',
+                                      isDense: true,
+                                    ),
+                                    onChanged: (_) =>
+                                        _hasCustomizedStory = true,
+                                  ),
+                                ],
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
 
-                        const SizedBox(height: AppSpacing.md),
+                          const SizedBox(height: AppSpacing.md),
 
-                        // Order info summary
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.order.productTitle,
+                          // Care & QR row
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Container(
+                                  padding: const EdgeInsets.all(AppSpacing.sm),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardSurface,
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.sm,
+                                    ),
+                                    border: Border.all(color: AppColors.line),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'CARE & HANDLING',
+                                        style: AppTextStyles.labelSmall
+                                            .copyWith(
+                                              color: AppColors.terracottaDark,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        washEn,
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.ink,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        washHi,
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.inkSoft,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardSurface,
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.sm,
+                                    ),
+                                    border: Border.all(color: AppColors.line),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        width: 58,
+                                        height: 58,
+                                        child: QrImageView(
+                                          data: ondcProfileStub,
+                                          version: QrVersions.auto,
+                                          size: 58.0,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Scan for ONDC',
+                                        style: AppTextStyles.caption.copyWith(
+                                          fontSize: 9,
+                                          color: AppColors.terracottaDark,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: AppSpacing.md),
+
+                          // Order info summary
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.order.productTitle,
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.ink,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '₹${widget.order.amount.toStringAsFixed(0)}',
                                 style: AppTextStyles.labelSmall.copyWith(
+                                  color: AppColors.terracottaDark,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.ink,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Deliver to: ${widget.order.buyerName}, ${widget.order.buyerLocation}',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.inkSoft,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '₹${widget.order.amount.toStringAsFixed(0)}',
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.terracottaDark,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Deliver to: ${widget.order.buyerName}, ${widget.order.buyerLocation}',
-                          style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: AppSpacing.lg),
-                ],
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                ),
               ),
-            ),
 
-            // Print / Share Action Bar
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: AppButton(
-                label: 'Print / Share Packaging Label',
-                icon: Icons.print_outlined,
-                isLoading: _isGenerating,
-                onPressed: _handlePrint,
+              // Print / Share Action Bar
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: AppButton(
+                  label: 'Print / Share Packaging Label',
+                  icon: Icons.print_outlined,
+                  isLoading: _isGenerating,
+                  onPressed: _handlePrint,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
   }
 }

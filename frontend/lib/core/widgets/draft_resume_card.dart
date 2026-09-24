@@ -21,7 +21,8 @@ class DraftResumeCard extends ConsumerWidget {
     final draft = ref.watch(addProductFlowProvider);
 
     // Only show if there's actual draft content (image or text)
-    final hasDraftContent = draft.originalImagePath.isNotEmpty ||
+    final hasDraftContent =
+        draft.originalImagePath.isNotEmpty ||
         draft.titleEn.isNotEmpty ||
         draft.titleHi.isNotEmpty ||
         draft.descriptionEn.isNotEmpty;

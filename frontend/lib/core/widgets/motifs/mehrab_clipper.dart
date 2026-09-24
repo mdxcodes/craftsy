@@ -17,13 +17,11 @@ import '../../theme/app_colors.dart';
 class MehrabClipper extends CustomClipper<Path> {
   /// Width of each scallop arch
   final double archWidth;
+
   /// Height (depth) of each scallop
   final double archHeight;
 
-  const MehrabClipper({
-    this.archWidth = 30.0,
-    this.archHeight = 18.0,
-  });
+  const MehrabClipper({this.archWidth = 30.0, this.archHeight = 18.0});
 
   @override
   Path getClip(Size size) {
@@ -39,15 +37,14 @@ class MehrabClipper extends CustomClipper<Path> {
       final endX = x + archWidth;
       // Cubic bezier producing a rounded arch (convex downward = scallop)
       path.cubicTo(
-        x, 0,          // control point 1: left shoulder down to 0
-        midX, 0,       // control point 2: peak at 0
-        midX, archHeight, // midpoint back down
+        x,
+        0, // control point 1: left shoulder down to 0
+        midX,
+        0, // control point 2: peak at 0
+        midX,
+        archHeight, // midpoint back down
       );
-      path.cubicTo(
-        midX, archHeight * 0.4,
-        endX, 0,
-        endX, archHeight,
-      );
+      path.cubicTo(midX, archHeight * 0.4, endX, 0, endX, archHeight);
       x += archWidth;
     }
 

@@ -13,14 +13,14 @@ void main() {
   setUpAll(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/shared_preferences'),
-      (MethodCall methodCall) async {
-        if (methodCall.method == 'getAll') {
-          return <String, Object>{};
-        }
-        return true;
-      },
-    );
+          const MethodChannel('plugins.flutter.io/shared_preferences'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'getAll') {
+              return <String, Object>{};
+            }
+            return true;
+          },
+        );
     await EasyLocalization.ensureInitialized();
   });
 
@@ -52,7 +52,9 @@ void main() {
   });
 
   group('TutorialCardWidget', () {
-    testWidgets('renders slide title, icon, and speaker button', (tester) async {
+    testWidgets('renders slide title, icon, and speaker button', (
+      tester,
+    ) async {
       final sampleSlide = TutorialSlidesData.slides[1];
 
       await tester.pumpWidget(
@@ -84,7 +86,9 @@ void main() {
   });
 
   group('TutorialCarouselScreen', () {
-    testWidgets('renders PageView, step badge, and navigation buttons', (tester) async {
+    testWidgets('renders PageView, step badge, and navigation buttons', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         EasyLocalization(
           supportedLocales: const [Locale('en')],
@@ -92,9 +96,7 @@ void main() {
           fallbackLocale: const Locale('en'),
           useOnlyLangCode: true,
           child: const ProviderScope(
-            child: MaterialApp(
-              home: TutorialCarouselScreen(),
-            ),
+            child: MaterialApp(home: TutorialCarouselScreen()),
           ),
         ),
       );

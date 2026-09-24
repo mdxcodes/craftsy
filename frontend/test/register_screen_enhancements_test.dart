@@ -24,77 +24,92 @@ void main() {
     }
   });
 
-  test('English and Hindi localization files contain all new bank and pehchan keys', () {
-    final enFile = File('assets/translations/en.json');
-    final hiFile = File('assets/translations/hi.json');
+  test(
+    'English and Hindi localization files contain all new bank and pehchan keys',
+    () {
+      final enFile = File('assets/translations/en.json');
+      final hiFile = File('assets/translations/hi.json');
 
-    expect(enFile.existsSync(), isTrue);
-    expect(hiFile.existsSync(), isTrue);
+      expect(enFile.existsSync(), isTrue);
+      expect(hiFile.existsSync(), isTrue);
 
-    final enMap = jsonDecode(enFile.readAsStringSync()) as Map<String, dynamic>;
-    final hiMap = jsonDecode(hiFile.readAsStringSync()) as Map<String, dynamic>;
+      final enMap =
+          jsonDecode(enFile.readAsStringSync()) as Map<String, dynamic>;
+      final hiMap =
+          jsonDecode(hiFile.readAsStringSync()) as Map<String, dynamic>;
 
-    final requiredKeys = [
-      'bank_details_title',
-      'bank_details_subtitle',
-      'bank_details_desc',
-      'bank_account_holder_label',
-      'bank_account_holder_hint',
-      'bank_account_number_label',
-      'bank_account_number_hint',
-      'bank_ifsc_label',
-      'bank_ifsc_hint',
-      'bank_name_label',
-      'bank_name_hint',
-      'pehchan_photo_label',
-      'pehchan_photo_desc',
-      'pehchan_photo_attached',
-      'remove_photo',
-      'change_photo',
-    ];
+      final requiredKeys = [
+        'bank_details_title',
+        'bank_details_subtitle',
+        'bank_details_desc',
+        'bank_account_holder_label',
+        'bank_account_holder_hint',
+        'bank_account_number_label',
+        'bank_account_number_hint',
+        'bank_ifsc_label',
+        'bank_ifsc_hint',
+        'bank_name_label',
+        'bank_name_hint',
+        'pehchan_photo_label',
+        'pehchan_photo_desc',
+        'pehchan_photo_attached',
+        'remove_photo',
+        'change_photo',
+      ];
 
-    for (final key in requiredKeys) {
-      expect(enMap.containsKey(key), isTrue, reason: 'Missing $key in en.json');
-      expect(hiMap.containsKey(key), isTrue, reason: 'Missing $key in hi.json');
-      expect((enMap[key] as String).isNotEmpty, isTrue);
-      expect((hiMap[key] as String).isNotEmpty, isTrue);
-    }
-  });
+      for (final key in requiredKeys) {
+        expect(
+          enMap.containsKey(key),
+          isTrue,
+          reason: 'Missing $key in en.json',
+        );
+        expect(
+          hiMap.containsKey(key),
+          isTrue,
+          reason: 'Missing $key in hi.json',
+        );
+        expect((enMap[key] as String).isNotEmpty, isTrue);
+        expect((hiMap[key] as String).isNotEmpty, isTrue);
+      }
+    },
+  );
 
-  testWidgets('Register screen renders Pehchan Card photo options and Bank Details section', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: RegisterScreen(),
-        ),
-      ),
-    );
+  testWidgets(
+    'Register screen renders Pehchan Card photo options and Bank Details section',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(child: MaterialApp(home: RegisterScreen())),
+      );
 
-    await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
 
-    // Verify 9 text fields:
-    // 1: Name, 2: Phone, 3: Cluster, 4: Experience, 5: Pehchan ID
-    // 6: Account Holder, 7: Account Number, 8: IFSC, 9: Bank Name
-    final textFields = find.byType(TextFormField);
-    expect(textFields, findsNWidgets(9));
+      // Verify 9 text fields:
+      // 1: Name, 2: Phone, 3: Cluster, 4: Experience, 5: Pehchan ID
+      // 6: Account Holder, 7: Account Number, 8: IFSC, 9: Bank Name
+      final textFields = find.byType(TextFormField);
+      expect(textFields, findsNWidgets(9));
 
-    // Scroll to see Pehchan Card section and Bank Details
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -500));
-    await tester.pumpAndSettle();
+      // Scroll to see Pehchan Card section and Bank Details
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -500),
+      );
+      await tester.pumpAndSettle();
 
-    // Verify Camera and Gallery buttons are present for Pehchan card photo upload
-    expect(find.byIcon(Icons.camera_alt), findsWidgets);
-    expect(find.byIcon(Icons.photo_library), findsWidgets);
+      // Verify Camera and Gallery buttons are present for Pehchan card photo upload
+      expect(find.byIcon(Icons.camera_alt), findsWidgets);
+      expect(find.byIcon(Icons.photo_library), findsWidgets);
 
-    // Verify Bank Details icons are present
-    expect(find.byIcon(Icons.account_balance_outlined), findsWidgets);
-    expect(find.byIcon(Icons.confirmation_number_outlined), findsOneWidget);
+      // Verify Bank Details icons are present
+      expect(find.byIcon(Icons.account_balance_outlined), findsWidgets);
+      expect(find.byIcon(Icons.confirmation_number_outlined), findsOneWidget);
 
-    // Enter Bank Details
-    await tester.enterText(textFields.at(5), 'Ramesh Kumar');
-    await tester.enterText(textFields.at(6), '987654321098');
-    await tester.enterText(textFields.at(7), 'PUNB0123400');
-    await tester.enterText(textFields.at(8), 'Punjab National Bank');
-    await tester.pump();
-  });
+      // Enter Bank Details
+      await tester.enterText(textFields.at(5), 'Ramesh Kumar');
+      await tester.enterText(textFields.at(6), '987654321098');
+      await tester.enterText(textFields.at(7), 'PUNB0123400');
+      await tester.enterText(textFields.at(8), 'Punjab National Bank');
+      await tester.pump();
+    },
+  );
 }

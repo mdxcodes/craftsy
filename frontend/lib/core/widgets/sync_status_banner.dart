@@ -40,14 +40,26 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
 
     return queueAsync.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (items) {
         if (items.isEmpty) return const SizedBox.shrink();
 
-        final pendingCount = items.where((i) => i.status == QueueStatus.pending).length;
-        final processingCount = items.where((i) => i.status == QueueStatus.uploading || i.status == QueueStatus.processing).length;
-        final failedCount = items.where((i) => i.status == QueueStatus.failed).length;
-        final completedCount = items.where((i) => i.status == QueueStatus.completed).length;
+        final pendingCount = items
+            .where((i) => i.status == QueueStatus.pending)
+            .length;
+        final processingCount = items
+            .where(
+              (i) =>
+                  i.status == QueueStatus.uploading ||
+                  i.status == QueueStatus.processing,
+            )
+            .length;
+        final failedCount = items
+            .where((i) => i.status == QueueStatus.failed)
+            .length;
+        final completedCount = items
+            .where((i) => i.status == QueueStatus.completed)
+            .length;
 
         // Only show pending/processing/failed — not completed
         final activeCount = pendingCount + processingCount + failedCount;
@@ -58,15 +70,21 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
         Color statusColor;
 
         if (failedCount > 0) {
-          statusLabel = 'sync_failed_status'.tr(namedArgs: {'count': '$failedCount'});
+          statusLabel = 'sync_failed_status'.tr(
+            namedArgs: {'count': '$failedCount'},
+          );
           statusIcon = Icons.error_outline_rounded;
           statusColor = AppColors.coral;
         } else if (processingCount > 0) {
-          statusLabel = 'syncing_status'.tr(namedArgs: {'count': '$processingCount'});
+          statusLabel = 'syncing_status'.tr(
+            namedArgs: {'count': '$processingCount'},
+          );
           statusIcon = Icons.sync_rounded;
           statusColor = AppColors.amber;
         } else {
-          statusLabel = 'sync_pending_status'.tr(namedArgs: {'count': '$pendingCount'});
+          statusLabel = 'sync_pending_status'.tr(
+            namedArgs: {'count': '$pendingCount'},
+          );
           statusIcon = Icons.cloud_queue_rounded;
           statusColor = AppColors.indigo;
         }
@@ -86,7 +104,10 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
                 InkWell(
                   onTap: () {
                     setState(() => _expanded = !_expanded);
-                    _ttsService.speak(statusLabel, languageCode: context.locale.languageCode);
+                    _ttsService.speak(
+                      statusLabel,
+                      languageCode: context.locale.languageCode,
+                    );
                   },
                   borderRadius: BorderRadius.circular(AppRadii.card),
                   child: Padding(
@@ -215,12 +236,7 @@ class _QueueItemRow extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: AppSpacing.xs),
-          Expanded(
-            child: Text(
-              label.tr(),
-              style: AppTextStyles.bodySmall,
-            ),
-          ),
+          Expanded(child: Text(label.tr(), style: AppTextStyles.bodySmall)),
           Text(
             '$count',
             style: AppTextStyles.labelMedium.copyWith(color: color),

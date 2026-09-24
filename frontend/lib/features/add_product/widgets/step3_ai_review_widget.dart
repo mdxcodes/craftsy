@@ -42,10 +42,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
   void initState() {
     super.initState();
     final draft = ref.read(addProductFlowProvider);
-    _titleController.text =
-        _selectedLanguageIndex == 0 ? draft.titleEn : draft.titleHi;
-    _descController.text =
-        _selectedLanguageIndex == 0 ? draft.descriptionEn : draft.descriptionHi;
+    _titleController.text = _selectedLanguageIndex == 0
+        ? draft.titleEn
+        : draft.titleHi;
+    _descController.text = _selectedLanguageIndex == 0
+        ? draft.descriptionEn
+        : draft.descriptionHi;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initiateProcessing();
     });
@@ -59,7 +61,8 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
     super.didChangeDependencies();
     if (!_initializedLanguageFromLocale) {
       _initializedLanguageFromLocale = true;
-      final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+      final isHindi =
+          (Localizations.maybeLocaleOf(context)?.languageCode ??
               EasyLocalization.of(context)?.locale.languageCode) ==
           'hi';
       if (isHindi) {
@@ -86,9 +89,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
       final opened = await _tts.openVoiceDownloadScreen();
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -98,13 +99,15 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
     if (!mounted) return;
     final draft = ref.read(addProductFlowProvider);
     if (draft.originalImagePath.isEmpty || draft.currentStep != 2) return;
-    if (draft.isEnhanced && (draft.voiceTranscript.isNotEmpty || draft.recordedAudioPath.isEmpty)) {
+    if (draft.isEnhanced &&
+        (draft.voiceTranscript.isNotEmpty || draft.recordedAudioPath.isEmpty)) {
       return;
     }
     if (_processingDraftId == draft.draftId) return;
     _processingDraftId = draft.draftId;
     final isOnline = ref.read(connectivityProvider).value ?? true;
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
     final localeCode = isHindi ? 'hi' : 'en';
@@ -132,7 +135,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('retake_photo_title'.tr(), style: AppTextStyles.headlineMedium),
+              Text(
+                'retake_photo_title'.tr(),
+                style: AppTextStyles.headlineMedium,
+              ),
               const SizedBox(height: 16),
               ListTile(
                 leading: Container(
@@ -143,13 +149,23 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   child: const Icon(Icons.camera_alt, color: AppColors.indigo),
                 ),
-                title: Text('take_photo'.tr(), style: AppTextStyles.headlineSmall),
-                subtitle: Text('capture_new_photo_sub'.tr(), style: AppTextStyles.bodySmall),
+                title: Text(
+                  'take_photo'.tr(),
+                  style: AppTextStyles.headlineSmall,
+                ),
+                subtitle: Text(
+                  'capture_new_photo_sub'.tr(),
+                  style: AppTextStyles.bodySmall,
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
-                  final img = await picker.pickImage(source: ImageSource.camera);
+                  final img = await picker.pickImage(
+                    source: ImageSource.camera,
+                  );
                   if (img != null) {
-                    await ref.read(addProductFlowProvider.notifier).retakePhoto(File(img.path));
+                    await ref
+                        .read(addProductFlowProvider.notifier)
+                        .retakePhoto(File(img.path));
                   }
                 },
               ),
@@ -163,13 +179,23 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   child: const Icon(Icons.photo_library, color: AppColors.ink),
                 ),
-                title: Text('upload_gallery'.tr(), style: AppTextStyles.headlineSmall),
-                subtitle: Text('choose_gallery_sub'.tr(), style: AppTextStyles.bodySmall),
+                title: Text(
+                  'upload_gallery'.tr(),
+                  style: AppTextStyles.headlineSmall,
+                ),
+                subtitle: Text(
+                  'choose_gallery_sub'.tr(),
+                  style: AppTextStyles.bodySmall,
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
-                  final img = await picker.pickImage(source: ImageSource.gallery);
+                  final img = await picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (img != null) {
-                    await ref.read(addProductFlowProvider.notifier).retakePhoto(File(img.path));
+                    await ref
+                        .read(addProductFlowProvider.notifier)
+                        .retakePhoto(File(img.path));
                   }
                 },
               ),
@@ -200,7 +226,8 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
       final nowOnline = next.value == true;
       if (!wasOffline || !nowOnline) return;
 
-      final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+      final isHindi =
+          (Localizations.maybeLocaleOf(context)?.languageCode ??
               EasyLocalization.of(context)?.locale.languageCode) ==
           'hi';
       final localeCode = isHindi ? 'hi' : 'en';
@@ -210,8 +237,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
     });
 
     ref.listen<AddProductDraft>(addProductFlowProvider, (previous, next) {
-      final currentExpectedTitle =
-          _selectedLanguageIndex == 0 ? next.titleEn : next.titleHi;
+      final currentExpectedTitle = _selectedLanguageIndex == 0
+          ? next.titleEn
+          : next.titleHi;
       if (_titleController.text != currentExpectedTitle &&
           (previous == null ||
               (_selectedLanguageIndex == 0
@@ -220,8 +248,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   currentExpectedTitle)) {
         _titleController.text = currentExpectedTitle;
       }
-      final currentExpectedDesc =
-          _selectedLanguageIndex == 0 ? next.descriptionEn : next.descriptionHi;
+      final currentExpectedDesc = _selectedLanguageIndex == 0
+          ? next.descriptionEn
+          : next.descriptionHi;
       if (_descController.text != currentExpectedDesc &&
           (previous == null ||
               (_selectedLanguageIndex == 0
@@ -241,7 +270,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
       children: [
         SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -283,7 +315,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.7),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Row(
@@ -395,7 +429,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             color: _selectedLanguageIndex == 0
                                 ? AppColors.cardSurface
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppRadii.button),
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.button,
+                            ),
                             boxShadow: _selectedLanguageIndex == 0
                                 ? AppElevation.cardShadow
                                 : null,
@@ -430,7 +466,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             color: _selectedLanguageIndex == 1
                                 ? AppColors.cardSurface
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppRadii.button),
+                            borderRadius: BorderRadius.circular(
+                              AppRadii.button,
+                            ),
                             boxShadow: _selectedLanguageIndex == 1
                                 ? AppElevation.cardShadow
                                 : null,
@@ -459,7 +497,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(
                   labelText: 'product_title_label'.tr(),
-                  labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                  labelStyle: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
                     borderSide: const BorderSide(color: AppColors.line),
@@ -470,7 +510,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.indigo,
+                      width: 1.5,
+                    ),
                   ),
                   filled: true,
                   fillColor: AppColors.cardSurface,
@@ -496,7 +539,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
                 decoration: InputDecoration(
                   labelText: 'product_desc_label'.tr(),
-                  labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+                  labelStyle: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.inkSoft,
+                  ),
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
@@ -508,7 +553,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.indigo,
+                      width: 1.5,
+                    ),
                   ),
                   filled: true,
                   fillColor: AppColors.cardSurface,
@@ -543,8 +591,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     backgroundColor: AppColors.indigoLight,
                     deleteIconColor: AppColors.indigoDark,
                     side: BorderSide.none,
-                    onDeleted: () =>
-                        ref.read(addProductFlowProvider.notifier).removeTag(tag),
+                    onDeleted: () => ref
+                        .read(addProductFlowProvider.notifier)
+                        .removeTag(tag),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadii.button),
                     ),
@@ -559,10 +608,14 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   Expanded(
                     child: TextField(
                       controller: _customTagController,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.ink,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'add_custom_tag_hint'.tr(),
-                        hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkFaint),
+                        hintStyle: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.inkFaint,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 12,
@@ -577,7 +630,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadii.button),
-                          borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: AppColors.indigo,
+                            width: 1.5,
+                          ),
                         ),
                         filled: true,
                         fillColor: AppColors.cardSurface,
@@ -630,8 +686,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               PrimaryActionButton(
                 label: 'looks_good'.tr(),
                 icon: Icons.arrow_forward,
-                onPressed: () =>
-                    ref.read(addProductFlowProvider.notifier).submitForPricingAndAdvance(),
+                onPressed: () => ref
+                    .read(addProductFlowProvider.notifier)
+                    .submitForPricingAndAdvance(),
               ),
               const SizedBox(height: AppSpacing.sm),
 
@@ -643,9 +700,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   if (!isOnline) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          'offline_regenerate_warning'.tr(),
-                        ),
+                        content: Text('offline_regenerate_warning'.tr()),
                       ),
                     );
                     return;
@@ -692,7 +747,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     const SizedBox(height: 22),
                     Text(
                       'ai_regenerating_title'.tr(),
-                      style: AppTextStyles.headlineMedium.copyWith(fontSize: 18),
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        fontSize: 18,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
@@ -778,7 +835,10 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                                 SizedBox(height: 8),
                                 Text(
                                   'Loading enhanced photo...',
-                                  style: TextStyle(fontSize: 12, color: AppColors.inkSoft),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.inkSoft,
+                                  ),
                                 ),
                               ],
                             ),

@@ -25,6 +25,8 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/orders/screens/my_orders_screen.dart';
 import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/orders/models/order.dart';
+import '../../features/commerce/screens/unified_commerce_hub_screen.dart';
+import '../../features/chatbot/screens/chatbot_sheet.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../providers/app_providers.dart';
 
@@ -32,20 +34,15 @@ class RouterNotifier extends ChangeNotifier {
   final Ref _ref;
 
   RouterNotifier(this._ref) {
-    _ref.listen<AuthState>(
-      authStateProvider,
-      (previous, next) {
-        final justLoggedIn = previous?.isAuthenticated != true && next.isAuthenticated;
-        if (justLoggedIn) {
-          _ref.read(homeTabIndexProvider.notifier).state = 0;
-        }
-        notifyListeners();
-      },
-    );
-    _ref.listen<bool>(
-      hasSelectedLanguageProvider,
-      (_, _) => notifyListeners(),
-    );
+    _ref.listen<AuthState>(authStateProvider, (previous, next) {
+      final justLoggedIn =
+          previous?.isAuthenticated != true && next.isAuthenticated;
+      if (justLoggedIn) {
+        _ref.read(homeTabIndexProvider.notifier).state = 0;
+      }
+      notifyListeners();
+    });
+    _ref.listen<bool>(hasSelectedLanguageProvider, (_, _) => notifyListeners());
   }
 }
 
@@ -66,10 +63,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       final isOnSplash = state.matchedLocation == '/splash';
       final isOnLanguage = state.matchedLocation == '/language';
-      final isOnAuth = state.matchedLocation == '/sign-in' ||
-                        state.matchedLocation == '/register' ||
-                        state.matchedLocation == '/otp' ||
-                        state.matchedLocation == '/ngo-auth';
+      final isOnAuth =
+          state.matchedLocation == '/sign-in' ||
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/otp' ||
+          state.matchedLocation == '/ngo-auth';
 
       if (isOnSplash) return null;
 
@@ -198,9 +196,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/assistant',
         name: AppRouteConstants.assistant,
-        builder: (context, state) => const Scaffold(
-          body: SafeArea(child: ChatbotSheet()),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: SafeArea(child: ChatbotSheet())),
       ),
       GoRoute(
         path: '/notifications',
@@ -213,14 +210,36 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MyOrdersScreen(),
       ),
       GoRoute(
+        path: '/commerce-hub',
+        name: AppRouteConstants.commerceHub,
+        builder: (context, state) =>
+            UnifiedCommerceHubScreen(artisanId: 'default_artisan'),
+      ),
+      GoRoute(
+        path: '/inventory',
+        name: AppRouteConstants.inventory,
+        builder: (context, state) =>
+            UnifiedCommerceHubScreen(artisanId: 'default_artisan', initialTab: 3),
+      ),
+      GoRoute(
+        path: '/craftmitra',
+        name: AppRouteConstants.craftMitra,
+        builder: (context, state) {
+          final mode = state.uri.queryParameters['mode'] ?? 'text';
+          return Scaffold(
+            body: SafeArea(
+              child: ChatbotSheet(),
+            ),
+          );
+        },
+      ),
+      GoRoute(
         path: '/orders/:orderId',
         name: AppRouteConstants.orderDetail,
         builder: (context, state) {
           final order = state.extra;
           if (order is! Order) {
-            return Scaffold(
-              body: Center(child: Text('order_not_found'.tr())),
-            );
+            return Scaffold(body: Center(child: Text('order_not_found'.tr())));
           }
           return OrderDetailScreen(order: order);
         },

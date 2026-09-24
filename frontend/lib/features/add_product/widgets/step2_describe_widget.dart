@@ -28,7 +28,8 @@ class Step2DescribeWidget extends ConsumerStatefulWidget {
   const Step2DescribeWidget({super.key});
 
   @override
-  ConsumerState<Step2DescribeWidget> createState() => _Step2DescribeWidgetState();
+  ConsumerState<Step2DescribeWidget> createState() =>
+      _Step2DescribeWidgetState();
 }
 
 class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
@@ -82,13 +83,16 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
       final path = await _recorder.stop();
       if (path != null) {
         final audioFile = File(path);
-        await ref.read(addProductFlowProvider.notifier).queueVoiceRecording(audioFile);
+        await ref
+            .read(addProductFlowProvider.notifier)
+            .queueVoiceRecording(audioFile);
 
         // Immediately trigger real voice pipeline transcription in the background with language auto-detection
-        unawaited(ref.read(addProductFlowProvider.notifier).transcribeVoiceDirectly(
-          audioFile,
-          languageCode: 'auto',
-        ));
+        unawaited(
+          ref
+              .read(addProductFlowProvider.notifier)
+              .transcribeVoiceDirectly(audioFile, languageCode: 'auto'),
+        );
       }
 
       await Future.delayed(const Duration(milliseconds: 1200));
@@ -106,7 +110,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
       final appDir = await getApplicationDocumentsDirectory();
       final recordingDir = Directory('${appDir.path}/offline_sync_recordings');
       await recordingDir.create(recursive: true);
-      final path = '${recordingDir.path}/voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final path =
+          '${recordingDir.path}/voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
       await _recorder.start(
         const RecordConfig(encoder: AudioEncoder.aacLc),
         path: path,
@@ -161,26 +166,11 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
   }
 
   List<GuidanceCue> get _describeCues => [
-    GuidanceCue(
-      text: 'describe_cue_1'.tr(),
-      icon: Icons.mic_none_outlined,
-    ),
-    GuidanceCue(
-      text: 'describe_cue_2'.tr(),
-      icon: Icons.texture_rounded,
-    ),
-    GuidanceCue(
-      text: 'describe_cue_3'.tr(),
-      icon: Icons.handyman_outlined,
-    ),
-    GuidanceCue(
-      text: 'describe_cue_4'.tr(),
-      icon: Icons.scale_outlined,
-    ),
-    GuidanceCue(
-      text: 'describe_cue_5'.tr(),
-      icon: Icons.auto_stories_outlined,
-    ),
+    GuidanceCue(text: 'describe_cue_1'.tr(), icon: Icons.mic_none_outlined),
+    GuidanceCue(text: 'describe_cue_2'.tr(), icon: Icons.texture_rounded),
+    GuidanceCue(text: 'describe_cue_3'.tr(), icon: Icons.handyman_outlined),
+    GuidanceCue(text: 'describe_cue_4'.tr(), icon: Icons.scale_outlined),
+    GuidanceCue(text: 'describe_cue_5'.tr(), icon: Icons.auto_stories_outlined),
   ];
 
   Future<void> _rerecord() async {
@@ -214,10 +204,9 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
         (draft.isEnhanced &&
             draft.enhancedImagePath.isNotEmpty &&
             draft.enhancedImagePath != draft.originalImagePath)) {
-      ref.read(addProductFlowProvider.notifier).submitForAiProcessing(
-        isOnline,
-        languageCode: localeCode,
-      );
+      ref
+          .read(addProductFlowProvider.notifier)
+          .submitForAiProcessing(isOnline, languageCode: localeCode);
       ref.read(addProductFlowProvider.notifier).nextStep();
       return;
     }
@@ -225,11 +214,12 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
     ref.read(addProductFlowProvider.notifier).nextStep();
 
     try {
-      await ref.read(addProductFlowProvider.notifier).enhanceProductImageAndWait();
-      ref.read(addProductFlowProvider.notifier).submitForAiProcessing(
-        isOnline,
-        languageCode: localeCode,
-      );
+      await ref
+          .read(addProductFlowProvider.notifier)
+          .enhanceProductImageAndWait();
+      ref
+          .read(addProductFlowProvider.notifier)
+          .submitForAiProcessing(isOnline, languageCode: localeCode);
     } catch (e) {
       debugPrint('[Step2] Error waiting for image enhancement: $e');
     }
@@ -239,7 +229,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
   Widget build(BuildContext context) {
     ref.listen<AddProductDraft>(addProductFlowProvider, (previous, next) {
       if (next.voiceTranscript.isNotEmpty &&
-          (previous == null || previous.voiceTranscript != next.voiceTranscript)) {
+          (previous == null ||
+              previous.voiceTranscript != next.voiceTranscript)) {
         _textController.text = next.voiceTranscript;
       }
     });
@@ -253,7 +244,10 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
 
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -308,8 +302,12 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                       } else if (hasAudio) {
                         circleColor = AppColors.ink;
                         shadowColor = AppColors.inkFaint;
-                        iconData = _isPlayingAudio ? Icons.pause_rounded : Icons.play_arrow_rounded;
-                        labelText = _isPlayingAudio ? 'audio_playing'.tr() : 'tap_to_replay'.tr();
+                        iconData = _isPlayingAudio
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded;
+                        labelText = _isPlayingAudio
+                            ? 'audio_playing'.tr()
+                            : 'tap_to_replay'.tr();
                       } else {
                         circleColor = AppColors.indigo;
                         shadowColor = AppColors.indigoLight;
@@ -336,14 +334,12 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                iconData,
-                                size: 48,
-                                color: Colors.white,
-                              ),
+                              Icon(iconData, size: 48, color: Colors.white),
                               const SizedBox(height: AppSpacing.xs),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.sm,
+                                ),
                                 child: Text(
                                   labelText,
                                   style: AppTextStyles.labelMedium.copyWith(
@@ -365,12 +361,10 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                 const SizedBox(height: AppSpacing.md),
 
                 // Listening state indicator
-                if (_isRecording)
-                  const ListeningState(),
+                if (_isRecording) const ListeningState(),
 
                 // Processing state indicator
-                if (_showCheckmark)
-                  const app_widgets.ProcessingState(),
+                if (_showCheckmark) const app_widgets.ProcessingState(),
 
                 // Replay button (when audio exists and not recording)
                 if (hasAudio && !_isRecording && !_showCheckmark) ...[
@@ -424,7 +418,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             headerIcon: Icons.lightbulb_outline,
             spokenIntro: 'step2_tts_intro'.tr(),
             cues: _describeCues,
-            isPaused: _isRecording || _isPlayingAudio || _textFocusNode.hasFocus,
+            isPaused:
+                _isRecording || _isPlayingAudio || _textFocusNode.hasFocus,
             onCueChanged: (cue) {},
           ),
 
@@ -439,7 +434,9 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             decoration: InputDecoration(
               hintText: 'type_desc_hint'.tr(),
               labelText: 'transcript_label'.tr(),
-              labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+              labelStyle: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.inkSoft,
+              ),
               alignLabelWithHint: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadii.card),
@@ -451,13 +448,18 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadii.card),
-                borderSide: const BorderSide(color: AppColors.indigo, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.indigo,
+                  width: 1.5,
+                ),
               ),
               filled: true,
               fillColor: AppColors.cardSurface,
             ),
             onChanged: (val) {
-              ref.read(addProductFlowProvider.notifier).setManualDescription(val);
+              ref
+                  .read(addProductFlowProvider.notifier)
+                  .setManualDescription(val);
             },
           ),
 
@@ -469,16 +471,24 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
               decoration: BoxDecoration(
                 color: AppColors.amberLight,
                 borderRadius: BorderRadius.circular(AppRadii.sm),
-                border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.amber.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: AppColors.amberDark, size: 18),
+                  const Icon(
+                    Icons.info_outline,
+                    color: AppColors.amberDark,
+                    size: 18,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'Some words might need review. You can edit the text above.',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.amberDark),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.amberDark,
+                      ),
                     ),
                   ),
                 ],
@@ -494,11 +504,14 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             icon: Icons.arrow_forward,
             onPressed: () {
               final currentDraft = ref.read(addProductFlowProvider);
-              final hasManualDescription = _textController.text.trim().isNotEmpty ||
+              final hasManualDescription =
+                  _textController.text.trim().isNotEmpty ||
                   currentDraft.manualDescription.isNotEmpty;
-              final hasRecordedAudio = currentDraft.recordedAudioPath.isNotEmpty;
+              final hasRecordedAudio =
+                  currentDraft.recordedAudioPath.isNotEmpty;
               final hasTranscript = currentDraft.voiceTranscript.isNotEmpty;
-              final voiceReady = hasRecordedAudio ||
+              final voiceReady =
+                  hasRecordedAudio ||
                   hasTranscript ||
                   currentDraft.voiceQueueItemId == null ||
                   currentDraft.voiceQueueStatus == QueueStatus.completed;

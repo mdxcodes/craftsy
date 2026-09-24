@@ -87,8 +87,9 @@ class _TtsEngine {
 ///    Settings > System > Languages > Text-to-speech > Install voice data.
 class AppTtsService {
   /// Bridge to MainActivity.kt. Android only — iOS manages voices itself.
-  static const MethodChannel _voiceDataChannel =
-      MethodChannel('craftsy/tts_voice_data');
+  static const MethodChannel _voiceDataChannel = MethodChannel(
+    'craftsy/tts_voice_data',
+  );
 
   bool _isSpeaking = false;
   bool get isSpeaking => _isSpeaking;

@@ -31,7 +31,9 @@ class AuthState {
       userId: userId ?? this.userId,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       isLoading: isLoading ?? this.isLoading,
-      pendingRegistration: pendingRegistration != null ? pendingRegistration() : this.pendingRegistration,
+      pendingRegistration: pendingRegistration != null
+          ? pendingRegistration()
+          : this.pendingRegistration,
     );
   }
 }
@@ -57,17 +59,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signInWithPhone(String phoneNumber) async {
-    state = state.copyWith(
-      isLoading: true,
-      pendingRegistration: () => null,
-    );
+    state = state.copyWith(isLoading: true, pendingRegistration: () => null);
     await _authRepository.savePhoneNumber(phoneNumber);
     // Request OTP from backend (if server is reachable)
     await _authRepository.requestOtp(phoneNumber);
-    state = state.copyWith(
-      phoneNumber: phoneNumber,
-      isLoading: false,
-    );
+    state = state.copyWith(phoneNumber: phoneNumber, isLoading: false);
   }
 
   Future<void> registerWithDetails(UserProfile profile) async {
@@ -85,7 +81,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: false);
   }
 
-  Future<bool> verifyOtp(String phoneNumber, String otp, {UserProfile? profileOverride}) async {
+  Future<bool> verifyOtp(
+    String phoneNumber,
+    String otp, {
+    UserProfile? profileOverride,
+  }) async {
     state = state.copyWith(isLoading: true);
 
     final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
@@ -93,17 +93,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     // 1. If registering and not yet assigned a backend ID, attempt registration
     if (registrationProfile != null && registrationProfile.id.isEmpty) {
-      final regResult = await _authRepository.registerArtisan(registrationProfile);
+      final regResult = await _authRepository.registerArtisan(
+        registrationProfile,
+      );
       if (regResult != null) {
         state = state.copyWith(pendingRegistration: () => regResult);
       }
     }
 
     // 2. Call backend /api/v1/auth/verify-otp
-    final (backendProfile, token) = await _authRepository.verifyOtpWithBackend(effectivePhone, otp);
+    final (backendProfile, token) = await _authRepository.verifyOtpWithBackend(
+      effectivePhone,
+      otp,
+    );
 
     // 3. Resolve profile: backend response > pending registration > local fallback
-    final resolvedProfile = backendProfile ??
+    final resolvedProfile =
+        backendProfile ??
         (registrationProfile != null
             ? registrationProfile.copyWith(
                 id: registrationProfile.id.isNotEmpty

@@ -79,6 +79,10 @@ class Product extends HiveObject {
   @HiveField(15)
   final String? statusReason;
 
+  /// Available stock quantity (unified inventory across all channels)
+  @HiveField(16)
+  final int stock;
+
   Product({
     required this.id,
     required this.title,
@@ -96,6 +100,7 @@ class Product extends HiveObject {
     this.statusUpdatedAt,
     this.restockQuantity,
     this.statusReason,
+    this.stock = 0,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// All captured photos in order (primary first), for the review screen's
@@ -130,6 +135,7 @@ class Product extends HiveObject {
     DateTime? statusUpdatedAt,
     int? restockQuantity,
     String? statusReason,
+    int? stock,
   }) {
     return Product(
       id: id ?? this.id,
@@ -148,6 +154,7 @@ class Product extends HiveObject {
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
       restockQuantity: restockQuantity ?? this.restockQuantity,
       statusReason: statusReason ?? this.statusReason,
+      stock: stock ?? this.stock,
     );
   }
 
@@ -169,6 +176,7 @@ class Product extends HiveObject {
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
       'restockQuantity': restockQuantity,
       'statusReason': statusReason,
+      'stock': stock,
     };
   }
 
@@ -192,16 +200,22 @@ class Product extends HiveObject {
     return Product(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      titleHi: json['titleHi'] as String? ?? (json['title_hi'] as String? ?? ''),
+      titleHi:
+          json['titleHi'] as String? ?? (json['title_hi'] as String? ?? ''),
       description: json['description'] as String? ?? '',
-      descriptionHi: json['descriptionHi'] as String? ?? (json['description_hi'] as String? ?? ''),
+      descriptionHi:
+          json['descriptionHi'] as String? ??
+          (json['description_hi'] as String? ?? ''),
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      photoPath: json['photoPath'] as String? ??
+      photoPath:
+          json['photoPath'] as String? ??
           (json['image_url'] as String? ?? (json['imageUrl'] as String? ?? '')),
       category: (json['category'] as String?)?.trim().isNotEmpty == true
           ? (json['category'] as String).trim()
           : 'Handicraft',
-      tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+          [],
       status: ProductStatus.values.firstWhere(
         (e) => e.name == json['status'],
         orElse: () => ProductStatus.draft,
@@ -209,9 +223,11 @@ class Product extends HiveObject {
       createdAt: json['created_at'] != null
           ? (DateTime.tryParse(json['created_at'] as String) ?? DateTime.now())
           : (json['createdAt'] != null
-              ? (DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now())
-              : DateTime.now()),
-      additionalPhotoPaths: (json['additionalPhotoPaths'] as List<dynamic>?)
+                ? (DateTime.tryParse(json['createdAt'] as String) ??
+                      DateTime.now())
+                : DateTime.now()),
+      additionalPhotoPaths:
+          (json['additionalPhotoPaths'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -219,10 +235,11 @@ class Product extends HiveObject {
       statusUpdatedAt: json['statusUpdatedAt'] != null
           ? DateTime.tryParse(json['statusUpdatedAt'] as String)
           : (json['updated_at'] != null
-              ? DateTime.tryParse(json['updated_at'] as String)
-              : null),
+                ? DateTime.tryParse(json['updated_at'] as String)
+                : null),
       restockQuantity: json['restockQuantity'] as int?,
       statusReason: json['statusReason'] as String?,
+      stock: json['stock'] as int? ?? 0,
     );
   }
 }

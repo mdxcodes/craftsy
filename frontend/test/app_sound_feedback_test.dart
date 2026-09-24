@@ -8,33 +8,36 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AppSoundService & AppSoundFeedback Tests', () {
-    test('Service initializes with sensible defaults and volume clamping', () async {
-      final service = AppSoundService.instance;
-      expect(service.isSoundEnabled, isTrue);
-      expect(service.isHapticsEnabled, isTrue);
-      expect(service.volume, 0.35);
+    test(
+      'Service initializes with sensible defaults and volume clamping',
+      () async {
+        final service = AppSoundService.instance;
+        expect(service.isSoundEnabled, isTrue);
+        expect(service.isHapticsEnabled, isTrue);
+        expect(service.volume, 0.35);
 
-      await service.setVolume(1.5);
-      expect(service.volume, 1.0);
+        await service.setVolume(1.5);
+        expect(service.volume, 1.0);
 
-      await service.setVolume(-0.2);
-      expect(service.volume, 0.0);
+        await service.setVolume(-0.2);
+        expect(service.volume, 0.0);
 
-      await service.setVolume(0.35);
-      expect(service.volume, 0.35);
+        await service.setVolume(0.35);
+        expect(service.volume, 0.35);
 
-      await service.setSoundEnabled(false);
-      expect(service.isSoundEnabled, isFalse);
+        await service.setSoundEnabled(false);
+        expect(service.isSoundEnabled, isFalse);
 
-      await service.setSoundEnabled(true);
-      expect(service.isSoundEnabled, isTrue);
+        await service.setSoundEnabled(true);
+        expect(service.isSoundEnabled, isTrue);
 
-      await service.setHapticsEnabled(false);
-      expect(service.isHapticsEnabled, isFalse);
+        await service.setHapticsEnabled(false);
+        expect(service.isHapticsEnabled, isFalse);
 
-      await service.setHapticsEnabled(true);
-      expect(service.isHapticsEnabled, isTrue);
-    });
+        await service.setHapticsEnabled(true);
+        expect(service.isHapticsEnabled, isTrue);
+      },
+    );
 
     test('AppSoundFeedback.wrap executes the underlying callback', () {
       bool called = false;

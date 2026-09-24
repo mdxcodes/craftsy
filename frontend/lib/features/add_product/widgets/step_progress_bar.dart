@@ -29,8 +29,6 @@ class StepProgressBar extends StatelessWidget {
     '✅', // Confirm
   ];
 
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,10 +55,7 @@ class StepProgressBar extends StatelessWidget {
                             dashGap: 4,
                           ),
                         )
-                      : Container(
-                          height: 2,
-                          color: AppColors.line,
-                        ),
+                      : Container(height: 2, color: AppColors.line),
                 ),
               ),
             );
@@ -111,10 +106,7 @@ class StepProgressBar extends StatelessWidget {
                   boxShadow: shadows,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  emoji,
-                  style: const TextStyle(fontSize: 18),
-                ),
+                child: Text(emoji, style: const TextStyle(fontSize: 18)),
               ),
             );
           }

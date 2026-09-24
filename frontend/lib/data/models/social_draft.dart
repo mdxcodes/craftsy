@@ -15,15 +15,18 @@ class SocialDraft {
       draftId: json['draft_id'] as String? ?? '',
       caption: json['caption'] as String? ?? '',
       hashtags:
-          (json['hashtags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+          (json['hashtags'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'draft_id': draftId,
-        'caption': caption,
-        'hashtags': hashtags,
-      };
+    'draft_id': draftId,
+    'caption': caption,
+    'hashtags': hashtags,
+  };
 
   SocialDraft copyWith({
     String? draftId,

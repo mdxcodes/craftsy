@@ -7,10 +7,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../core/services/app_tts_service.dart';
+import '../../../core/services/language_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/speaker_affordance.dart';
+import '../../../core/widgets/voice_state_widget.dart';
 import '../../../core/widgets/motifs/mehrab_clipper.dart';
 import '../../../data/models/chat_message.dart';
 import '../providers/chat_provider.dart';
@@ -43,6 +45,12 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
   int _recordDuration = 0;
   Timer? _recordTimer;
 
+  // Voice interaction state (Bhashini/Whisper)
+  final CraftsyLanguageService _languageService = CraftsyLanguageService();
+  VoiceState _voiceState = VoiceState.idle;
+  String? _voiceTranscript;
+  double _voiceConfidence = 0.0;
+
   // Repeats a CraftMitra reply on tap. One shared engine for the whole
   // conversation — only one message plays at a time — tracked by message id
   // so the correct bubble's icon reflects playback state.
@@ -73,12 +81,15 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       duration: const Duration(milliseconds: 900),
     );
     _tts.onStateChanged = () {
-      if (!_tts.isSpeaking && mounted) setState(() => _speakingMessageId = null);
+      if (!_tts.isSpeaking && mounted)
+        setState(() => _speakingMessageId = null);
     };
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final lang = _getLanguage();
-        ref.read(chatNotifierProvider.notifier).syncLanguage(lang.isNotEmpty ? lang : 'en');
+        ref
+            .read(chatNotifierProvider.notifier)
+            .syncLanguage(lang.isNotEmpty ? lang : 'en');
       }
     });
   }
@@ -110,9 +121,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       final opened = await _tts.openVoiceDownloadScreen();
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -147,7 +156,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
     if (text.isEmpty) return;
 
     final langCode = context.locale.languageCode;
-    ref.read(chatNotifierProvider.notifier).sendMessage(text, languageCode: langCode);
+    ref
+        .read(chatNotifierProvider.notifier)
+        .sendMessage(text, languageCode: langCode);
     _textController.clear();
     _scrollToBottom();
   }
@@ -161,8 +172,8 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
           SnackBar(
             content: Text(
               isHi
-                  ? 'माइक्रोफ़ोन की अनुमति आवश्यक है।'
-                  : 'Microphone permission is required.',
+                  ? 'mic_permission_required'.tr()
+                  : 'mic_permission_required'.tr(),
             ),
           ),
         );
@@ -219,7 +230,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       });
 
       if (path != null && path.isNotEmpty) {
-        ref.read(chatNotifierProvider.notifier).sendVoiceMessage(
+        ref
+            .read(chatNotifierProvider.notifier)
+            .sendVoiceMessage(
               path,
               languageCode: langCode,
               currentScreen: 'chatbot_sheet',
@@ -256,7 +269,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
 
   void _handleSuggestedTap(String query) {
     final langCode = context.locale.languageCode;
-    ref.read(chatNotifierProvider.notifier).sendMessage(query, languageCode: langCode);
+    ref
+        .read(chatNotifierProvider.notifier)
+        .sendMessage(query, languageCode: langCode);
     _scrollToBottom();
   }
 
@@ -305,10 +320,15 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
         children: [
           // ── Header ────────────────────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 10,
+            ),
             decoration: const BoxDecoration(
               color: AppColors.cardSurface,
-              border: Border(bottom: BorderSide(color: AppColors.line, width: 1)),
+              border: Border(
+                bottom: BorderSide(color: AppColors.line, width: 1),
+              ),
             ),
             child: Row(
               children: [
@@ -321,13 +341,13 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.terracotta.withValues(alpha: 0.2),
+                        color: AppColors.indigo.withValues(alpha: 0.2),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
                     ],
                     border: Border.all(
-                      color: AppColors.terracotta.withValues(alpha: 0.3),
+                      color: AppColors.indigo.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
@@ -338,7 +358,11 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                       height: 44,
                       fit: BoxFit.contain,
                       errorBuilder: (_, _, _) => const Center(
-                        child: Icon(Icons.smart_toy_outlined, color: AppColors.terracotta, size: 22),
+                        child: Icon(
+                          Icons.smart_toy_outlined,
+                          color: AppColors.indigo,
+                          size: 22,
+                        ),
                       ),
                     ),
                   ),
@@ -360,11 +384,18 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.successLight,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.success.withValues(alpha: 0.25)),
+                              border: Border.all(
+                                color: AppColors.success.withValues(
+                                  alpha: 0.25,
+                                ),
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -403,17 +434,28 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 ),
                 // Refresh chat
                 IconButton(
-                  icon: const Icon(Icons.refresh_rounded, color: AppColors.inkSoft, size: 20),
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    color: AppColors.inkSoft,
+                    size: 20,
+                  ),
                   tooltip: 'craftmitra_reset'.tr(),
                   onPressed: () {
-                    ref.read(chatNotifierProvider.notifier).clearChat(
-                      EasyLocalization.of(context)?.locale.languageCode ?? 'en',
-                    );
+                    ref
+                        .read(chatNotifierProvider.notifier)
+                        .clearChat(
+                          EasyLocalization.of(context)?.locale.languageCode ??
+                              'en',
+                        );
                   },
                 ),
                 // Close button
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.ink, size: 22),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.ink,
+                    size: 22,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -427,12 +469,21 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               color: AppColors.parchmentDeep.withValues(alpha: 0.4),
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 5,
+                ),
                 itemCount: chatState.quickTopics.length,
                 itemBuilder: (context, index) {
                   final topic = chatState.quickTopics[index];
-                  final label = (isHi ? topic['label_hi'] : topic['label']) ?? topic['label'] ?? '';
-                  final query = (isHi ? topic['query_hi'] : topic['query']) ?? topic['query'] ?? label;
+                  final label =
+                      (isHi ? topic['label_hi'] : topic['label']) ??
+                      topic['label'] ??
+                      '';
+                  final query =
+                      (isHi ? topic['query_hi'] : topic['query']) ??
+                      topic['query'] ??
+                      label;
 
                   return Padding(
                     padding: const EdgeInsets.only(right: 6),
@@ -465,9 +516,11 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               child: ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: chatState.messages.length + (chatState.isLoading ? 1 : 0),
+                itemCount:
+                    chatState.messages.length + (chatState.isLoading ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index == chatState.messages.length && chatState.isLoading) {
+                  if (index == chatState.messages.length &&
+                      chatState.isLoading) {
                     return _buildTypingIndicator();
                   }
 
@@ -477,6 +530,19 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               ),
             ),
           ),
+
+          // ── Voice State Display ───────────────────────────────────────────
+          if (_voiceState != VoiceState.idle)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              child: VoiceStateDisplay(
+                state: _voiceState,
+                message: _voiceTranscript,
+              ),
+            ),
 
           // ── Bottom Input Bar ──────────────────────────────────────────────
           Container(
@@ -512,9 +578,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                             decoration: BoxDecoration(
                               color: AppColors.parchment,
                               borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: AppColors.line,
-                              ),
+                              border: Border.all(color: AppColors.line),
                             ),
                             child: TextField(
                               controller: _textController,
@@ -539,7 +603,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                         // Send text button
                         Container(
                           decoration: const BoxDecoration(
-                            color: AppColors.terracotta,
+                            color: AppColors.indigo,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -562,7 +626,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
 
   Widget _buildMicButton(bool isHi) {
     return Tooltip(
-      message: isHi ? 'बोलकर पूछें (व्हिस्पर)' : 'Speak your question (Whisper)',
+      message: isHi ? 'speak_question'.tr() : 'speak_question'.tr(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -572,16 +636,16 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.terracottaLight.withValues(alpha: 0.2),
+              color: AppColors.indigoLight.withValues(alpha: 0.2),
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.terracotta.withValues(alpha: 0.5),
+                color: AppColors.indigo.withValues(alpha: 0.5),
                 width: 1.2,
               ),
             ),
             child: const Icon(
               Icons.mic_none_rounded,
-              color: AppColors.terracotta,
+              color: AppColors.indigo,
               size: 22,
             ),
           ),
@@ -631,7 +695,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isHi ? 'आवाज़ रिकॉर्ड हो रही है...' : 'Listening to your voice...',
+                  isHi ? 'voice_listening'.tr() : 'voice_listening'.tr(),
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -649,8 +713,12 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
           ),
           // Cancel recording
           IconButton(
-            icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 22),
-            tooltip: isHi ? 'रद्द करें' : 'Cancel',
+            icon: const Icon(
+              Icons.close,
+              color: AppColors.textSecondary,
+              size: 22,
+            ),
+            tooltip: 'voice_recording_cancel'.tr(),
             onPressed: _cancelRecording,
           ),
           const SizedBox(width: 4),
@@ -661,7 +729,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                color: AppColors.terracotta,
+                color: AppColors.indigo,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -686,9 +754,12 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
           children: [
             Flexible(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: const BoxDecoration(
-                  color: AppColors.terracotta,
+                  color: AppColors.indigo,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
@@ -724,7 +795,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.terracotta.withValues(alpha: 0.25),
+                color: AppColors.indigo.withValues(alpha: 0.25),
                 width: 1,
               ),
               boxShadow: const [
@@ -742,9 +813,13 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => Container(
-                  color: AppColors.terracotta,
+                  color: AppColors.indigo,
                   child: const Center(
-                    child: Icon(Icons.smart_toy_outlined, color: AppColors.cardSurface, size: 16),
+                    child: Icon(
+                      Icons.smart_toy_outlined,
+                      color: AppColors.cardSurface,
+                      size: 16,
+                    ),
                   ),
                 ),
               ),
@@ -755,7 +830,10 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
                     borderRadius: const BorderRadius.only(
@@ -814,11 +892,16 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.72,
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.cardSurface,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.terracotta.withValues(alpha: 0.35)),
+                            border: Border.all(
+                              color: AppColors.indigo.withValues(alpha: 0.35),
+                            ),
                             boxShadow: const [
                               BoxShadow(
                                 color: AppColors.shadow,
@@ -830,7 +913,11 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.chat_bubble_outline_rounded, size: 12, color: AppColors.terracotta),
+                              const Icon(
+                                Icons.chat_bubble_outline_rounded,
+                                size: 12,
+                                color: AppColors.indigo,
+                              ),
                               const SizedBox(width: 5),
                               Flexible(
                                 child: Text(
@@ -871,35 +958,34 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
     String subtitle;
     if (isStatus) {
       subtitle = action.isUndone
-          ? (isHi ? 'स्थिति पहले जैसी कर दी गई' : 'Status restored to previous')
-          : (isHi ? 'कैटलॉग में सीधे अपडेट किया गया' : 'Updated directly in your catalogue');
+          ? (isHi ? 'status_restored'.tr() : 'status_restored'.tr())
+          : (isHi ? 'catalogue_updated'.tr() : 'catalogue_updated'.tr());
     } else if (isSync) {
       subtitle = action.isExecuted
-          ? (isHi ? 'सिंक पूरा हुआ • कैटलॉग देखें' : 'Sync completed • Tap to open catalogue')
-          : (isHi ? 'लंबित उत्पाद सिंक करने के लिए टैप करें' : 'Tap to sync pending products now');
+          ? (isHi ? 'sync_completed'.tr() : 'sync_completed'.tr())
+          : (isHi ? 'sync_pending'.tr() : 'sync_pending'.tr());
     } else if (isFilter) {
-      subtitle = isHi ? 'फ़िल्टर किए गए उत्पाद देखने के लिए टैप करें' : 'Tap to view filtered products';
+      subtitle = isHi ? 'filter_products'.tr() : 'filter_products'.tr();
     } else {
-      subtitle = isHi ? 'सीधे इस स्क्रीन पर जाने के लिए टैप करें' : 'Tap to jump directly to this screen';
+      subtitle = isHi ? 'jump_to_screen'.tr() : 'jump_to_screen'.tr();
     }
 
     final bool isSuccessGreen = isStatus && !action.isUndone;
 
     return Container(
       decoration: BoxDecoration(
-        color: isSuccessGreen
-            ? AppColors.successLight
-            : AppColors.cardSurface,
+        color: isSuccessGreen ? AppColors.successLight : AppColors.cardSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isSuccessGreen
               ? AppColors.success
-              : AppColors.terracotta.withValues(alpha: 0.6),
+              : AppColors.indigo.withValues(alpha: 0.6),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isSuccessGreen ? AppColors.success : AppColors.terracotta).withValues(alpha: 0.1),
+            color: (isSuccessGreen ? AppColors.success : AppColors.indigo)
+                .withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -910,7 +996,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            ref.read(chatNotifierProvider.notifier).executeAction(context, action);
+            ref
+                .read(chatNotifierProvider.notifier)
+                .executeAction(context, action);
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -919,7 +1007,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: isSuccessGreen ? AppColors.success : AppColors.terracotta,
+                    color: isSuccessGreen
+                        ? AppColors.success
+                        : AppColors.indigo,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: AppColors.cardSurface, size: 16),
@@ -934,7 +1024,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isSuccessGreen ? AppColors.forestGreenDark : AppColors.terracottaDark,
+                          color: isSuccessGreen
+                              ? AppColors.forestGreenDark
+                              : AppColors.indigoDark,
                         ),
                       ),
                       Text(
@@ -948,35 +1040,46 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                   ),
                 ),
                 // Show Undo button for status update if not yet undone
-                if (isStatus && !action.isUndone && action.updatedProductId != null) ...[
+                if (isStatus &&
+                    !action.isUndone &&
+                    action.updatedProductId != null) ...[
                   const SizedBox(width: 8),
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
                     onTap: () {
-                      ref.read(chatNotifierProvider.notifier).undoProductStatusUpdate(
+                      ref
+                          .read(chatNotifierProvider.notifier)
+                          .undoProductStatusUpdate(
                             msg.id,
                             action.updatedProductId!,
                             action.previousStatus ?? 'live',
                           );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.terracotta, width: 1.2),
+                        border: Border.all(color: AppColors.indigo, width: 1.2),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.undo_rounded, size: 14, color: AppColors.terracotta),
+                          const Icon(
+                            Icons.undo_rounded,
+                            size: 14,
+                            color: AppColors.indigo,
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            context.locale.languageCode == 'hi' ? 'वापस लें' : 'Undo',
+                            'undo'.tr(),
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.terracotta,
+                              color: AppColors.indigo,
                             ),
                           ),
                         ],
@@ -984,7 +1087,11 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                     ),
                   ),
                 ] else
-                  const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.terracotta),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: AppColors.indigo,
+                  ),
               ],
             ),
           ),
@@ -1006,7 +1113,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.terracotta.withValues(alpha: 0.2),
+                color: AppColors.indigo.withValues(alpha: 0.2),
                 width: 1,
               ),
               boxShadow: [
@@ -1024,9 +1131,13 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => Container(
-                  color: AppColors.terracotta,
+                  color: AppColors.indigo,
                   child: const Center(
-                    child: Icon(Icons.smart_toy_outlined, color: AppColors.cream, size: 16),
+                    child: Icon(
+                      Icons.smart_toy_outlined,
+                      color: AppColors.cream,
+                      size: 16,
+                    ),
                   ),
                 ),
               ),
@@ -1060,7 +1171,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       width: 6,
       height: 6,
       decoration: const BoxDecoration(
-        color: AppColors.terracotta,
+        color: AppColors.indigo,
         shape: BoxShape.circle,
       ),
     );

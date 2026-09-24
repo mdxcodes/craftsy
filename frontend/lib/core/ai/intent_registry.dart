@@ -37,6 +37,42 @@ class IntentRegistry {
 
   /// All registered intents.
   static final Map<String, IntentMetadata> _intents = {
+    // ── GeM Government Selling Intents ─────────────────────────────────
+    'SELL_TO_GOVERNMENT': const IntentMetadata(
+      type: 'SELL_TO_GOVERNMENT',
+      descriptionEn: 'Sell a product to the government',
+      descriptionHi: 'सरकार को उत्पाद बेचें',
+      safety: IntentSafety.confirmRequired,
+    ),
+    'CHECK_GEM_READINESS': const IntentMetadata(
+      type: 'CHECK_GEM_READINESS',
+      descriptionEn: 'Check government selling readiness',
+      descriptionHi: 'सरकारी बिक्री तैयारी जांचें',
+    ),
+    'GET_GEM_HELP': const IntentMetadata(
+      type: 'GET_GEM_HELP',
+      descriptionEn: 'Get help with government selling',
+      descriptionHi: 'सरकारी बिक्री में मदद लें',
+    ),
+
+    // ── ONDC Commerce Intents ─────────────────────────────────────────
+    'SELL_ON_ONDC': const IntentMetadata(
+      type: 'SELL_ON_ONDC',
+      descriptionEn: 'Sell a product on ONDC',
+      descriptionHi: 'उत्पाद को ONDC पर बेचें',
+      safety: IntentSafety.confirmRequired,
+    ),
+    'CHECK_ONDC_STATUS': const IntentMetadata(
+      type: 'CHECK_ONDC_STATUS',
+      descriptionEn: 'Check ONDC selling status',
+      descriptionHi: 'ONDC बेचने की स्थिति जांचें',
+    ),
+    'GET_ONDC_HELP': const IntentMetadata(
+      type: 'GET_ONDC_HELP',
+      descriptionEn: 'Get help with ONDC selling',
+      descriptionHi: 'ONDC बेचने में मदद लें',
+    ),
+
     // ── Navigation Intents (SAFE) ──────────────────────────────────────
     'OPEN_HOME': const IntentMetadata(
       type: 'OPEN_HOME',
@@ -183,8 +219,9 @@ class IntentRegistry {
       _intents.values.where((i) => i.safety == IntentSafety.safe).toList();
 
   /// Get all intents requiring confirmation.
-  static List<IntentMetadata> get confirmRequiredIntents =>
-      _intents.values.where((i) => i.safety == IntentSafety.confirmRequired).toList();
+  static List<IntentMetadata> get confirmRequiredIntents => _intents.values
+      .where((i) => i.safety == IntentSafety.confirmRequired)
+      .toList();
 
   /// Get description in the appropriate language.
   static String getDescription(String type, {bool isHindi = false}) {

@@ -158,7 +158,8 @@ class _CyclingGuidanceCueState extends State<CyclingGuidanceCue> {
   void _previousCue() {
     if (widget.cues.isEmpty) return;
     setState(() {
-      _currentIndex = (_currentIndex - 1 + widget.cues.length) % widget.cues.length;
+      _currentIndex =
+          (_currentIndex - 1 + widget.cues.length) % widget.cues.length;
     });
     final cue = widget.cues[_currentIndex];
     // TODO: hook TTS playback here via onCueChanged
@@ -194,9 +195,7 @@ class _CyclingGuidanceCueState extends State<CyclingGuidanceCue> {
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('voice_download_settings_hint'.tr()),
-          ),
+          SnackBar(content: Text('voice_download_settings_hint'.tr())),
         );
       }
     }
@@ -218,11 +217,7 @@ class _CyclingGuidanceCueState extends State<CyclingGuidanceCue> {
           width: 1.2,
         ),
         boxShadow: const [
-          BoxShadow(
-            color: AppColors.line,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: AppColors.line, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -305,7 +300,10 @@ class _CyclingGuidanceCueState extends State<CyclingGuidanceCue> {
                         : () => _onHearAffordanceTap(currentCue),
                     borderRadius: BorderRadius.circular(AppRadii.sm),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 6,
+                      ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 380),
                         transitionBuilder: (child, animation) {
@@ -322,7 +320,9 @@ class _CyclingGuidanceCueState extends State<CyclingGuidanceCue> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.terracotta.withValues(alpha: 0.12),
+                                  color: AppColors.terracotta.withValues(
+                                    alpha: 0.12,
+                                  ),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(

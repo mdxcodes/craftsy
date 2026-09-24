@@ -11,6 +11,8 @@ import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
 import '../../../core/widgets/visual_status_chip.dart';
 import '../../../core/widgets/motifs/craft_category_badge.dart';
+import '../../commerce/widgets/where_i_sell_section.dart';
+import '../../../core/providers/commerce_hub_provider.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
 import '../../social_media/providers/social_media_provider.dart';
@@ -24,15 +26,22 @@ class ProductDetailScreen extends ConsumerWidget {
   void _showEditDialog(BuildContext context, WidgetRef ref, Product product) {
     final titleCtrl = TextEditingController(text: product.title);
     final descCtrl = TextEditingController(text: product.description);
-    final priceCtrl = TextEditingController(text: product.price.toStringAsFixed(0));
+    final priceCtrl = TextEditingController(
+      text: product.price.toStringAsFixed(0),
+    );
 
     showDialog(
       context: context,
       builder: (ctx) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.dialog)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.dialog),
+          ),
           backgroundColor: AppColors.cardSurface,
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding, vertical: AppSpacing.lg),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
+            vertical: AppSpacing.lg,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.cardPadding),
             child: SingleChildScrollView(
@@ -87,11 +96,15 @@ class ProductDetailScreen extends ConsumerWidget {
                         description: descCtrl.text.trim(),
                         price: double.tryParse(priceCtrl.text) ?? product.price,
                       );
-                      await ref.read(productListProvider.notifier).updateProduct(updated);
+                      await ref
+                          .read(productListProvider.notifier)
+                          .updateProduct(updated);
                       if (ctx.mounted) {
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('product_updated_success'.tr())),
+                          SnackBar(
+                            content: Text('product_updated_success'.tr()),
+                          ),
                         );
                       }
                     },
@@ -132,7 +145,11 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showSoldOutDialog(BuildContext context, WidgetRef ref, Product product) {
+  void _showSoldOutDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Product product,
+  ) {
     showAppConfirmationDialog(
       context: context,
       title: 'mark_sold_out_dialog_title'.tr(),
@@ -159,7 +176,11 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showRemoveListingDialog(BuildContext context, WidgetRef ref, Product product) {
+  void _showRemoveListingDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Product product,
+  ) {
     showAppConfirmationDialog(
       context: context,
       title: 'remove_listing_dialog_title'.tr(),
@@ -185,7 +206,11 @@ class ProductDetailScreen extends ConsumerWidget {
             ),
             child: Text(
               '• ${'remove_listing_note_1'.tr()}\n• ${'remove_listing_note_2'.tr()}\n• ${'remove_listing_note_3'.tr()}',
-              style: const TextStyle(fontSize: 13, color: AppColors.inkSoft, height: 1.4),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.inkSoft,
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -209,7 +234,11 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _relistProduct(BuildContext context, WidgetRef ref, Product product) async {
+  Future<void> _relistProduct(
+    BuildContext context,
+    WidgetRef ref,
+    Product product,
+  ) async {
     final updated = product.copyWith(
       status: ProductStatus.live,
       statusUpdatedAt: DateTime.now(),
@@ -229,9 +258,14 @@ class ProductDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadii.dialog)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.dialog),
+        ),
         backgroundColor: AppColors.cardSurface,
-        insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding, vertical: AppSpacing.lg),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+          vertical: AppSpacing.lg,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.cardPadding),
           child: Column(
@@ -247,12 +281,39 @@ class ProductDetailScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.md),
-              Text('• ${'mark_sold_out_dialog_title'.tr()}:', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
-              Text('${'mark_sold_out_dialog_msg'.tr()}\n', style: const TextStyle(color: AppColors.inkSoft)),
-              Text('• ${'remove_listing_dialog_title'.tr()}:', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink)),
-              Text('${'remove_vs_delete_hint'.tr()}\n', style: const TextStyle(color: AppColors.inkSoft)),
-              Text('• ${'delete_product_confirm_title'.tr()}:', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.error)),
-              Text('delete_product_confirm_msg'.tr(), style: const TextStyle(color: AppColors.inkSoft)),
+              Text(
+                '• ${'mark_sold_out_dialog_title'.tr()}:',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.ink,
+                ),
+              ),
+              Text(
+                '${'mark_sold_out_dialog_msg'.tr()}\n',
+                style: const TextStyle(color: AppColors.inkSoft),
+              ),
+              Text(
+                '• ${'remove_listing_dialog_title'.tr()}:',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.ink,
+                ),
+              ),
+              Text(
+                '${'remove_vs_delete_hint'.tr()}\n',
+                style: const TextStyle(color: AppColors.inkSoft),
+              ),
+              Text(
+                '• ${'delete_product_confirm_title'.tr()}:',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.error,
+                ),
+              ),
+              Text(
+                'delete_product_confirm_msg'.tr(),
+                style: const TextStyle(color: AppColors.inkSoft),
+              ),
               const SizedBox(height: AppSpacing.lg),
               AppButton(
                 label: 'understood_btn'.tr(),
@@ -308,7 +369,13 @@ class ProductDetailScreen extends ConsumerWidget {
         isActive: false,
       );
     }
-    if (l.contains('textile') || l.contains('saree') || l.contains('chanderi') || l.contains('silk') || l.contains('cotton') || l.contains('fabric') || l.contains('dupatta')) {
+    if (l.contains('textile') ||
+        l.contains('saree') ||
+        l.contains('chanderi') ||
+        l.contains('silk') ||
+        l.contains('cotton') ||
+        l.contains('fabric') ||
+        l.contains('dupatta')) {
       return CraftCategoryBadge(
         label: category,
         icon: CraftCategoryIcons.textile(),
@@ -329,10 +396,7 @@ class ProductDetailScreen extends ConsumerWidget {
         isActive: false,
       );
     }
-    return CraftCategoryBadge.all(
-      label: category,
-      isActive: false,
-    );
+    return CraftCategoryBadge.all(label: category, isActive: false);
   }
 
   @override
@@ -356,7 +420,11 @@ class ProductDetailScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.coralDark),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.coralDark,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'error_loading_product'.tr(),
@@ -368,7 +436,9 @@ class ProductDetailScreen extends ConsumerWidget {
                   label: 'retry'.tr(),
                   width: 140,
                   onPressed: () {
-                    ref.read(productListProvider.notifier).loadProducts(forceRefresh: true);
+                    ref
+                        .read(productListProvider.notifier)
+                        .loadProducts(forceRefresh: true);
                   },
                 ),
               ],
@@ -380,8 +450,8 @@ class ProductDetailScreen extends ConsumerWidget {
             (p) => p.id == productId,
             orElse: () => Product(
               id: productId,
-              title: 'Craft Product',
-              description: 'No product details found',
+              title: 'product_fallback_title'.tr(),
+              description: 'product_fallback_desc'.tr(),
               price: 0,
               photoPath: '',
               category: 'General',
@@ -399,11 +469,17 @@ class ProductDetailScreen extends ConsumerWidget {
                 backgroundColor: AppColors.background,
                 elevation: 0,
                 leading: Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.screenPadding),
+                  padding: const EdgeInsets.only(
+                    left: AppSpacing.screenPadding,
+                  ),
                   child: Center(
                     child: _CircleHeaderButton(
                       onTap: () => Navigator.of(context).pop(),
-                      child: const Icon(Icons.arrow_back, color: AppColors.ink, size: 20),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.ink,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -412,12 +488,18 @@ class ProductDetailScreen extends ConsumerWidget {
                     child: _CircleHeaderButton(
                       tooltip: 'edit'.tr(),
                       onTap: () => _showEditDialog(context, ref, product),
-                      child: const Icon(Icons.edit_outlined, color: AppColors.ink, size: 19),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.ink,
+                        size: 19,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Padding(
-                    padding: const EdgeInsets.only(right: AppSpacing.screenPadding),
+                    padding: const EdgeInsets.only(
+                      right: AppSpacing.screenPadding,
+                    ),
                     child: Center(
                       child: Container(
                         width: 38,
@@ -430,7 +512,11 @@ class ProductDetailScreen extends ConsumerWidget {
                         ),
                         child: PopupMenuButton<String>(
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.more_vert, color: AppColors.ink, size: 20),
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: AppColors.ink,
+                            size: 20,
+                          ),
                           tooltip: 'listing_actions'.tr(),
                           color: AppColors.cardSurface,
                           shape: RoundedRectangleBorder(
@@ -462,7 +548,11 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'relist',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.refresh, color: AppColors.teal, size: 18),
+                                    const Icon(
+                                      Icons.refresh,
+                                      color: AppColors.teal,
+                                      size: 18,
+                                    ),
                                     const SizedBox(width: 8),
                                     Text('relist_item_btn'.tr()),
                                   ],
@@ -473,7 +563,11 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'sold_out',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.remove_shopping_cart_outlined, color: AppColors.coral, size: 18),
+                                    const Icon(
+                                      Icons.remove_shopping_cart_outlined,
+                                      color: AppColors.coral,
+                                      size: 18,
+                                    ),
                                     const SizedBox(width: 8),
                                     Text('mark_sold_out_btn'.tr()),
                                   ],
@@ -483,7 +577,11 @@ class ProductDetailScreen extends ConsumerWidget {
                                 value: 'remove_listing',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.visibility_off_outlined, color: AppColors.inkSoft, size: 18),
+                                    const Icon(
+                                      Icons.visibility_off_outlined,
+                                      color: AppColors.inkSoft,
+                                      size: 18,
+                                    ),
                                     const SizedBox(width: 8),
                                     Text('remove_listing_btn'.tr()),
                                   ],
@@ -495,7 +593,11 @@ class ProductDetailScreen extends ConsumerWidget {
                               value: 'legend',
                               child: Row(
                                 children: [
-                                  const Icon(Icons.info_outline, size: 18, color: AppColors.inkSoft),
+                                  const Icon(
+                                    Icons.info_outline,
+                                    size: 18,
+                                    color: AppColors.inkSoft,
+                                  ),
                                   const SizedBox(width: 8),
                                   Text('listing_info_btn'.tr()),
                                 ],
@@ -505,9 +607,18 @@ class ProductDetailScreen extends ConsumerWidget {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  const Icon(Icons.delete_outline, color: AppColors.error, size: 18),
+                                  const Icon(
+                                    Icons.delete_outline,
+                                    color: AppColors.error,
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text('delete'.tr(), style: const TextStyle(color: AppColors.error)),
+                                  Text(
+                                    'delete'.tr(),
+                                    style: const TextStyle(
+                                      color: AppColors.error,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -520,11 +631,20 @@ class ProductDetailScreen extends ConsumerWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   background: ColorFiltered(
                     colorFilter: isNonLive
-                        ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                        : const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
+                        ? const ColorFilter.mode(
+                            Colors.grey,
+                            BlendMode.saturation,
+                          )
+                        : const ColorFilter.mode(
+                            Colors.transparent,
+                            BlendMode.multiply,
+                          ),
                     child: Opacity(
                       opacity: isNonLive ? 0.72 : 1.0,
-                      child: AppImage(imageUrl: product.displayPhotoPath, fit: BoxFit.cover),
+                      child: AppImage(
+                        imageUrl: product.displayPhotoPath,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -541,21 +661,34 @@ class ProductDetailScreen extends ConsumerWidget {
                           children: [
                             for (final path in product.allPhotoPaths)
                               Padding(
-                                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                                padding: const EdgeInsets.only(
+                                  right: AppSpacing.xs,
+                                ),
                                 child: Container(
                                   width: 68,
                                   height: 68,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(AppRadii.card),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.card,
+                                    ),
                                     border: Border.all(color: AppColors.line),
                                     boxShadow: AppElevation.cardShadow,
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: ColorFiltered(
                                     colorFilter: isNonLive
-                                        ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                                        : const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
-                                    child: AppImage(imageUrl: path, fit: BoxFit.cover),
+                                        ? const ColorFilter.mode(
+                                            Colors.grey,
+                                            BlendMode.saturation,
+                                          )
+                                        : const ColorFilter.mode(
+                                            Colors.transparent,
+                                            BlendMode.multiply,
+                                          ),
+                                    child: AppImage(
+                                      imageUrl: path,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -571,7 +704,9 @@ class ProductDetailScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (product.category.trim().isNotEmpty) ...[
-                          Flexible(child: _buildCategoryBadge(product.category)),
+                          Flexible(
+                            child: _buildCategoryBadge(product.category),
+                          ),
                           const SizedBox(width: 8),
                         ],
                         VisualStatusChip(
@@ -587,15 +722,24 @@ class ProductDetailScreen extends ConsumerWidget {
                     // Title
                     Builder(
                       builder: (context) {
-                        final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
-                                EasyLocalization.of(context)?.locale.languageCode) ==
+                        final isHindi =
+                            (Localizations.maybeLocaleOf(
+                                  context,
+                                )?.languageCode ??
+                                EasyLocalization.of(
+                                  context,
+                                )?.locale.languageCode) ==
                             'hi';
-                        final primaryTitle = (isHindi && product.titleHi.trim().isNotEmpty)
+                        final primaryTitle =
+                            (isHindi && product.titleHi.trim().isNotEmpty)
                             ? product.titleHi
                             : product.title;
-                        final secondaryTitle = (isHindi && product.titleHi.trim().isNotEmpty)
+                        final secondaryTitle =
+                            (isHindi && product.titleHi.trim().isNotEmpty)
                             ? product.title
-                            : (product.titleHi.trim().isNotEmpty ? product.titleHi : null);
+                            : (product.titleHi.trim().isNotEmpty
+                                  ? product.titleHi
+                                  : null);
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,7 +752,8 @@ class ProductDetailScreen extends ConsumerWidget {
                                 height: 1.25,
                               ),
                             ),
-                            if (secondaryTitle != null && secondaryTitle.isNotEmpty) ...[
+                            if (secondaryTitle != null &&
+                                secondaryTitle.isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Text(
                                 secondaryTitle,
@@ -628,7 +773,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     Text(
                       '₹${product.price.toStringAsFixed(0)}',
                       style: AppTextStyles.headlineLarge.copyWith(
-                        color: isNonLive ? AppColors.inkSoft : AppColors.indigoDark,
+                        color: isNonLive
+                            ? AppColors.inkSoft
+                            : AppColors.indigoDark,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -691,7 +838,8 @@ class ProductDetailScreen extends ConsumerWidget {
                                   child: Text(
                                     'status_updated_at'.tr(
                                       namedArgs: {
-                                        'date': '${product.statusUpdatedAt!.day}/${product.statusUpdatedAt!.month}/${product.statusUpdatedAt!.year}',
+                                        'date':
+                                            '${product.statusUpdatedAt!.day}/${product.statusUpdatedAt!.month}/${product.statusUpdatedAt!.year}',
                                       },
                                     ),
                                     style: AppTextStyles.caption.copyWith(
@@ -711,7 +859,8 @@ class ProductDetailScreen extends ConsumerWidget {
                               label: 'relist_item_btn'.tr(),
                               icon: Icons.refresh,
                               type: AppButtonType.secondary,
-                              onPressed: () => _relistProduct(context, ref, product),
+                              onPressed: () =>
+                                  _relistProduct(context, ref, product),
                             ),
                           ] else ...[
                             IntrinsicHeight(
@@ -720,31 +869,49 @@ class ProductDetailScreen extends ConsumerWidget {
                                 children: [
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () => _showSoldOutDialog(context, ref, product),
+                                      onPressed: () => _showSoldOutDialog(
+                                        context,
+                                        ref,
+                                        product,
+                                      ),
                                       style: OutlinedButton.styleFrom(
-                                        backgroundColor: AppColors.parchmentDeep,
-                                        side: const BorderSide(color: AppColors.line),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(AppRadii.button),
+                                        backgroundColor:
+                                            AppColors.parchmentDeep,
+                                        side: const BorderSide(
+                                          color: AppColors.line,
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            AppRadii.button,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 10,
+                                        ),
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          const Icon(Icons.remove_shopping_cart_outlined, size: 16, color: AppColors.coral),
+                                          const Icon(
+                                            Icons.remove_shopping_cart_outlined,
+                                            size: 16,
+                                            color: AppColors.coral,
+                                          ),
                                           const SizedBox(width: 6),
                                           Flexible(
                                             child: Text(
                                               'mark_sold_out_btn'.tr(),
                                               textAlign: TextAlign.center,
                                               maxLines: 2,
-                                              style: AppTextStyles.labelMedium.copyWith(
-                                                color: AppColors.coral,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                                height: 1.2,
-                                              ),
+                                              style: AppTextStyles.labelMedium
+                                                  .copyWith(
+                                                    color: AppColors.coral,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12,
+                                                    height: 1.2,
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -754,31 +921,49 @@ class ProductDetailScreen extends ConsumerWidget {
                                   const SizedBox(width: AppSpacing.sm),
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () => _showRemoveListingDialog(context, ref, product),
+                                      onPressed: () => _showRemoveListingDialog(
+                                        context,
+                                        ref,
+                                        product,
+                                      ),
                                       style: OutlinedButton.styleFrom(
-                                        backgroundColor: AppColors.parchmentDeep,
-                                        side: const BorderSide(color: AppColors.line),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(AppRadii.button),
+                                        backgroundColor:
+                                            AppColors.parchmentDeep,
+                                        side: const BorderSide(
+                                          color: AppColors.line,
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            AppRadii.button,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 10,
+                                        ),
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          const Icon(Icons.visibility_off_outlined, size: 16, color: AppColors.inkSoft),
+                                          const Icon(
+                                            Icons.visibility_off_outlined,
+                                            size: 16,
+                                            color: AppColors.inkSoft,
+                                          ),
                                           const SizedBox(width: 6),
                                           Flexible(
                                             child: Text(
                                               'remove_listing_btn'.tr(),
                                               textAlign: TextAlign.center,
                                               maxLines: 2,
-                                              style: AppTextStyles.labelMedium.copyWith(
-                                                color: AppColors.inkSoft,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                                height: 1.2,
-                                              ),
+                                              style: AppTextStyles.labelMedium
+                                                  .copyWith(
+                                                    color: AppColors.inkSoft,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12,
+                                                    height: 1.2,
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -793,18 +978,35 @@ class ProductDetailScreen extends ConsumerWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.info_outline, size: 14, color: AppColors.inkFaint),
+                              const Icon(
+                                Icons.info_outline,
+                                size: 14,
+                                color: AppColors.inkFaint,
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   'remove_vs_delete_hint'.tr(),
-                                  style: AppTextStyles.caption.copyWith(color: AppColors.inkFaint, fontSize: 11),
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.inkFaint,
+                                    fontSize: 11,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ],
                       ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Where I Sell — Channel Status Section
+                    WhereISellSection(
+                      productId: product.id,
+                      onRefresh: () {
+                        ref.invalidate(productChannelsProvider(product.id));
+                      },
                     ),
 
                     const SizedBox(height: AppSpacing.md),
@@ -880,10 +1082,15 @@ class ProductDetailScreen extends ConsumerWidget {
                               runSpacing: AppSpacing.xs,
                               children: product.tags.map((tag) {
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: AppColors.parchmentDeep,
-                                    borderRadius: BorderRadius.circular(AppRadii.chip),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.chip,
+                                    ),
                                     border: Border.all(color: AppColors.line),
                                   ),
                                   child: Text(
@@ -906,7 +1113,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     Center(
                       child: Text(
                         '${'created_on'.tr()}: ${product.createdAt.day}/${product.createdAt.month}/${product.createdAt.year}',
-                        style: AppTextStyles.caption.copyWith(color: AppColors.inkFaint),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.inkFaint,
+                        ),
                       ),
                     ),
 
@@ -927,11 +1136,7 @@ class _CircleHeaderButton extends StatelessWidget {
   final VoidCallback? onTap;
   final String? tooltip;
 
-  const _CircleHeaderButton({
-    required this.child,
-    this.onTap,
-    this.tooltip,
-  });
+  const _CircleHeaderButton({required this.child, this.onTap, this.tooltip});
 
   @override
   Widget build(BuildContext context) {

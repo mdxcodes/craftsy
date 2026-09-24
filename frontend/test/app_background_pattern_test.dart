@@ -8,12 +8,12 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('AppBackgroundPattern Tests', () {
-    testWidgets('renders IgnorePointer with ignoring true and Image widget', (tester) async {
+    testWidgets('renders IgnorePointer with ignoring true and Image widget', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: AppBackgroundPattern(opacity: 0.08),
-          ),
+          home: Scaffold(body: AppBackgroundPattern(opacity: 0.08)),
         ),
       );
 
@@ -39,9 +39,7 @@ void main() {
     testWidgets('returns SizedBox.shrink when opacity is 0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: AppBackgroundPattern(opacity: 0.0),
-          ),
+          home: Scaffold(body: AppBackgroundPattern(opacity: 0.0)),
         ),
       );
 
@@ -54,37 +52,40 @@ void main() {
       );
     });
 
-    testWidgets('AppScaffold renders AppBackgroundPattern in body stack by default', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AppScaffold(
-              title: null,
-              body: Text('Screen Content'),
+    testWidgets(
+      'AppScaffold renders AppBackgroundPattern in body stack by default',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: AppScaffold(title: null, body: Text('Screen Content')),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(AppBackgroundPattern), findsOneWidget);
-      expect(find.text('Screen Content'), findsOneWidget);
-    });
+        expect(find.byType(AppBackgroundPattern), findsOneWidget);
+        expect(find.text('Screen Content'), findsOneWidget);
+      },
+    );
 
-    testWidgets('AppScaffold suppresses AppBackgroundPattern when showBackgroundPattern is false', (tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AppScaffold(
-              title: null,
-              showBackgroundPattern: false,
-              body: Text('Screen Content'),
+    testWidgets(
+      'AppScaffold suppresses AppBackgroundPattern when showBackgroundPattern is false',
+      (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: AppScaffold(
+                title: null,
+                showBackgroundPattern: false,
+                body: Text('Screen Content'),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(AppBackgroundPattern), findsNothing);
-      expect(find.text('Screen Content'), findsOneWidget);
-    });
+        expect(find.byType(AppBackgroundPattern), findsNothing);
+        expect(find.text('Screen Content'), findsOneWidget);
+      },
+    );
   });
 }

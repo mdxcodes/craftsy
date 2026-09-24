@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../core/router/app_route_constants.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/providers/app_providers.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../widgets/step_progress_bar.dart';
 import '../widgets/step1_capture_widget.dart';
@@ -111,10 +112,7 @@ class AddProductFlowScreen extends ConsumerWidget {
             },
           ),
           Expanded(
-            child: IndexedStack(
-              index: currentStep,
-              children: steps,
-            ),
+            child: IndexedStack(index: currentStep, children: steps),
           ),
         ],
       ),
@@ -177,7 +175,7 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF8F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -193,10 +191,10 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                       height: 88,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: const Color(0xFFF5EFE6),
+                        color: AppColors.parchment,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFC86D51).withValues(
+                            color: AppColors.indigo.withValues(
                               alpha: 0.18 + 0.22 * _glowAnim.value,
                             ),
                             blurRadius: 20 + 14 * _glowAnim.value,
@@ -208,8 +206,8 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                         widget.icon,
                         size: 38,
                         color: Color.lerp(
-                          const Color(0xFFC86D51),
-                          const Color(0xFFE8956A),
+                          AppColors.indigo,
+                          AppColors.indigoLight,
                           _glowAnim.value,
                         ),
                       ),
@@ -222,8 +220,8 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                   height: 52,
                   child: CircularProgressIndicator(
                     strokeWidth: 4,
-                    color: Color(0xFFC86D51),
-                    backgroundColor: Color(0xFFEBE3D5),
+                    color: AppColors.indigo,
+                    backgroundColor: AppColors.parchmentDeep,
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -236,7 +234,7 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                 Text(
                   widget.subtitle,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: const Color(0xFF7A6E63),
+                    color: AppColors.inkSoft,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -248,7 +246,7 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                   Text(
                     'taking_longer_prompt'.tr(context: context),
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: const Color(0xFF9E8F80),
+                      color: AppColors.inkSoft,
                       fontSize: 12,
                     ),
                     textAlign: TextAlign.center,
@@ -259,18 +257,18 @@ class _FullScreenAiLoadingState extends State<_FullScreenAiLoading>
                     icon: const Icon(
                       Icons.arrow_back,
                       size: 18,
-                      color: Color(0xFF8C533E),
+                      color: AppColors.indigoDark,
                     ),
                     label: Text(
                       'go_back'.tr(context: context),
                       style: const TextStyle(
-                        color: Color(0xFF8C533E),
+                        color: AppColors.indigoDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFD6C7B2)),
-                      backgroundColor: Colors.white,
+                      side: const BorderSide(color: AppColors.parchmentDeep),
+                      backgroundColor: AppColors.cardSurface,
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 20,
@@ -343,8 +341,8 @@ class _AnimatedDotsState extends State<_AnimatedDots>
                 height: 8.0 + 6.0 * bounce,
                 decoration: BoxDecoration(
                   color: Color.lerp(
-                    const Color(0xFFD6C7B2),
-                    const Color(0xFFC86D51),
+                    AppColors.parchmentDeep,
+                    AppColors.indigo,
                     bounce,
                   ),
                   borderRadius: BorderRadius.circular(4),
@@ -393,7 +391,7 @@ class _FullScreenOfflineWaitingState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF8F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -406,16 +404,16 @@ class _FullScreenOfflineWaitingState
                   height: 88,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFFF0EBE3),
+                    color: AppColors.parchmentDeep,
                     border: Border.all(
-                      color: const Color(0xFFD6C7B2),
+                      color: AppColors.parchmentDeep,
                       width: 2,
                     ),
                   ),
                   child: const Icon(
                     Icons.wifi_off_rounded,
                     size: 40,
-                    color: Color(0xFF9E8F80),
+                    color: AppColors.inkSoft,
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -428,7 +426,7 @@ class _FullScreenOfflineWaitingState
                 Text(
                   'offline_photo_saved_desc'.tr(context: context),
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: const Color(0xFF7A6E63),
+                    color: AppColors.inkSoft,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -444,8 +442,8 @@ class _FullScreenOfflineWaitingState
                           Icons.circle,
                           size: 8,
                           color: Color.lerp(
-                            const Color(0xFFD6C7B2),
-                            const Color(0xFF9E8F80),
+                            AppColors.parchmentDeep,
+                            AppColors.inkSoft,
                             _pulseCtrl.value,
                           ),
                         ),
@@ -455,8 +453,8 @@ class _FullScreenOfflineWaitingState
                           style: TextStyle(
                             fontSize: 13,
                             color: Color.lerp(
-                              const Color(0xFFB3A99A),
-                              const Color(0xFF7A6E63),
+                              AppColors.inkFaint,
+                              AppColors.inkSoft,
                               _pulseCtrl.value,
                             ),
                             fontWeight: FontWeight.w500,
@@ -474,18 +472,18 @@ class _FullScreenOfflineWaitingState
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 18,
-                    color: Color(0xFF8C533E),
+                    color: AppColors.indigoDark,
                   ),
                   label: Text(
                     'go_back_and_edit'.tr(context: context),
                     style: const TextStyle(
-                      color: Color(0xFF8C533E),
+                      color: AppColors.indigoDark,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFD6C7B2)),
-                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: AppColors.parchmentDeep),
+                    backgroundColor: AppColors.cardSurface,
                     padding: const EdgeInsets.symmetric(
                       vertical: 12,
                       horizontal: 20,
@@ -514,7 +512,7 @@ class _FullScreenOfflinePricing extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF8F2),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -527,16 +525,16 @@ class _FullScreenOfflinePricing extends ConsumerWidget {
                   height: 88,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFFF0EBE3),
+                    color: AppColors.parchmentDeep,
                     border: Border.all(
-                      color: const Color(0xFFD6C7B2),
+                      color: AppColors.parchmentDeep,
                       width: 2,
                     ),
                   ),
                   child: const Icon(
                     Icons.wifi_off_rounded,
                     size: 40,
-                    color: Color(0xFF9E8F80),
+                    color: AppColors.inkSoft,
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -549,7 +547,7 @@ class _FullScreenOfflinePricing extends ConsumerWidget {
                 Text(
                   'offline_pricing_desc'.tr(context: context),
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: const Color(0xFF7A6E63),
+                    color: AppColors.inkSoft,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -564,18 +562,18 @@ class _FullScreenOfflinePricing extends ConsumerWidget {
                   },
                   icon: const Icon(
                     Icons.arrow_forward,
-                    color: Colors.white,
+                    color: AppColors.cardSurface,
                     size: 18,
                   ),
                   label: Text(
                     'continue_with_estimate'.tr(context: context),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.cardSurface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC86D51),
+                    backgroundColor: AppColors.indigo,
                     padding: const EdgeInsets.symmetric(
                       vertical: 13,
                       horizontal: 24,
@@ -594,18 +592,18 @@ class _FullScreenOfflinePricing extends ConsumerWidget {
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 18,
-                    color: Color(0xFF8C533E),
+                    color: AppColors.indigoDark,
                   ),
                   label: Text(
                     'go_back'.tr(context: context),
                     style: const TextStyle(
-                      color: Color(0xFF8C533E),
+                      color: AppColors.indigoDark,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFD6C7B2)),
-                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: AppColors.parchmentDeep),
+                    backgroundColor: AppColors.cardSurface,
                     padding: const EdgeInsets.symmetric(
                       vertical: 12,
                       horizontal: 24,

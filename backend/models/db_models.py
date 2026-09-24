@@ -8,7 +8,7 @@ Two core tables:
 
 import json
 from datetime import datetime
-from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey, Boolean
+from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey, Boolean, Integer
 from sqlalchemy.orm import relationship
 from ..database import Base
 
@@ -54,6 +54,7 @@ class ProductDB(Base):
     category = Column(String(128), default="General", index=True)
     tags = Column(Text, default="[]")  # JSON encoded list of strings
     status = Column(String(32), default="live", index=True)  # live, draft, archived
+    stock = Column(Integer, default=0)  # Unified inventory — one source of truth
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 

@@ -15,7 +15,8 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
 
@@ -26,7 +27,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
       vsync: this,
       duration: const Duration(milliseconds: 3200), // 3.2s glow pulse loop
     );
-    _scaleAnimation = CurvedAnimation(parent: _animController, curve: Curves.easeOutBack);
+    _scaleAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOutBack,
+    );
     _animController.repeat(reverse: true); // softly pulsing glow
     _navigateToNext();
   }
@@ -62,7 +66,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
               ScaleTransition(
                 scale: _scaleAnimation,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                    vertical: AppSpacing.lg,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(AppRadii.xl),
@@ -84,14 +91,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
               const SizedBox(height: AppSpacing.xl),
               Text(
                 'app_tagline_full'.tr(),
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xxl),
               const SizedBox(
                 width: 32,
                 height: 32,
-                child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.indigo),
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: AppColors.indigo,
+                ),
               ),
             ],
           ),

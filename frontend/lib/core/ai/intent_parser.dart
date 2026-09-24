@@ -23,111 +23,416 @@ class IntentParser {
       return _intent('OPEN_HOME', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['catalogue', 'कैटलॉग', 'catalog', 'सामान', 'saman', 'items', 'inventory', 'stock', 'dukaan', 'दुकान'])) {
+    if (_matchesAny(clean, [
+      'catalogue',
+      'कैटलॉग',
+      'catalog',
+      'सामान',
+      'saman',
+      'items',
+      'inventory',
+      'stock',
+      'dukaan',
+      'दुकान',
+    ])) {
       return _intent('OPEN_CATALOGUE', isHindi: isHindi);
     }
 
     // ── Order Intents ─────────────────────────────────────────────────
     // Check for specific order status check before general order navigation
-    if (_matchesAny(clean, ['order status', 'ऑर्डर स्थिति', 'order check', 'track order', 'tracking']) ||
+    if (_matchesAny(clean, [
+          'order status',
+          'ऑर्डर स्थिति',
+          'order check',
+          'track order',
+          'tracking',
+        ]) ||
         _extractOrderId(clean) != null) {
       final orderId = _extractOrderId(clean);
-      return _intent('CHECK_ORDER_STATUS', parameters: orderId != null ? {'order_id': orderId} : {}, isHindi: isHindi);
+      return _intent(
+        'CHECK_ORDER_STATUS',
+        parameters: orderId != null ? {'order_id': orderId} : {},
+        isHindi: isHindi,
+      );
     }
 
     if (_matchesAny(clean, ['order', 'ऑर्डर', 'orders'])) {
       return _intent('OPEN_ORDERS', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['earning', 'कमाई', 'kamai', 'revenue', 'sales', 'bikri', 'बिक्री', 'income', 'stats', 'statistics', 'आंकड़े'])) {
+    if (_matchesAny(clean, [
+      'earning',
+      'कमाई',
+      'kamai',
+      'revenue',
+      'sales',
+      'bikri',
+      'बिक्री',
+      'income',
+      'stats',
+      'statistics',
+      'आंकड़े',
+    ])) {
       return _intent('OPEN_EARNINGS', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['profile', 'प्रोफ़ाइल', 'account', 'mera profile', 'details', 'pehchan', 'cluster'])) {
+    if (_matchesAny(clean, [
+      'profile',
+      'प्रोफ़ाइल',
+      'account',
+      'mera profile',
+      'details',
+      'pehchan',
+      'cluster',
+    ])) {
       return _intent('OPEN_PROFILE', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['notification', 'नोटिफिकेशन', 'notifications', 'alert', 'alerts'])) {
+    if (_matchesAny(clean, [
+      'notification',
+      'नोटिफिकेशन',
+      'notifications',
+      'alert',
+      'alerts',
+    ])) {
       return _intent('OPEN_NOTIFICATIONS', isHindi: isHindi);
     }
 
     // ── Advanced Assistance Intents (check before CraftMitra) ──────────
-    if (_matchesAny(clean, ['packaging', 'packing', 'पैकेजिंग', 'package', 'pack', 'पैक', 'kaise pack', 'कैसे पैक'])) {
+    if (_matchesAny(clean, [
+      'packaging',
+      'packing',
+      'पैकेजिंग',
+      'package',
+      'pack',
+      'पैक',
+      'kaise pack',
+      'कैसे पैक',
+    ])) {
       return _intent('OPEN_PACKAGING_HELP', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['label', 'लेबल', 'sticker', 'sticker', 'label maker', 'label banao', 'लेबल बनाओ', 'label banana'])) {
+    if (_matchesAny(clean, [
+      'label',
+      'लेबल',
+      'sticker',
+      'sticker',
+      'label maker',
+      'label banao',
+      'लेबल बनाओ',
+      'label banana',
+    ])) {
       return _intent('OPEN_LABEL_MAKER', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['social', 'सोशल', 'share', 'sharing', 'promote', 'promotion'])) {
+    if (_matchesAny(clean, [
+      'social',
+      'सोशल',
+      'share',
+      'sharing',
+      'promote',
+      'promotion',
+    ])) {
       return _intent('OPEN_SOCIAL_HELPER', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['language', 'भाषा', 'bhasha', 'hindi', 'tamil', 'bengali', 'english', 'change language'])) {
+    if (_matchesAny(clean, [
+      'language',
+      'भाषा',
+      'bhasha',
+      'hindi',
+      'tamil',
+      'bengali',
+      'english',
+      'change language',
+    ])) {
       return _intent('OPEN_LANGUAGE_SETTINGS', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['tutorial', 'ट्यूटोरियल', 'guide', 'how to', 'कैसे', 'kaise', 'learn', 'सीखें'])) {
+    if (_matchesAny(clean, [
+      'tutorial',
+      'ट्यूटोरियल',
+      'guide',
+      'how to',
+      'कैसे',
+      'kaise',
+      'learn',
+      'सीखें',
+    ])) {
       return _intent('OPEN_TUTORIAL', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['craftmitra', 'क्राफ्ट-मित्र', 'assistant', 'सहायक', 'help', 'मदद', 'madad'])) {
+    if (_matchesAny(clean, [
+      'craftmitra',
+      'क्राफ्ट-मित्र',
+      'assistant',
+      'सहायक',
+      'help',
+      'मदद',
+      'madad',
+    ])) {
       return _intent('OPEN_CRAFTMITRA', isHindi: isHindi);
     }
 
+    // ── GeM Government Selling Intents ─────────────────────────────────
+    if (_matchesAny(clean, [
+          'sell to government',
+          'sarkar ko becho',
+          'सरकार को बेचो',
+          'sarkari bikri',
+          'सरकारी बिक्री',
+          'gem selling',
+          'gem par becho',
+          'gem bikri',
+        ]) ||
+        (clean.contains('gem') &&
+            (clean.contains('sell') ||
+                clean.contains('becho') ||
+                clean.contains('bikri') ||
+                clean.contains('government') ||
+                clean.contains('sarkar')))) {
+      return _intent('SELL_TO_GOVERNMENT', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, [
+          'gem readiness',
+          'gem ki tayyari',
+          'gem check',
+          'gem kaise chal raha',
+          'sarkari bikri tayyari',
+        ]) ||
+        (clean.contains('gem') &&
+            (clean.contains('ready') ||
+                clean.contains('tayyari') ||
+                clean.contains('check') ||
+                clean.contains('kaise')))) {
+      return _intent('CHECK_GEM_READINESS', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, [
+          'gem help',
+          'gem madad',
+          'gem kaise',
+          'gem guide',
+          'gem setup',
+          'sarkari bikri madad',
+        ]) ||
+        (clean.contains('gem') &&
+            (clean.contains('help') ||
+                clean.contains('madad') ||
+                clean.contains('kaise') ||
+                clean.contains('guide') ||
+                clean.contains('setup')))) {
+      return _intent('GET_GEM_HELP', isHindi: isHindi);
+    }
+
+    // ── ONDC Commerce Intents ─────────────────────────────────────────
+    if (_matchesAny(clean, [
+          'sell on ondc',
+          'ondc par becho',
+          'ONDC पर बेचो',
+          'ondc par dal do',
+          'ONDC पर डाल दो',
+          'ondc par bechna',
+          'ondc par padao',
+        ]) ||
+        (clean.contains('ondc') &&
+            (clean.contains('sell') ||
+                clean.contains('becho') ||
+                clean.contains('dal') ||
+                clean.contains('padao') ||
+                clean.contains('list') ||
+                clean.contains('share')))) {
+      return _intent('SELL_ON_ONDC', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, [
+          'ondc status',
+          'ondc ki sthiti',
+          'ONDC की स्थिति',
+          'ondc check',
+          'ondc kaise chal raha',
+        ]) ||
+        (clean.contains('ondc') &&
+            (clean.contains('status') ||
+                clean.contains('sthiti') ||
+                clean.contains('check') ||
+                clean.contains('kaise')))) {
+      return _intent('CHECK_ONDC_STATUS', isHindi: isHindi);
+    }
+
+    if (_matchesAny(clean, [
+          'ondc help',
+          'ondc madad',
+          'ONDC मदद',
+          'ondc kaise',
+          'ONDC कैसे',
+          'ondc guide',
+          'ondc setup',
+        ]) ||
+        (clean.contains('ondc') &&
+            (clean.contains('help') ||
+                clean.contains('madad') ||
+                clean.contains('kaise') ||
+                clean.contains('guide') ||
+                clean.contains('setup')))) {
+      return _intent('GET_ONDC_HELP', isHindi: isHindi);
+    }
+
     // ── Product Intents ───────────────────────────────────────────────
-    if (_matchesAny(clean, ['add product', 'add a product', 'add new product', 'naya saman', 'नया सामान', 'upload', 'bechna', 'बेचना', 'list', 'jodna', 'जोड़ना', 'create product', 'photo', 'फोटो']) ||
-        (clean.contains('add') && (clean.contains('product') || clean.contains('item') || clean.contains('craft') || clean.contains('saman')))) {
+    if (_matchesAny(clean, [
+          'add product',
+          'add a product',
+          'add new product',
+          'naya saman',
+          'नया सामान',
+          'upload',
+          'bechna',
+          'बेचना',
+          'list',
+          'jodna',
+          'जोड़ना',
+          'create product',
+          'photo',
+          'फोटो',
+        ]) ||
+        (clean.contains('add') &&
+            (clean.contains('product') ||
+                clean.contains('item') ||
+                clean.contains('craft') ||
+                clean.contains('saman')))) {
       return _intent('ADD_PRODUCT', isHindi: isHindi);
     }
 
     // Open specific product: "open X", "show X", "dikhao X", "दिखाओ X"
-    final openProductMatch = _extractProductName(clean, ['open', 'show', 'dikhao', 'दिखाओ', 'kholo', 'खोलो']);
+    final openProductMatch = _extractProductName(clean, [
+      'open',
+      'show',
+      'dikhao',
+      'दिखाओ',
+      'kholo',
+      'खोलो',
+    ]);
     if (openProductMatch != null) {
-      return _intent('OPEN_PRODUCT', parameters: {'product_name': openProductMatch}, isHindi: isHindi);
+      return _intent(
+        'OPEN_PRODUCT',
+        parameters: {'product_name': openProductMatch},
+        isHindi: isHindi,
+      );
     }
 
     // Edit product: "edit X", "change X", "modify X"
-    final editProductMatch = _extractProductName(clean, ['edit', 'change', 'modify', 'संपादित', 'बदलें']);
+    final editProductMatch = _extractProductName(clean, [
+      'edit',
+      'change',
+      'modify',
+      'संपादित',
+      'बदलें',
+    ]);
     if (editProductMatch != null) {
-      return _intent('EDIT_PRODUCT', parameters: {'product_name': editProductMatch}, isHindi: isHindi);
+      return _intent(
+        'EDIT_PRODUCT',
+        parameters: {'product_name': editProductMatch},
+        isHindi: isHindi,
+      );
     }
 
     // Delete product: "delete X", "remove X", "hatao X", "हटाओ X"
-    final deleteProductMatch = _extractProductName(clean, ['delete', 'remove', 'hatao', 'हटाओ', 'hata', 'हटा']);
+    final deleteProductMatch = _extractProductName(clean, [
+      'delete',
+      'remove',
+      'hatao',
+      'हटाओ',
+      'hata',
+      'हटा',
+    ]);
     if (deleteProductMatch != null) {
-      return _intent('DELETE_PRODUCT', parameters: {'product_name': deleteProductMatch}, isHindi: isHindi);
+      return _intent(
+        'DELETE_PRODUCT',
+        parameters: {'product_name': deleteProductMatch},
+        isHindi: isHindi,
+      );
     }
 
     // Check price: "price of X", "cost of X", "kimat X", "कीमत X"
-    final priceMatch = _extractProductName(clean, ['price of', 'cost of', 'kimat', 'कीमत', 'keemat', 'rate of']);
+    final priceMatch = _extractProductName(clean, [
+      'price of',
+      'cost of',
+      'kimat',
+      'कीमत',
+      'keemat',
+      'rate of',
+    ]);
     if (priceMatch != null) {
-      return _intent('CHECK_PRODUCT_PRICE', parameters: {'product_name': priceMatch}, isHindi: isHindi);
+      return _intent(
+        'CHECK_PRODUCT_PRICE',
+        parameters: {'product_name': priceMatch},
+        isHindi: isHindi,
+      );
     }
 
     // ── Order Intents ─────────────────────────────────────────────────
-    if (_matchesAny(clean, ['order status', 'ऑर्डर स्थिति', 'order check', 'track order', 'tracking'])) {
+    if (_matchesAny(clean, [
+      'order status',
+      'ऑर्डर स्थिति',
+      'order check',
+      'track order',
+      'tracking',
+    ])) {
       final orderId = _extractOrderId(clean);
-      return _intent('CHECK_ORDER_STATUS', parameters: orderId != null ? {'order_id': orderId} : {}, isHindi: isHindi);
+      return _intent(
+        'CHECK_ORDER_STATUS',
+        parameters: orderId != null ? {'order_id': orderId} : {},
+        isHindi: isHindi,
+      );
     }
 
     // ── Draft Intents ─────────────────────────────────────────────────
-    if (_matchesAny(clean, ['resume draft', 'continue draft', 'draft', 'ड्राफ्ट', 'adhaura', 'अधूरा'])) {
+    if (_matchesAny(clean, [
+      'resume draft',
+      'continue draft',
+      'draft',
+      'ड्राफ्ट',
+      'adhaura',
+      'अधूरा',
+    ])) {
       return _intent('RESUME_DRAFT', isHindi: isHindi);
     }
 
     // ── App Intents ───────────────────────────────────────────────────
-    if (_matchesAny(clean, ['change language', 'भाषा बदलें', 'language change', 'switch language'])) {
+    if (_matchesAny(clean, [
+      'change language',
+      'भाषा बदलें',
+      'language change',
+      'switch language',
+    ])) {
       return _intent('CHANGE_LANGUAGE', isHindi: isHindi);
     }
 
-    if (_matchesAny(clean, ['logout', 'log out', 'लॉग आउट', 'sign out', 'बाहर निकलें'])) {
+    if (_matchesAny(clean, [
+      'logout',
+      'log out',
+      'लॉग आउट',
+      'sign out',
+      'बाहर निकलें',
+    ])) {
       return _intent('LOGOUT', isHindi: isHindi);
     }
 
     // ── Sync Intents ──────────────────────────────────────────────────
-    if (_matchesAny(clean, ['sync', 'सिंक', 'sync pending', 'sync offline', 'sync now', 'sync products', 'upload offline', 'upload pending', 'pending sync', 'offline sync', 'sync karo'])) {
+    if (_matchesAny(clean, [
+      'sync',
+      'सिंक',
+      'sync pending',
+      'sync offline',
+      'sync now',
+      'sync products',
+      'upload offline',
+      'upload pending',
+      'pending sync',
+      'offline sync',
+      'sync karo',
+    ])) {
       return _intent('SYNC_PENDING', isHindi: isHindi);
     }
 
@@ -137,7 +442,11 @@ class IntentParser {
 
   // ── Helper Methods ──────────────────────────────────────────────────
 
-  static CraftsyIntent _intent(String type, {Map<String, dynamic> parameters = const {}, bool isHindi = false}) {
+  static CraftsyIntent _intent(
+    String type, {
+    Map<String, dynamic> parameters = const {},
+    bool isHindi = false,
+  }) {
     final metadata = IntentRegistry.get(type);
     return CraftsyIntent(
       type: type,
@@ -165,8 +474,17 @@ class IntentParser {
         final after = text.substring(idx + trigger.length).trim();
         // Remove common filler words
         final cleaned = after
-            .replaceAll(RegExp(r'^(my|the|this|mera|meri|ye|apna|apni|ka|ki)\s+', caseSensitive: false), '')
-            .replaceAll(RegExp(r'\s+(please|plz|bhai|yaar)\s*$', caseSensitive: false), '')
+            .replaceAll(
+              RegExp(
+                r'^(my|the|this|mera|meri|ye|apna|apni|ka|ki)\s+',
+                caseSensitive: false,
+              ),
+              '',
+            )
+            .replaceAll(
+              RegExp(r'\s+(please|plz|bhai|yaar)\s*$', caseSensitive: false),
+              '',
+            )
             .trim();
         if (cleaned.isNotEmpty && cleaned.length > 1) {
           return cleaned;
@@ -179,7 +497,10 @@ class IntentParser {
   /// Extract an order ID from text.
   static String? _extractOrderId(String text) {
     // Match patterns like "ORD-1001", "order 1001", "#1001"
-    final match = RegExp(r'(ORD[- ]?(\d+)|order\s+(\d+)|#(\d+))', caseSensitive: false).firstMatch(text);
+    final match = RegExp(
+      r'(ORD[- ]?(\d+)|order\s+(\d+)|#(\d+))',
+      caseSensitive: false,
+    ).firstMatch(text);
     if (match != null) {
       final number = match.group(2) ?? match.group(3) ?? match.group(4);
       if (number != null) {

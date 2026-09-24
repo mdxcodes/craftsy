@@ -4,22 +4,32 @@ enum OrderStatus { newOrder, packed, shipped, delivered, cancelled }
 extension OrderStatusX on OrderStatus {
   String get labelKey {
     switch (this) {
-      case OrderStatus.newOrder:   return 'order_status_new';
-      case OrderStatus.packed:     return 'order_status_packed';
-      case OrderStatus.shipped:    return 'order_status_shipped';
-      case OrderStatus.delivered:  return 'order_status_delivered';
-      case OrderStatus.cancelled:  return 'order_status_cancelled';
+      case OrderStatus.newOrder:
+        return 'order_status_new';
+      case OrderStatus.packed:
+        return 'order_status_packed';
+      case OrderStatus.shipped:
+        return 'order_status_shipped';
+      case OrderStatus.delivered:
+        return 'order_status_delivered';
+      case OrderStatus.cancelled:
+        return 'order_status_cancelled';
     }
   }
 
   /// Returns the next logical status, or null if terminal.
   OrderStatus? get next {
     switch (this) {
-      case OrderStatus.newOrder:  return OrderStatus.packed;
-      case OrderStatus.packed:    return OrderStatus.shipped;
-      case OrderStatus.shipped:   return OrderStatus.delivered;
-      case OrderStatus.delivered: return null;
-      case OrderStatus.cancelled: return null;
+      case OrderStatus.newOrder:
+        return OrderStatus.packed;
+      case OrderStatus.packed:
+        return OrderStatus.shipped;
+      case OrderStatus.shipped:
+        return OrderStatus.delivered;
+      case OrderStatus.delivered:
+        return null;
+      case OrderStatus.cancelled:
+        return null;
     }
   }
 }
@@ -38,6 +48,9 @@ class Order {
   final DateTime placedAt;
   final DateTime? shippedAt;
   final String? trackingId;
+  final String channel;
+  final String? channelLabel;
+  final String? externalOrderId;
 
   const Order({
     required this.id,
@@ -53,11 +66,13 @@ class Order {
     required this.placedAt,
     this.shippedAt,
     this.trackingId,
+    this.channel = 'craftsy',
+    this.channelLabel,
+    this.externalOrderId,
   });
 
-  String get buyerCity => buyerLocation.isNotEmpty
-      ? buyerLocation.split(',').last.trim()
-      : 'India';
+  String get buyerCity =>
+      buyerLocation.isNotEmpty ? buyerLocation.split(',').last.trim() : 'India';
 
   Order copyWith({
     String? id,
@@ -73,6 +88,9 @@ class Order {
     DateTime? placedAt,
     DateTime? shippedAt,
     String? trackingId,
+    String? channel,
+    String? channelLabel,
+    String? externalOrderId,
   }) {
     return Order(
       id: id ?? this.id,
@@ -87,6 +105,9 @@ class Order {
       placedAt: placedAt ?? this.placedAt,
       shippedAt: shippedAt ?? this.shippedAt,
       trackingId: trackingId ?? this.trackingId,
+      channel: channel ?? this.channel,
+      channelLabel: channelLabel ?? this.channelLabel,
+      externalOrderId: externalOrderId ?? this.externalOrderId,
     );
   }
 }

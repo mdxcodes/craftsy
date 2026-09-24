@@ -38,7 +38,9 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
       );
       if (picked != null) {
         debugPrint('[Step1Capture] Image selected: ${picked.path}');
-        await ref.read(addProductFlowProvider.notifier).queueImage(File(picked.path));
+        await ref
+            .read(addProductFlowProvider.notifier)
+            .queueImage(File(picked.path));
       }
     } catch (e, st) {
       debugPrint('[Step1Capture] Image picker error: $e\n$st');
@@ -57,7 +59,9 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
       );
       if (picked != null) {
         debugPrint('[Step1Capture] Additional image selected: ${picked.path}');
-        await ref.read(addProductFlowProvider.notifier).addAdditionalImage(picked.path);
+        await ref
+            .read(addProductFlowProvider.notifier)
+            .addAdditionalImage(picked.path);
       }
     } catch (e, st) {
       debugPrint('[Step1Capture] Additional image error: $e\n$st');
@@ -67,26 +71,11 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
   }
 
   List<GuidanceCue> get _captureCues => [
-    GuidanceCue(
-      text: 'capture_cue_1'.tr(),
-      icon: Icons.touch_app_outlined,
-    ),
-    GuidanceCue(
-      text: 'capture_cue_2'.tr(),
-      icon: Icons.crop_free_rounded,
-    ),
-    GuidanceCue(
-      text: 'capture_cue_3'.tr(),
-      icon: Icons.zoom_in_rounded,
-    ),
-    GuidanceCue(
-      text: 'capture_cue_4'.tr(),
-      icon: Icons.wb_sunny_outlined,
-    ),
-    GuidanceCue(
-      text: 'capture_cue_5'.tr(),
-      icon: Icons.straighten_rounded,
-    ),
+    GuidanceCue(text: 'capture_cue_1'.tr(), icon: Icons.touch_app_outlined),
+    GuidanceCue(text: 'capture_cue_2'.tr(), icon: Icons.crop_free_rounded),
+    GuidanceCue(text: 'capture_cue_3'.tr(), icon: Icons.zoom_in_rounded),
+    GuidanceCue(text: 'capture_cue_4'.tr(), icon: Icons.wb_sunny_outlined),
+    GuidanceCue(text: 'capture_cue_5'.tr(), icon: Icons.straighten_rounded),
   ];
 
   Widget _buildGuidanceCues() {
@@ -125,8 +114,14 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                   ),
                   child: const Icon(Icons.camera_alt, color: AppColors.indigo),
                 ),
-                title: Text('take_photo'.tr(), style: AppTextStyles.headlineSmall),
-                subtitle: Text('capture_new_photo_sub'.tr(), style: AppTextStyles.bodySmall),
+                title: Text(
+                  'take_photo'.tr(),
+                  style: AppTextStyles.headlineSmall,
+                ),
+                subtitle: Text(
+                  'capture_new_photo_sub'.tr(),
+                  style: AppTextStyles.bodySmall,
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.camera);
@@ -142,8 +137,14 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                   ),
                   child: const Icon(Icons.photo_library, color: AppColors.ink),
                 ),
-                title: Text('upload_gallery'.tr(), style: AppTextStyles.headlineSmall),
-                subtitle: Text('choose_gallery_sub'.tr(), style: AppTextStyles.bodySmall),
+                title: Text(
+                  'upload_gallery'.tr(),
+                  style: AppTextStyles.headlineSmall,
+                ),
+                subtitle: Text(
+                  'choose_gallery_sub'.tr(),
+                  style: AppTextStyles.bodySmall,
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.gallery);
@@ -161,13 +162,17 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
   Widget build(BuildContext context) {
     final draft = ref.watch(addProductFlowProvider);
     final hasImage = draft.originalImagePath.isNotEmpty;
-    final displayImagePath = draft.isEnhanced && draft.enhancedImagePath.isNotEmpty
+    final displayImagePath =
+        draft.isEnhanced && draft.enhancedImagePath.isNotEmpty
         ? draft.enhancedImagePath
         : draft.originalImagePath;
 
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -221,7 +226,9 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     child: Text(
                       'capture_instructions'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
@@ -300,17 +307,29 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(AppRadii.sm),
                             border: Border.all(color: AppColors.line),
-                            image: DecorationImage(image: FileImage(File(path)), fit: BoxFit.cover),
+                            image: DecorationImage(
+                              image: FileImage(File(path)),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Positioned(
                           top: 2,
                           right: 10,
                           child: GestureDetector(
-                            onTap: () => ref.read(addProductFlowProvider.notifier).removeAdditionalImage(path),
+                            onTap: () => ref
+                                .read(addProductFlowProvider.notifier)
+                                .removeAdditionalImage(path),
                             child: Container(
-                              decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -332,7 +351,11 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.add_a_photo_outlined, size: 20, color: AppColors.indigo),
+                            const Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 20,
+                              color: AppColors.indigo,
+                            ),
                             const SizedBox(height: 2),
                             Text(
                               'add_another_angle'.tr(),
@@ -355,7 +378,8 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
             AppButton(
               label: 'accept_photo'.tr(),
               icon: Icons.check_circle_outline,
-              onPressed: () => ref.read(addProductFlowProvider.notifier).confirmPhoto(),
+              onPressed: () =>
+                  ref.read(addProductFlowProvider.notifier).confirmPhoto(),
             ),
             const SizedBox(height: AppSpacing.sm),
 

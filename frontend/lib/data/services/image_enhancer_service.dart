@@ -112,13 +112,17 @@ class HttpImageEnhancerService implements ImageEnhancerService {
             debugPrint('[ImageEnhancer] Success: $fullUrl');
             try {
               final appDir = await getApplicationDocumentsDirectory();
-              final localEnhancedDir = Directory('${appDir.path}/enhanced_photos');
+              final localEnhancedDir = Directory(
+                '${appDir.path}/enhanced_photos',
+              );
               await localEnhancedDir.create(recursive: true);
               final filename = fullUrl.split('/').last;
               final localFile = File('${localEnhancedDir.path}/$filename');
               await _dio.download(fullUrl, localFile.path);
               if (await localFile.exists() && await localFile.length() > 0) {
-                debugPrint('[ImageEnhancer] Downloaded locally: ${localFile.path}');
+                debugPrint(
+                  '[ImageEnhancer] Downloaded locally: ${localFile.path}',
+                );
                 return localFile.path;
               }
             } catch (dlErr) {

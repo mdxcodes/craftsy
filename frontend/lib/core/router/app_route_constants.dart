@@ -15,6 +15,9 @@ class AppRouteConstants {
   static const String notifications = 'notifications';
   static const String myOrders = 'myOrders';
   static const String orderDetail = 'orderDetail';
+  static const String commerceHub = 'commerceHub';
+  static const String inventory = 'inventory';
+  static const String craftMitra = 'craftMitra';
 
   static const String productDetail = 'productDetail';
   static const String languageSettings = 'languageSettings';

@@ -3,28 +3,28 @@ import 'package:flutter/material.dart';
 /// Responsive spacing system — 8pt grid
 class AppSpacing {
   // Base spacing units
-  static const double xs   = 4.0;
-  static const double sm   = 8.0;
-  static const double md   = 16.0;
-  static const double lg   = 24.0;
-  static const double xl   = 32.0;
-  static const double xxl  = 48.0;
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 16.0;
+  static const double lg = 24.0;
+  static const double xl = 32.0;
+  static const double xxl = 48.0;
   static const double xxxl = 64.0;
 
   // Semantic spacing
-  static const double screenPadding  = 20.0;
-  static const double cardPadding    = 16.0;
+  static const double screenPadding = 20.0;
+  static const double cardPadding = 16.0;
   static const double sectionSpacing = 24.0;
-  static const double itemSpacing    = 12.0;
+  static const double itemSpacing = 12.0;
 
   // Touch targets — 48dp minimum per WCAG / Material
-  static const double minTouchTarget        = 48.0;
+  static const double minTouchTarget = 48.0;
   static const double minTouchTargetCompact = 40.0;
 
   // Icon sizes
-  static const double iconSize       = 24.0;
-  static const double iconSizeLarge  = 32.0;
-  static const double iconSizeSmall  = 20.0;
+  static const double iconSize = 24.0;
+  static const double iconSizeLarge = 32.0;
+  static const double iconSizeSmall = 20.0;
   static const double iconSizeXLarge = 48.0;
 
   // Responsive screen padding
@@ -68,20 +68,20 @@ class AppSpacing {
 
 /// Soft rounded corners for warm, approachable feel
 class AppRadii {
-  static const double xs         = 4.0;
-  static const double sm         = 8.0;
-  static const double md         = 12.0;
-  static const double lg         = 16.0;
-  static const double xl         = 20.0;
-  static const double xxl        = 24.0;
-  static const double full       = 999.0;
+  static const double xs = 4.0;
+  static const double sm = 8.0;
+  static const double md = 12.0;
+  static const double lg = 16.0;
+  static const double xl = 20.0;
+  static const double xxl = 24.0;
+  static const double full = 999.0;
 
   // Semantic radii — v3 spec
-  static const double button     = 999.0; // fully rounded pill buttons
-  static const double card       = 16.0;
-  static const double chip       = 999.0; // pill chips
+  static const double button = 999.0; // fully rounded pill buttons
+  static const double card = 16.0;
+  static const double chip = 999.0; // pill chips
   static const double bottomSheet = 24.0;
-  static const double dialog     = 20.0;
+  static const double dialog = 20.0;
   static const double inputField = 12.0;
 
   // Responsive card radius
@@ -97,11 +97,11 @@ class AppRadii {
 
 /// Elevation and shadow definitions — v3 warm-toned shadows
 class AppElevation {
-  static const double none    = 0;
-  static const double subtle  = 2;
-  static const double low     = 4;
-  static const double medium  = 8;
-  static const double high    = 12;
+  static const double none = 0;
+  static const double subtle = 2;
+  static const double low = 4;
+  static const double medium = 8;
+  static const double high = 12;
   static const double highest = 16;
 
   /// Resting card shadow — rgba(32,26,24,0.08) shallow and tactile
@@ -127,11 +127,7 @@ class AppElevation {
       spreadRadius: -14,
       offset: Offset(0, 14),
     ),
-    BoxShadow(
-      color: Color(0x14201A18),
-      blurRadius: 8,
-      offset: Offset(0, 3),
-    ),
+    BoxShadow(color: Color(0x14201A18), blurRadius: 8, offset: Offset(0, 3)),
   ];
 
   /// Responsive version (kept for backward compat; returns cardShadow always)

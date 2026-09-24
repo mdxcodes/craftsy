@@ -80,19 +80,25 @@ final socialSharingServiceProvider = Provider<SocialSharingService>((ref) {
   return SocialSharingService();
 });
 
-final socialMediaProvider = StateNotifierProvider.family<
-    SocialMediaNotifier, SocialMediaState, SocialMediaArgs>((ref, args) {
-  return SocialMediaNotifier(ref.watch(socialMediaServiceProvider), args);
-});
+final socialMediaProvider =
+    StateNotifierProvider.family<
+      SocialMediaNotifier,
+      SocialMediaState,
+      SocialMediaArgs
+    >((ref, args) {
+      return SocialMediaNotifier(ref.watch(socialMediaServiceProvider), args);
+    });
 
 class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
   final SocialMediaService _service;
   final SocialMediaArgs args;
 
   SocialMediaNotifier(this._service, this.args)
-      : super(SocialMediaState(
+    : super(
+        SocialMediaState(
           selectedImageUrl: args.allImages.isEmpty ? '' : args.allImages.first,
-        )) {
+        ),
+      ) {
     if (state.selectedImageUrl.isNotEmpty) {
       _loadOrGenerate(state.selectedImageUrl);
     }
@@ -100,7 +106,11 @@ class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
 
   Future<void> _loadOrGenerate(String imageUrl, {String? channel}) async {
     final targetChannel = channel ?? state.currentChannel;
-    state = state.copyWith(isLoading: true, clearError: true, currentChannel: targetChannel);
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+      currentChannel: targetChannel,
+    );
     try {
       final normalizedImageUrl = await _normalizeImage(imageUrl);
       try {
@@ -127,7 +137,10 @@ class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
       }
       await generateForImage(normalizedImageUrl, channel: targetChannel);
     } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _messageFor(error));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _messageFor(error),
+      );
     }
   }
 
@@ -189,14 +202,20 @@ class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
         clearError: true,
       );
     } catch (error) {
-      state = state.copyWith(isLoading: false, errorMessage: _messageFor(error));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _messageFor(error),
+      );
     }
   }
 
   void updateCaption(String caption) {
     final draft = state.draft;
     if (draft == null) return;
-    state = state.copyWith(draft: draft.copyWith(caption: caption), isEdited: true);
+    state = state.copyWith(
+      draft: draft.copyWith(caption: caption),
+      isEdited: true,
+    );
   }
 
   void removeHashtag(String hashtag) {
@@ -214,7 +233,8 @@ class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
     state = state.copyWith(hashtags: hashtags, isEdited: true);
   }
 
-  Future<void> regenerate() => generateForImage(state.selectedImageUrl, channel: state.currentChannel);
+  Future<void> regenerate() =>
+      generateForImage(state.selectedImageUrl, channel: state.currentChannel);
 
   Future<bool> save() async {
     final draft = state.draft;
@@ -238,7 +258,9 @@ class SocialMediaNotifier extends StateNotifier<SocialMediaState> {
   Future<void> copyToClipboard() async {
     final draft = state.draft;
     if (draft == null) return;
-    await Clipboard.setData(ClipboardData(text: '${draft.caption}\n\n${state.hashtags.join(' ')}'));
+    await Clipboard.setData(
+      ClipboardData(text: '${draft.caption}\n\n${state.hashtags.join(' ')}'),
+    );
   }
 
   String _messageFor(Object error) {

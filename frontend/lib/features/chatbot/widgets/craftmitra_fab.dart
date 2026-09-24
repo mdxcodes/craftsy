@@ -51,10 +51,7 @@ class CraftMitraFab extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: Colors.white, width: 1.5),
                     boxShadow: const [
                       BoxShadow(
                         color: AppColors.shadow,
@@ -100,5 +97,3 @@ class CraftMitraFab extends ConsumerWidget {
     );
   }
 }
-
-

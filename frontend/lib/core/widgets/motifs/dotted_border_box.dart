@@ -29,7 +29,7 @@ class DottedBorderBox extends StatelessWidget {
     this.child,
     this.borderColor = AppColors.dottedBorder,
     this.borderWidth = 1.5,
-    this.radius = AppSpacing.md,         // 16dp card radius
+    this.radius = AppSpacing.md, // 16dp card radius
     this.dashLength = 4.0,
     this.dashGap = 4.0,
     this.padding,
@@ -45,12 +45,12 @@ class DottedBorderBox extends StatelessWidget {
     this.borderWidth = 1.5,
     this.dashLength = 5.0,
     this.dashGap = 4.0,
-  })  : child = null,
-        radius = 0,
-        padding = null,
-        backgroundColor = null,
-        width = double.infinity,
-        height = 1;
+  }) : child = null,
+       radius = 0,
+       padding = null,
+       backgroundColor = null,
+       width = double.infinity,
+       height = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -120,15 +120,17 @@ class _DottedBorderPainter extends CustomPainter {
 
     // Rounded-rect dotted border
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          strokeWidth / 2,
-          strokeWidth / 2,
-          size.width - strokeWidth,
-          size.height - strokeWidth,
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            strokeWidth / 2,
+            strokeWidth / 2,
+            size.width - strokeWidth,
+            size.height - strokeWidth,
+          ),
+          Radius.circular(radius),
         ),
-        Radius.circular(radius),
-      ));
+      );
 
     _drawDashedPath(canvas, path, paint);
   }

@@ -24,7 +24,8 @@ class LanguagePicker extends ConsumerWidget {
       context: context,
       builder: (modalContext) {
         final profileLang = ref.read(userProfileProvider).preferredLanguage;
-        final liveLocale = Localizations.maybeLocaleOf(context)?.languageCode ??
+        final liveLocale =
+            Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode ??
             profileLang;
         final currentLocaleCode = liveLocale.isNotEmpty ? liveLocale : 'en';
@@ -52,7 +53,11 @@ class LanguagePicker extends ConsumerWidget {
               ),
               Row(
                 children: [
-                  const Icon(Icons.language, color: AppColors.terracotta, size: 22),
+                  const Icon(
+                    Icons.language,
+                    color: AppColors.terracotta,
+                    size: 22,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
                     'select_language'.tr(),
@@ -70,7 +75,9 @@ class LanguagePicker extends ConsumerWidget {
                   selected: isSelected,
                   label: '${lang['name']} (${lang['native']})',
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+                    constraints: const BoxConstraints(
+                      minHeight: AppSpacing.minTouchTarget,
+                    ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.sm,
@@ -79,8 +86,12 @@ class LanguagePicker extends ConsumerWidget {
                       title: Text(
                         lang['name']!,
                         style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AppColors.terracotta : AppColors.ink,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: isSelected
+                              ? AppColors.terracotta
+                              : AppColors.ink,
                         ),
                       ),
                       subtitle: Text(
@@ -90,21 +101,33 @@ class LanguagePicker extends ConsumerWidget {
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: AppColors.terracotta)
-                          : const Icon(Icons.circle_outlined, color: AppColors.border),
+                          ? const Icon(
+                              Icons.check_circle,
+                              color: AppColors.terracotta,
+                            )
+                          : const Icon(
+                              Icons.circle_outlined,
+                              color: AppColors.border,
+                            ),
                       onTap: () async {
                         final newLocale = Locale(lang['code']!);
                         try {
                           await context.setLocale(newLocale);
-                          debugPrint('setLocale SUCCESS: ${newLocale.languageCode}');
+                          debugPrint(
+                            'setLocale SUCCESS: ${newLocale.languageCode}',
+                          );
                         } catch (e, st) {
                           debugPrint('setLocale ERROR: $e\n$st');
                         }
 
                         // Also update profile state
                         final currentProfile = ref.read(userProfileProvider);
-                        ref.read(userProfileProvider.notifier).updateProfile(
-                              currentProfile.copyWith(preferredLanguage: lang['code']!),
+                        ref
+                            .read(userProfileProvider.notifier)
+                            .updateProfile(
+                              currentProfile.copyWith(
+                                preferredLanguage: lang['code']!,
+                              ),
                             );
 
                         if (modalContext.mounted) {
@@ -125,7 +148,8 @@ class LanguagePicker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileLang = ref.watch(userProfileProvider).preferredLanguage;
-    final liveLocale = Localizations.maybeLocaleOf(context)?.languageCode ??
+    final liveLocale =
+        Localizations.maybeLocaleOf(context)?.languageCode ??
         EasyLocalization.of(context)?.locale.languageCode ??
         profileLang;
     final currentCode = liveLocale.isNotEmpty ? liveLocale : 'en';
@@ -159,14 +183,22 @@ class LanguagePicker extends ConsumerWidget {
             mainAxisSize: isCompact ? MainAxisSize.min : MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.language, size: AppSpacing.iconSize, color: AppColors.terracotta),
+              const Icon(
+                Icons.language,
+                size: AppSpacing.iconSize,
+                color: AppColors.terracotta,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 '${currentLang['native']} (${currentLang['name']})',
                 style: AppTextStyles.labelMedium,
               ),
               const SizedBox(width: AppSpacing.xs),
-              const Icon(Icons.arrow_drop_down, size: AppSpacing.iconSize, color: AppColors.textSecondary),
+              const Icon(
+                Icons.arrow_drop_down,
+                size: AppSpacing.iconSize,
+                color: AppColors.textSecondary,
+              ),
             ],
           ),
         ),

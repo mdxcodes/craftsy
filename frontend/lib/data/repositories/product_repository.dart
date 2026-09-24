@@ -9,7 +9,7 @@ class ProductRepository {
   static const String _pendingBoxName = 'pending_sync_box';
 
   ProductRepository({ApiService? apiService})
-      : _apiService = apiService ?? MockApiService();
+    : _apiService = apiService ?? MockApiService();
 
   Box<Product> _getProductsBox() {
     return Hive.box<Product>(_productsBoxName);
@@ -20,7 +20,10 @@ class ProductRepository {
   }
 
   /// Get all products - Hive is the instant source of truth
-  Future<List<Product>> getProducts({bool forceRefresh = false, bool isOnline = true}) async {
+  Future<List<Product>> getProducts({
+    bool forceRefresh = false,
+    bool isOnline = true,
+  }) async {
     final box = _getProductsBox();
     final pendingBox = _getPendingBox();
 
@@ -35,7 +38,9 @@ class ProductRepository {
           }
         }
       } catch (e) {
-        debugPrint('ProductRepository: Remote fetch failed, using local cache: $e');
+        debugPrint(
+          'ProductRepository: Remote fetch failed, using local cache: $e',
+        );
       }
     }
 
@@ -50,7 +55,11 @@ class ProductRepository {
   }
 
   /// Add product - Writes to Hive first, queues for sync if offline or sync fails
-  Future<Product> addProduct(Product product, {bool isOnline = true, String? artisanId}) async {
+  Future<Product> addProduct(
+    Product product, {
+    bool isOnline = true,
+    String? artisanId,
+  }) async {
     final productsBox = _getProductsBox();
     final pendingBox = _getPendingBox();
 
@@ -60,13 +69,21 @@ class ProductRepository {
 
     if (isOnline) {
       try {
-        final onlineProduct = product.copyWith(id: id, status: ProductStatus.live);
-        final created = await _apiService.createProduct(onlineProduct, artisanId: artisanId);
+        final onlineProduct = product.copyWith(
+          id: id,
+          status: ProductStatus.live,
+        );
+        final created = await _apiService.createProduct(
+          onlineProduct,
+          artisanId: artisanId,
+        );
         await productsBox.put(created.id, created);
         await pendingBox.delete(created.id);
         return created;
       } catch (e) {
-        debugPrint('ProductRepository: Online create failed, saving to pending queue: $e');
+        debugPrint(
+          'ProductRepository: Online create failed, saving to pending queue: $e',
+        );
       }
     }
 
@@ -96,12 +113,16 @@ class ProductRepository {
         await pendingBox.delete(product.id);
         return saved;
       } catch (e) {
-        debugPrint('ProductRepository: Online update failed, saving to pending queue: $e');
+        debugPrint(
+          'ProductRepository: Online update failed, saving to pending queue: $e',
+        );
       }
     }
 
     final localProduct = product.copyWith(
-      status: product.status == ProductStatus.live ? ProductStatus.pendingSync : product.status,
+      status: product.status == ProductStatus.live
+          ? ProductStatus.pendingSync
+          : product.status,
     );
     await productsBox.put(localProduct.id, localProduct);
     await pendingBox.put(localProduct.id, 'UPDATE');
@@ -149,7 +170,10 @@ class ProductRepository {
           if (product != null) {
             if (action == 'CREATE') {
               final created = await _apiService.createProduct(product);
-              await productsBox.put(id, created.copyWith(status: ProductStatus.live));
+              await productsBox.put(
+                id,
+                created.copyWith(status: ProductStatus.live),
+              );
             } else {
               final updated = await _apiService.updateProduct(product);
               final targetStatus = product.status == ProductStatus.pendingSync

@@ -35,7 +35,9 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
     setState(() => _isSubmitting = true);
     final coordinatorId = _coordinatorIdController.text.trim();
 
-    await ref.read(authStateProvider.notifier).signInWithCoordinator(coordinatorId);
+    await ref
+        .read(authStateProvider.notifier)
+        .signInWithCoordinator(coordinatorId);
 
     if (mounted) {
       setState(() => _isSubmitting = false);
@@ -126,7 +128,9 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                      ),
                       child: Text(
                         'qr_placeholder_label'.tr(),
                         style: AppTextStyles.labelSmall.copyWith(
@@ -184,7 +188,9 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
               children: [
                 const Expanded(child: Divider(color: AppColors.line)),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
                   child: Text(
                     'or_enter_coordinator_id'.tr(),
                     style: AppTextStyles.labelSmall.copyWith(
@@ -206,13 +212,22 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                 children: [
                   TextFormField(
                     controller: _coordinatorIdController,
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.ink,
+                    ),
                     decoration: InputDecoration(
                       labelText: 'coordinator_id_label'.tr(),
                       hintText: 'coordinator_id_hint'.tr(),
-                      labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
-                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkFaint),
-                      prefixIcon: const Icon(Icons.badge_outlined, color: AppColors.terracotta),
+                      labelStyle: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.inkSoft,
+                      ),
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.inkFaint,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.badge_outlined,
+                        color: AppColors.terracotta,
+                      ),
                       filled: true,
                       fillColor: AppColors.cardSurface,
                       contentPadding: const EdgeInsets.symmetric(
@@ -221,15 +236,24 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+                        borderSide: const BorderSide(
+                          color: AppColors.line,
+                          width: 1.5,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+                        borderSide: const BorderSide(
+                          color: AppColors.line,
+                          width: 1.5,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(color: AppColors.terracotta, width: 2),
+                        borderSide: const BorderSide(
+                          color: AppColors.terracotta,
+                          width: 2,
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -241,7 +265,9 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

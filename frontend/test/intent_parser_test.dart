@@ -74,8 +74,14 @@ void main() {
     });
 
     test('returns localized descriptions', () {
-      final enDesc = IntentRegistry.getDescription('OPEN_ORDERS', isHindi: false);
-      final hiDesc = IntentRegistry.getDescription('OPEN_ORDERS', isHindi: true);
+      final enDesc = IntentRegistry.getDescription(
+        'OPEN_ORDERS',
+        isHindi: false,
+      );
+      final hiDesc = IntentRegistry.getDescription(
+        'OPEN_ORDERS',
+        isHindi: true,
+      );
 
       expect(enDesc, 'Open my orders');
       expect(hiDesc, 'मेरे ऑर्डर खोलें');

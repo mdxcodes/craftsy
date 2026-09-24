@@ -64,6 +64,7 @@ class ProductBase(BaseModel):
     category: str = Field(default="General", description="Craft category")
     tags: List[str] = Field(default_factory=list, description="Search and catalog tags")
     status: str = Field(default="live", description="Status: live, draft, archived")
+    stock: int = Field(default=0, ge=0, description="Available stock (unified inventory)")
 
 
 class ProductCreate(ProductBase):
@@ -82,6 +83,7 @@ class ProductUpdate(BaseModel):
     category: Optional[str] = None
     tags: Optional[List[str]] = None
     status: Optional[str] = None
+    stock: Optional[int] = None
 
 
 class ProductResponse(ProductBase):
@@ -91,6 +93,7 @@ class ProductResponse(ProductBase):
     artisan_id: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+    stock: int = 0
 
 
 class ProductSyncBatch(BaseModel):

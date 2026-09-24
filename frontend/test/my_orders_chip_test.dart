@@ -6,26 +6,32 @@ import 'package:craftsy/features/orders/providers/orders_provider.dart';
 import 'package:craftsy/features/orders/models/order.dart';
 
 void main() {
-  testWidgets('My Orders filter chips hug text tightly and default to New tab', (tester) async {
+  testWidgets('My Orders filter chips hug text tightly and default to New tab', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const ProviderScope(
-        child: MaterialApp(
-          home: Scaffold(
-            body: MyOrdersScreen(),
-          ),
-        ),
+        child: MaterialApp(home: Scaffold(body: MyOrdersScreen())),
       ),
     );
     await tester.pumpAndSettle();
 
     // Verify initial filter is OrderStatus.newOrder
-    final container = ProviderScope.containerOf(tester.element(find.byType(MyOrdersScreen)));
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MyOrdersScreen)),
+    );
     expect(container.read(selectedOrderFilterProvider), OrderStatus.newOrder);
 
     // Find ChoiceChips
     final newChipFinder = find.widgetWithText(ChoiceChip, 'order_status_new');
-    final deliveredChipFinder = find.widgetWithText(ChoiceChip, 'order_status_delivered');
-    final cancelledChipFinder = find.widgetWithText(ChoiceChip, 'order_status_cancelled');
+    final deliveredChipFinder = find.widgetWithText(
+      ChoiceChip,
+      'order_status_delivered',
+    );
+    final cancelledChipFinder = find.widgetWithText(
+      ChoiceChip,
+      'order_status_cancelled',
+    );
 
     expect(newChipFinder, findsOneWidget);
     expect(deliveredChipFinder, findsOneWidget);

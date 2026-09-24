@@ -14,9 +14,7 @@ class SocialMediaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.parchment,
-      body: SafeArea(
-        child: SocialMediaLaunchpadSheet(args: args),
-      ),
+      body: SafeArea(child: SocialMediaLaunchpadSheet(args: args)),
     );
   }
 }

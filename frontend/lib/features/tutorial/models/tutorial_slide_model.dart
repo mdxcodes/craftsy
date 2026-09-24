@@ -54,11 +54,7 @@ class TutorialSlidesData {
       ttsKey: 'slide2_tts',
       icon: Icons.camera_alt_rounded,
       accentColor: AppColors.mustard,
-      highlights: [
-        'Morning Daylight',
-        'Clean Background',
-        '2–3 Angles',
-      ],
+      highlights: ['Morning Daylight', 'Clean Background', '2–3 Angles'],
     ),
     // ── Slide 3: Step 2 — Voice Story ───────────────────────────────────
     TutorialSlideModel(
@@ -114,11 +110,7 @@ class TutorialSlidesData {
       ttsKey: 'slide6_tts',
       icon: Icons.record_voice_over_rounded,
       accentColor: AppColors.gold,
-      highlights: [
-        'Ask in Your Language',
-        'Pricing Advice',
-        'Pehchan ID Help',
-      ],
+      highlights: ['Ask in Your Language', 'Pricing Advice', 'Pehchan ID Help'],
     ),
     // ── Slide 7: Step 6 — Orders & Analytics (NEW) ──────────────────────
     TutorialSlideModel(

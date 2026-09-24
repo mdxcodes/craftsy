@@ -40,7 +40,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     if (currentTab != 0) return; // Only trigger for Home tab
 
     final authState = ref.read(authStateProvider);
-    final userId = authState.userId ?? authState.phoneNumber ?? 'default_artisan';
+    final userId =
+        authState.userId ?? authState.phoneNumber ?? 'default_artisan';
 
     final shouldLaunch = await ref
         .read(listingTutorialProvider.notifier)
@@ -123,9 +124,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.cardSurface,
-          border: Border(
-            top: BorderSide(color: AppColors.line, width: 1),
-          ),
+          border: Border(top: BorderSide(color: AppColors.line, width: 1)),
         ),
         child: SafeArea(
           top: false,
@@ -233,7 +232,9 @@ class _NavItem extends StatelessWidget {
                 SizedBox(
                   width: 14,
                   height: 2,
-                  child: CustomPaint(painter: _DashedLinePainter(color: AppColors.indigo)),
+                  child: CustomPaint(
+                    painter: _DashedLinePainter(color: AppColors.indigo),
+                  ),
                 )
               else
                 const SizedBox(height: 2),

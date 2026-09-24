@@ -63,14 +63,18 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
   List<Product> _filterProducts(List<Product> products) {
     return products.where((p) {
       if (_selectedCategory != 'filter_all') {
-        final catName = _selectedCategory.replaceAll('filter_', '').toLowerCase();
+        final catName = _selectedCategory
+            .replaceAll('filter_', '')
+            .toLowerCase();
         if (!p.category.toLowerCase().contains(catName)) {
           return false;
         }
       }
       if (_searchQuery.isNotEmpty) {
         final q = _searchQuery.toLowerCase();
-        final matchTitle = p.title.toLowerCase().contains(q) || p.titleHi.toLowerCase().contains(q);
+        final matchTitle =
+            p.title.toLowerCase().contains(q) ||
+            p.titleHi.toLowerCase().contains(q);
         final matchCat = p.category.toLowerCase().contains(q);
         final matchTag = p.tags.any((t) => t.toLowerCase().contains(q));
         return matchTitle || matchCat || matchTag;
@@ -254,7 +258,8 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
       if (next.searchQuery != _searchController.text) {
         _searchController.text = next.searchQuery;
       }
-      if (next.searchQuery != _searchQuery || next.selectedCategory != _selectedCategory) {
+      if (next.searchQuery != _searchQuery ||
+          next.selectedCategory != _selectedCategory) {
         setState(() {
           _searchQuery = next.searchQuery;
           _selectedCategory = next.selectedCategory;
@@ -284,19 +289,31 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
               decoration: InputDecoration(
                 hintText: 'search_products_hint'.tr(),
-                hintStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.inkFaint),
-                prefixIcon: const Icon(Icons.search, color: AppColors.inkFaint, size: 20),
+                hintStyle: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.inkFaint,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppColors.inkFaint,
+                  size: 20,
+                ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? Semantics(
                         button: true,
                         label: 'clear_search'.tr(),
                         child: IconButton(
-                          icon: const Icon(Icons.clear, size: 18, color: AppColors.inkSoft),
+                          icon: const Icon(
+                            Icons.clear,
+                            size: 18,
+                            color: AppColors.inkSoft,
+                          ),
                           tooltip: 'clear_search'.tr(),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
-                            ref.read(catalogueFilterProvider.notifier).setSearchQuery('');
+                            ref
+                                .read(catalogueFilterProvider.notifier)
+                                .setSearchQuery('');
                           },
                         ),
                       )
@@ -309,20 +326,31 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadii.button),
-                  borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+                  borderSide: const BorderSide(
+                    color: AppColors.line,
+                    width: 1.5,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadii.button),
-                  borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+                  borderSide: const BorderSide(
+                    color: AppColors.line,
+                    width: 1.5,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadii.button),
-                  borderSide: const BorderSide(color: AppColors.indigo, width: 2),
+                  borderSide: const BorderSide(
+                    color: AppColors.indigo,
+                    width: 2,
+                  ),
                 ),
               ),
               onChanged: (val) {
                 setState(() => _searchQuery = val.trim());
-                ref.read(catalogueFilterProvider.notifier).setSearchQuery(val.trim());
+                ref
+                    .read(catalogueFilterProvider.notifier)
+                    .setSearchQuery(val.trim());
               },
             ),
           ),
@@ -333,9 +361,13 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
           SizedBox(
             height: 48,
             child: ListView.builder(
-              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 return Padding(
@@ -360,15 +392,24 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 48, color: AppColors.coralDark),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: AppColors.coralDark,
+                      ),
                       const SizedBox(height: AppSpacing.md),
-                      Text('error_loading_catalogue'.tr(), style: AppTextStyles.headlineMedium),
+                      Text(
+                        'error_loading_catalogue'.tr(),
+                        style: AppTextStyles.headlineMedium,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
                         label: 'retry'.tr(),
                         width: 140,
                         onPressed: () {
-                          ref.read(productListProvider.notifier).loadProducts(forceRefresh: true);
+                          ref
+                              .read(productListProvider.notifier)
+                              .loadProducts(forceRefresh: true);
                         },
                       ),
                     ],
@@ -380,7 +421,9 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 if (filtered.isEmpty) {
                   return Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.screenPadding,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -389,12 +432,18 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                             padding: const EdgeInsets.all(AppSpacing.xl),
                             decoration: BoxDecoration(
                               color: AppColors.parchmentDeep,
-                              borderRadius: BorderRadius.circular(AppRadii.card),
+                              borderRadius: BorderRadius.circular(
+                                AppRadii.card,
+                              ),
                               border: Border.all(color: AppColors.line),
                             ),
                             child: Column(
                               children: [
-                                const Icon(Icons.shopping_bag_outlined, size: 64, color: AppColors.indigo),
+                                const Icon(
+                                  Icons.shopping_bag_outlined,
+                                  size: 64,
+                                  color: AppColors.indigo,
+                                ),
                                 const SizedBox(height: AppSpacing.md),
                                 Text(
                                   'no_products_title'.tr(),
@@ -404,7 +453,9 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   'no_products_desc'.tr(),
-                                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.inkSoft,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -427,7 +478,9 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                             type: AppButtonType.outlined,
                             width: 240,
                             onPressed: () {
-                              context.pushNamed(AppRouteConstants.listingTutorial);
+                              context.pushNamed(
+                                AppRouteConstants.listingTutorial,
+                              );
                             },
                           ),
                         ],
@@ -442,17 +495,20 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                       .read(productListProvider.notifier)
                       .loadProducts(forceRefresh: true),
                   child: GridView.builder(
-                    physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                    physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.screenPadding,
                       vertical: AppSpacing.xs,
                     ),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.62,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.62,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       final item = filtered[index];
@@ -468,17 +524,17 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                         onSocialTap: item.allPhotoPaths.isEmpty
                             ? null
                             : () => showSocialMediaLaunchpadSheet(
-                                  context,
-                                  SocialMediaArgs(
-                                    listingId: item.id,
-                                    source: 'catalogue',
-                                    allImages: item.allPhotoPaths,
-                                    title: item.title,
-                                    category: item.category,
-                                    description: item.description,
-                                    materials: item.tags,
-                                  ),
+                                context,
+                                SocialMediaArgs(
+                                  listingId: item.id,
+                                  source: 'catalogue',
+                                  allImages: item.allPhotoPaths,
+                                  title: item.title,
+                                  category: item.category,
+                                  description: item.description,
+                                  materials: item.tags,
                                 ),
+                              ),
                       );
                     },
                   ),
@@ -507,7 +563,8 @@ class _GridProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isHindi = (Localizations.maybeLocaleOf(context)?.languageCode ??
+    final isHindi =
+        (Localizations.maybeLocaleOf(context)?.languageCode ??
             EasyLocalization.of(context)?.locale.languageCode) ==
         'hi';
     final displayTitle = (isHindi && product.titleHi.trim().isNotEmpty)
@@ -539,8 +596,14 @@ class _GridProductCard extends StatelessWidget {
                     Positioned.fill(
                       child: ColorFiltered(
                         colorFilter: product.isNonLive
-                            ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                            : const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
+                            ? const ColorFilter.mode(
+                                Colors.grey,
+                                BlendMode.saturation,
+                              )
+                            : const ColorFilter.mode(
+                                Colors.transparent,
+                                BlendMode.multiply,
+                              ),
                         child: Opacity(
                           opacity: product.isNonLive ? 0.72 : 1.0,
                           child: product.displayPhotoPath.isNotEmpty
@@ -559,7 +622,10 @@ class _GridProductCard extends StatelessWidget {
 
               // Card details — minimal: name, price
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 10.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -628,13 +694,19 @@ class _GridProductCard extends StatelessWidget {
   Widget _buildFallbackImage(String category) {
     final cat = category.toLowerCase();
     CustomPainter painter;
-    if (cat.contains('pot') || cat.contains('clay') || cat.contains('ceramic')) {
+    if (cat.contains('pot') ||
+        cat.contains('clay') ||
+        cat.contains('ceramic')) {
       painter = CraftCategoryIcons.pottery(color: AppColors.terracottaDark);
-    } else if (cat.contains('silk') || cat.contains('textile') || cat.contains('saree')) {
+    } else if (cat.contains('silk') ||
+        cat.contains('textile') ||
+        cat.contains('saree')) {
       painter = CraftCategoryIcons.textile(color: AppColors.terracottaDark);
     } else if (cat.contains('wood') || cat.contains('toy')) {
       painter = CraftCategoryIcons.woodwork(color: AppColors.terracottaDark);
-    } else if (cat.contains('jewel') || cat.contains('gold') || cat.contains('silver')) {
+    } else if (cat.contains('jewel') ||
+        cat.contains('gold') ||
+        cat.contains('silver')) {
       painter = CraftCategoryIcons.jewelry(color: AppColors.terracottaDark);
     } else {
       painter = CraftCategoryIcons.pottery(color: AppColors.terracottaDark);
@@ -643,10 +715,7 @@ class _GridProductCard extends StatelessWidget {
     return Container(
       color: AppColors.parchmentDeep,
       child: Center(
-        child: CustomPaint(
-          size: const Size(40, 40),
-          painter: painter,
-        ),
+        child: CustomPaint(size: const Size(40, 40), painter: painter),
       ),
     );
   }

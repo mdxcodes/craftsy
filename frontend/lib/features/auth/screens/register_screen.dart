@@ -147,16 +147,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         pehchanId: _pehchanController.text.trim().isNotEmpty
             ? _pehchanController.text.trim()
             : null,
-        preferredLanguage: EasyLocalization.of(context)?.locale.languageCode ?? 'en',
+        preferredLanguage:
+            EasyLocalization.of(context)?.locale.languageCode ?? 'en',
       );
 
       ref.read(authStateProvider.notifier).registerWithDetails(profile);
       context.pushNamed(
         AppRouteConstants.otp,
-        queryParameters: {
-          'phone': phone,
-          'isNewUser': 'true',
-        },
+        queryParameters: {'phone': phone, 'isNewUser': 'true'},
       );
     }
   }
@@ -280,10 +278,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: InkWell(
-                            onTap: () => context.pushNamed(AppRouteConstants.ngoAuth),
+                            onTap: () =>
+                                context.pushNamed(AppRouteConstants.ngoAuth),
                             borderRadius: BorderRadius.circular(AppRadii.sm),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 2.0,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -292,11 +293,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       Expanded(
                                         child: Text(
                                           'registration_help_cue_title'.tr(),
-                                          style: AppTextStyles.labelMedium.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.ink,
-                                            fontSize: 13,
-                                          ),
+                                          style: AppTextStyles.labelMedium
+                                              .copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.ink,
+                                                fontSize: 13,
+                                              ),
                                         ),
                                       ),
                                       const Icon(
@@ -333,9 +335,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             size: 20,
                             color: AppColors.terracotta,
                           ),
-                          tooltip: _tts.isSpeaking ? 'stop_audio'.tr() : 'tap_to_hear'.tr(),
+                          tooltip: _tts.isSpeaking
+                              ? 'stop_audio'.tr()
+                              : 'tap_to_hear'.tr(),
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           onPressed: () async {
                             if (_tts.isSpeaking) {
                               await _tts.stop();
@@ -356,12 +363,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             );
                             final result = await _tts.speak(
-                              TtsPageGuides.register
-                                  .forLanguage(context.locale.languageCode),
+                              TtsPageGuides.register.forLanguage(
+                                context.locale.languageCode,
+                              ),
                               languageCode: context.locale.languageCode,
                             );
                             if (mounted) setState(() {});
-                            if (result == TtsResult.voiceUnavailable && mounted) {
+                            if (result == TtsResult.voiceUnavailable &&
+                                mounted) {
                               await _tts.openVoiceDownloadScreen();
                             }
                           },
@@ -375,7 +384,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           tooltip: 'Dismiss',
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                          constraints: const BoxConstraints(
+                            minWidth: 28,
+                            minHeight: 28,
+                          ),
                           onPressed: () {
                             setState(() => _isHelpCueDismissed = true);
                           },
@@ -441,10 +453,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   items: _craftCategories.map((craft) {
                     return DropdownMenuItem<String>(
                       value: craft,
-                      child: Text(
-                        craft,
-                        style: AppTextStyles.bodyMedium,
-                      ),
+                      child: Text(craft, style: AppTextStyles.bodyMedium),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -485,10 +494,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   items: _indianStates.map((stateName) {
                     return DropdownMenuItem<String>(
                       value: stateName,
-                      child: Text(
-                        stateName,
-                        style: AppTextStyles.bodyMedium,
-                      ),
+                      child: Text(stateName, style: AppTextStyles.bodyMedium),
                     );
                   }).toList(),
                   onChanged: (val) {
@@ -531,7 +537,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: AppColors.terracotta.withValues(alpha: 0.1),
+                              color: AppColors.terracotta.withValues(
+                                alpha: 0.1,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -620,7 +628,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       if (_pehchanImageFile == null)
                         DottedBorderBox(
                           width: double.infinity,
-                          backgroundColor: AppColors.parchmentDeep.withValues(alpha: 0.5),
+                          backgroundColor: AppColors.parchmentDeep.withValues(
+                            alpha: 0.5,
+                          ),
                           radius: AppRadii.card,
                           borderColor: AppColors.dottedBorder,
                           padding: const EdgeInsets.all(AppSpacing.md),
@@ -663,7 +673,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       type: AppButtonType.outlined,
                                       isCompact: true,
                                       isLoading: _isPickingPehchanPhoto,
-                                      onPressed: () => _pickPehchanPhoto(ImageSource.camera),
+                                      onPressed: () =>
+                                          _pickPehchanPhoto(ImageSource.camera),
                                     ),
                                   ),
                                   const SizedBox(width: AppSpacing.sm),
@@ -674,7 +685,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       type: AppButtonType.outlined,
                                       isCompact: true,
                                       isLoading: _isPickingPehchanPhoto,
-                                      onPressed: () => _pickPehchanPhoto(ImageSource.gallery),
+                                      onPressed: () => _pickPehchanPhoto(
+                                        ImageSource.gallery,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -686,7 +699,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.sm),
                           decoration: BoxDecoration(
-                            color: AppColors.parchmentDeep.withValues(alpha: 0.5),
+                            color: AppColors.parchmentDeep.withValues(
+                              alpha: 0.5,
+                            ),
                             borderRadius: BorderRadius.circular(AppRadii.card),
                             border: Border.all(color: AppColors.line),
                           ),
@@ -694,7 +709,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(AppRadii.sm),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.sm,
+                                ),
                                 child: SizedBox(
                                   height: 140,
                                   width: double.infinity,
@@ -724,8 +741,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     ),
                                   ),
                                   TextButton.icon(
-                                    onPressed: () => _pickPehchanPhoto(ImageSource.camera),
-                                    icon: const Icon(Icons.refresh, size: 16, color: AppColors.terracotta),
+                                    onPressed: () =>
+                                        _pickPehchanPhoto(ImageSource.camera),
+                                    icon: const Icon(
+                                      Icons.refresh,
+                                      size: 16,
+                                      color: AppColors.terracotta,
+                                    ),
                                     label: Text(
                                       'change_photo'.tr(),
                                       style: AppTextStyles.labelSmall.copyWith(
@@ -735,7 +757,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.inkSoft),
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      size: 20,
+                                      color: AppColors.inkSoft,
+                                    ),
                                     tooltip: 'remove_photo'.tr(),
                                     onPressed: _removePehchanPhoto,
                                   ),
@@ -768,7 +794,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: AppColors.terracotta.withValues(alpha: 0.1),
+                              color: AppColors.terracotta.withValues(
+                                alpha: 0.1,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -886,7 +914,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         decoration: InputDecoration(
                           labelText: 'bank_ifsc_label'.tr(),
                           hintText: 'bank_ifsc_hint'.tr(),
-                          prefixIcon: const Icon(Icons.confirmation_number_outlined),
+                          prefixIcon: const Icon(
+                            Icons.confirmation_number_outlined,
+                          ),
                         ),
                       ),
 
@@ -899,7 +929,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         decoration: InputDecoration(
                           labelText: 'bank_name_label'.tr(),
                           hintText: 'bank_name_hint'.tr(),
-                          prefixIcon: const Icon(Icons.account_balance_outlined),
+                          prefixIcon: const Icon(
+                            Icons.account_balance_outlined,
+                          ),
                         ),
                       ),
                     ],

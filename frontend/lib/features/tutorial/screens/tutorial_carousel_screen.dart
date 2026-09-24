@@ -15,10 +15,12 @@ class TutorialCarouselScreen extends ConsumerStatefulWidget {
   const TutorialCarouselScreen({super.key});
 
   @override
-  ConsumerState<TutorialCarouselScreen> createState() => _TutorialCarouselScreenState();
+  ConsumerState<TutorialCarouselScreen> createState() =>
+      _TutorialCarouselScreenState();
 }
 
-class _TutorialCarouselScreenState extends ConsumerState<TutorialCarouselScreen> {
+class _TutorialCarouselScreenState
+    extends ConsumerState<TutorialCarouselScreen> {
   final PageController _pageController = PageController();
   final TutorialTtsService _ttsService = TutorialTtsService();
   int _currentPage = 0;
@@ -81,7 +83,8 @@ class _TutorialCarouselScreenState extends ConsumerState<TutorialCarouselScreen>
 
   void _finishTutorialAndStartListing() {
     _ttsService.stop();
-    ref.read(homeTabIndexProvider.notifier).state = 2; // Switch to Add Product tab
+    ref.read(homeTabIndexProvider.notifier).state =
+        2; // Switch to Add Product tab
     if (context.canPop()) {
       context.pop();
     } else {
@@ -144,13 +147,13 @@ class _TutorialCarouselScreenState extends ConsumerState<TutorialCarouselScreen>
                           currentSlide.isIntro
                               ? 'overview'.tr()
                               : currentSlide.isOutro
-                                  ? 'ready_to_list'.tr()
-                                  : 'step_counter'.tr(
-                                      namedArgs: {
-                                        'current': '${currentSlide.stepIndex}',
-                                        'total': '6',
-                                      },
-                                    ),
+                              ? 'ready_to_list'.tr()
+                              : 'step_counter'.tr(
+                                  namedArgs: {
+                                    'current': '${currentSlide.stepIndex}',
+                                    'total': '6',
+                                  },
+                                ),
                           style: AppTextStyles.labelMedium.copyWith(
                             color: AppColors.textPrimary,
                           ),
@@ -254,7 +257,10 @@ class _TutorialCarouselScreenState extends ConsumerState<TutorialCarouselScreen>
                               side: const BorderSide(color: AppColors.border),
                               padding: const EdgeInsets.all(12),
                             ),
-                            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+                            icon: const Icon(
+                              Icons.arrow_back_rounded,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                         ],

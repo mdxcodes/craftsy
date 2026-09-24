@@ -33,7 +33,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
       ref.read(authStateProvider.notifier).signInWithPhone(phone);
-      context.pushNamed(AppRouteConstants.otp, queryParameters: {'phone': phone});
+      context.pushNamed(
+        AppRouteConstants.otp,
+        queryParameters: {'phone': phone},
+      );
     }
   }
 
@@ -57,7 +60,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
               Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                    vertical: AppSpacing.md,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
                     borderRadius: BorderRadius.circular(AppRadii.lg),
@@ -81,7 +87,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
               Text(
                 'sign_in_subtitle'.tr(),
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
 
@@ -131,7 +139,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 children: [
                   const Expanded(child: Divider(color: AppColors.border)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     child: Text(
                       'new_artisan_prompt'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
