@@ -25,6 +25,8 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/orders/screens/my_orders_screen.dart';
 import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/orders/models/order.dart';
+import '../../features/commerce/screens/unified_commerce_hub_screen.dart';
+import '../../features/chatbot/screens/chatbot_sheet.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../providers/app_providers.dart';
 
@@ -206,6 +208,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/my-orders',
         name: AppRouteConstants.myOrders,
         builder: (context, state) => const MyOrdersScreen(),
+      ),
+      GoRoute(
+        path: '/commerce-hub',
+        name: AppRouteConstants.commerceHub,
+        builder: (context, state) =>
+            UnifiedCommerceHubScreen(artisanId: 'default_artisan'),
+      ),
+      GoRoute(
+        path: '/inventory',
+        name: AppRouteConstants.inventory,
+        builder: (context, state) =>
+            UnifiedCommerceHubScreen(artisanId: 'default_artisan', initialTab: 3),
+      ),
+      GoRoute(
+        path: '/craftmitra',
+        name: AppRouteConstants.craftMitra,
+        builder: (context, state) {
+          final mode = state.uri.queryParameters['mode'] ?? 'text';
+          return Scaffold(
+            body: SafeArea(
+              child: ChatbotSheet(),
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/orders/:orderId',

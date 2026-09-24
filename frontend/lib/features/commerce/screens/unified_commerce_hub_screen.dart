@@ -18,8 +18,13 @@ import '../../orders/screens/unified_orders_screen.dart';
 /// - Inventory overview
 class UnifiedCommerceHubScreen extends ConsumerStatefulWidget {
   final String artisanId;
+  final int? initialTab;
 
-  const UnifiedCommerceHubScreen({super.key, required this.artisanId});
+  const UnifiedCommerceHubScreen({
+    super.key,
+    required this.artisanId,
+    this.initialTab,
+  });
 
   @override
   ConsumerState<UnifiedCommerceHubScreen> createState() =>
@@ -28,7 +33,13 @@ class UnifiedCommerceHubScreen extends ConsumerStatefulWidget {
 
 class _UnifiedCommerceHubScreenState
     extends ConsumerState<UnifiedCommerceHubScreen> {
-  int _selectedTab = 0;
+  late int _selectedTab;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTab = widget.initialTab ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {

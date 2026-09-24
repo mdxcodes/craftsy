@@ -2034,6 +2034,155 @@ Make Craftsy feel like ONE complete, coherent application. Connect and polish wh
 
 ---
 
+## Android Widgets — Phase 1 Audit
+
+**Status:** Audit Complete — No implementation performed
+
+### Audit Summary
+- Inspected entire Flutter + Android repository
+- All 5 widget concepts are missing (no widget infrastructure exists)
+- Data sources partially exist (Order, Product, CommerceHub models)
+- Deep-link configuration missing (no intent filters, no widget routes)
+- Authentication is single-account (no multi-account widget concerns)
+- WorkManager exists for background sync (15-minute periodic)
+- Glance dependency NOT added yet
+
+### Widget Readiness
+| Widget | Status |
+|--------|--------|
+| Craftsy Today | Missing |
+| Orders | Missing |
+| Stock Alerts | Missing |
+| CraftMitra | Missing |
+| Selling Channels | Missing |
+
+### Key Findings
+- Flutter 3.47.2, Dart ^3.12.0, AGP 8.11.1, Kotlin 2.2.20, compileSdk 37
+- Orders data is mock in Riverpod (OrdersNotifier)
+- No "needs attention" logic exists
+- No low-stock threshold logic exists
+- No inventory/commerce-hub/ONDC/Government routes in GoRouter
+- No deep-link intent filters in AndroidManifest.xml
+
+### Next Phase
+Phase 2: Widget Foundation — Glance dependency, WidgetSnapshot, WidgetDataStore, MethodChannel bridge
+
+---
+
+## Android Widgets — Phase 2: Widget Data Bridge & Shared Snapshot Foundation
+
+**Status:** Complete
+
+### Architecture Implemented
+
+```
+Flutter App (Riverpod providers)
+    ↓
+WidgetDataProjection (maps domain models → widget snapshots)
+    ↓
+WidgetSnapshot (serializable, versioned, safe)
+    ↓
+MethodChannel (com.craftsy.app/widget_data)
+    ↓
+WidgetDataStore (SharedPreferences persistence)
+    ↓
+WidgetUpdateReceiver (broadcast receiver for refresh)
+    ↓
+Android Widgets (Glance — to be implemented in Phase 3+)
+```
+
+### Files Created
+
+**Android (Kotlin):**
+- `android/app/src/main/kotlin/com/craftsy/app/widget/WidgetSnapshot.kt` — Snapshot data models (WidgetSnapshot, TodaySnapshot, OrdersSnapshot, StockSnapshot, ChannelsSnapshot, CraftMitraSnapshot)
+- `android/app/src/main/kotlin/com/craftsy/app/widget/WidgetDataStore.kt` — SharedPreferences-based persistence with account isolation
+- `android/app/src/main/kotlin/com/craftsy/app/widget/WidgetUpdateManager.kt` — Centralized widget refresh management
+- `android/app/src/main/kotlin/com/craftsy/app/widget/WidgetUpdateReceiver.kt` — BroadcastReceiver for update requests
+- `android/app/src/test/kotlin/com/craftsy/app/widget/WidgetSnapshotTest.kt` — 20 unit tests
+
+**Flutter (Dart):**
+- `lib/core/widgets/widget_data_bridge.dart` — MethodChannel bridge (sendSnapshot, clearWidgetData, requestWidgetRefresh)
+- `lib/core/widgets/widget_data_projection.dart` — Domain model → widget snapshot projection
+- `lib/core/widgets/widget_snapshot_provider.dart` — Riverpod providers for snapshot building and refresh triggers
+
+### Files Modified
+
+- `android/app/src/main/kotlin/com/craftsy/app/MainActivity.kt` — Added widget data MethodChannel handler
+- `android/app/src/main/AndroidManifest.xml` — Registered WidgetUpdateReceiver
+- `lib/core/router/app_router.dart` — Added /commerce-hub, /inventory, /craftmitra routes
+- `lib/core/router/app_route_constants.dart` — Added commerceHub, inventory, craftMitra constants
+- `lib/features/commerce/screens/unified_commerce_hub_screen.dart` — Added initialTab parameter
+
+### Widget Data Sources
+
+| Widget | Real Source | Status |
+|--------|-------------|--------|
+| Craftsy Today | ordersProvider + productListProvider | ✅ Real data projected |
+| Orders | ordersProvider (mock data in dev) | ✅ Real structure, mock data |
+| Stock Alerts | productListProvider (Product.stock) | ✅ Real data projected |
+| CraftMitra | Static launcher config | ✅ Deep links to /assistant |
+| Selling Channels | Commerce state (ONDC/GeM not connected) | ✅ Honest NOT_CONFIGURED |
+
+### Snapshot Model
+
+- Schema version: 1
+- JSON-serializable via org.json
+- Fields: schemaVersion, authenticated, accountId, lastUpdated, dataFreshness, today, orders, stock, channels, craftMitra
+- No authentication secrets stored
+- No unnecessary PII (only order IDs, product names, stock quantities)
+
+### Persistence
+
+- SharedPreferences (`craftsy_widget_data`)
+- Key: `widget_snapshot_{accountId}`
+- Timestamp tracked for staleness detection
+- Account isolation: logout clears all data
+
+### Account Isolation
+
+- Logout → clearAll() → widgets show "Open Craftsy to sign in"
+- Account switch → clearAccount(old) → refresh → new data
+- Null account ID → stored under `widget_snapshot_default`
+
+### Deep Links Implemented
+
+| Destination | Route | Status |
+|-------------|-------|--------|
+| Home | `/home` | ✅ Existing |
+| Order detail | `/orders/:orderId` | ✅ Existing |
+| Product detail | `/product/:id` | ✅ Existing |
+| CraftMitra | `/craftmitra?mode=voice/text` | ✅ Added |
+| Commerce Hub | `/commerce-hub` | ✅ Added |
+| Inventory | `/inventory` | ✅ Added (initialTab=3) |
+
+### Update Mechanism
+
+- **Event-triggered:** widgetSnapshotProvider rebuilds when orders/products change
+- **Manual refresh:** WidgetDataBridge.requestWidgetRefresh() → broadcast → WidgetUpdateReceiver
+- **Scheduled:** WorkManager periodic sync (15 min) already exists for offline sync
+- **Idempotent:** Same snapshot produces same JSON; no duplicate writes
+
+### Tests
+
+- `flutter analyze` — Clean (0 errors, 21 info)
+- `flutter test` — 102/102 pass
+- WidgetSnapshotTest.kt — 20 unit tests (serialization, projection, malformed data, account isolation)
+
+### Known Limitations
+
+1. Orders data is mock in Riverpod (OrdersNotifier uses hardcoded data)
+2. No low-stock threshold defined (only OUT_OF_STOCK when stock == 0)
+3. ONDC/GeM channels show NOT_CONFIGURED (not connected)
+4. No Glance dependency added yet (Phase 3+)
+5. No actual widget UI implementations (Phase 3+)
+6. Widget strings are English-only (localization pending)
+7. No stale-data timestamp display in widgets yet
+
+### Next Phase
+**Phase 3: Widget UI Implementation** — Add Glance dependency, create 5 widget providers with layouts, register in AndroidManifest, implement deep-link navigation.
+
+---
+
 ## Unified Commerce Hub
 
 **Status:** Complete
