@@ -2179,7 +2179,49 @@ Android Widgets (Glance — to be implemented in Phase 3+)
 7. No stale-data timestamp display in widgets yet
 
 ### Next Phase
-**Phase 3: Widget UI Implementation** — Add Glance dependency, create 5 widget providers with layouts, register in AndroidManifest, implement deep-link navigation.
+Phase 5: Stock Alerts Widget, CraftMitra Widget, Selling Channels Widget
+
+---
+
+## Android Widgets — Phase 4: Orders Widget
+
+### Status: COMPLETE
+
+**Craftsy Orders Widget** — answers "What orders need my attention?"
+
+| Component | File |
+|-----------|------|
+| `OrdersWidget.kt` | GlanceAppWidget — renders actionable orders |
+| `OrdersWidgetReceiver.kt` | AppWidgetProvider — lifecycle events |
+| `orders_widget_info.xml` | Widget metadata (180x110dp min, 3x2 cells) |
+| `widget_orders.xml` | Initial placeholder layout |
+| `OrdersWidgetStateTest.kt` | 20 unit tests |
+
+### Data Source
+
+- Uses Phase 2 `WidgetDataStore` and `WidgetSnapshot.orders` model
+- `WidgetDataProjection.projectOrders()` in Flutter pushes data
+- Only actionable orders (newOrder, packed, shipped) are shown
+- Priority: newOrder > packed > shipped (fulfillment pipeline order)
+
+### States
+
+- **Logged out**: "Open Craftsy to sign in"
+- **Data unavailable**: "Open Craftsy to update"
+- **Empty**: "No orders need attention"
+- **With data**: Order rows with ID, action, product title, "+N more" if >3
+
+### Security
+
+- No buyer names, locations, or PII in widget snapshot
+- No tokens or credentials in SharedPreferences
+- Account isolation via accountId-scoped keys
+
+### Build Results
+
+- `compileDebugKotlin`: BUILD SUCCESS
+- `flutter test`: 102/102 pass
+- APK installed on device Q4JZAMFUKNPNW8WO
 
 ---
 
