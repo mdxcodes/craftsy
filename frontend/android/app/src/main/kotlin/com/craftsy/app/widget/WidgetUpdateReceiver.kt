@@ -38,10 +38,12 @@ class WidgetUpdateReceiver : BroadcastReceiver() {
         val appWidgetManager = AppWidgetManager.getInstance(context)
 
         // Refresh each widget type that exists
-        // Future widgets (StockAlerts, CraftMitra, SellingChannels) will be added in later phases
+        // Future widgets (SellingChannels) will be added in later phases
         val widgetClasses = listOf(
             CraftsyTodayWidget::class.java,
             OrdersWidget::class.java,
+            StockAlertsWidget::class.java,
+            CraftMitraWidget::class.java,
         )
 
         for (widgetClass in widgetClasses) {

@@ -2179,7 +2179,98 @@ Android Widgets (Glance — to be implemented in Phase 3+)
 7. No stale-data timestamp display in widgets yet
 
 ### Next Phase
-Phase 5: Stock Alerts Widget, CraftMitra Widget, Selling Channels Widget
+Phase 7: Selling Channels Widget + WorkManager periodic sync
+
+---
+
+## Android Widgets — Phase 6: CraftMitra Widget
+
+### Status: COMPLETE
+
+**CraftMitra Quick-Action Widget** — one-tap access to Craftsy's AI assistant.
+
+### Architecture
+
+```
+CraftMitra Widget (Glance)
+      ↓
+actionStartActivity<MainActivity>()
+      ↓
+Flutter CraftMitra (existing ChatbotSheet)
+      ↓
+LanguageService → Bhashini → AI/Intent system
+```
+
+The widget is a **lightweight launcher** — no AI, voice, ASR, TTS, or Bhashini in widget code.
+
+### Voice Action
+
+- Button: "Speak" → launches Craftsy app → CraftMitra screen
+- Route: `/assistant?mode=voice` (existing route)
+
+### Text Action
+
+- Button: "Type" → launches Craftsy app → CraftMitra screen
+- Route: `/assistant?mode=text` (existing route)
+
+### Deep Links
+
+| Action | Route | Status |
+|--------|-------|--------|
+| Speak | `/assistant?mode=voice` | ✅ Existing route |
+| Type | `/assistant?mode=text` | ✅ Existing route |
+
+### Authentication
+
+- Logged in: Shows "CRAFTMITRA" header, "How can I help?", Speak/Type buttons
+- Logged out: Shows "Open Craftsy to sign in"
+
+### Bhashini Boundary
+
+Widget does NOT call Bhashini ASR/TTS/NMT/ALD. All language work happens inside Flutter's `LanguageService` → `BhashiniLanguageProvider` chain.
+
+### Accessibility
+
+- "Speak" not "mic"
+- "Type" not unexplained icon
+- Touch targets: 48dp height minimum
+- Screen reader compatible
+
+### Performance
+
+- No AI initialization
+- No network calls
+- No ASR/TTS startup
+- Only reads from WidgetDataStore
+- `updatePeriodMillis = 0` — no periodic updates
+
+### Files Created
+
+- `CraftMitraWidget.kt` — GlanceAppWidget with Speak/Type actions
+- `CraftMitraWidgetReceiver.kt` — lifecycle management
+- `craftmitra_widget_info.xml` — widget metadata
+- `widget_craftmitra.xml` — initial layout
+- `CraftMitraWidgetStateTest.kt` — 25 unit tests
+
+### Files Modified
+
+- `AndroidManifest.xml` — registered CraftMitraWidgetReceiver
+- `WidgetUpdateReceiver.kt` — added CraftMitraWidget to refresh list
+
+### Tests
+
+- `compileDebugKotlin`: BUILD SUCCESS
+- `flutter test`: 102/102 pass
+- 25 new unit tests (deep links, voice/text entry, auth, accessibility, performance, security)
+
+### Known Limitations
+
+1. Both buttons launch same MainActivity — mode query params not yet passed as intent extras
+2. Widget strings are English-only (localization pending)
+3. No contextual entry (e.g., "ask about orders")
+4. Widget does not show CraftMitra conversation state (by design)
+
+---
 
 ---
 
