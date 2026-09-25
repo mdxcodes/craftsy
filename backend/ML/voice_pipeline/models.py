@@ -15,6 +15,7 @@ class STTProvider(str, Enum):
     WHISPER = "whisper"
     GOOGLE = "google"
     GROQ = "groq"
+    BHASHINI = "bhashini"
 
 
 @dataclass

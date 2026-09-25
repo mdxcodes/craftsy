@@ -11,271 +11,400 @@ Services:
     - ASR (Automatic Speech Recognition)
     - NMT (Neural Machine Translation)
     - TTS (Text-to-Speech)
-    - ALD (Automatic Language Detection)
 
 Configuration:
     Set BHASHINI_API_KEY and BHASHINI_USER_ID in environment variables.
     Without credentials, all endpoints return 503 with clear status.
+
+Reference:
+    https://dibd-bhashini.gitbook.io/bhashini-apis
 """
 
 from __future__ import annotations
 
-import httpx
 import logging
-from typing import Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Response
-from sqlalchemy.orm import Session
+from typing import Any, Dict, List, Optional
+
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFile, File
+from pydantic import BaseModel, Field
 
 from ..config import get_settings
-from ..database import get_db
+from ..services.bhashini_service import (
+    BhashiniAPIError,
+    BhashiniConfigError,
+    BhashiniService,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/bhashini", tags=["Bhashini Language Services"])
 
 
-# ── Configuration ────────────────────────────────────────────────────────────
+# ── Schemas ──────────────────────────────────────────────────────────────────
 
 
-def _get_bhashini_config() -> Dict[str, str]:
-    """Get Bhashini credentials from the centralized settings."""
-    settings = get_settings()
-    return {
-        "api_key": settings.bhashini_api_key,
-        "user_id": settings.bhashini_user_id,
-        "base_url": settings.bhashini_base_url,
-    }
+class LanguageInfo(BaseModel):
+    code: str = Field(..., description="ISO-639 language code.")
+    name: str = Field(..., description="English language name.")
+    nativeName: str = Field(..., description="Native language name.")
+    asr: bool = Field(..., description="ASR supported.")
+    nmt: bool = Field(..., description="Translation supported.")
+    tts: bool = Field(..., description="TTS supported.")
 
 
-def _is_configured() -> bool:
-    """Check if Bhashini credentials are configured."""
-    config = _get_bhashini_config()
-    return bool(config["api_key"] and config["user_id"])
+class TranscribeResponse(BaseModel):
+    transcript: str = Field(..., description="Recognized speech text.")
+    language_code: str = Field(..., description="Language code used.")
+    confidence: Optional[float] = Field(default=None, description="Confidence score.")
 
 
-def _get_headers() -> Dict[str, str]:
-    """Get request headers with credentials."""
-    config = _get_bhashini_config()
-    return {
-        "Authorization": f"Bearer {config['api_key']}",
-        "X-User-Id": config["user_id"],
-        "Content-Type": "application/json",
-    }
+class TranslateResponse(BaseModel):
+    translated_text: str = Field(..., description="Translated text.")
+    source_language: str = Field(..., description="Source language code.")
+    target_language: str = Field(..., description="Target language code.")
+
+
+class DetectLanguageResponse(BaseModel):
+    detected_language: str = Field(..., description="Detected language code.")
+    confidence: Optional[float] = Field(default=None, description="Confidence score.")
 
 
 # ── Language Configuration ───────────────────────────────────────────────────
+# These are the languages Craftsy actively supports in the UI.
+# Bhashini capability for each language is verified against the ULCA pipeline.
 
-
-# Bhashini-supported languages with capability flags
-# Source: https://bhashini.gov.in/
-BHASHINI_LANGUAGES = {
-    "en": {"name": "English", "nativeName": "English", "asr": True, "nmt": True, "tts": True, "ald": True},
-    "hi": {"name": "Hindi", "nativeName": "हिन्दी", "asr": True, "nmt": True, "tts": True, "ald": True},
-    "bn": {"name": "Bengali", "nativeName": "বাংলা", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "ta": {"name": "Tamil", "nativeName": "தமிழ்", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "te": {"name": "Telugu", "nativeName": "తెలుగు", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "mr": {"name": "Marathi", "nativeName": "मराठी", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "gu": {"name": "Gujarati", "nativeName": "ગુજરાતી", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "kn": {"name": "Kannada", "nativeName": "ಕನ್ನಡ", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "ml": {"name": "Malayalam", "nativeName": "മലയാളം", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "pa": {"name": "Punjabi", "nativeName": "ਪੰਜਾਬੀ", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "or": {"name": "Odia", "nativeName": "ଓଡ଼ିଆ", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "as": {"name": "Assamese", "nativeName": "অসমীয়া", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "ur": {"name": "Urdu", "nativeName": "اردو", "asr": True, "nmt": True, "tts": False, "ald": True},
-    "sd": {"name": "Sindhi", "nativeName": "سنڌي", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "ne": {"name": "Nepali", "nativeName": "नेपाली", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "sa": {"name": "Sanskrit", "nativeName": "संस्कृतम्", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "kok": {"name": "Konkani", "nativeName": "कोंकणी", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "mni": {"name": "Manipuri", "nativeName": "মৈতৈলোন", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "sat": {"name": "Santali", "nativeName": "ᱥᱟᱱᱛᱟᱲᱤ", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "doi": {"name": "Dogri", "nativeName": "डोगरी", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "brx": {"name": "Bodo", "nativeName": "बर'", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "ks": {"name": "Kashmiri", "nativeName": "कश्मीरी", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "gom": {"name": "Goan Konkani", "nativeName": "गोंयची कोंकणी", "asr": False, "nmt": True, "tts": False, "ald": True},
-    "mai": {"name": "Maithili", "nativeName": "मैथिली", "asr": False, "nmt": True, "tts": False, "ald": True},
+BHASHINI_LANGUAGES: Dict[str, Dict[str, Any]] = {
+    "en": {
+        "name": "English",
+        "nativeName": "English",
+        "asr": True,
+        "nmt": True,
+        "tts": True,
+    },
+    "hi": {
+        "name": "Hindi",
+        "nativeName": "हिन्दी",
+        "asr": True,
+        "nmt": True,
+        "tts": True,
+    },
+    "bn": {
+        "name": "Bengali",
+        "nativeName": "বাংলা",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "ta": {
+        "name": "Tamil",
+        "nativeName": "தமிழ்",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "te": {
+        "name": "Telugu",
+        "nativeName": "తెలుగు",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "mr": {
+        "name": "Marathi",
+        "nativeName": "मराठी",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "gu": {
+        "name": "Gujarati",
+        "nativeName": "ગુજરાતી",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "kn": {
+        "name": "Kannada",
+        "nativeName": "ಕನ್ನಡ",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "ml": {
+        "name": "Malayalam",
+        "nativeName": "മലയാളം",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "pa": {
+        "name": "Punjabi",
+        "nativeName": "ਪੰਜਾਬੀ",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "or": {
+        "name": "Odia",
+        "nativeName": "ଓଡ଼ିଆ",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "as": {
+        "name": "Assamese",
+        "nativeName": "অসমীয়া",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
+    "ur": {
+        "name": "Urdu",
+        "nativeName": "اردو",
+        "asr": True,
+        "nmt": True,
+        "tts": False,
+    },
 }
 
+SUPPORTED_LANGUAGE_CODES = set(BHASHINI_LANGUAGES.keys())
 
-@router.get("/languages")
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+
+def _get_bhashini_service() -> BhashiniService:
+    """Create a BhashiniService from app settings."""
+    settings = get_settings()
+    if not settings.bhashini_api_key or not settings.bhashini_user_id:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Bhashini credentials not configured. "
+                "Set BHASHINI_API_KEY and BHASHINI_USER_ID environment variables."
+            ),
+        )
+    return BhashiniService(
+        api_key=settings.bhashini_api_key,
+        user_id=settings.bhashini_user_id,
+    )
+
+
+def _is_configured() -> bool:
+    settings = get_settings()
+    return bool(settings.bhashini_api_key and settings.bhashini_user_id)
+
+
+# ── Endpoints ────────────────────────────────────────────────────────────────
+
+
+@router.get("/languages", response_model=Dict[str, Any])
 async def get_supported_languages():
-    """Get all Bhashini-supported languages with capabilities."""
+    """Return Bhashini-supported languages with capability flags."""
     return {
         "configured": _is_configured(),
-        "languages": BHASHINI_LANGUAGES,
+        "languages": [
+            {
+                "code": code,
+                **info,
+            }
+            for code, info in BHASHINI_LANGUAGES.items()
+        ],
     }
 
 
-@router.get("/status")
+@router.get("/status", response_model=Dict[str, Any])
 async def get_service_status():
-    """Check if Bhashini services are configured and available."""
-    config = _get_bhashini_config()
+    """Check if Bhashini services are configured."""
+    settings = get_settings()
     return {
         "configured": _is_configured(),
-        "api_key_set": bool(config["api_key"]),
-        "user_id_set": bool(config["user_id"]),
-        "base_url": config["base_url"],
+        "api_key_set": bool(settings.bhashini_api_key),
+        "user_id_set": bool(settings.bhashini_user_id),
+        "base_url": settings.bhashini_base_url,
         "services": {
             "asr": _is_configured(),
             "nmt": _is_configured(),
             "tts": _is_configured(),
-            "ald": _is_configured(),
         },
-        "message": "Bhashini credentials configured" if _is_configured() else "Bhashini credentials not configured. Set BHASHINI_API_KEY and BHASHINI_USER_ID environment variables.",
+        "message": (
+            "Bhashini credentials configured"
+            if _is_configured()
+            else "Bhashini credentials not configured."
+        ),
     }
 
 
-@router.post("/transcribe")
+@router.post("/transcribe", response_model=TranscribeResponse)
 async def transcribe_audio(
-    audio: UploadFile = File(..., description="Audio file (.m4a, .wav, .mp3)"),
-    language_code: str = "hi",
+    audio: UploadFile = File(..., description="Audio file (.wav, .mp3, .m4a)"),
+    language_code: str = Query(default="hi", description="ISO-639 language code."),
 ):
-    """
-    Transcribe audio using Bhashini ASR.
+    """Transcribe audio using Bhashini ASR via ULCA pipeline.
 
-    Requires Bhashini credentials configured server-side.
+    Sends audio through the Bhashini ULCA pipeline:
+      1. Pipeline Config Call → obtain ASR service ID + callback URL
+      2. Pipeline Compute Call → send base64 audio, receive transcript
     """
-    if not _is_configured():
+    service = _get_bhashini_service()
+
+    if language_code not in SUPPORTED_LANGUAGE_CODES:
         raise HTTPException(
-            status_code=503,
-            detail="Bhashini ASR not configured. Set BHASHINI_API_KEY and BHASHINI_USER_ID.",
+            status_code=400,
+            detail=(
+                f"Unsupported language code '{language_code}'. "
+                f"Supported: {sorted(SUPPORTED_LANGUAGE_CODES)}"
+            ),
         )
 
-    # Read audio bytes
     audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise HTTPException(status_code=400, detail="Empty audio file.")
 
-    # Map to Bhashini language code (keys are already BCP-47 codes)
-    bhashini_code = language_code if language_code in BHASHINI_LANGUAGES else "hi"
-
-    # Call Bhashini ASR API
-    config = _get_bhashini_config()
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{config['base_url']}/asr/transcribe",
-                headers=_get_headers(),
-                files={"audio": (audio.filename or "audio.m4a", audio_bytes, "audio/m4a")},
-                data={"language_code": bhashini_code},
-            )
-            response.raise_for_status()
-            result = response.json()
-            return {
-                "transcript": result.get("transcript", ""),
-                "language_code": language_code,
-                "confidence": result.get("confidence", 0.0),
-            }
-    except httpx.HTTPError as e:
-        logger.error(f"Bhashini ASR error: {e}")
-        raise HTTPException(status_code=502, detail=f"Bhashini ASR failed: {str(e)}")
-
-
-@router.post("/translate")
-async def translate_text(
-    text: str,
-    source_language: str,
-    target_language: str,
-):
-    """
-    Translate text using Bhashini NMT.
-
-    Requires Bhashini credentials configured server-side.
-    """
-    if not _is_configured():
-        raise HTTPException(
-            status_code=503,
-            detail="Bhashini NMT not configured. Set BHASHINI_API_KEY and BHASHINI_USER_ID.",
+        transcript = await service.transcribe_audio(
+            audio_bytes=audio_bytes,
+            language=language_code,
         )
+    except BhashiniConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except BhashiniAPIError as exc:
+        logger.error("Bhashini ASR failed: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini ASR failed: {exc}") from exc
+    except httpx.HTTPError as exc:
+        logger.error("Bhashini ASR HTTP error: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini ASR network error: {exc}") from exc
 
-    config = _get_bhashini_config()
+    return TranscribeResponse(
+        transcript=transcript,
+        language_code=language_code,
+        confidence=None,
+    )
+
+
+@router.post("/translate", response_model=TranslateResponse)
+async def translate_text(
+    text: str = Query(..., description="Text to translate."),
+    source_language: str = Query(..., description="ISO-639 source language code."),
+    target_language: str = Query(..., description="ISO-639 target language code."),
+):
+    """Translate text using Bhashini NMT via ULCA pipeline."""
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Empty text.")
+
+    service = _get_bhashini_service()
+
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{config['base_url']}/nmt/translate",
-                headers=_get_headers(),
-                json={
-                    "text": text,
-                    "source_language": source_language,
-                    "target_language": target_language,
-                },
-            )
-            response.raise_for_status()
-            result = response.json()
-            return {
-                "translated_text": result.get("translated_text", ""),
-                "source_language": source_language,
-                "target_language": target_language,
-            }
-    except httpx.HTTPError as e:
-        logger.error(f"Bhashini NMT error: {e}")
-        raise HTTPException(status_code=502, detail=f"Bhashini NMT failed: {str(e)}")
+        translated = await service.translate_text(
+            text=text,
+            source_language=source_language,
+            target_language=target_language,
+        )
+    except BhashiniConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except BhashiniAPIError as exc:
+        logger.error("Bhashini translation failed: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini translation failed: {exc}") from exc
+    except httpx.HTTPError as exc:
+        logger.error("Bhashini translation HTTP error: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini translation network error: {exc}") from exc
+
+    return TranslateResponse(
+        translated_text=translated,
+        source_language=source_language,
+        target_language=target_language,
+    )
 
 
 @router.post("/synthesize")
 async def synthesize_speech(
-    text: str,
-    language_code: str,
+    text: str = Query(..., description="Text to synthesize."),
+    language_code: str = Query(default="hi", description="ISO-639 language code."),
 ):
-    """
-    Synthesize speech using Bhashini TTS.
+    """Synthesize speech using Bhashini TTS via ULCA pipeline.
 
-    Requires Bhashini credentials configured server-side.
+    Returns raw WAV audio bytes.
     """
-    if not _is_configured():
-        raise HTTPException(
-            status_code=503,
-            detail="Bhashini TTS not configured. Set BHASHINI_API_KEY and BHASHINI_USER_ID.",
-        )
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Empty text.")
 
-    config = _get_bhashini_config()
+    service = _get_bhashini_service()
+
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{config['base_url']}/tts/synthesize",
-                headers=_get_headers(),
-                json={
-                    "text": text,
-                    "language_code": language_code,
-                },
-            )
-            response.raise_for_status()
-            return Response(
-                content=response.content,
-                media_type="audio/mpeg",
-                headers={"Content-Disposition": f"attachment; filename=tts_{language_code}.mp3"},
-            )
-    except httpx.HTTPError as e:
-        logger.error(f"Bhashini TTS error: {e}")
-        raise HTTPException(status_code=502, detail=f"Bhashini TTS failed: {str(e)}")
+        audio_bytes = await service.synthesize_speech(
+            text=text,
+            language=language_code,
+        )
+    except BhashiniConfigError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except BhashiniAPIError as exc:
+        logger.error("Bhashini TTS failed: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini TTS failed: {exc}") from exc
+    except httpx.HTTPError as exc:
+        logger.error("Bhashini TTS HTTP error: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Bhashini TTS network error: {exc}") from exc
+
+    return Response(
+        content=audio_bytes,
+        media_type="audio/wav",
+        headers={"Content-Disposition": f"attachment; filename=tts_{language_code}.wav"},
+    )
 
 
-@router.post("/detect-language")
+@router.post("/detect-language", response_model=DetectLanguageResponse)
 async def detect_language(
-    text: str,
+    text: str = Query(..., description="Text to detect language for."),
 ):
-    """
-    Detect language using Bhashini ALD.
+    """Detect the language of input text.
 
-    Requires Bhashini credentials configured server-side.
+    NOTE: Bhashini does not expose a standalone ALD endpoint in the ULCA pipeline.
+    This endpoint uses a lightweight heuristic based on Unicode script detection
+    as a fallback when the translator cannot determine language.
     """
-    if not _is_configured():
-        raise HTTPException(
-            status_code=503,
-            detail="Bhashini ALD not configured. Set BHASHINI_API_KEY and BHASHINI_USER_ID.",
-        )
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Empty text.")
 
-    config = _get_bhashini_config()
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{config['base_url']}/ald/detect",
-                headers=_get_headers(),
-                json={"text": text},
-            )
-            response.raise_for_status()
-            result = response.json()
-            return {
-                "detected_language": result.get("language_code", "unknown"),
-                "confidence": result.get("confidence", 0.0),
-            }
-    except httpx.HTTPError as e:
-        logger.error(f"Bhashini ALD error: {e}")
-        raise HTTPException(status_code=502, detail=f"Bhashini ALD failed: {str(e)}")
+    # Use simple Unicode-range heuristic for common Indian scripts.
+    # This is a pragmatic fallback since Bhashini ULCA does not have a
+    # dedicated text-language-detection compute endpoint.
+    detected = _detect_language_heuristic(text)
+    return DetectLanguageResponse(
+        detected_language=detected,
+        confidence=None,
+    )
+
+
+def _detect_language_heuristic(text: str) -> str:
+    """Lightweight Unicode script-based language detection.
+
+    Returns an ISO-639 language code or 'en' as fallback.
+    """
+    if not text:
+        return "en"
+
+    # Check for Devanagari script (Hindi, Marathi, Sanskrit, etc.)
+    for ch in text:
+        cp = ord(ch)
+        if 0x0900 <= cp <= 0x097F:
+            return "hi"
+        if 0x0980 <= cp <= 0x09FF:
+            return "bn"
+        if 0x0A00 <= cp <= 0x0A7F:
+            return "pa"
+        if 0x0A80 <= cp <= 0x0AFF:
+            return "gu"
+        if 0x0B00 <= cp <= 0x0B7F:
+            return "or"
+        if 0x0B80 <= cp <= 0x0BFF:
+            return "ta"
+        if 0x0C00 <= cp <= 0x0C7F:
+            return "te"
+        if 0x0C80 <= cp <= 0x0CFF:
+            return "kn"
+        if 0x0D00 <= cp <= 0x0D7F:
+            return "ml"
+        if 0x0600 <= cp <= 0x06FF:
+            return "ur"
+
+    return "en"

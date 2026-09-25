@@ -1,10 +1,12 @@
 """
 Artisan Voice Processor.
 
-Processes voice notes through speech-to-text (Whisper) with craft glossary biasing.
+Processes voice notes through speech-to-text (Bhashini ASR) with craft glossary biasing.
 """
 
+import asyncio
 import logging
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -33,7 +35,7 @@ class ArtisanVoiceProcessor:
         product_draft_id: Optional[str] = None,
     ) -> VoicePipelineResult:
         """
-        Transcribe a voice note using Whisper STT.
+        Transcribe a voice note using Bhashini ASR.
 
         Args:
             audio_path: Path to the audio file
@@ -45,19 +47,70 @@ class ArtisanVoiceProcessor:
         Returns:
             VoicePipelineResult with transcript
         """
-        # This is a stub implementation.
-        # The actual Whisper model integration would be here.
-        logger.warning("[ArtisanVoiceProcessor] Using stub implementation")
+        path = Path(audio_path)
+        if not path.exists():
+            return VoicePipelineResult(
+                voice_note_id=note_id or "error",
+                status=JobStatus.FAILED,
+                error=f"Audio file not found: {audio_path}",
+            )
+
+        # Map "auto" to a default language for Bhashini.
+        bhashini_language = language_code if language_code != "auto" else "hi"
+
+        try:
+            # Run async Bhashini client in a new event loop.
+            # This method is called from run_in_threadpool, so there is no
+            # running event loop in this thread.
+            transcript_text = asyncio.run(
+                self._transcribe_with_bhashini(path, bhashini_language)
+            )
+        except Exception as exc:
+            logger.error("[ArtisanVoiceProcessor] Bhashini ASR failed: %s", exc)
+            return VoicePipelineResult(
+                voice_note_id=note_id or "error",
+                status=JobStatus.FAILED,
+                error=f"Voice transcription failed: {exc}",
+            )
+
+        if not transcript_text or not transcript_text.strip():
+            return VoicePipelineResult(
+                voice_note_id=note_id or "stub_note",
+                status=JobStatus.COMPLETED,
+                transcript=Transcript(
+                    text="",
+                    language_code=bhashini_language,
+                    provider=STTProvider.BHASHINI,
+                    duration_seconds=0.0,
+                    is_fallback=False,
+                ),
+                elapsed_seconds=0.0,
+                error="No audible speech detected. Please speak closer to the microphone.",
+            )
 
         return VoicePipelineResult(
             voice_note_id=note_id or "stub_note",
             status=JobStatus.COMPLETED,
             transcript=Transcript(
-                text="",
-                language_code=language_code if language_code != "auto" else "en",
-                provider=STTProvider.WHISPER,
+                text=transcript_text.strip(),
+                language_code=bhashini_language,
+                provider=STTProvider.BHASHINI,
                 duration_seconds=0.0,
-                is_fallback=True,
+                is_fallback=False,
             ),
             elapsed_seconds=0.0,
         )
+
+    async def _transcribe_with_bhashini(self, audio_path: Path, language: str) -> str:
+        """Call Bhashini ASR via the centralized service."""
+        from backend.services.bhashini_service import BhashiniConfigError, BhashiniService
+
+        api_key = os.environ.get("BHASHINI_API_KEY", "")
+        user_id = os.environ.get("BHASHINI_USER_ID", "")
+        if not api_key or not user_id:
+            raise BhashiniConfigError("Bhashini credentials not configured.")
+
+        service = BhashiniService(api_key=api_key, user_id=user_id)
+        audio_bytes = audio_path.read_bytes()
+        return await service.transcribe_audio(audio_bytes=audio_bytes, language=language)
+

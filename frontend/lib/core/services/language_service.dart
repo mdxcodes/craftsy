@@ -162,7 +162,7 @@ class BhashiniLanguageProvider implements LanguageProvider {
   @override
   String get name => 'Bhashini';
 
-  // Bhashini language code mapping
+  // Bhashini language code mapping (ISO-639)
   static const Map<String, String> _bhashiniCodes = {
     'en': 'en',
     'hi': 'hi',
@@ -178,11 +178,33 @@ class BhashiniLanguageProvider implements LanguageProvider {
     'as': 'as',
   };
 
+  Dio? _dio;
+
+  Future<Dio> _getDio() async {
+    _dio ??= Dio(
+      BaseOptions(
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
+    return _dio!;
+  }
+
   @override
   Future<bool> isAvailable() async {
-    // Bhashini is available only when backend proxy is configured.
-    // Check settings for configured flag.
-    return false; // Not configured yet
+    try {
+      final dio = await _getDio();
+      final response = await dio.get('/api/v1/bhashini/status');
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return data['configured'] == true;
+      }
+    } catch (_) {
+      // Backend not reachable or Bhashini not configured.
+    }
+    return false;
   }
 
   @override
@@ -190,8 +212,23 @@ class BhashiniLanguageProvider implements LanguageProvider {
     List<int> audioBytes, {
     required String languageCode,
   }) async {
-    // Would call backend /api/v1/voice/transcribe with Bhashini proxy
-    // Backend uses configured Bhashini credentials
+    try {
+      final dio = await _getDio();
+      final formData = FormData.fromMap({
+        'audio': MultipartFile.fromBytes(audioBytes, filename: 'audio.m4a'),
+        'language_code': languageCode,
+      });
+      final response = await dio.post(
+        '/api/v1/bhashini/transcribe',
+        data: formData,
+      );
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return data['transcript'] as String?;
+      }
+    } catch (e) {
+      debugPrint('[BhashiniLanguageProvider] transcribe error: $e');
+    }
     return null;
   }
 
@@ -201,7 +238,23 @@ class BhashiniLanguageProvider implements LanguageProvider {
     required String sourceLanguage,
     required String targetLanguage,
   }) async {
-    // Would call backend /api/v1/translate with Bhashini NMT
+    try {
+      final dio = await _getDio();
+      final response = await dio.post(
+        '/api/v1/bhashini/translate',
+        queryParameters: {
+          'text': text,
+          'source_language': sourceLanguage,
+          'target_language': targetLanguage,
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return data['translated_text'] as String?;
+      }
+    } catch (e) {
+      debugPrint('[BhashiniLanguageProvider] translate error: $e');
+    }
     return null;
   }
 
@@ -210,13 +263,40 @@ class BhashiniLanguageProvider implements LanguageProvider {
     String text, {
     required String languageCode,
   }) async {
-    // Would call backend /api/v1/tts with Bhashini TTS
+    try {
+      final dio = await _getDio();
+      final response = await dio.post(
+        '/api/v1/bhashini/synthesize',
+        queryParameters: {
+          'text': text,
+          'language_code': languageCode,
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      if (response.statusCode == 200) {
+        return response.data as List<int>?;
+      }
+    } catch (e) {
+      debugPrint('[BhashiniLanguageProvider] synthesize error: $e');
+    }
     return null;
   }
 
   @override
   Future<String?> detect(String text) async {
-    // Would call backend /api/v1/detect-language with Bhashini ALD
+    try {
+      final dio = await _getDio();
+      final response = await dio.post(
+        '/api/v1/bhashini/detect-language',
+        queryParameters: {'text': text},
+      );
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return data['detected_language'] as String?;
+      }
+    } catch (e) {
+      debugPrint('[BhashiniLanguageProvider] detect error: $e');
+    }
     return null;
   }
 
