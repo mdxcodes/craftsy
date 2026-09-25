@@ -237,6 +237,24 @@ def get_settings() -> Settings:
 
 
 def ensure_upload_dir() -> Path:
-    """Ensure media upload directory exists."""
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    return UPLOAD_DIR
+    """Ensure media upload directory exists and is writable.
+
+    Falls back to ``/tmp/uploads`` when the configured path cannot be
+    created or written to (for example, when a Railway volume mount is
+    owned by root but the container user is unprivileged).
+    """
+    try:
+        UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        test_file = UPLOAD_DIR / ".write_test"
+        test_file.touch()
+        test_file.unlink()
+        return UPLOAD_DIR
+    except (PermissionError, OSError):
+        fallback = Path("/tmp/uploads")
+        fallback.mkdir(parents=True, exist_ok=True)
+        logger.warning(
+            "Configured upload dir %s is not writable; falling back to %s",
+            UPLOAD_DIR,
+            fallback,
+        )
+        return fallback
