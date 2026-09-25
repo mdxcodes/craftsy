@@ -27,7 +27,7 @@ from google import genai
 from google.genai import types
 
 from .groq_client import GroqClient
-from ..config import get_settings
+from ..config import get_settings, ensure_upload_dir
 
 logger = logging.getLogger(__name__)
 
@@ -340,7 +340,7 @@ class SocialMediaService:
 
         # 2. CodeQL-compliant resolution
         # We must use os.path functions because CodeQL explicitly looks for them
-        safe_dir = os.path.realpath(str(self.settings.upload_dir))
+        safe_dir = os.path.realpath(str(ensure_upload_dir()))
         target_path = os.path.realpath(os.path.join(safe_dir, relative_path))
 
         # 3. CodeQL-compliant boundary check using .startswith()
