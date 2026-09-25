@@ -1,0 +1,23 @@
+# ============================================================
+# Railway deployment configuration
+# ============================================================
+# Documentation: https://docs.railway.com/reference/config-as-code
+#
+# Required environment variables for production:
+#   DATABASE_URL   — Railway PostgreSQL connection string
+#   ENVIRONMENT    — "production"
+#   CORS_ORIGINS   — explicit allowed origins (comma-separated)
+# Optional (app boots without them):
+#   GROQ_API_KEY, GEMINI_API_KEY, WHISPER_API_KEY, BHASHINI_*
+# ============================================================
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

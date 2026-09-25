@@ -20,13 +20,13 @@ Configuration:
 
 from __future__ import annotations
 
-import os
 import httpx
 import logging
 from typing import Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Response
 from sqlalchemy.orm import Session
 
+from ..config import get_settings
 from ..database import get_db
 
 logger = logging.getLogger(__name__)
@@ -38,11 +38,12 @@ router = APIRouter(prefix="/api/v1/bhashini", tags=["Bhashini Language Services"
 
 
 def _get_bhashini_config() -> Dict[str, str]:
-    """Get Bhashini credentials from environment."""
+    """Get Bhashini credentials from the centralized settings."""
+    settings = get_settings()
     return {
-        "api_key": os.getenv("BHASHINI_API_KEY", ""),
-        "user_id": os.getenv("BHASHINI_USER_ID", ""),
-        "base_url": os.getenv("BHASHINI_BASE_URL", "https://api.bhashini.gov.in"),
+        "api_key": settings.bhashini_api_key,
+        "user_id": settings.bhashini_user_id,
+        "base_url": settings.bhashini_base_url,
     }
 
 
@@ -234,7 +235,6 @@ async def synthesize_speech(
                     "text": text,
                     "language_code": language_code,
                 },
-                response_type="bytes",
             )
             response.raise_for_status()
             return Response(

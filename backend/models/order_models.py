@@ -50,20 +50,29 @@ class OrderDB(Base):
         index=True,
     )
 
-    # Product info (denormalized for order history)
+    # Product info (denormalized for single-product orders)
     product_id = Column(
         String(64),
         ForeignKey("products.id", ondelete="SET NULL"),
         nullable=True,
     )
-    product_title = Column(String(255), nullable=False)
+    product_title = Column(String(255), nullable=True)  # NULL for multi-item orders
     product_image_url = Column(String(512), default="")
 
-    # Buyer info
+    # Buyer info (denormalized for artisan-oriented orders)
     buyer_name = Column(String(255), nullable=False)
     buyer_location = Column(String(255), default="")
     buyer_email = Column(String(255), nullable=True)
     buyer_phone = Column(String(20), nullable=True)
+
+    # Customer identity (for consumer marketplace orders)
+    # References the unified identity (ArtisanDB with role="customer")
+    customer_id = Column(
+        String(64),
+        ForeignKey("artisans.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
 
     # Order details
     quantity = Column(Integer, default=1)
@@ -82,13 +91,34 @@ class OrderDB(Base):
     shipped_at = Column(DateTime, nullable=True)
     delivered_at = Column(DateTime, nullable=True)
 
+    # Payment reference
+    payment_id = Column(
+        String(64),
+        ForeignKey("payments.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
+    # Address reference
+    address_id = Column(
+        String(64),
+        ForeignKey("addresses.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
     # Timestamps
     placed_at = Column(DateTime, default=datetime.now, index=True)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     # Relationships (no backref to avoid lazy-load issues in tests)
-    artisan = relationship("ArtisanDB")
-    product = relationship("ProductDB")
+    artisan = relationship("ArtisanDB", foreign_keys=[artisan_id])
+    customer = relationship("ArtisanDB", foreign_keys=[customer_id], back_populates="customer_orders")
+    product = relationship("ProductDB", foreign_keys=[product_id])
+    items = relationship("OrderItemDB", back_populates="order", lazy="dynamic", cascade="all, delete-orphan", foreign_keys="OrderItemDB.order_id")
+    address = relationship("AddressDB", foreign_keys=[address_id])
+    payment = relationship("PaymentDB", foreign_keys=[payment_id])
+    shipment = relationship("ShipmentDB", foreign_keys="ShipmentDB.order_id")
 
     @property
     def channel_data_dict(self) -> dict:
@@ -135,8 +165,8 @@ class OrderResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    product_title: str
-    product_image_url: str
+    product_title: Optional[str] = None  # NULL for multi-item consumer orders
+    product_image_url: str = ""
     buyer_name: str
     buyer_location: str
     quantity: int

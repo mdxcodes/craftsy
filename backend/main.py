@@ -2,8 +2,14 @@
 Craftsy FastAPI Application Entrypoint.
 
 AI-Driven Market Linkage & Smart Cataloging Backend for Marginalized Artisans.
+
+Deployment notes:
+    - Runs on Railway with `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`.
+    - Databases: SQLite locally, PostgreSQL in production (via DATABASE_URL).
+    - No optional AI provider is required to boot; heavy models are lazy-loaded.
 """
 
+import logging
 import sys
 import warnings
 from pathlib import Path
@@ -28,7 +34,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.config import get_settings, ensure_upload_dir
-from backend.database import init_db
+from backend.database import init_db, describe_database, check_database_connection
 from backend.routers import (
     health_router,
     pricing_router,
@@ -42,42 +48,81 @@ from backend.routers import (
     orders_router,
     commerce_hub_router,
     bhashini_router,
+    cart_router,
+    address_router,
+    checkout_router,
+    marketplace_router,
 )
 
 settings = get_settings()
 
 
+def _configure_logging() -> None:
+    """Configure application logging once, at import time.
+
+    Production logs identify startup, database status, and provider failures
+    without ever emitting secrets (keys/tokens are never logged by the app).
+    """
+    level = getattr(logging, (settings.log_level or "INFO").upper(), logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        stream=sys.stdout,
+        force=True,
+    )
+    # Reduce noisy third-party logs in production
+    if settings.is_production:
+        for noisy in ("chromadb", "httpx", "httpcore", "urllib3"):
+            logging.getLogger(noisy).setLevel(logging.WARNING)
+
+
+logger = logging.getLogger("craftsy.startup")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown event lifecycle."""
-    # 1. Ensure upload directory exists
+    _configure_logging()
+
+    # 1. Ensure upload directory exists (ephemeral on Railway — object storage
+    #    is a documented production requirement, see the readiness report).
     ensure_upload_dir()
-    
-    # 2. Initialize database tables (artisans + products)
+
+    # 2. Initialize database tables
     init_db()
+    ok, detail = check_database_connection()
+    logger.info("Database: %s — connection %s", describe_database(), "OK" if ok else f"FAILED ({detail})")
 
-    # 3. Pre-warm rembg ONNX session asynchronously so first request has 0s model download penalty
-    def _warmup_models():
-        try:
-            from ML.image_pipeline.processors.background_removal import get_rembg_session
-            get_rembg_session()
-        except Exception:
-            pass
+    # 3. Optionally pre-warm the rembg ONNX model.
+    #    Disabled by default: downloading a model on every container cold start is
+    #    wasteful on Railway. The session is created lazily on first request instead.
+    if settings.warmup_models_enabled:
+        def _warmup_models():
+            try:
+                from ML.image_pipeline.processors.background_removal import get_rembg_session
+                get_rembg_session()
+                logger.info("rembg model warm-up complete.")
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("rembg model warm-up skipped: %s", exc)
 
-    import threading
-    threading.Thread(target=_warmup_models, daemon=True).start()
+        import threading
+        threading.Thread(target=_warmup_models, daemon=True).start()
+    else:
+        logger.info("Model warm-up disabled (lazy-load on first request).")
 
-    print("\n" + "=" * 60)
-    print(f"  ✨ {settings.app_name} v{settings.app_version} Started")
-    print(f"  📖 Swagger UI Docs: http://localhost:{settings.port}/docs")
-    print(f"  🔍 Health Status:   http://localhost:{settings.port}/api/v1/health")
-    print(f"  🎙️ Voice Pipeline:  http://localhost:{settings.port}/api/v1/voice/process")
-    print(f"  💰 Pricing Endpoint: http://localhost:{settings.port}/api/v1/pricing/suggest")
-    print(f"  📦 Products API:    http://localhost:{settings.port}/api/v1/products")
-    print(f"  📱 Social Helper:   http://localhost:{settings.port}/api/v1/social-drafts/generate")
-    print("=" * 60 + "\n")
+    base = f"http://{settings.host}:{settings.port}"
+    logger.info(
+        "✨ %s v%s started | env=%s | db=%s",
+        settings.app_name,
+        settings.app_version,
+        settings.environment,
+        describe_database(),
+    )
+    logger.info("Swagger UI: %s/docs | Health: %s/api/v1/health", base, base)
 
     yield
+
+    logger.info("%s shutting down.", settings.app_name)
 
 
 app = FastAPI(
@@ -89,7 +134,9 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# ── CORS Middleware (Permissive for Flutter Web & Mobile) ────────────────────
+# ── CORS Middleware ──────────────────────────────────────────────────────────
+# Origins are configurable via CORS_ORIGINS. Credentials are automatically
+# disabled if a wildcard origin is configured (guarded in Settings).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -115,6 +162,10 @@ app.include_router(commerce_router)
 app.include_router(orders_router)
 app.include_router(commerce_hub_router)
 app.include_router(bhashini_router)
+app.include_router(cart_router)
+app.include_router(address_router)
+app.include_router(checkout_router)
+app.include_router(marketplace_router)
 
 
 @app.get("/", tags=["Root"])
@@ -123,6 +174,7 @@ async def root():
     return {
         "message": "Welcome to Craftsy API Gateway",
         "version": settings.app_version,
+        "environment": settings.environment,
         "docs": "/docs",
         "health": "/api/v1/health",
         "voice_pipeline": "/api/v1/voice/process",

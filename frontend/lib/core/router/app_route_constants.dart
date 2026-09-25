@@ -19,6 +19,13 @@ class AppRouteConstants {
   static const String inventory = 'inventory';
   static const String craftMitra = 'craftMitra';
   static const String businessAdvisor = 'businessAdvisor';
+  static const String marketplace = 'marketplace';
+  static const String marketplaceProductDetail = 'marketplaceProductDetail';
+  static const String myCart = 'myCart';
+  static const String checkout = 'checkout';
+  static const String orderConfirmation = 'orderConfirmation';
+  static const String myPurchases = 'myPurchases';
+  static const String purchaseDetail = 'purchaseDetail';
 
   static const String productDetail = 'productDetail';
   static const String languageSettings = 'languageSettings';

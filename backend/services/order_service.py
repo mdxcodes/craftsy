@@ -168,6 +168,186 @@ class OrderService:
             for row in results
         ]
 
+    def create_order_from_cart(
+        self,
+        db: Session,
+        customer_id: str,
+        address_id: str,
+        items: list,
+        payment_method: str = "cod",
+    ) -> OrderDB:
+        """
+        Create an order from cart items (server-authoritative).
+
+        This method:
+        1. Validates the address belongs to the customer
+        2. Validates each product exists and is live
+        3. Validates stock availability
+        4. Uses ProductDB.price as the authoritative price
+        5. Calculates totals server-side
+        6. Creates OrderDB, OrderItemDB, PaymentDB, ShipmentDB records
+        7. Decrements stock atomically
+        8. Uses a transaction (all-or-nothing)
+
+        Concurrency:
+            Product rows are read with `SELECT ... FOR UPDATE` so that two
+            simultaneous checkouts cannot both pass the stock check and oversell
+            the last unit. PostgreSQL honours the row lock; SQLite ignores
+            `FOR UPDATE` (single-writer) so local development is unaffected.
+
+        Raises:
+            ValueError: If address not found, product not found, product not live,
+                       or insufficient stock.
+        """
+        from ..models.commerce_foundation_models import AddressDB, OrderItemDB, PaymentDB, ShipmentDB
+
+        # Validate address
+        address = db.query(AddressDB).filter(
+            AddressDB.id == address_id,
+            AddressDB.user_id == customer_id,
+        ).first()
+        if not address:
+            raise ValueError("Address not found or does not belong to user")
+
+        # Validate items
+        if not items:
+            raise ValueError("No items in order")
+
+        # Build order items with server-authoritative pricing.
+        # Everything below runs inside a single transaction; on any failure we
+        # roll back so no partial order/payment/shipment/stock change survives.
+        order_items_data = []
+        total_amount = 0.0
+
+        try:
+            for item in items:
+                product_id = item.get("product_id")
+                quantity = item.get("quantity", 1)
+
+                if not product_id:
+                    raise ValueError("Product ID is required")
+
+                if quantity < 1:
+                    raise ValueError("Quantity must be at least 1")
+
+                # Look up product and take a row lock (no-op on SQLite) to
+                # serialise concurrent stock decrements on PostgreSQL.
+                product = (
+                    db.query(ProductDB)
+                    .filter(ProductDB.id == product_id)
+                    .with_for_update()
+                    .first()
+                )
+                if not product:
+                    raise ValueError(f"Product {product_id} not found")
+
+                # Validate product is live
+                if product.status != "live":
+                    raise ValueError(f"Product {product.title} is not available")
+
+                # Validate stock
+                if product.stock < quantity:
+                    raise ValueError(
+                        f"Insufficient stock for {product.title}. "
+                        f"Available: {product.stock}, Requested: {quantity}"
+                    )
+
+                # Use server-authoritative price, rounded to paise
+                unit_price = round(float(product.price or 0.0), 2)
+                item_total = round(unit_price * quantity, 2)
+                total_amount = round(total_amount + item_total, 2)
+
+                order_items_data.append({
+                    "product_id": product.id,
+                    "product_title": product.title,
+                    "product_image_url": product.image_url,
+                    "quantity": quantity,
+                    "unit_price": unit_price,
+                    "total_price": item_total,
+                })
+
+            # Create order
+            # Link the order to the seller (artisan) via the first product so the
+            # artisan's existing order inbox can discover consumer orders.
+            first_product = db.query(ProductDB).filter(
+                ProductDB.id == order_items_data[0]["product_id"]
+            ).first()
+
+            order = OrderDB(
+                id=f"ord_{uuid.uuid4().hex[:12]}",
+                artisan_id=first_product.artisan_id,
+                customer_id=customer_id,
+                address_id=address_id,
+                buyer_name=address.name,
+                buyer_location=f"{address.city}, {address.state}",
+                buyer_phone=address.phone,
+                quantity=sum(item["quantity"] for item in order_items_data),
+                unit_price=0.0,  # Not used for multi-item orders
+                total_amount=total_amount,
+                status="new",
+                channel="craftsy",
+            )
+            db.add(order)
+            db.flush()  # Get order.id
+
+            # Create order items and decrement stock
+            for item_data in order_items_data:
+                order_item = OrderItemDB(
+                    id=f"oitem_{uuid.uuid4().hex[:12]}",
+                    order_id=order.id,
+                    product_id=item_data["product_id"],
+                    product_title=item_data["product_title"],
+                    product_image_url=item_data["product_image_url"],
+                    quantity=item_data["quantity"],
+                    unit_price=item_data["unit_price"],
+                    total_price=item_data["total_price"],
+                )
+                db.add(order_item)
+
+                # Decrement stock (row already locked above)
+                product = (
+                    db.query(ProductDB)
+                    .filter(ProductDB.id == item_data["product_id"])
+                    .with_for_update()
+                    .first()
+                )
+                product.stock -= item_data["quantity"]
+
+            # Create payment record
+            payment = PaymentDB(
+                id=f"pay_{uuid.uuid4().hex[:12]}",
+                order_id=order.id,
+                user_id=customer_id,
+                amount=total_amount,
+                method=payment_method,
+                status="pending",
+            )
+            db.add(payment)
+            db.flush()
+
+            # Link payment to order
+            order.payment_id = payment.id
+
+            # Create shipment record for the seller
+            shipment = ShipmentDB(
+                id=f"ship_{uuid.uuid4().hex[:12]}",
+                order_id=order.id,
+                artisan_id=first_product.artisan_id,
+                status="pending",
+            )
+            db.add(shipment)
+
+            # Commit transaction
+            db.commit()
+            db.refresh(order)
+            return order
+
+        except Exception:
+            # Preserve all-or-nothing semantics: no partial order, payment,
+            # shipment, or stock change survives a failure.
+            db.rollback()
+            raise
+
 
 # ── Singleton ────────────────────────────────────────────────────────────────
 

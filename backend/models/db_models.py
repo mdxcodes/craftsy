@@ -27,10 +27,18 @@ class ArtisanDB(Base):
     experience_years = Column(String(16), default="")
     pehchan_id = Column(String(64), nullable=True)
     preferred_language = Column(String(8), default="en")
+    role = Column(String(32), default="artisan", nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.now)
 
     # Relationship: one artisan owns many products
     products = relationship("ProductDB", back_populates="artisan", lazy="dynamic")
+
+    # Commerce foundation relationships
+    cart = relationship("CartDB", back_populates="user", uselist=False, cascade="all, delete-orphan", foreign_keys="CartDB.user_id")
+    addresses = relationship("AddressDB", back_populates="user", lazy="dynamic", cascade="all, delete-orphan")
+    payments = relationship("PaymentDB", back_populates="user", lazy="dynamic", cascade="all, delete-orphan")
+    shipments = relationship("ShipmentDB", back_populates="artisan", lazy="dynamic", cascade="all, delete-orphan")
+    customer_orders = relationship("OrderDB", foreign_keys="OrderDB.customer_id", back_populates="customer", lazy="dynamic")
 
 
 class ProductDB(Base):

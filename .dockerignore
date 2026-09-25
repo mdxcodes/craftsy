@@ -1,0 +1,63 @@
+# Version control
+.git
+.gitignore
+
+# Secrets & environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python caches & virtualenvs
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Frontend (not needed by the backend image)
+frontend/
+build/
+submission/
+assets/
+docs/
+
+# Databases & runtime data (never bake data into the image)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+backend/craftsy.db
+backend/uploads/
+uploads/
+**/uploads/
+ML/pricing/chroma_db/
+ML/pricing/data/
+ML/voice_pipeline/data/
+ML/image_pipeline/output/
+ML/image_pipeline/input/
+**/chroma_db/
+
+# Media
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.aac
+*.flac
+
+# Docs
+*.md
+!README.md
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

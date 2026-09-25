@@ -356,3 +356,31 @@ All backend services, routers, ML pipeline, database models, and most Flutter se
 - Business Advisor built with real canonical data, not hardcoded metrics
 
 ### Integration Complete
+
+---
+
+## Repository Canonicalization
+
+**Status: COMPLETE**
+
+| Item | Value |
+|------|-------|
+| Canonical repository | `/secondary/craftsy` |
+| Archived repository | `/secondary/craftsy_bhavya_archived` |
+| Final commit | `23e455c` |
+| Final tag | `bhavya-integration-complete` |
+| Branch | `feature/bhavya-selective-integration` |
+| Remote | `git@github.com:mdxcodes/craftsy.git` |
+| Push result | SUCCESS |
+| Force push | NONE |
+| History rewrite | NONE |
+
+### Final Validation
+- Flutter tests: 104/104 pass
+- Backend tests: 48/53 (3 pre-existing failures)
+- Analyzer: 0 errors, 32 warnings (pre-existing)
+- APK build: SUCCESSFUL
+- Security: No secrets introduced
+
+**The Bhavya repository is no longer an active development source.**
+**Canonical Craftsy development continues exclusively in `/secondary/craftsy`.**

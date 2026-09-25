@@ -48,6 +48,7 @@ class ArtisanProfileResponse(BaseModel):
     experience_years: Optional[str] = None
     pehchan_id: Optional[str] = None
     preferred_language: str
+    role: str = "artisan"
     created_at: datetime
 
 

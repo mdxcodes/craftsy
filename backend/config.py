@@ -3,18 +3,48 @@ Craftsy Backend Configuration.
 
 Loads environment variables from the root .env file and provides
 centralized application settings.
+
+Environment strategy:
+    - Local development : SQLite + permissive defaults, no external keys needed.
+    - Production        : PostgreSQL via DATABASE_URL, explicit CORS origins,
+                          optional AI keys supplied as environment variables.
+
+Nothing here makes a network call or requires an API key at import time.
 """
 
+import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import List
-from pydantic_settings import BaseSettings
-from pydantic import Field
+from typing import Annotated, List
+
+from pydantic import Field, field_validator, model_validator
+from pydantic_settings import BaseSettings, NoDecode
+
+logger = logging.getLogger(__name__)
 
 # Directories
 BACKEND_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_ROOT.parent
 UPLOAD_DIR = BACKEND_ROOT / "uploads"
+
+
+def _split_env_list(value):
+    """Accept both JSON arrays and comma-separated strings for list settings."""
+    if value is None or isinstance(value, list):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return []
+        if text.startswith("["):
+            import json
+
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                pass
+        return [part.strip() for part in text.split(",") if part.strip()]
+    return value
 
 
 class Settings(BaseSettings):
@@ -23,13 +53,26 @@ class Settings(BaseSettings):
     app_name: str = "Craftsy API"
     app_version: str = "1.0.0"
     app_description: str = "AI-Driven Market Linkage & Smart Cataloging Backend for Marginalized Artisans"
-    debug: bool = False
+
+    # Deployment environment: "development" or "production"
+    environment: str = Field(
+        default="development",
+        description="Deployment environment (development | production).",
+    )
+    debug: bool = Field(
+        default=False,
+        description="Enable verbose SQLAlchemy echo / debug behaviour.",
+    )
+    log_level: str = Field(
+        default="INFO",
+        description="Root log level (DEBUG, INFO, WARNING, ERROR).",
+    )
 
     # Server
-    host: str = "0.0.0.0"
-    port: int = 8000
+    host: str = Field(default="0.0.0.0", description="Bind host.")
+    port: int = Field(default=8000, description="Bind port. Railway supplies this via PORT.")
 
-    # API Keys
+    # API Keys (all optional — the app degrades gracefully without them)
     gemini_api_key: str = Field(
         default="",
         description="Google Gemini API key for multimodal embeddings and LLM pricing/cataloging.",
@@ -83,28 +126,108 @@ class Settings(BaseSettings):
         """Resolve active Groq API key from groq_api_key or whisper_api_key."""
         return self.groq_api_key.strip() or self.whisper_api_key.strip()
 
+    # Bhashini Language Services (optional; server-side only)
+    bhashini_api_key: str = Field(default="", description="Bhashini API key (server-side only).")
+    bhashini_user_id: str = Field(default="", description="Bhashini user id.")
+    bhashini_base_url: str = Field(
+        default="https://api.bhashini.gov.in",
+        description="Bhashini API base URL.",
+    )
+
     # Models
     llm_model: str = "gemini-3.6-flash"
     embedding_model: str = "gemini-embedding-001"
 
-    # Database
+    # Database — defaults to local SQLite, overridden by DATABASE_URL in production.
     database_url: str = f"sqlite:///{BACKEND_ROOT / 'craftsy.db'}"
+    database_echo: bool = Field(
+        default=False,
+        description="Echo SQL statements (dev only). Defaults to `debug` when unset.",
+    )
 
     # Media Storage
     upload_dir: str = str(UPLOAD_DIR)
     static_url_prefix: str = "/uploads"
 
-    # CORS
-    cors_origins: List[str] = ["*"]
-    cors_allow_credentials: bool = True
-    cors_allow_methods: List[str] = ["*"]
-    cors_allow_headers: List[str] = ["*"]
+    # Startup behaviour
+    warmup_models_enabled: bool = Field(
+        default=False,
+        description=(
+            "Pre-download / pre-warm the rembg ONNX model on startup. "
+            "Disabled by default so production containers do not download models on boot; "
+            "the model is loaded lazily on first image-enhancement request instead."
+        ),
+    )
+
+    # CORS — comma-separated list or JSON array. Never `*` with credentials.
+    cors_origins: Annotated[List[str], NoDecode] = Field(
+        default=["*"],
+        description="Allowed CORS origins (comma-separated). Narrow this in production.",
+    )
+    cors_allow_credentials: bool = Field(
+        default=False,
+        description="Allow credentials. Forced off whenever a wildcard origin is present.",
+    )
+    cors_allow_methods: Annotated[List[str], NoDecode] = Field(
+        default=["*"],
+        description="Allowed CORS methods (comma-separated).",
+    )
+    cors_allow_headers: Annotated[List[str], NoDecode] = Field(
+        default=["*"],
+        description="Allowed CORS headers (comma-separated).",
+    )
 
     model_config = {
         "env_file": str(PROJECT_ROOT / ".env"),
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }
+
+    @field_validator(
+        "cors_origins",
+        "cors_allow_methods",
+        "cors_allow_headers",
+        "supported_languages",
+        mode="before",
+    )
+    @classmethod
+    def _parse_list_settings(cls, value):
+        return _split_env_list(value)
+
+    @model_validator(mode="after")
+    def _guard_cors_wildcard_credentials(self):
+        """Never combine a wildcard origin with credentialed requests."""
+        if "*" in self.cors_origins and self.cors_allow_credentials:
+            logger.warning(
+                "CORS: wildcard origin with credentials is unsafe; disabling credentials."
+            )
+            self.cors_allow_credentials = False
+        return self
+
+    # ── Derived helpers ──────────────────────────────────────────────────────
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.strip().lower() in {"production", "prod"}
+
+    @property
+    def resolved_database_url(self) -> str:
+        """Normalise the database URL for SQLAlchemy.
+
+        Railway historically exposes `postgres://`, which SQLAlchemy does not
+        recognise as a dialect prefix. Map it to `postgresql://` (psycopg2).
+        """
+        url = (self.database_url or "").strip()
+        if url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://"):]
+        if url.startswith("postgresql+psycopg://"):
+            # A psycopg (v3) URL requires the psycopg driver; keep as-is.
+            return url
+        return url
+
+    @property
+    def uses_sqlite(self) -> bool:
+        return self.resolved_database_url.startswith("sqlite")
 
 
 @lru_cache()
