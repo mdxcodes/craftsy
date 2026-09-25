@@ -102,3 +102,6 @@ key.properties
 **/*.jks
 local.properties
 **/local.properties
+
+# Freebuff local pipeline state
+.freebuff/
