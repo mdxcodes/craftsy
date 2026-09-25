@@ -196,29 +196,43 @@ class _QuickActions extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: LargeActionCard(
-                  label: 'home_my_orders'.tr(),
-                  icon: Icons.receipt_long,
-                  onTap: () => context.pushNamed(AppRouteConstants.myOrders),
-                  backgroundColor: AppColors.tealLight,
-                  iconColor: AppColors.teal,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: LargeActionCard(
-                  label: 'home_my_stats'.tr(),
-                  icon: Icons.trending_up,
-                  onTap: () => context.pushNamed(AppRouteConstants.myStats),
-                  backgroundColor: AppColors.coralLight,
-                  iconColor: AppColors.coral,
-                ),
-              ),
-            ],
-          ),
+           Row(
+             children: [
+               Expanded(
+                 child: LargeActionCard(
+                   label: 'home_my_orders'.tr(),
+                   icon: Icons.receipt_long,
+                   onTap: () => context.pushNamed(AppRouteConstants.myOrders),
+                   backgroundColor: AppColors.tealLight,
+                   iconColor: AppColors.teal,
+                 ),
+               ),
+               const SizedBox(width: AppSpacing.md),
+               Expanded(
+                 child: LargeActionCard(
+                   label: 'home_my_stats'.tr(),
+                   icon: Icons.trending_up,
+                   onTap: () => context.pushNamed(AppRouteConstants.myStats),
+                   backgroundColor: AppColors.coralLight,
+                   iconColor: AppColors.coral,
+                 ),
+               ),
+             ],
+           ),
+           const SizedBox(height: AppSpacing.md),
+           Row(
+             children: [
+               Expanded(
+                 child: LargeActionCard(
+                   label: 'advisor_title'.tr(),
+                   icon: Icons.lightbulb,
+                   onTap: () => context.pushNamed(AppRouteConstants.businessAdvisor),
+                   backgroundColor: AppColors.indigoLight,
+                   iconColor: AppColors.indigo,
+                 ),
+               ),
+             ],
+           ),
         ],
       ),
     );
