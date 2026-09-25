@@ -231,7 +231,7 @@ class BhashiniService:
                 }
             ],
             "inputData": {
-                "input": [{"source": None}],
+                "input": [{"source": ""}],
                 "audio": [
                     {"audioContent": self._encode_audio(audio_bytes)}
                 ],
