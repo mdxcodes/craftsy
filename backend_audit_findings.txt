@@ -1,0 +1,38 @@
+Production Readiness Audit Findings for Craftsy Backend
+=======================================================
+
+1. Configuration Issues
+   - config.py:142 - database_url defaults to SQLite (`sqlite:///.../craftsy.db`). In production, this must be overridden via DATABASE_URL environment variable. If not overridden, the application will use SQLite which is unsuitable for production due to ephemeral storage and limited concurrency.
+   - config.py:163-165 - CORS origins default to ["*"] (wildcard). While there is a validator that disables credentials when a wildcard is present, explicit origins should be configured in production for security.
+   - config.py:28-29 - UPLOAD_DIR is set to a relative path (`backend/uploads`). Combined with the ensure_upload_dir() function, this relies on local disk storage which may be ephemeral in production environments (e.g., Railway filesystem). Production should use object storage as noted in config.py comments.
+
+2. Database Layer Issues
+   - database.py:41 - SQLite-specific connect_arg `{"check_same_thread": False}` is used. While necessary for SQLite to work in multithreaded environments (like FastAPI), SQLite is not recommended for production workloads due to concurrency limitations and lack of network accessibility.
+   - database.py:107-145 - SQLite migration logic (`_migrate_sqlite_columns`) runs only when the database dialect is SQLite. This is acceptable for SQLite-only deployments but indicates the application is not fully database-agnostic; PostgreSQL deployments skip these migrations.
+   - database.py:168-173 - Warning logged when running production on SQLite, but the application continues to start. This may lead to unnoticed production misconfigurations.
+
+3. Application Entrypoint Issues
+   - main.py:113 - Base URL constructed as `f"http://{settings.host}:{settings.port}"`. This does not account for common production reverse proxy setups (e.g., load balancers, TLS termination) where the client-facing host, port, or protocol may differ. This can result in incorrect URLs being generated in API responses (e.g., root endpoint links).
+
+4. Service Layer Observations
+   - No hardcoded external URLs, IPs, or ports found in service files after excluding virtual environment dependencies.
+   - Services appropriately use configuration from `Settings` (e.g., groq_client.py uses groq_api_key and groq_base_url from settings; gem_adapter.py uses gemini_api_key).
+   - External service clients (e.g., for Groq, Gemini) are initialized per-request or lazily, which is acceptable.
+
+5. Router Layer Observations
+   - All routers are included via `app.include_router()` in main.py (lines 153-168). No hardcoded URLs found in route definitions.
+   - Route prefixes are expected to be defined in each router module (e.g., `/api/v1/...`), consistent with versioned API practices.
+
+6. ML Pipeline Observations
+   - ML/image_pipeline/processors/background_removal.py: Uses `os.environ.get("REMBG_MODEL", "u2netp")` for model selection, which is appropriate.
+   - No hardcoded paths or URLs found in ML directories after excluding virtual environment dependencies.
+   - Voice and pricing pipelines appear to rely on configuration settings for API keys and endpoints.
+
+7. Uploads Directory
+   - The uploads directory (`backend/uploads`) exists and is created by `ensure_upload_dir()` during startup. However, as noted above, reliance on local storage poses a risk in ephemeral production environments.
+
+Summary of Key Production Readiness Concerns:
+- Default SQLite configuration poses data persistence and scalability risks.
+- Wildcard CORS origins, while mitigated, should be replaced with explicit origins.
+- Base URL construction may generate incorrect links in proxied environments.
+- Local file storage for uploads may not persist across redeployments/restarts.

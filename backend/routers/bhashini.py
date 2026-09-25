@@ -143,8 +143,8 @@ async def transcribe_audio(
     # Read audio bytes
     audio_bytes = await audio.read()
 
-    # Map to Bhashini language code
-    bhashini_code = BHASHINI_LANGUAGES.get(language_code, {}).get("code", language_code)
+    # Map to Bhashini language code (keys are already BCP-47 codes)
+    bhashini_code = language_code if language_code in BHASHINI_LANGUAGES else "hi"
 
     # Call Bhashini ASR API
     config = _get_bhashini_config()

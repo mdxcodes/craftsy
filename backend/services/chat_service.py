@@ -192,7 +192,13 @@ class ChatService:
         if guardrail_rejection:
             return guardrail_rejection
 
-        # ── 1. Try Groq Cloud ───────────────────────────────────────────────
+        # ── 1. Deterministic Direct-Action Parsing (BEFORE LLM) ─────────────
+        # Catch app actions that must never depend on non-deterministic LLM output.
+        deterministic = self._try_deterministic_action(user_msg, app_lang, artisan_craft=request.artisan_craft)
+        if deterministic is not None:
+            return deterministic
+
+        # ── 2. Try Groq Cloud ───────────────────────────────────────────────
         if self.groq_client.is_available():
             try:
                 system_prompt = build_chat_system_prompt(app_lang, artisan_craft=request.artisan_craft)
@@ -220,8 +226,214 @@ class ChatService:
             except Exception as e:
                 logger.warning("[ChatService] Groq LLM processing failed, using smart fallback: %s", e)
 
-        # ── 2. Rule-based Offline Fallback ──────────────────────────────────
+        # ── 3. Rule-based Offline Fallback ──────────────────────────────────
         return self._rule_based_fallback(user_msg, app_lang, artisan_craft=request.artisan_craft)
+
+    def _try_deterministic_action(
+        self,
+        query: str,
+        language_code: str,
+        artisan_craft: Optional[str] = None,
+    ) -> Optional[ChatResponseSchema]:
+        """Detect deterministic in-app actions before invoking the LLM.
+
+        These commands must never depend on non-deterministic model output:
+        - sync_pending
+        - update_product_status
+        - filter_catalogue
+
+        Returns a full ChatResponseSchema when a deterministic action is matched,
+        otherwise None so the caller can continue to the LLM.
+        """
+        q = query.lower().strip()
+
+        has_devanagari = bool(re.search(r'[\u0900-\u097F]', q))
+        is_query_hindi = has_devanagari or any(
+            w in q for w in [
+                "kaise", "kahan", "batao", "mujhe", "kholo", "jana", "hai", "kya", "saman",
+                "kamai", "bataiye", "kariye", "karo", "bikri", "karigar", "shilp", "yojana", "darar"
+            ]
+        )
+        is_hindi = is_query_hindi
+
+        is_mismatch = (is_query_hindi and language_code != "hi") or (not is_query_hindi and language_code == "hi")
+        if is_mismatch:
+            if is_query_hindi:
+                suggestion_prefix = "सुझाव: यदि आप Craftsy ऐप की भाषा हिंदी में बदलना चाहते हैं, तो आप भाषा सेटिंग्स में जाकर इसे बदल सकते हैं।\n\n"
+                default_action = ChatActionSchema(
+                    type="navigate",
+                    destination="language_settings",
+                    route="/language-settings",
+                    tab_index=None,
+                    label="भाषा सेटिंग्स खोलें",
+                    params={},
+                )
+            else:
+                suggestion_prefix = "Suggestion: If you prefer using Craftsy in English, you can switch the app language in Language Settings.\n\n"
+                default_action = ChatActionSchema(
+                    type="navigate",
+                    destination="language_settings",
+                    route="/language-settings",
+                    tab_index=None,
+                    label="Open Language Settings",
+                    params={},
+                )
+        else:
+            suggestion_prefix = ""
+            default_action = None
+
+        # ── Direct Action 1: Instant Sync Trigger ─────────────────────────
+        if any(w in q for w in [
+            "sync my pending", "sync pending", "sync offline", "sync now", "sync products",
+            "upload offline", "upload pending", "pending sync", "offline sync", "sync karo"
+        ]):
+            if is_hindi:
+                return ChatResponseSchema(
+                    reply=suggestion_prefix + "ऑफ़लाइन लंबित उत्पादों का ऑनलाइन सिंक शुरू किया जा रहा है। प्रगति नीचे प्रदर्शित होगी...",
+                    action=ChatActionSchema(
+                        type="sync_pending",
+                        destination="catalogue",
+                        tab_index=1,
+                        label="लंबित उत्पाद सिंक करें",
+                        params={},
+                    ),
+                    suggested_queries=["माय कैटलॉग खोलें", "मेरी कमाई दिखाएं", "नया उत्पाद जोड़ें"],
+                )
+            return ChatResponseSchema(
+                reply=suggestion_prefix + "Initiating synchronization for your pending offline products. Progress will update below...",
+                action=ChatActionSchema(
+                    type="sync_pending",
+                    destination="catalogue",
+                    tab_index=1,
+                    label="Sync Offline Products Now",
+                    params={},
+                ),
+                suggested_queries=["Show my catalogue", "Show my stats", "Add new product"],
+            )
+
+        # ── Direct Action 2: Product Status Update (Sold / Live / Draft) ──
+        has_status_action = False
+        target = "product"
+        target_status = "sold"
+
+        if " as " in q and ("mark " in q or q.startswith("mark")):
+            parts = q.split(" as ")
+            if len(parts) >= 2:
+                left = parts[0].strip()
+                right_words = parts[1].strip().split()
+                right = right_words[0].strip("?.,!;:") if right_words else ""
+                if right in ["sold", "live", "draft"]:
+                    left_words = left.split()
+                    if left_words and left_words[0] == "mark":
+                        left_words = left_words[1:]
+                    if left_words and left_words[0] in ["my", "the", "this", "mera", "meri", "ye", "apna", "apni"]:
+                        left_words = left_words[1:]
+                    target = " ".join(left_words).strip() or "product"
+                    target_status = right
+                    has_status_action = True
+        elif "bik gaya" in q or "बिक गया" in q:
+            target = q.replace("bik gaya", "").replace("बिक गया", "").replace("mera", "").replace("meri", "").replace("ye", "").strip() or "product"
+            target_status = "sold"
+            has_status_action = True
+        elif any(w in q for w in ["sold mark", "mark sold", "set sold", "mark as sold"]) or ("sold" in q and any(w in q for w in ["mark", "update", "set", "kar"])):
+            target = "product"
+            target_status = "sold"
+            has_status_action = True
+
+        if has_status_action:
+            clean_target = target
+            for prefix in ["my ", "the ", "this ", "mera ", "meri ", "ye ", "apna ", "apni "]:
+                if clean_target.lower().startswith(prefix):
+                    clean_target = clean_target[len(prefix):].strip()
+                    break
+
+            label_en = f"Mark as {target_status.capitalize()}"
+            label_hi = "बिका हुआ चिह्नित करें" if target_status == "sold" else f"{target_status.capitalize()} करें"
+
+            if is_hindi:
+                return ChatResponseSchema(
+                    reply=suggestion_prefix + f"मैं आपके कैटलॉग में '{clean_target or 'उत्पाद'}' का स्टेटस '{target_status}' अपडेट कर रहा हूँ। आप इसे कभी भी नीचे अनडू (Undo) कर सकते हैं।",
+                    action=ChatActionSchema(
+                        type="update_product_status",
+                        destination="catalogue",
+                        tab_index=1,
+                        label=label_hi,
+                        params={
+                            "target_product": clean_target or "product",
+                            "status": target_status,
+                        },
+                    ),
+                    suggested_queries=["माय कैटलॉग खोलें", "मेरी कमाई दिखाएं", "लंबित सिंक करें"],
+                )
+            return ChatResponseSchema(
+                reply=suggestion_prefix + f"Updating '{clean_target or 'product'}' in your catalogue to status '{target_status}'. You can undo this action anytime below.",
+                action=ChatActionSchema(
+                    type="update_product_status",
+                    destination="catalogue",
+                    tab_index=1,
+                    label=label_en,
+                    params={
+                        "target_product": clean_target or "product",
+                        "status": target_status,
+                    },
+                ),
+                suggested_queries=["Show my catalogue", "Show my stats", "Sync pending items"],
+            )
+
+        # ── Direct Action 3: Pre-filtered Catalogue Navigation ────────────
+        triggers = {"show", "filter", "find", "search", "dikhaye", "dikhao"}
+        negatives = {"how", "kaise", "what", "kya", "add", "jodna", "mark", "sync"}
+        filler_words = {"the", "all", "my", "me", "some", "please", "mere", "meri", "sab", "sabhi", "apna", "apni", "apne"}
+
+        words = [w.strip("?.,!;:") for w in q.split()]
+        if not any(w in negatives for w in words):
+            trigger_idx = -1
+            for idx, word in enumerate(words):
+                if word in triggers:
+                    trigger_idx = idx
+                    break
+
+            if trigger_idx != -1 and trigger_idx + 1 < len(words):
+                tokens = words[trigger_idx + 1:]
+                while len(tokens) > 1 and tokens[-1] in ["items", "products", "crafts", "catalogue", "catalog", "saman"]:
+                    tokens.pop()
+                if len(tokens) > 1 and tokens[-1] == "in":
+                    tokens.pop()
+                tokens = [tok for tok in tokens if tok not in filler_words]
+                query_term = " ".join(tokens).strip()
+
+                if query_term and query_term not in ["catalogue", "catalog", "products", "items", "saman", "crafts", "craft"]:
+                    if is_hindi:
+                        return ChatResponseSchema(
+                            reply=suggestion_prefix + f"कैटलॉग में '{query_term}' से संबंधित आपके आइटम फ़िल्टर करके दिखाए जा रहे हैं।",
+                            action=ChatActionSchema(
+                                type="filter_catalogue",
+                                destination="catalogue",
+                                tab_index=1,
+                                label=f"कैटलॉग में '{query_term}' देखें",
+                                params={
+                                    "query": query_term,
+                                    "category": None,
+                                },
+                            ),
+                            suggested_queries=["नया सामान जोड़ें", "मेरी कमाई दिखाएं", "लंबित सिंक करें"],
+                        )
+                    return ChatResponseSchema(
+                        reply=suggestion_prefix + f"Navigating to your catalogue pre-filtered for '{query_term}'.",
+                        action=ChatActionSchema(
+                            type="filter_catalogue",
+                            destination="catalogue",
+                            tab_index=1,
+                            label=f"Show '{query_term}' in Catalogue",
+                            params={
+                                "query": query_term,
+                                "category": None,
+                            },
+                        ),
+                        suggested_queries=["Add new product", "Show my stats", "Sync pending items"],
+                    )
+
+        return None
 
     def _check_guardrails(self, user_msg: str, language_code: str) -> Optional[ChatResponseSchema]:
         """

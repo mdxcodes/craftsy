@@ -165,26 +165,6 @@ async def lookup_draft(
             return _draft_to_response(fallback)
 
     raise HTTPException(status_code=404, detail="Social draft not found.")
-    """Return a saved draft for an image and channel, or 404 when none exists."""
-    if not listing_id and not draft_key:
-        raise HTTPException(
-            status_code=400,
-            detail="Either listing_id or draft_key is required.",
-        )
-
-    query = db.query(SocialDraftDB).filter(SocialDraftDB.image_url == image_url)
-    if listing_id:
-        query = query.filter(SocialDraftDB.listing_id == listing_id)
-    else:
-        query = query.filter(SocialDraftDB.draft_key == draft_key)
-
-    if channel:
-        query = query.filter(SocialDraftDB.channel == channel)
-
-    draft = query.order_by(SocialDraftDB.updated_at.desc()).first()
-    if not draft:
-        raise HTTPException(status_code=404, detail="Social draft not found.")
-    return _draft_to_response(draft)
 
 
 @router.post(

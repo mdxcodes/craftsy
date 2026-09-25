@@ -10,7 +10,7 @@
 
 [![Flutter](https://img.shields.io/badge/Mobile-Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Supabase](https://img.shields.io/badge/Data-Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![PostgreSQL](https://img.shields.io/badge/Data-PostgreSQL-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![ChromaDB](https://img.shields.io/badge/Vector%20Store-ChromaDB-purple)](https://www.trychroma.com)
 [![Offline First](https://img.shields.io/badge/Design-Offline--First-orange)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](#license)
@@ -101,7 +101,7 @@ Every AI decision — image, listing, and price — is read aloud via on-device 
 | **Local DB** | Drift (SQLite), Hive | Offline queue, persistent storage |
 | **Background sync** | WorkManager | Automatic drain on reconnect |
 | **Backend** | FastAPI, SQLAlchemy 2.0 | Async REST API |
-| **Database** | Supabase | Postgres + auth + object storage |
+| **Database** | SQLAlchemy 2.0 + PostgreSQL (Railway) / SQLite (local) | Persistent product, order, and artisan data |
 | **Vector store** | ChromaDB | Embedding-based market comparables |
 | **Image pipeline** | rembg (U²-Net), OpenCV, Pillow | Background removal, auto-crop, correction |
 | **Speech-to-text** | Whisper / Bhashini ASR | Regional dialect transcription |
@@ -117,8 +117,8 @@ Every AI decision — image, listing, and price — is read aloud via on-device 
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.x)
 - [Python 3.11+](https://www.python.org/downloads/)
-- [Supabase](https://supabase.com) account (free tier)
-- [Groq API key](https://console.groq.com) (free tier)
+- [Groq API key](https://console.groq.com) (free tier, optional)
+- [Google Gemini API key](https://aistudio.google.com) (optional, fallback LLM)
 
 ### Backend Setup
 
@@ -127,10 +127,12 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your GROQ_API_KEY and SUPABASE credentials
+cp ../.env.example .env
+# Edit .env with your API keys if needed
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+For production deployment on Railway, set the environment variables in the Railway dashboard. The app boots without any external API keys; AI features degrade gracefully when keys are absent.
 
 ### Frontend Setup
 
@@ -140,11 +142,12 @@ flutter pub get
 flutter run
 ```
 
-### Build APK
+### Build APK (Production)
 
 ```bash
 cd frontend
-flutter build apk --release --no-tree-shake-icons
+flutter build apk --release \
+  --dart-define=API_BASE_URL=https://YOUR-RAILWAY-DOMAIN
 ```
 
 ---
