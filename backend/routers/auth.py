@@ -7,6 +7,7 @@ OTP verification is still demo-mode (accepts any 6-digit code).
 
 import uuid
 from datetime import datetime
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,14 @@ from ..models.schemas import (
     OtpVerifyRequest,
     ArtisanProfileResponse,
 )
+from pydantic import BaseModel, Field
+
+
+class CustomerRegisterRequest(BaseModel):
+    name: str = Field(..., description="Full name")
+    phone: str = Field(..., description="10-digit mobile number")
+    preferred_language: Optional[str] = Field(default="en", description="Preferred app language")
+
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication & Artisans"])
 
@@ -58,7 +67,46 @@ async def register_artisan(
         experience_years=request.experience_years or "",
         pehchan_id=request.pehchan_id,
         preferred_language=request.preferred_language or "en",
-        created_at=datetime.now(),
+    )
+    db.add(artisan)
+    db.commit()
+    db.refresh(artisan)
+
+    return artisan
+
+
+@router.post(
+    "/register-consumer",
+    response_model=ArtisanProfileResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new consumer/buyer",
+    description="Registers a new consumer account with role='customer'.",
+)
+async def register_consumer(
+    request: CustomerRegisterRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = request.phone.strip()
+    if len(phone_clean) < 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be at least 10 digits.",
+        )
+
+    # Check if phone already registered
+    existing = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An account with this phone number is already registered.",
+        )
+
+    artisan = ArtisanDB(
+        id=f"customer_{uuid.uuid4().hex[:10]}",
+        name=request.name,
+        phone=phone_clean,
+        preferred_language=request.preferred_language or "en",
+        role="customer",
     )
     db.add(artisan)
     db.commit()

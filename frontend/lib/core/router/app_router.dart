@@ -12,6 +12,14 @@ import '../../features/auth/screens/otp_screen.dart';
 import '../../features/home/screens/home_shell.dart';
 import '../../features/home/screens/home_v2_screen.dart';
 import '../../features/home/screens/business_advisor_screen.dart';
+import '../../features/marketplace/screens/marketplace_screen.dart';
+import '../../features/marketplace/screens/product_detail_screen.dart';
+import '../../features/marketplace/screens/cart_screen.dart';
+import '../../core/services/commerce_service.dart' show PlacedOrder;
+import '../../features/marketplace/screens/checkout_screen.dart';
+import '../../features/marketplace/screens/order_confirmation_screen.dart';
+import '../../features/marketplace/screens/my_purchases_screen.dart';
+import '../../features/marketplace/screens/purchase_detail_screen.dart';
 import '../../features/catalogue/screens/catalogue_screen.dart';
 import '../../features/catalogue/screens/product_detail_screen.dart';
 import '../../features/add_product/screens/add_product_flow_screen.dart';
@@ -226,6 +234,55 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/business-advisor',
         name: AppRouteConstants.businessAdvisor,
         builder: (context, state) => const BusinessAdvisorScreen(),
+      ),
+      GoRoute(
+        path: '/marketplace',
+        name: AppRouteConstants.marketplace,
+        builder: (context, state) => const MarketplaceScreen(),
+      ),
+      GoRoute(
+        path: '/marketplace/product/:id',
+        name: AppRouteConstants.marketplaceProductDetail,
+        builder: (context, state) {
+          final productId = state.pathParameters['id'] ?? '';
+          return MarketplaceProductDetailScreen(productId: productId);
+        },
+      ),
+      GoRoute(
+        path: '/my-cart',
+        name: AppRouteConstants.myCart,
+        builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        path: '/checkout',
+        name: AppRouteConstants.checkout,
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/order-confirmation',
+        name: AppRouteConstants.orderConfirmation,
+        builder: (context, state) {
+          final order = state.extra;
+          if (order is! PlacedOrder) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          return OrderConfirmationScreen(order: order);
+        },
+      ),
+      GoRoute(
+        path: '/my-purchases',
+        name: AppRouteConstants.myPurchases,
+        builder: (context, state) => const MyPurchasesScreen(),
+      ),
+      GoRoute(
+        path: '/purchase/:orderId',
+        name: AppRouteConstants.purchaseDetail,
+        builder: (context, state) {
+          final orderId = state.pathParameters['orderId'] ?? '';
+          return PurchaseDetailScreen(orderId: orderId);
+        },
       ),
       GoRoute(
         path: '/craftmitra',

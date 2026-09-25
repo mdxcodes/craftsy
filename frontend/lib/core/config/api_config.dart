@@ -5,11 +5,23 @@ import 'package:flutter/foundation.dart';
 /// Centralized API configuration that dynamically resolves the working backend URL.
 /// Works seamlessly across physical Android phones on Wi-Fi (e.g., SM-M346B),
 /// Android Emulators (10.0.2.2), adb reverse tunnels, and desktop.
+///
+/// Production / Railway builds pin the backend explicitly at compile time:
+///
+///     flutter build apk --dart-define=API_BASE_URL=https://<railway-domain>
+///
+/// When API_BASE_URL is provided it is always used verbatim and the local
+/// discovery probes are skipped. The LAN fallback IP is also overridable:
+///
+///     --dart-define=API_HOST_LAN_IP=192.168.1.42
 class ApiConfig {
   static String? _cachedBaseUrl;
 
-  /// Default fallback Wi-Fi IP of the host machine
-  static const String hostLanIp = '192.168.1.5';
+  /// Default fallback Wi-Fi IP of the host machine (overridable at build time).
+  static const String hostLanIp = String.fromEnvironment(
+    'API_HOST_LAN_IP',
+    defaultValue: '192.168.1.5',
+  );
 
   static String get baseUrl {
     if (_cachedBaseUrl != null) return _cachedBaseUrl!;
