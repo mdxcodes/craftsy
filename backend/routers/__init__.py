@@ -14,6 +14,7 @@ from .cart import router as cart_router
 from .address import router as address_router
 from .checkout import router as checkout_router
 from .marketplace import router as marketplace_router
+from .ondc import router as ondc_router
 
 __all__ = [
     "health_router",
@@ -32,4 +33,5 @@ __all__ = [
     "address_router",
     "checkout_router",
     "marketplace_router",
+    "ondc_router",
 ]

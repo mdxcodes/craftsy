@@ -52,6 +52,7 @@ from backend.routers import (
     address_router,
     checkout_router,
     marketplace_router,
+    ondc_router,
 )
 
 settings = get_settings()
@@ -166,6 +167,7 @@ app.include_router(cart_router)
 app.include_router(address_router)
 app.include_router(checkout_router)
 app.include_router(marketplace_router)
+app.include_router(ondc_router)
 
 
 @app.get("/", tags=["Root"])
