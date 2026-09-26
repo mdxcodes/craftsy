@@ -161,8 +161,25 @@ class ArtisanVoiceProcessor:
                 user_id=settings.bhashini_user_id,
             )
             audio_bytes = audio_path.read_bytes()
+            logger.info(
+                "Bhashini ASR request: path=%s, size=%d bytes, language=%s",
+                audio_path,
+                len(audio_bytes),
+                bhashini_language,
+            )
             text = asyncio.run(
                 service.transcribe_audio(audio_bytes=audio_bytes, language=bhashini_language)
+            )
+            logger.info(
+                "Bhashini ASR response: text=%r, len=%d",
+                text,
+                len(text) if text else 0,
+            )
+        except BhashiniConfigError as exc:
+            logger.error("Bhashini ASR config error: %s", exc)
+            return self._failed_transcript(
+                language_code=language_code,
+                error=f"Bhashini ASR config error: {exc}",
             )
         except Exception as exc:
             logger.error("Bhashini ASR failed: %s", exc)

@@ -263,11 +263,29 @@ class BhashiniService:
         headers = self._get_compute_headers(config)
         compute_url = self._get_compute_url(config)
 
+        logger.info(
+            "Bhashini ASR compute request: url=%s, service_id=%s, language=%s, format=%s, rate=%s",
+            compute_url,
+            service_id,
+            language,
+            audio_format,
+            sampling_rate,
+        )
+
         async with httpx.AsyncClient(timeout=self._timeout) as client:
             response = await client.post(
                 compute_url,
                 headers=headers,
                 json=compute_payload,
+            )
+            logger.info(
+                "Bhashini ASR compute response: status=%s, content_type=%s",
+                response.status_code,
+                response.headers.get("content-type"),
+            )
+            logger.debug(
+                "Bhashini ASR compute response body: %s",
+                response.text[:500],
             )
             response.raise_for_status()
             result = response.json()
@@ -278,9 +296,18 @@ class BhashiniService:
             if step.get("taskType") == TASK_ASR:
                 output = step.get("output", [])
                 if output:
-                    return output[0].get("source", "")
+                    transcript = output[0].get("source", "")
+                    logger.info(
+                        "Bhashini ASR transcript extracted: len=%d",
+                        len(transcript),
+                    )
+                    return transcript
                 break
 
+        logger.error(
+            "Bhashini ASR response missing output. Response keys: %s",
+            list(result.keys()) if isinstance(result, dict) else type(result).__name__,
+        )
         raise BhashiniAPIError(
             f"Bhashini ASR response missing output. Response: {result}"
         )
