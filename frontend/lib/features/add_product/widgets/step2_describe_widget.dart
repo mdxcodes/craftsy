@@ -9,6 +9,7 @@ import 'package:record/record.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/accessibility/accessibility_tokens.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/cycling_guidance_cue.dart';
 import '../../../core/widgets/motifs/dotted_border_box.dart';
@@ -42,6 +43,25 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
   final AudioPlayer _audioPlayer = AudioPlayer();
   final AudioRecorder _recorder = AudioRecorder();
   bool _isPlayingAudio = false;
+  String _selectedVoiceLanguage = 'auto';
+
+  static const List<Map<String, String>> _voiceLanguages = [
+    {'code': 'auto', 'name': 'Auto Detect', 'native': 'Auto Detect'},
+    {'code': 'hi', 'name': 'Hindi', 'native': 'हिन्दी'},
+    {'code': 'en', 'name': 'English', 'native': 'English'},
+    {'code': 'bn', 'name': 'Bengali', 'native': 'বাংলা'},
+    {'code': 'ta', 'name': 'Tamil', 'native': 'தமிழ்'},
+    {'code': 'te', 'name': 'Telugu', 'native': 'తెలుగు'},
+    {'code': 'kn', 'name': 'Kannada', 'native': 'ಕನ್ನಡ'},
+    {'code': 'ml', 'name': 'Malayalam', 'native': 'മലയാളം'},
+    {'code': 'mr', 'name': 'Marathi', 'native': 'मराठी'},
+    {'code': 'gu', 'name': 'Gujarati', 'native': 'ગુજરાતી'},
+    {'code': 'pa', 'name': 'Punjabi', 'native': 'ਪੰਜਾਬੀ'},
+    {'code': 'or', 'name': 'Odia', 'native': 'ଓଡ଼ିଆ'},
+    {'code': 'as', 'name': 'Assamese', 'native': 'অসমীয়া'},
+    {'code': 'ur', 'name': 'Urdu', 'native': 'اردو'},
+    {'code': 'ne', 'name': 'Nepali', 'native': 'नेपाली'},
+  ];
 
   @override
   void initState() {
@@ -61,6 +81,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
     } else if (draft.manualDescription.isNotEmpty) {
       _textController.text = draft.manualDescription;
     }
+    _selectedVoiceLanguage = draft.voiceLanguage;
   }
 
   @override
@@ -71,6 +92,62 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
     _audioPlayer.dispose();
     _recorder.dispose();
     super.dispose();
+  }
+
+  String _getCurrentVoiceLanguageName() {
+    final lang = _voiceLanguages.firstWhere(
+      (l) => l['code'] == _selectedVoiceLanguage,
+      orElse: () => _voiceLanguages[0],
+    );
+    return lang['name']!;
+  }
+
+  void _showVoiceLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (modalContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Text(
+                  'select_voice_language'.tr(),
+                  style: AppTextStyles.headlineMedium,
+                ),
+              ),
+              const Divider(height: 1),
+              ..._voiceLanguages.map((lang) {
+                final isSelected = _selectedVoiceLanguage == lang['code'];
+                return ListTile(
+                  title: Text(
+                    '${lang['name']} (${lang['native']})',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppColors.terracotta : AppColors.ink,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? Icon(Icons.check_circle, color: AppColors.terracotta)
+                      : Icon(Icons.circle_outlined, color: AppColors.border),
+                  onTap: () {
+                    setState(() {
+                      _selectedVoiceLanguage = lang['code']!;
+                    });
+                    ref
+                        .read(addProductFlowProvider.notifier)
+                        .setVoiceLanguage(lang['code']!);
+                    Navigator.pop(modalContext);
+                  },
+                );
+              }),
+              const SizedBox(height: AppSpacing.md),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _toggleRecording() async {
@@ -87,11 +164,11 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             .read(addProductFlowProvider.notifier)
             .queueVoiceRecording(audioFile);
 
-        // Immediately trigger real voice pipeline transcription in the background with language auto-detection
+        // Immediately trigger real voice pipeline transcription in the background with selected language
         unawaited(
           ref
               .read(addProductFlowProvider.notifier)
-              .transcribeVoiceDirectly(audioFile, languageCode: 'auto'),
+              .transcribeVoiceDirectly(audioFile, languageCode: _selectedVoiceLanguage),
         );
       }
 
@@ -259,6 +336,53 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
           ),
           const SizedBox(height: AppSpacing.xl),
+
+          // ── VOICE LANGUAGE SELECTOR ─────────────────────────────────────
+          Semantics(
+            button: true,
+            label: 'Voice language: ${_getCurrentVoiceLanguageName()}',
+            hint: 'Double tap to change voice language',
+            child: InkWell(
+              onTap: _showVoiceLanguagePicker,
+              borderRadius: BorderRadius.circular(AccessibilityTokens.radiusMd),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(AccessibilityTokens.radiusMd),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.language,
+                      size: 18,
+                      color: AppColors.terracotta,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      _getCurrentVoiceLanguageName(),
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
 
           // ── VOICE ACTION: Large mic button ────────────────────────────────
           Center(

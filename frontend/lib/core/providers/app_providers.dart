@@ -355,6 +355,7 @@ class AddProductDraft {
   final String? voiceQueueItemId;
   final QueueStatus imageQueueStatus;
   final QueueStatus voiceQueueStatus;
+  final String voiceLanguage;
 
   const AddProductDraft({
     this.draftId = '',
@@ -396,6 +397,7 @@ class AddProductDraft {
     this.voiceQueueItemId,
     this.imageQueueStatus = QueueStatus.completed,
     this.voiceQueueStatus = QueueStatus.completed,
+    this.voiceLanguage = 'auto',
   });
 
   AddProductDraft copyWith({
@@ -438,6 +440,7 @@ class AddProductDraft {
     Object? voiceQueueItemId = _unset,
     QueueStatus? imageQueueStatus,
     QueueStatus? voiceQueueStatus,
+    String? voiceLanguage,
   }) {
     return AddProductDraft(
       draftId: draftId ?? this.draftId,
@@ -484,6 +487,7 @@ class AddProductDraft {
           : voiceQueueItemId as String?,
       imageQueueStatus: imageQueueStatus ?? this.imageQueueStatus,
       voiceQueueStatus: voiceQueueStatus ?? this.voiceQueueStatus,
+      voiceLanguage: voiceLanguage ?? this.voiceLanguage,
     );
   }
 }
@@ -585,6 +589,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
     : super(
         AddProductDraft(
           draftId: 'draft_${DateTime.now().microsecondsSinceEpoch}',
+          voiceLanguage: 'auto',
         ),
       ) {
     _loadDraft();
@@ -778,6 +783,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       hasExistingDraft: false,
       resumePromptHandled: true,
       isAiProcessing: false,
+      voiceLanguage: 'auto',
     );
     if (Hive.isBoxOpen('draft_box')) {
       Hive.box('draft_box').clear();
@@ -1388,8 +1394,9 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
 
   Future<void> transcribeVoiceDirectly(
     File audioFile, {
-    String languageCode = 'auto',
+    String? languageCode,
   }) async {
+    final effectiveLanguage = languageCode ?? state.voiceLanguage;
     if (kMockAiBackend) {
       await Future.delayed(const Duration(milliseconds: 700));
       const fakeTranscript =
@@ -1419,7 +1426,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       final result = await speechService
           .transcribeAudio(
             audioPath: audioFile.path,
-            languageCode: languageCode,
+            languageCode: effectiveLanguage,
           )
           .timeout(
             const Duration(seconds: 20),
@@ -1455,7 +1462,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       final suggestion = await speechService
           .generateListingFromTranscript(
             transcript: transcript,
-            languageCode: languageCode,
+            languageCode: effectiveLanguage,
             categoryHint:
                 (state.category.isNotEmpty && state.category != 'Handicrafts')
                 ? state.category
@@ -1564,6 +1571,11 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       voiceQueueItemId: null,
       voiceQueueStatus: QueueStatus.completed,
     );
+    _persistDraft();
+  }
+
+  void setVoiceLanguage(String languageCode) {
+    state = state.copyWith(voiceLanguage: languageCode);
     _persistDraft();
   }
 
@@ -1862,6 +1874,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       draftId: 'draft_${DateTime.now().microsecondsSinceEpoch}',
       hasExistingDraft: false,
       resumePromptHandled: true,
+      voiceLanguage: 'auto',
     );
     if (Hive.isBoxOpen('draft_box')) {
       Hive.box('draft_box').clear();

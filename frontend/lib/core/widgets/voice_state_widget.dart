@@ -192,9 +192,9 @@ class VoiceTranscriptDisplay extends StatelessWidget {
             children: [
               const Icon(Icons.record_voice_over, size: 16, color: Colors.blue),
               const SizedBox(width: 6),
-              Text(
-                'You said:',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+               Text(
+                 'voice_transcript_label'.tr(),
+                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: Colors.blue.shade700,
                   fontWeight: FontWeight.w600,
                 ),

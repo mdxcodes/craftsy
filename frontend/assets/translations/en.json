@@ -261,7 +261,7 @@
   "craftmitra_action_tap": "Tap to jump directly to this screen",
   "tab_my_orders": "My Orders",
   "my_orders_title": "My Orders",
-  "order_status_new": "New",
+  "order_status_new": "Order Placed",
   "order_status_packed": "Packed",
   "order_status_shipped": "Shipped",
   "order_status_delivered": "Delivered",
@@ -889,7 +889,6 @@
   "marketplace_all": "All",
   "marketplace_no_products": "No crafts found",
   "marketplace_no_products_desc": "New crafts will appear here when artisans add them.",
-
   "cart_title": "My Cart",
   "cart_empty": "Your cart is empty",
   "cart_empty_desc": "Browse the marketplace and add crafts you love.",
@@ -911,7 +910,6 @@
   "cart_login_required": "Please sign in to continue",
   "cart_login_required_desc": "Sign in to view your cart and place orders.",
   "cart_item_unavailable": "Item unavailable",
-
   "product_out_of_stock": "Out of stock",
   "product_in_stock": "{count} in stock",
   "product_quantity": "Quantity",
@@ -919,7 +917,6 @@
   "product_decrease_quantity": "Decrease quantity",
   "product_add_to_cart": "Add to Cart",
   "product_buy_now": "Buy Now",
-
   "checkout_title": "Checkout",
   "checkout_delivery_address": "Delivery Address",
   "checkout_payment_method": "Payment Method",
@@ -932,7 +929,6 @@
   "checkout_select_address_error": "Please select a delivery address",
   "checkout_failed": "Could not place order. Please try again.",
   "checkout_load_failed": "Could not load checkout. Please try again.",
-
   "address_add_new": "Add New Address",
   "address_edit": "Edit Address",
   "address_none_yet": "No address saved yet. Add one to receive your order.",
@@ -947,7 +943,6 @@
   "address_set_default": "Use as my default address",
   "address_form_invalid": "Please fill all required fields correctly",
   "address_save_failed": "Could not save address. Please try again.",
-
   "order_confirmed_title": "Order Placed!",
   "order_confirmed_cod_note": "Your order is confirmed. Pay with cash when it is delivered.",
   "order_confirmed_paid_note": "Your order is confirmed.",
@@ -955,31 +950,23 @@
   "order_status_label": "Status",
   "order_payment_status": "Payment",
   "order_view_my_orders": "View My Orders",
-  "order_placed_on": "Placed on {date}",
   "order_more_items": "more",
   "order_item_unnamed": "Item",
   "order_address_unavailable": "Delivery address not available",
   "payment_method_cod": "Cash on Delivery (pay at doorstep)",
   "payment_cod_pending": "Pay cash at delivery",
-
   "my_purchases_title": "My Purchases",
   "my_purchases_empty": "No orders yet",
   "my_purchases_empty_desc": "Crafts you order will appear here.",
   "purchase_detail_title": "My Order",
   "purchase_items": "Items",
   "orders_load_failed": "Could not load orders. Please try again.",
-
-  "order_status_new": "Order Placed",
-  "order_status_confirmed": "Confirmed",
-  "order_status_packed": "Packed",
-  "order_status_shipped": "Shipped",
-  "order_status_delivered": "Delivered",
-  "order_status_cancelled": "Cancelled",
-
   "action_back": "Back",
   "action_retry": "Retry",
   "action_cancel": "Cancel",
   "action_save": "Save",
   "action_edit": "Edit",
-  "action_optional": "optional"
+  "action_optional": "optional",
+  "replay_audio": "Replay audio",
+  "select_voice_language": "Select voice language"
 }
