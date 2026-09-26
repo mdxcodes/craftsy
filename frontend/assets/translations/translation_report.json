@@ -1,0 +1,121 @@
+{
+  "locales": [
+    {
+      "locale": "en",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": true
+    },
+    {
+      "locale": "hi",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": true
+    },
+    {
+      "locale": "bn",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "ta",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "te",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "mr",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "gu",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "kn",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "ml",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "pa",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "or",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "as",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    },
+    {
+      "locale": "ur",
+      "status": "VERIFIED",
+      "keys_translated": 967,
+      "missing_keys": 0,
+      "placeholder_mismatches": 0,
+      "voice_asr": true,
+      "voice_tts": false
+    }
+  ]
+}

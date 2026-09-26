@@ -74,16 +74,16 @@ void main() {
         }
 
         expect(en['mark_sold_out_btn'], 'Mark as Sold Out');
-        expect(hi['mark_sold_out_btn'], 'बिक गया (स्टॉक समाप्त) चिह्नित करें');
+        expect(hi['mark_sold_out_btn'], 'बिक चुका के रूप में चिह्नित करें');
 
         expect(en['remove_listing_btn'], 'Remove Listing from ONDC');
-        expect(hi['remove_listing_btn'], 'ओएनडीसी से लिस्टिंग हटाएं');
+        expect(hi['remove_listing_btn'], 'ओ. एन. डी. सी. से सूची हटाएँ');
 
         expect(en['listing_info_btn'], 'Remove vs Delete Info');
-        expect(hi['listing_info_btn'], 'हटाने और मिटाने की जानकारी');
+        expect(hi['listing_info_btn'], 'जानकारी हटाएँ बनाम हटाएँ');
 
         expect(en['relist_item_btn'], 'Relist Item (Make Live)');
-        expect(hi['relist_item_btn'], 'पुनः सूचीबद्ध करें (लाइव करें)');
+        expect(hi['relist_item_btn'], 'रीलिस्ट आइटम (लाइव बनाएँ)');
       },
     );
 

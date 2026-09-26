@@ -31,6 +31,15 @@ void main() async {
   rootBundle.evict('assets/translations/hi.json');
   rootBundle.evict('assets/translations/ta.json');
   rootBundle.evict('assets/translations/bn.json');
+  rootBundle.evict('assets/translations/te.json');
+  rootBundle.evict('assets/translations/mr.json');
+  rootBundle.evict('assets/translations/gu.json');
+  rootBundle.evict('assets/translations/kn.json');
+  rootBundle.evict('assets/translations/ml.json');
+  rootBundle.evict('assets/translations/pa.json');
+  rootBundle.evict('assets/translations/or.json');
+  rootBundle.evict('assets/translations/as.json');
+  rootBundle.evict('assets/translations/ur.json');
   await EasyLocalization.ensureInitialized();
 
   await Hive.initFlutter();
@@ -67,8 +76,17 @@ void main() async {
       supportedLocales: const [
         Locale('en'),
         Locale('hi'),
-        Locale('ta'),
         Locale('bn'),
+        Locale('ta'),
+        Locale('te'),
+        Locale('mr'),
+        Locale('gu'),
+        Locale('kn'),
+        Locale('ml'),
+        Locale('pa'),
+        Locale('or'),
+        Locale('as'),
+        Locale('ur'),
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),

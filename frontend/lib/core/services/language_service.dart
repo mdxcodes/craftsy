@@ -393,15 +393,39 @@ class CraftsyLanguageService implements LanguageService {
            nmtSupported: true,
            ttsSupported: false,
          ),
-         'pa': const LanguageConfig(
-           code: 'pa',
-           displayName: 'Punjabi',
-           nativeName: 'ਪੰਜਾਬੀ',
-           asrSupported: true,
-           nmtSupported: true,
-           ttsSupported: false,
-         ),
-       };
+          'pa': const LanguageConfig(
+            code: 'pa',
+            displayName: 'Punjabi',
+            nativeName: 'ਪੰਜਾਬੀ',
+            asrSupported: true,
+            nmtSupported: true,
+            ttsSupported: false,
+          ),
+          'or': const LanguageConfig(
+            code: 'or',
+            displayName: 'Odia',
+            nativeName: 'ଓଡ଼ିଆ',
+            asrSupported: true,
+            nmtSupported: true,
+            ttsSupported: false,
+          ),
+          'as': const LanguageConfig(
+            code: 'as',
+            displayName: 'Assamese',
+            nativeName: 'অসমীয়া',
+            asrSupported: true,
+            nmtSupported: true,
+            ttsSupported: false,
+          ),
+          'ur': const LanguageConfig(
+            code: 'ur',
+            displayName: 'Urdu',
+            nativeName: 'اردو',
+            asrSupported: true,
+            nmtSupported: true,
+            ttsSupported: false,
+          ),
+        };
 
   @override
   List<LanguageConfig> getSupportedLanguages() => _languages.values.toList();
