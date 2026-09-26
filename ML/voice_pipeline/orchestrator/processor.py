@@ -153,6 +153,8 @@ class ArtisanVoiceProcessor:
                 error="Bhashini credentials not configured.",
             )
 
+        bhashini_language = language_code if language_code not in ("auto", "detect", "none", "") else "hi"
+
         try:
             service = BhashiniService(
                 api_key=settings.bhashini_api_key,
@@ -160,7 +162,7 @@ class ArtisanVoiceProcessor:
             )
             audio_bytes = audio_path.read_bytes()
             text = asyncio.run(
-                service.transcribe_audio(audio_bytes=audio_bytes, language=language_code)
+                service.transcribe_audio(audio_bytes=audio_bytes, language=bhashini_language)
             )
         except Exception as exc:
             logger.error("Bhashini ASR failed: %s", exc)
@@ -178,7 +180,7 @@ class ArtisanVoiceProcessor:
         from ..models import Transcript
         return Transcript(
             text=text.strip(),
-            language_code=language_code,
+            language_code=bhashini_language,
             provider=STTProvider.BHASHINI,
             is_fallback=False,
         )
