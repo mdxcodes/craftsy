@@ -203,13 +203,58 @@ This project builds on established ICTD (ICT for Development) research:
 
 ---
 
-## Impact
+## Feature Status
 
-- **Year-round income** — converts seasonal fair exposure into continuous digital storefront
-- **Fair pricing** — cost-floor model protects artisans from information asymmetry
-- **Financial inclusion** — timestamped sales history as alternative credit signal
-- **Women artisan empowerment** — voice-first design overcomes mobility and literacy barriers
-- **DPI alignment** — designed to plug into ONDC, GeM, and Bhashini
+| Feature | Status | Notes |
+|---|---|---|
+| Artisan registration & login | Implemented | Phone + OTP |
+| Product CRUD | Implemented | Full create/read/update/delete |
+| AI image enhancement | Implemented | rembg + OpenCV + Pillow |
+| Voice-to-listing | Implemented | Whisper/Bhashini ASR + LLM |
+| Bilingual listing (EN/HI) | Implemented | Gemini/Groq LLM |
+| Social media drafts | Implemented | WhatsApp/Instagram/Facebook |
+| Fair pricing assistant | Implemented | Cost floor + ChromaDB RAG |
+| Offline-first sync | Implemented | Local queue + background drain |
+| Commerce channels | Implemented | ONDC/GeM channel metadata |
+| Unified orders | Implemented | Multi-channel order model |
+| ONDC BPP adapter | Hackathon/Mock | Local Retail B2C harness; official mock server blocked |
+| Bhashini integration | Implemented | REST ASR tested; WebSocket ASR blocked |
+| Accessibility | Implemented | TTS, haptics, large text, voice actions |
+
+## Testing
+
+```bash
+# Backend tests
+cd backend
+.venv/bin/python -m pytest tests/ -q
+
+# ONDC BPP tests
+.venv/bin/python -m pytest tests/test_ondc_bpp.py -v
+
+# Frontend tests
+cd frontend
+flutter test
+```
+
+## ONDC Integration
+
+Craftsy includes a minimal **Retail B2C BPP (Seller) adapter** for hackathon/demo purposes.
+
+- **Protocol:** ONDC:RET10, version 2.0.2
+- **Endpoints:** `/api/v1/ondc/search`, `/select`, `/init`, `/confirm`, `/status` (and `on_*` callbacks)
+- **Data source:** Real `ProductDB`, `OrderDB`, `ProductDB.stock`
+- **Idempotency:** Duplicate `confirm` requests return existing orders; stock is not double-decremented
+- **Official mock server:** `ONDC-Official/ondc-mock-server` was inspected but could not be started in this environment due to missing retail spec submodules. A local protocol harness is used instead.
+
+See `ONDC_HACKATHON_DEMO.md` for the demo flow.
+
+## Known Limitations
+
+- ONDC integration is **mock/hackathon only** — no production registry onboarding, no production signing keys, no production network participation
+- Bhashini WebSocket ASR is blocked by upstream auth/handshake issues; REST ASR is functional
+- Some AI features require external API keys (Groq/Gemini) and degrade gracefully when absent
+- Flutter `flutter analyze` reports pre-existing lint warnings
+- One pre-existing backend test failure: `test_social_channels.py::test_independent_channels_generation_and_lookup`
 
 ---
 
