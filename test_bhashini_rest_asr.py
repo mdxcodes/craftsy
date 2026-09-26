@@ -25,6 +25,7 @@ import base64
 import json
 import logging
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -36,12 +37,19 @@ logging.basicConfig(
 logger = logging.getLogger("bhashini_rest_asr_test")
 
 sys.path.insert(0, str(Path(__file__).parent))
-from backend.services.bhashini_service import (  # noqa: E402
-    BhashiniAPIError,
-    BhashiniAuthenticationError,
-    BhashiniConfigError,
-    BhashiniService,
+from importlib.util import spec_from_file_location, module_from_spec
+
+_spec = spec_from_file_location(
+    "bhashini_service",
+    str(Path(__file__).parent / "backend" / "services" / "bhashini_service.py"),
 )
+_bhashini_service = module_from_spec(_spec)
+_spec.loader.exec_module(_bhashini_service)
+
+BhashiniAPIError = _bhashini_service.BhashiniAPIError
+BhashiniAuthenticationError = _bhashini_service.BhashiniAuthenticationError
+BhashiniConfigError = _bhashini_service.BhashiniConfigError
+BhashiniService = _bhashini_service.BhashiniService
 
 
 def load_env_credentials() -> tuple[str, str, str, str]:
@@ -66,6 +74,33 @@ def load_env_credentials() -> tuple[str, str, str, str]:
     return user_id, ulca_api_key, inference_api_key, inference_api_key_name
 
 
+def convert_to_wav(audio_path: Path) -> Path:
+    """Convert audio to WAV 16kHz mono if needed."""
+    if audio_path.suffix.lower() == ".wav":
+        return audio_path
+
+    wav_path = audio_path.with_suffix(".wav")
+    try:
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i", str(audio_path),
+                "-ar", "16000",
+                "-ac", "1",
+                "-y",
+                str(wav_path),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
+        if wav_path.exists():
+            return wav_path
+    except Exception as exc:
+        logger.warning("Failed to convert audio to WAV: %s", exc)
+    return audio_path
+
+
 async def run_rest_asr_test(audio_path: Path, language: str = "hi") -> dict:
     """Run Bhashini REST ASR test with real audio."""
     user_id, ulca_api_key, inference_api_key, inference_api_key_name = load_env_credentials()
@@ -77,6 +112,8 @@ async def run_rest_asr_test(audio_path: Path, language: str = "hi") -> dict:
         inference_api_key_name=inference_api_key_name,
     )
 
+    audio_path = Path(audio_path)
+    audio_path = convert_to_wav(audio_path)
     audio_bytes = audio_path.read_bytes()
     logger.info(
         "Audio file: %s, size=%d bytes, language=%s",
@@ -128,24 +165,92 @@ async def run_rest_asr_test(audio_path: Path, language: str = "hi") -> dict:
     }
 
 
+async def run_websocket_asr_test(audio_path: Path, language: str = "hi") -> dict:
+    """Run Bhashini WebSocket ASR test with real audio."""
+    user_id, ulca_api_key, inference_api_key, inference_api_key_name = load_env_credentials()
+
+    service = BhashiniService(
+        user_id=user_id,
+        ulca_api_key=ulca_api_key,
+        inference_api_key=inference_api_key,
+        inference_api_key_name=inference_api_key_name,
+    )
+
+    audio_path = Path(audio_path)
+    wav_path = convert_to_wav(audio_path)
+
+    import wave
+    with wave.open(str(wav_path), "rb") as w:
+        raw_data = w.readframes(w.getnframes())
+    audio_bytes = raw_data
+
+    logger.info(
+        "Audio file: %s, size=%d bytes, language=%s",
+        wav_path,
+        len(audio_bytes),
+        language,
+    )
+
+    start = time.perf_counter()
+    try:
+        transcript = await service.transcribe_audio_websocket(
+            audio_bytes=audio_bytes,
+            language=language,
+        )
+    except BhashiniConfigError as exc:
+        logger.error("Configuration error: %s", exc)
+        return {"success": False, "error": str(exc), "error_type": "config"}
+    except BhashiniAPIError as exc:
+        logger.error("API error: %s", exc)
+        return {"success": False, "error": str(exc), "error_type": "api"}
+    except Exception as exc:
+        logger.error("Unexpected error: %s", exc)
+        return {"success": False, "error": str(exc), "error_type": "unexpected"}
+    finally:
+        elapsed = time.perf_counter() - start
+
+    if not transcript or not transcript.strip():
+        logger.warning("Empty transcript returned.")
+        return {
+            "success": False,
+            "error": "Empty transcript returned by Bhashini.",
+            "error_type": "empty_transcript",
+            "transcript": transcript,
+            "latency_seconds": round(elapsed, 3),
+        }
+
+    logger.info("Transcript received in %.3fs: %r", elapsed, transcript)
+    return {
+        "success": True,
+        "transcript": transcript,
+        "language": language,
+        "latency_seconds": round(elapsed, 3),
+    }
+
+
 def main() -> None:
     """CLI entry point."""
     audio_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("test_audio.wav")
     language = sys.argv[2] if len(sys.argv) > 2 else "hi"
+    mode = sys.argv[3] if len(sys.argv) > 3 else "rest"
 
     if not audio_path.exists():
         logger.error("Audio file not found: %s", audio_path)
         sys.exit(1)
 
     print("=" * 60)
-    print("Bhashini REST ASR Integration Test")
+    print("Bhashini ASR Integration Test")
     print("=" * 60)
     print(f"Audio file : {audio_path}")
     print(f"Language   : {language}")
+    print(f"Mode       : {mode}")
     print(f"User ID    : {'*' * 8}... (hidden)")
     print()
 
-    result = asyncio.run(run_rest_asr_test(audio_path, language))
+    if mode == "websocket":
+        result = asyncio.run(run_websocket_asr_test(audio_path, language))
+    else:
+        result = asyncio.run(run_rest_asr_test(audio_path, language))
 
     print("-" * 60)
     if result["success"]:

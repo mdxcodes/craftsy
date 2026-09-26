@@ -245,7 +245,7 @@ def test_transcribe_audio_payload_structure():
     assert transcript == "नमस्ते"
     sent_payload = mock_post.call_args.kwargs.get("json") or mock_post.call_args[1].get("json")
     assert sent_payload["pipelineTasks"][0]["taskType"] == "asr"
-    assert sent_payload["inputData"]["input"][0]["source"] is None
+    assert sent_payload["inputData"]["input"][0]["source"] == ""
 
 
 def test_transcribe_empty_output_returns_empty():
@@ -288,6 +288,18 @@ def test_transcribe_empty_output_returns_empty():
             )
 
     assert transcript == "   "
+
+
+def test_websocket_missing_inference_key_raises():
+    service = BhashiniService(
+        user_id="user",
+        ulca_api_key="key",
+        inference_api_key="",
+    )
+    with pytest.raises(BhashiniConfigError):
+        asyncio.run(
+            service.transcribe_audio_websocket(audio_bytes=b"fake", language="hi")
+        )
 
 
 if __name__ == "__main__":

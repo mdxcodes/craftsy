@@ -14,7 +14,9 @@ Architecture:
 
 from __future__ import annotations
 
+import asyncio
 import base64
+import json
 import logging
 from typing import Any, Dict, List, Optional
 
@@ -258,6 +260,11 @@ class BhashiniService:
                 response.status_code,
                 response.headers.get("content-type"),
             )
+            logger.debug(
+                "Bhashini %s compute response body: %s",
+                task_label,
+                response.text[:1000],
+            )
 
             if response.status_code == 400:
                 raise BhashiniAPIError(
@@ -361,7 +368,7 @@ class BhashiniService:
                 }
             ],
             "inputData": {
-                "input": [{"source": None}],
+                "input": [{"source": ""}],
                 "audio": [
                     {"audioContent": self._encode_audio(audio_bytes)}
                 ],
@@ -596,3 +603,187 @@ class BhashiniService:
         raise BhashiniAPIError(
             f"Bhashini TTS response missing audio. Response: {result}"
         )
+
+    async def transcribe_audio_websocket(
+        self,
+        audio_bytes: bytes,
+        language: str = "hi",
+        *,
+        service_id: Optional[str] = None,
+        sample_rate: int = 16000,
+        chunk_duration_ms: int = 200,
+        receive_timeout: float = 60.0,
+    ) -> str:
+        """Transcribe audio using Bhashini WebSocket streaming ASR.
+
+        Uses the direct WebSocket endpoint:
+            wss://dhruva-api.bhashini.gov.in/ws/v1/asr/stream
+
+        Authentication uses the inference API key as a query parameter.
+        Audio is converted to float32 PCM before streaming.
+
+        Args:
+            audio_bytes: Raw audio bytes (WAV or PCM).
+            language: ISO-639 language code.
+            service_id: Optional ASR service ID.
+            sample_rate: Audio sample rate in Hz. Default 16000.
+            chunk_duration_ms: Duration of each audio chunk in milliseconds.
+            receive_timeout: Timeout for waiting for final transcript.
+
+        Returns:
+            Transcribed text.
+
+        Raises:
+            BhashiniConfigError: If inference API key is missing.
+            BhashiniAPIError: If the WebSocket service returns an error.
+        """
+        if not self._inference_api_key:
+            raise BhashiniConfigError(
+                "Bhashini inference API key is required for WebSocket ASR. "
+                "Set BHASHINI_INFERENCE_API_KEY environment variable."
+            )
+
+        try:
+            import websockets as _websockets
+        except ImportError:
+            raise BhashiniConfigError(
+                "The 'websockets' package is required for WebSocket ASR. "
+                "Install it before using this feature."
+            )
+
+        websocket_url = (
+            f"wss://dhruva-api.bhashini.gov.in/ws/v1/asr/stream"
+            f"?api_key={self._inference_api_key}"
+        )
+
+        start_config = {
+            "type": "start",
+            "controlConfig": {"dataTracking": False},
+            "config": {
+                "serviceId": service_id or "bhashini/ai4b/indic-conformer/grpc",
+                "language": {"sourceLanguage": language},
+                "audioFormat": "pcm",
+                "encoding": "raw",
+                "samplingRate": sample_rate,
+                "transcriptionFormat": {"value": "transcript"},
+                "profanityFilter": True,
+                "postProcessors": ["itn", "punctuation"],
+            },
+            "streamingConfig": {
+                "chunkDurationMs": chunk_duration_ms,
+                "interimResults": True,
+                "endOfStreamPolicy": "client_signal",
+            },
+        }
+
+        transcripts: List[Dict[str, Any]] = []
+        messages: List[Dict[str, Any]] = []
+
+        async def wait_until_ready(websocket: _websockets.WebSocketClientProtocol) -> Optional[Dict[str, Any]]:
+            while True:
+                raw = await asyncio.wait_for(websocket.recv(), timeout=receive_timeout)
+                if isinstance(raw, bytes):
+                    continue
+                response = json.loads(raw)
+                messages.append(response)
+                if response.get("type") == "ready":
+                    return None
+                if response.get("type") == "error":
+                    return response
+
+        async def receive_transcripts(websocket: _websockets.WebSocketClientProtocol) -> None:
+            try:
+                while True:
+                    raw = await websocket.recv()
+                    if isinstance(raw, bytes):
+                        continue
+                    response = json.loads(raw)
+                    messages.append(response)
+                    if response.get("type") != "transcript":
+                        continue
+                    text = (response.get("output") or [{}])[0].get("source")
+                    if text:
+                        transcripts.append(
+                            {
+                                "source": text,
+                                "isFinal": response.get("isFinal", False),
+                                "raw": response,
+                            }
+                        )
+                    if response.get("isFinal"):
+                        break
+            except _websockets.ConnectionClosed:
+                return
+            except Exception:
+                return
+
+        def convert_to_float32_pcm(data: bytes) -> bytes:
+            """Convert int16 PCM bytes to float32 PCM bytes."""
+            try:
+                import struct
+                int16_samples = struct.unpack(f"<{len(data)//2}h", data)
+                float32_samples = [
+                    max(-1.0, min(1.0, sample / 32768.0)) for sample in int16_samples
+                ]
+                return struct.pack(f"<{len(float32_samples)}f", *float32_samples)
+            except Exception:
+                return data
+
+        try:
+            async with _websockets.connect(websocket_url, max_size=16 * 1024 * 1024) as websocket:
+                logger.info(
+                    "Bhashini WebSocket ASR connected: url=%s, language=%s",
+                    websocket_url,
+                    language,
+                )
+                await websocket.send(json.dumps(start_config))
+
+                early_error = await wait_until_ready(websocket)
+                if early_error:
+                    error_message = early_error.get("message") or "ASR streaming backend returned an error."
+                    raise BhashiniAPIError(error_message)
+
+                receiver_task = asyncio.create_task(receive_transcripts(websocket))
+
+                audio_float32 = convert_to_float32_pcm(audio_bytes)
+                chunk_size = int(sample_rate * 4 * chunk_duration_ms / 1000)  # float32 = 4 bytes per sample
+                for idx in range(0, len(audio_float32), chunk_size):
+                    chunk = audio_float32[idx : idx + chunk_size]
+                    await websocket.send(chunk)
+                    await asyncio.sleep(chunk_duration_ms / 1000.0)
+
+                try:
+                    await websocket.send(json.dumps({"type": "end"}))
+                except Exception:
+                    pass
+
+                try:
+                    await asyncio.wait_for(receiver_task, timeout=receive_timeout)
+                except asyncio.TimeoutError:
+                    receiver_task.cancel()
+
+        except _websockets.ConnectionClosed as exc:
+            raise BhashiniAPIError(f"Bhashini WebSocket ASR connection closed: {exc}")
+        except asyncio.TimeoutError:
+            raise BhashiniAPIError("Bhashini WebSocket ASR timed out waiting for transcript.")
+        except BhashiniAPIError:
+            raise
+        except Exception as exc:
+            raise BhashiniAPIError(f"Bhashini WebSocket ASR failed: {exc}")
+
+        error_messages = [msg for msg in messages if msg.get("type") == "error"]
+        if error_messages:
+            error_message = error_messages[-1].get("message") or "ASR streaming backend returned an error."
+            raise BhashiniAPIError(error_message)
+
+        if not transcripts:
+            raise BhashiniAPIError("Bhashini WebSocket ASR returned an empty transcription.")
+
+        final_transcripts = [item for item in transcripts if item["isFinal"]]
+        transcript = (final_transcripts or transcripts)[-1]["source"]
+        logger.info(
+            "Bhashini WebSocket ASR transcript: len=%d, language=%s",
+            len(transcript),
+            language,
+        )
+        return transcript

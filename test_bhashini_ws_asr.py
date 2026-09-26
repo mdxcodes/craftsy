@@ -1,14 +1,19 @@
 """
-Isolated Bhashini WebSocket ASR POC.
+Bhashini WebSocket ASR POC (updated with verified protocol).
 
 This script tests the Bhashini WebSocket ASR endpoint directly
-without modifying any production code.
+using the verified protocol from the official Bhashini Python SDK.
+
+Verified protocol:
+    URL: wss://dhruva-api.bhashini.gov.in/ws/v1/asr/stream?api_key=<key>
+    Auth: query parameter api_key
+    Start: JSON {"type": "start", "config": {...}, "streamingConfig": {...}}
+    Audio: binary float32 PCM chunks
+    End: JSON {"type": "end"}
+    Response: JSON {"type": "ready"} / {"type": "transcript"} / {"type": "error"}
 
 Requirements:
-- websockets
-- numpy (for audio conversion)
-
-Install: pip install websockets numpy
+    pip install websockets
 
 Usage:
     python test_bhashini_ws_asr.py /path/to/audio.wav hi
@@ -20,23 +25,13 @@ import asyncio
 import json
 import logging
 import os
+import struct
 import sys
 import time
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
-
-# Bhashini WebSocket endpoint
-BHASHINI_WS_URL = "wss://dhruva-api.bhashini.gov.in"
-
-# Known service IDs from getModelsPipeline
-KNOWN_SERVICE_IDS = {
-    "hi": "ai4bharat/conformer-hi-gpu--t4",
-    "en": "ai4bharat/whisper-medium-en--gpu--t4",
-    "bn": "ai4bharat/conformer-multilingual-indo_aryan-gpu--t4",
-    "ta": "ai4bharat/conformer-multilingual-indo_aryan-gpu--t4",
-}
 
 
 def load_env_credentials() -> tuple[str, str, str, str]:
@@ -53,31 +48,19 @@ def load_env_credentials() -> tuple[str, str, str, str]:
 
 
 def convert_to_wav(audio_path: Path) -> Path:
-    """
-    Convert audio to Bhashini-required WAV format:
-    - 8000 Hz
-    - 16-bit PCM
-    - mono
-    """
+    """Convert audio to WAV 16kHz mono if needed."""
     if audio_path.suffix.lower() == ".wav":
-        # Check if already correct format
-        import wave
-        with wave.open(str(audio_path), "rb") as w:
-            if (w.getnchannels() == 1 and
-                w.getsampwidth() == 2 and
-                w.getframerate() == 8000):
-                return audio_path
+        return audio_path
 
     wav_path = audio_path.with_suffix(".wav")
     try:
         import subprocess
-        result = subprocess.run(
+        subprocess.run(
             [
                 "ffmpeg",
                 "-i", str(audio_path),
-                "-ar", "8000",
+                "-ar", "16000",
                 "-ac", "1",
-                "-sample_fmt", "s16",
                 "-y",
                 str(wav_path),
             ],
@@ -88,17 +71,17 @@ def convert_to_wav(audio_path: Path) -> Path:
         if wav_path.exists():
             return wav_path
     except Exception as exc:
-        logger.warning("Failed to convert audio: %s", exc)
-
+        logger.warning("Failed to convert audio to WAV: %s", exc)
     raise ValueError(f"Could not convert {audio_path} to WAV format")
 
 
-async def send_audio_chunk(ws, audio_data: bytes, chunk_size: int = 3200):
-    """Send audio data in chunks (3200 bytes = 0.4s at 8000 Hz 16-bit mono)."""
-    for i in range(0, len(audio_data), chunk_size):
-        chunk = audio_data[i:i + chunk_size]
-        await ws.send(chunk)
-        await asyncio.sleep(0.2)
+def convert_to_float32_pcm(data: bytes) -> bytes:
+    """Convert int16 PCM bytes to float32 PCM bytes."""
+    int16_samples = struct.unpack(f"<{len(data)//2}h", data)
+    float32_samples = [
+        max(-1.0, min(1.0, sample / 32768.0)) for sample in int16_samples
+    ]
+    return struct.pack(f"<{len(float32_samples)}f", *float32_samples)
 
 
 async def test_bhashini_websocket(audio_path: Path, language_code: str = "hi"):
@@ -109,117 +92,101 @@ async def test_bhashini_websocket(audio_path: Path, language_code: str = "hi"):
         audio_path: Path to audio file (WAV, MP3, etc.)
         language_code: ISO-639 language code (hi, en, bn, ta, etc.)
     """
-    api_key, user_id, inference_api_key, inference_api_key_name = load_env_credentials()
+    _, user_id, inference_api_key, _ = load_env_credentials()
     wav_path = convert_to_wav(audio_path)
 
-    # Read audio file
-    audio_data = wav_path.read_bytes()
-    logger.info("Audio file: %s (%d bytes)", wav_path, len(audio_data))
+    # Read and convert audio to float32 PCM
+    import wave
+    with wave.open(str(wav_path), "rb") as w:
+        raw_data = w.readframes(w.getnframes())
+    audio_float32 = convert_to_float32_pcm(raw_data)
+    logger.info("Audio file: %s (%d bytes float32)", wav_path, len(audio_float32))
 
-    # Get service ID for language
-    service_id = KNOWN_SERVICE_IDS.get(language_code)
-    if not service_id:
-        raise ValueError(f"No known service ID for language '{language_code}'. Available: {list(KNOWN_SERVICE_IDS.keys())}")
+    # Build WebSocket URL with inference API key
+    websocket_url = (
+        f"wss://dhruva-api.bhashini.gov.in/ws/v1/asr/stream"
+        f"?api_key={inference_api_key}"
+    )
 
     # Build ASR task config
-    asr_task = {
-        "taskType": "asr",
+    start_config = {
+        "type": "start",
+        "controlConfig": {"dataTracking": False},
         "config": {
-            "serviceId": service_id,
-            "language": {
-                "sourceLanguage": language_code
-            },
-            "samplingRate": 8000,
-            "audioFormat": "wav",
-            "encoding": None
-        }
+            "serviceId": "bhashini/ai4b/indic-conformer/grpc",
+            "language": {"sourceLanguage": language_code},
+            "audioFormat": "pcm",
+            "encoding": "raw",
+            "samplingRate": 16000,
+            "transcriptionFormat": {"value": "transcript"},
+            "profanityFilter": True,
+            "postProcessors": ["itn", "punctuation"],
+        },
+        "streamingConfig": {
+            "chunkDurationMs": 200,
+            "interimResults": True,
+            "endOfStreamPolicy": "client_signal",
+        },
     }
 
-    # Build streaming config
-    streaming_config = {
-        "responseFrequencyInSecs": 2.0,
-        "responseTaskSequenceDepth": 1
-    }
-
-    # Build full config
-    config_message = {
-        "task": asr_task,
-        "streamingConfig": streaming_config
-    }
-
-    logger.info("Connecting to %s", BHASHINI_WS_URL)
-    logger.info("Service ID: %s", service_id)
+    logger.info("Connecting to %s", websocket_url)
     logger.info("Language: %s", language_code)
 
     import websockets
-    # Try with additional headers
-    extra_headers = {
-        "userID": user_id,
-        "ulcaApiKey": api_key,
-    }
-    async with websockets.connect(BHASHINI_WS_URL, extra_headers=extra_headers) as ws:
+    async with websockets.connect(websocket_url, max_size=16 * 1024 * 1024) as ws:
         logger.info("WebSocket connected")
 
-        # Send auth
-        auth_message = {
-            "apiKey": api_key,
-            "userId": user_id
-        }
-        await ws.send(json.dumps(auth_message))
-        logger.info("Auth sent")
-
-        # Wait for connect/ready
-        connect_response = await ws.recv()
-        logger.info("Connect response: %s", connect_response[:200])
-
         # Send ASR config
-        await ws.send(json.dumps(config_message))
+        await ws.send(json.dumps(start_config))
         logger.info("ASR config sent")
 
-        # Wait for ready
-        ready_response = await ws.recv()
-        logger.info("Ready response: %s", ready_response[:200])
+        # Wait for ready or error
+        while True:
+            msg = await ws.recv()
+            if isinstance(msg, str):
+                data = json.loads(msg)
+                logger.info("Received: %s", msg[:200])
+                if data.get("type") == "ready":
+                    logger.info("Server ready, session=%s", data.get("sessionId"))
+                    break
+                if data.get("type") == "error":
+                    raise RuntimeError(f"Server error: {data}")
 
-        # Send audio
+        # Send audio in chunks
         logger.info("Sending audio...")
-        await send_audio_chunk(ws, audio_data)
+        chunk_size = 16000 * 4 * 200 // 1000  # float32 = 4 bytes, 200ms
+        for i in range(0, len(audio_float32), chunk_size):
+            chunk = audio_float32[i:i + chunk_size]
+            await ws.send(chunk)
+            await asyncio.sleep(0.2)
 
-        # Send terminate
-        await ws.send(json.dumps({"event": "terminate"}))
-        logger.info("Terminate sent")
+        # Send end
+        await ws.send(json.dumps({"type": "end"}))
+        logger.info("End sent")
 
         # Collect responses
-        responses = []
         final_transcript = None
         error = None
 
         try:
             while True:
-                response = await asyncio.wait_for(ws.recv(), timeout=10)
-                logger.info("Received: %s", response[:200])
+                msg = await asyncio.wait_for(ws.recv(), timeout=10)
+                if isinstance(msg, str):
+                    data = json.loads(msg)
+                    logger.info("Received: %s", msg[:200])
 
-                try:
-                    data = json.loads(response)
-                    responses.append(data)
+                    if data.get("type") == "transcript":
+                        text = (data.get("output") or [{}])[0].get("source", "")
+                        logger.info("Transcript: %s (isFinal=%s)", text, data.get("isFinal"))
+                        if data.get("isFinal"):
+                            final_transcript = text
+                            break
 
-                    # Extract transcript from response
-                    if isinstance(data, dict):
-                        # Check for final transcript
-                        if "pipelineResponse" in data:
-                            for step in data.get("pipelineResponse", []):
-                                if step.get("taskType") == "asr":
-                                    output = step.get("output", [])
-                                    if output:
-                                        text = output[0].get("source", "")
-                                        if text:
-                                            final_transcript = text
-
-                        # Check for error
-                        if "error" in data or "message" in data:
-                            error = data.get("error") or data.get("message")
-
-                except json.JSONDecodeError:
-                    pass
+                    if data.get("type") == "error":
+                        error = data.get("message")
+                        break
+                else:
+                    logger.info("Binary message: %d bytes", len(msg))
 
         except asyncio.TimeoutError:
             logger.info("Response collection timeout")
@@ -228,12 +195,10 @@ async def test_bhashini_websocket(audio_path: Path, language_code: str = "hi"):
         logger.info("RESULTS:")
         logger.info("Final transcript: %s", final_transcript)
         logger.info("Error: %s", error)
-        logger.info("Total responses: %d", len(responses))
 
         return {
             "transcript": final_transcript,
             "error": error,
-            "responses": len(responses),
         }
 
 
@@ -255,4 +220,3 @@ if __name__ == "__main__":
     print("FINAL RESULT:")
     print(f"Transcript: {result['transcript']}")
     print(f"Error: {result['error']}")
-    print(f"Responses received: {result['responses']}")
