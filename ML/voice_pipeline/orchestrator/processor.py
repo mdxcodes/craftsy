@@ -142,11 +142,11 @@ class ArtisanVoiceProcessor:
         Returns a Transcript instance. On failure, returns a non-usable fallback
         transcript so the caller can decide whether to abort.
         """
+        from backend.config import get_settings
         from backend.services.bhashini_service import BhashiniConfigError, BhashiniService
 
-        api_key = os.environ.get("BHASHINI_API_KEY", "")
-        user_id = os.environ.get("BHASHINI_USER_ID", "")
-        if not api_key or not user_id:
+        settings = get_settings()
+        if not settings.bhashini_api_key or not settings.bhashini_user_id:
             logger.error("Bhashini credentials not configured.")
             return self._failed_transcript(
                 language_code=language_code,
@@ -154,7 +154,10 @@ class ArtisanVoiceProcessor:
             )
 
         try:
-            service = BhashiniService(api_key=api_key, user_id=user_id)
+            service = BhashiniService(
+                api_key=settings.bhashini_api_key,
+                user_id=settings.bhashini_user_id,
+            )
             audio_bytes = audio_path.read_bytes()
             text = asyncio.run(
                 service.transcribe_audio(audio_bytes=audio_bytes, language=language_code)
