@@ -27,11 +27,11 @@ Craftsy Business Services
 
 **Repository:** `ONDC-Official/ondc-mock-server`
 
-**Commit inspected:** `dev` branch
+**Commit inspected:** `dev` branch (`694089e449449a73dac51567b7ef6294c380f79b`)
 
 **Attempted:** Yes
 
-**Blocker:** Server startup hangs after Redis connection. Root cause is missing/incomplete submodule initialization for retail spec files (`apps/backend/domain-repos/@retail-b2b/release-2.0.2` and `b2c_exports_2.0`). Submodule checkout was extremely slow and did not complete within the time-box. The backend process remains alive but does not bind to the port.
+**Blocker:** Server startup hangs after Redis connection. The retail specification submodules (`apps/backend/domain-repos/@retail-b2b/release-2.0.2` and `b2c_exports_2.0`) did not finish initializing. The backend process stays alive but does not bind to the port.
 
 **Workaround:** Implemented a minimal local Retail BPP test harness inside Craftsy that follows the official ONDC Retail B2C contract structure and uses real Craftsy business data.
 
@@ -132,7 +132,7 @@ curl -X POST http://localhost:8000/api/v1/ondc/confirm \
 - Stock is read from `ProductDB.stock`
 - `select` and `confirm` validate requested quantity <= available stock
 - Successful `confirm` decrements stock via `OrderService.create_order()`
-- Repeated `confirm` with same `transaction_id`/`message_id` does not decrement stock again
+- Repeated `confirm` with the same `transaction_id`/`message_id` does not decrement stock again
 
 ## Idempotency Behavior
 
@@ -149,6 +149,8 @@ cd /secondary/craftsy/backend
 ```
 
 ## Test Results
+
+All 18 ONDC BPP tests pass:
 
 ```text
 tests/test_ondc_bpp.py::test_search_returns_catalog PASSED
@@ -178,7 +180,7 @@ Existing Craftsy tests: `155 passed, 1 failed` — the single failure is the pre
 See `tests/test_ondc_bpp.py::test_full_ondc_flow` for the full search → select → init → confirm → status sequence using real seeded Craftsy data.
 
 Idempotency evidence:
-- `test_confirm_is_idempotent` — repeated confirm with same `transaction_id`/`message_id` returns existing order, no second `OrderDB` row, stock unchanged after first decrement.
+- `test_confirm_is_idempotent` — repeated confirm with the same `transaction_id`/`message_id` returns the existing order, no second `OrderDB` row, stock unchanged after the first decrement.
 - `test_confirm_rejects_duplicate_external_order_id` — confirms the idempotency key includes the external order reference.
 
 ## Known Limitations

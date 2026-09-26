@@ -1,10 +1,10 @@
 """
-Voice Router.
+Voice router.
 
-Exposes endpoints for:
-1. Artisan Voice Speech-to-Text Transcription (Whisper STT + Craft Glossary).
-2. Complete Voice-to-Product Pipeline (Voice -> Description & Tags -> Base Price -> Product Draft).
-3. Craft Glossary Term Lookups by Category.
+Endpoints:
+- POST /transcribe — audio to transcript
+- POST /process — full voice-to-product pipeline
+- GET /glossary — craft term lookup
 """
 
 from typing import Optional

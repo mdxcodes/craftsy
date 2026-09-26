@@ -3,22 +3,20 @@ FastAPI Backend Integration Tests.
 
 Validates:
 1. Health check endpoint
-2. Pricing status & Pricing suggestion (integrated with ML engine)
-3. Product catalog CRUD & Offline batch sync
-4. AI Catalog listing generation
+2. Pricing status & suggestion (integrated with ML engine)
+3. Product catalog CRUD & offline batch sync
+4. AI catalog listing generation
 """
 
 import sys
 from pathlib import Path
 
-# Fix Windows console encoding for emoji output
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from fastapi.testclient import TestClient
 
-# Ensure root is on path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -34,7 +32,6 @@ def test_health():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    print("✅ Health Check Passed")
 
 
 def test_pricing_status():
@@ -43,11 +40,10 @@ def test_pricing_status():
     assert response.status_code == 200
     data = response.json()
     assert "indexed_benchmark_products" in data
-    print(f"✅ Pricing Status Passed: {data['indexed_benchmark_products']} benchmark products indexed")
 
 
 def test_pricing_suggest():
-    """Test /api/v1/pricing/suggest endpoint calling our ML engine."""
+    """Test /api/v1/pricing/suggest endpoint calling the ML engine."""
     payload = {
         "description": "Handcrafted terracotta floral vase sculpted on traditional potter wheel",
         "category": "Pottery",
@@ -63,19 +59,15 @@ def test_pricing_suggest():
     assert "reasoning" in data
     assert "reasoning_hi" in data
     assert len(data["comparable_products"]) > 0
-    print(f"✅ Pricing Suggest Passed: Suggested ₹{data['suggested_price']} (Floor: ₹{data['floor_price']})")
 
 
 def test_products_crud_and_sync():
     """Test product listing, creation, and offline batch sync."""
-    # 1. List initial products
     res = client.get("/api/v1/products")
     assert res.status_code == 200
     initial_products = res.json()
     assert isinstance(initial_products, list)
-    print(f"✅ Product List Passed: Found {len(initial_products)} products")
 
-    # 2. Create a product
     new_prod = {
         "title": "Test Dokra Brass Figurine",
         "description": "Lost wax cast brass craft",
@@ -89,14 +81,11 @@ def test_products_crud_and_sync():
     assert res_create.status_code == 201
     created = res_create.json()
     prod_id = created["id"]
-    print(f"✅ Product Create Passed: Created ID {prod_id}")
 
-    # 3. Get single product
     res_get = client.get(f"/api/v1/products/{prod_id}")
     assert res_get.status_code == 200
     assert res_get.json()["title"] == "Test Dokra Brass Figurine"
 
-    # 4. Offline Batch Sync
     sync_payload = {
         "products": [
             {
@@ -116,12 +105,9 @@ def test_products_crud_and_sync():
     sync_data = res_sync.json()
     assert sync_data["synced_count"] == 1
     assert sync_data["products"][0]["id"] == "offline_prod_101"
-    print("✅ Product Offline Sync Batch Passed")
 
-    # 5. Delete product
     res_del = client.delete(f"/api/v1/products/{prod_id}")
     assert res_del.status_code == 200
-    print("✅ Product Delete Passed")
 
 
 def test_catalog_listing_generation():
@@ -139,7 +125,6 @@ def test_catalog_listing_generation():
     assert "description_en" in data
     assert "description_hi" in data
     assert "category" in data
-    print(f"✅ Catalog Listing Generation Passed: {data['title_en']}")
 
 
 def test_voice_glossary_api():
@@ -149,16 +134,15 @@ def test_voice_glossary_api():
     data = response.json()
     assert data["total_terms"] > 0
     assert "Terracotta" in data["terms"]
-    print("✅ Voice Glossary API Passed")
 
 
 if __name__ == "__main__":
-    print("\n🚀 Running Craftsy Backend Integration Tests...\n")
+    print("Running Craftsy backend integration tests...")
     test_health()
     test_pricing_status()
     test_products_crud_and_sync()
     test_catalog_listing_generation()
     test_pricing_suggest()
     test_voice_glossary_api()
-    print("\n🎉 ALL BACKEND TESTS PASSED SUCCESSFULLY!\n")
+    print("All backend integration tests passed.")
 

@@ -1,20 +1,8 @@
 """
-Commerce Channel Service.
+Commerce channel service.
 
-Manages the multi-channel commerce abstraction:
-- Craftsy Marketplace
-- ONDC (Open Network for Digital Commerce)
-- GeM (Government e-Marketplace)
-
-This service does NOT implement real ONDC or GeM API calls.
-It provides:
-- Channel status management
-- Channel-specific validation
-- Product-channel relationship tracking
-- Audit logging for all channel operations
-
-Architecture:
-    Flutter App → Craftsy Backend → CommerceService → Channel Adapters
+Tracks product status per channel (Craftsy, ONDC, GeM) and logs channel
+operations. Does not implement real external API calls.
 """
 
 from __future__ import annotations

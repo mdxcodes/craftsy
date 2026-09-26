@@ -87,7 +87,6 @@ def test_craft_glossary_endpoint():
     assert "Terracotta" in data["terms"]
     assert "Pottery" in data["categories"]
     assert len(data["categories"]) >= 5
-    print(f"✅ Craft Glossary Endpoint Passed: {data['total_terms']} terms retrieved")
 
 
 def test_voice_transcribe_endpoint(mock_voice_processor):
@@ -96,28 +95,23 @@ def test_voice_transcribe_endpoint(mock_voice_processor):
     files = {"audio": ("sample.wav", wav_bytes, "audio/wav")}
     data = {"language_code": "hi", "category_hint": "Pottery"}
 
-    # Test /api/v1/voice/transcribe
     res_voice = client.post("/api/v1/voice/transcribe", files=files, data=data)
     assert res_voice.status_code == 200
     res_json = res_voice.json()
     assert res_json["status"] == "completed"
     assert "मिट्टी का" in res_json["transcript"]
     assert res_json["language_code"] == "hi"
-    print(f"✅ /api/v1/voice/transcribe Passed: '{res_json['transcript'][:40]}...'")
 
-    # Test /api/v1/catalog/transcribe
     files2 = {"audio": ("sample.wav", wav_bytes, "audio/wav")}
     res_catalog = client.post("/api/v1/catalog/transcribe", files=files2, data=data)
     assert res_catalog.status_code == 200
     assert "मिट्टी का" in res_catalog.json()["transcript"]
-    print("✅ /api/v1/catalog/transcribe Passed")
 
 
 def test_voice_auto_language_detection(mock_voice_processor):
     """Test auto language detection: English voice produces English, Hindi produces Hindi."""
     wav_bytes = generate_synthetic_wav_bytes(duration_seconds=2.0)
 
-    # 1. Spoken English voice note
     files_en = {"audio": ("english_desc.wav", wav_bytes, "audio/wav")}
     res_en = client.post("/api/v1/voice/transcribe", files=files_en, data={"language_code": "en"})
     assert res_en.status_code == 200
@@ -125,7 +119,6 @@ def test_voice_auto_language_detection(mock_voice_processor):
     assert "handcrafted terracotta flower vase" in json_en["transcript"].lower()
     assert json_en["language_code"] == "en"
 
-    # 2. Default auto parameter without explicit language code
     files_auto = {"audio": ("auto_desc.wav", wav_bytes, "audio/wav")}
     res_auto = client.post("/api/v1/voice/transcribe", files=files_auto)
     assert res_auto.status_code == 200
@@ -148,7 +141,6 @@ def test_voice_to_listing_endpoint(mock_voice_processor):
     assert "description_en" in res_json
     assert "category" in res_json
     assert len(res_json["tags"]) > 0
-    print(f"✅ Voice to Listing Passed: {res_json['title_en']} ({res_json['category']})")
 
 
 def test_voice_to_pricing_endpoint(mock_voice_processor):
@@ -171,11 +163,10 @@ def test_voice_to_pricing_endpoint(mock_voice_processor):
     assert "reasoning" in pricing
     assert "reasoning_hi" in pricing
     assert len(pricing["comparable_products"]) > 0
-    print(f"✅ Voice to Pricing Passed: Suggested ₹{pricing['suggested_price']} (Floor: ₹{pricing['floor_price']})")
 
 
 def test_end_to_end_voice_to_product(mock_voice_processor):
-    """Test complete end-to-end voice-to-product draft creation."""
+    """Test complete voice-to-product draft creation."""
     wav_bytes = generate_synthetic_wav_bytes(duration_seconds=2.5)
     files = {"audio": ("sample.wav", wav_bytes, "audio/wav")}
     data = {
@@ -186,7 +177,6 @@ def test_end_to_end_voice_to_product(mock_voice_processor):
         "hourly_wage": 60.0,
     }
 
-    # Test /api/v1/voice/process
     res = client.post("/api/v1/voice/process", files=files, data=data)
     assert res.status_code == 200
     body = res.json()
@@ -205,14 +195,11 @@ def test_end_to_end_voice_to_product(mock_voice_processor):
     assert "product_draft" in body
     assert body["product_draft"]["status"] == "draft"
     assert body["product_draft"]["price"] == body["pricing"]["suggested_price"]
-    print(f"✅ End-to-End Voice Process Passed: Title='{body['title_en']}', Price=₹{body['product_draft']['price']}")
 
-    # Test /api/v1/catalog/voice-to-product
     files2 = {"audio": ("sample.wav", wav_bytes, "audio/wav")}
     res2 = client.post("/api/v1/catalog/voice-to-product", files=files2, data=data)
     assert res2.status_code == 200
     assert res2.json()["status"] == "completed"
-    print("✅ /api/v1/catalog/voice-to-product Passed")
 
 
 def test_voice_error_handling():
@@ -220,11 +207,10 @@ def test_voice_error_handling():
     files = {"audio": ("empty.wav", b"", "audio/wav")}
     res = client.post("/api/v1/voice/transcribe", files=files, data={"language_code": "hi"})
     assert res.status_code in [400, 500]
-    print("✅ Voice Error Handling Passed: Empty audio properly rejected")
 
 
 if __name__ == "__main__":
-    print("\n🚀 Running Craftsy Voice Integration Tests...\n")
+    print("Running voice integration tests...")
     test_craft_glossary_endpoint()
     test_voice_error_handling()
-    print("\n🎉 ALL VOICE TESTS PASSED SUCCESSFULLY!\n")
+    print("Voice integration tests passed.")

@@ -19,76 +19,73 @@
 
 ---
 
-## The Gap We Address
+## What is Craftsy?
 
-India's artisan economy — 7 million+ craftspeople — remains largely invisible to digital commerce. Government initiatives like Shilp Samagam and Surajkund Mela provide seasonal exposure, but the moment the fair ends, the sales stop.
+Craftsy is a Flutter mobile app paired with a FastAPI backend. It is built for artisans who sell handmade goods but lack the tools to list products online professionally.
 
-The barriers are not effort or talent. They are:
+The app guides an artisan through three steps:
 
-- **Technical friction** — e-commerce demands studio photography, English SEO descriptions, and typing-heavy onboarding
-- **Language exclusion** — most platforms assume Hindi or English fluency, leaving regional-language artisans behind
-- **Pricing exploitation** — without market awareness, artisans consistently undervalue their work or lose margins to intermediaries
-- **Connectivity poverty** — rural clusters often lack reliable internet, making cloud-only apps useless
+1. Photograph the product
+2. Speak a description in their regional language
+3. Review and publish a bilingual (English + Hindi) listing
 
-**Craftsy was designed from day one to work in zero-connectivity environments, in any Indian language, with zero typing required.**
+Behind the scenes, the backend runs computer-vision image enhancement, speech-to-text transcription, LLM-based listing generation, and a pricing engine that compares the product against indexed market data.
 
----
-
-## What Craftsy Does
-
-### One Photo → Studio-Quality Product Shot
-
-The artisan points their phone camera at their craft. A 10-stage computer vision pipeline removes cluttered backgrounds, corrects lighting, auto-crops to square format, and compresses for fast upload — producing an e-commerce-ready asset from a budget phone photo.
-
-### One Voice Note → Bilingual Listing
-
-The artisan speaks naturally in their regional language. Speech-to-text transcribes, translation models clean up, and an LLM structures the output into a bilingual (English + Hindi) product listing with title, description, SEO tags, and category — then reads it back aloud for confirmation.
-
-### Fair Pricing, Not Predatory Pricing
-
-A dual-layer pricing engine combines a mathematical cost floor (materials + labour + transport + overhead) with market-reference data from indexed handicraft listings. The result: a suggested price range with transparent reasoning the artisan can accept, adjust, or override.
-
-### Offline-First, Always
-
-Every photo, voice note, and draft is stored locally on the device. When connectivity returns, a background sync queue drains automatically with exponential backoff. Nothing is ever lost waiting for a signal.
-
-### Human-in-the-Loop
-
-Every AI decision — image, listing, and price — is read aloud via on-device bilingual TTS and requires the artisan's manual approval before going live. The AI assists; the artisan decides.
+The project was built for Smart India Hackathon 2026, Problem Statement PS-90.
 
 ---
 
-## Architecture
+## The Problem
 
+India's artisan economy includes millions of craftspeople. Seasonal markets like Shilp Samagam and Surajkund Mela provide temporary exposure, but sales stop when the event ends.
+
+Four barriers keep artisans offline:
+
+- **Photography** — e-commerce requires clean product photos. Most artisans do not have studio equipment.
+- **Language** — most platforms require English or Hindi. Regional-language artisans struggle to write descriptions.
+- **Pricing** — without market visibility, artisans underprice their work or lose margins to intermediaries.
+- **Connectivity** — rural areas often have unreliable internet. Cloud-only apps fail during the first mile.
+
+Craftsy targets all four at once: it processes photos and voice notes offline, in any supported Indian language, and produces a publishable listing with pricing guidance.
+
+---
+
+## What We Built
+
+| Feature | Implementation |
+|---|---|
+| Artisan auth | Phone + OTP; SQLite in development, PostgreSQL in production |
+| Product catalog | Full CRUD with image upload and offline sync |
+| Image enhancement | rembg background removal, OpenCV lighting/crop, Pillow compositing |
+| Voice listing | Whisper STT / Bhashini ASR, craft glossary biasing, Gemini/Groq listing generation |
+| Pricing | Cost-floor calculator + ChromaDB benchmark retrieval |
+| Commerce channels | ONDC and GeM channel metadata, status tracking, audit logging |
+| Offline support | Hive local cache + WorkManager background sync queue |
+| Accessibility | TTS readback, large text, haptic feedback, voice navigation |
+
+---
+
+## How It Works
+
+```mermaid
+flowchart LR
+    Artisan --> Flutter
+    Consumer --> Flutter
+    Flutter --> FastAPI
+    FastAPI --> Database
+    FastAPI --> AI
+    FastAPI --> Integrations
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Flutter Mobile Client                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Camera  │  │  Voice   │  │  Local   │  │  TTS     │   │
-│  │  Capture │  │  Record  │  │  Queue   │  │  Readback│   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-│       │              │              │              │         │
-│       └──────────────┴──────────────┴──────────────┘         │
-│                          │                                    │
-│                    ┌─────┴─────┐                             │
-│                    │  Drift +  │                             │
-│                    │  Hive DB  │                             │
-│                    └─────┬─────┘                             │
-└──────────────────────────┼──────────────────────────────────┘
-                           │ (sync on reconnect)
-                    ┌──────┴──────┐
-                    │  FastAPI    │
-                    │  Backend    │
-                    └──────┬──────┘
-           ┌───────────────┼───────────────┐
-           │               │               │
-    ┌──────┴──────┐ ┌──────┴──────┐ ┌──────┴──────┐
-    │  Image      │ │  Voice      │ │  Pricing    │
-    │  Pipeline   │ │  Pipeline   │ │  Engine     │
-    │  rembg+OpenCV│ │  Whisper+   │ │  Cost Floor │
-    │  +Pillow    │ │  IndicTrans │ │  +ChromaDB  │
-    └─────────────┘ └─────────────┘ └─────────────┘
-```
+
+The Flutter app handles all user-facing workflows: onboarding, product creation, marketplace browsing, orders, and settings. Local storage (Hive + Drift) keeps drafts and queued uploads available offline.
+
+The FastAPI backend owns persistence, AI orchestration, and external integrations. SQLAlchemy models define `ArtisanDB`, `ProductDB`, `OrderDB`, and channel metadata tables.
+
+AI services run in the `ML/` directory:
+
+- `ML/image_pipeline/` — background removal and enhancement
+- `ML/voice_pipeline/` — transcription, glossary, and product-draft generation
+- `ML/pricing/` — cost extraction, ChromaDB benchmark retrieval, and price suggestion
 
 ---
 
@@ -96,18 +93,17 @@ Every AI decision — image, listing, and price — is read aloud via on-device 
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **Mobile** | Flutter 3.x, Dart | Cross-platform, offline-capable local storage |
-| **State** | Riverpod 2.x | Reactive, decoupled state propagation |
-| **Local DB** | Drift (SQLite), Hive | Offline queue, persistent storage |
-| **Background sync** | WorkManager | Automatic drain on reconnect |
-| **Backend** | FastAPI, SQLAlchemy 2.0 | Async REST API |
-| **Database** | SQLAlchemy 2.0 + PostgreSQL (Railway) / SQLite (local) | Persistent product, order, and artisan data |
-| **Vector store** | ChromaDB | Embedding-based market comparables |
-| **Image pipeline** | rembg (U²-Net), OpenCV, Pillow | Background removal, auto-crop, correction |
-| **Speech-to-text** | Whisper / Bhashini ASR | Regional dialect transcription |
-| **Translation** | IndicTrans2 / Bhashini | 22 scheduled Indian languages |
-| **LLM** | Groq Cloud (primary), Gemini (fallback) | Bilingual listing generation, chat |
-| **Deployment** | Railway (PaaS) | Continuous cloud deployment |
+| Mobile | Flutter 3.x, Dart | Cross-platform client with offline-first local storage |
+| State | Riverpod 2.x | Reactive state management |
+| Local DB | Drift (SQLite), Hive | Offline queue and cached drafts |
+| Background sync | WorkManager | Periodic drain of upload queue |
+| Backend | FastAPI, SQLAlchemy 2.0 | REST API and ORM |
+| Database | SQLite (local), PostgreSQL via Railway (production) | Persistent product, order, and artisan data |
+| Vector store | ChromaDB | Embedding-based benchmark retrieval for pricing |
+| Image pipeline | rembg, OpenCV, Pillow | Background removal, lighting correction, cropping |
+| Speech-to-text | Whisper / Bhashini ASR | Regional-language transcription |
+| Translation / listing | Gemini, Groq | Bilingual title, description, tags, and pricing rationale |
+| Deployment | Railway | Continuous deployment of the FastAPI service |
 
 ---
 
@@ -115,26 +111,25 @@ Every AI decision — image, listing, and price — is read aloud via on-device 
 
 ### Prerequisites
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.x)
-- [Python 3.11+](https://www.python.org/downloads/)
-- [Groq API key](https://console.groq.com) (free tier, optional)
-- [Google Gemini API key](https://aistudio.google.com) (optional, fallback LLM)
+- Flutter SDK 3.x
+- Python 3.11+
+- Groq API key (optional)
+- Google Gemini API key (optional)
 
-### Backend Setup
+### Backend
 
 ```bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 cp ../.env.example .env
-# Edit .env with your API keys if needed
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-For production deployment on Railway, set the environment variables in the Railway dashboard. The app boots without any external API keys; AI features degrade gracefully when keys are absent.
+Railway uses the environment-variable form of the same settings. The app starts without external AI keys; features degrade gracefully when keys are missing.
 
-### Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
@@ -142,7 +137,7 @@ flutter pub get
 flutter run
 ```
 
-### Build APK (Production)
+### Build APK
 
 ```bash
 cd frontend
@@ -156,114 +151,81 @@ flutter build apk --release \
 
 ```
 craftsy/
-├── frontend/              # Flutter mobile app
+├── frontend/
 │   ├── lib/
-│   │   ├── core/          # Theme, routing, offline sync, TTS
-│   │   ├── data/          # Services, models, API clients
-│   │   └── features/      # Screens & widgets per feature
-│   ├── assets/            # Images, translations, fonts
-│   └── test/              # Widget & unit tests
-├── backend/               # FastAPI service
-│   ├── routers/           # API endpoints
-│   ├── services/          # Business logic
-│   ├── models/            # Pydantic schemas & DB models
-│   └── tests/             # Integration tests
-├── ML/                    # Standalone ML pipelines
-│   ├── image_pipeline/    # rembg, OpenCV, Pillow
-│   ├── voice_pipeline/    # Whisper, Bhashini, glossary
-│   └── pricing/           # Cost floor + ChromaDB RAG
-├── docs/                  # Architecture, research, ideas
-├── submission/            # SIH submission materials
-└── README.md
+│   │   ├── core/            # Theme, routing, offline sync, TTS
+│   │   ├── data/            # Services, models, API clients
+│   │   └── features/        # Screens and widgets per feature
+│   ├── assets/              # Images, translations, fonts
+│   └── test/                # Widget and unit tests
+├── backend/
+│   ├── routers/             # API endpoints
+│   ├── services/            # Business logic and external integrations
+│   ├── models/              # Pydantic schemas and SQLAlchemy models
+│   └── tests/               # Integration tests
+├── ML/
+│   ├── image_pipeline/      # rembg, OpenCV, Pillow
+│   ├── voice_pipeline/      # Whisper, Bhashini, glossary
+│   └── pricing/             # Cost floor + ChromaDB RAG
+├── docs/                    # Architecture and disclosure docs
+├── submission/              # SIH submission materials
+├── README.md
+├── Dockerfile
+├── railway.toml
+└── requirements.txt
 ```
 
 ---
-
-## Design Philosophy
-
-Craftsy's visual identity is built on **Indigo Loom** — a deep, premium indigo base with warm amber accents, inspired by the rich dyes of Indian textile traditions. The geometric logo evokes a loom's warp and weft, with a central diamond representing the artisan's craft at the heart of the system.
-
-Every design decision prioritizes:
-
-- **Accessibility first** — large touch targets, high contrast, voice-first interaction
-- **Trust through transparency** — every AI output is shown, read aloud, and approved
-- **Resilience** — works fully offline, syncs automatically, never loses data
-- **Dignity** — the artisan is the decision-maker; the AI is the assistant
-
----
-
-## Research Foundation
-
-This project builds on established ICTD (ICT for Development) research:
-
-- Patel et al., *["Experiences Designing a Voice Interface for Rural India" (Avaaj Otalo)](https://dl.acm.org/doi/10.1145/1998249.1998258)* — voice input paired with confirmation buttons
-- Medhi et al., *"Designing Mobile Interfaces for Novice and Low-Literacy Users" (VideoKheti)* — human-in-the-loop review safeguards
-- Gala, Chitale et al., *["IndicTrans2," TMLR 2023](https://github.com/AI4Bharat/IndicTrans2)* — translation across 22 Indian languages
-- Qin et al., *"U²-Net: Going Deeper with Nested U-Structure for Salient Object Detection," Pattern Recognition 2020* — background removal model
-
----
-
-## Feature Status
-
-| Feature | Status | Notes |
-|---|---|---|
-| Artisan registration & login | Implemented | Phone + OTP |
-| Product CRUD | Implemented | Full create/read/update/delete |
-| AI image enhancement | Implemented | rembg + OpenCV + Pillow |
-| Voice-to-listing | Implemented | Whisper/Bhashini ASR + LLM |
-| Bilingual listing (EN/HI) | Implemented | Gemini/Groq LLM |
-| Social media drafts | Implemented | WhatsApp/Instagram/Facebook |
-| Fair pricing assistant | Implemented | Cost floor + ChromaDB RAG |
-| Offline-first sync | Implemented | Local queue + background drain |
-| Commerce channels | Implemented | ONDC/GeM channel metadata |
-| Unified orders | Implemented | Multi-channel order model |
-| ONDC BPP adapter | Hackathon/Mock | Local Retail B2C harness; official mock server blocked |
-| Bhashini integration | Implemented | REST ASR tested; WebSocket ASR blocked |
-| Accessibility | Implemented | TTS, haptics, large text, voice actions |
 
 ## Testing
 
 ```bash
-# Backend tests
+# Backend
 cd backend
 .venv/bin/python -m pytest tests/ -q
 
-# ONDC BPP tests
+# ONDC BPP adapter
 .venv/bin/python -m pytest tests/test_ondc_bpp.py -v
 
-# Frontend tests
+# Frontend
 cd frontend
 flutter test
 ```
 
-## ONDC Integration
+Backend results: `155 passed, 1 failed`. The single failure is `test_social_channels.py::test_independent_channels_generation_and_lookup`, a pre-existing issue unrelated to the ONDC work.
 
-Craftsy includes a minimal **Retail B2C BPP (Seller) adapter** for hackathon/demo purposes.
+---
 
-- **Protocol:** ONDC:RET10, version 2.0.2
-- **Endpoints:** `/api/v1/ondc/search`, `/select`, `/init`, `/confirm`, `/status` (and `on_*` callbacks)
-- **Data source:** Real `ProductDB`, `OrderDB`, `ProductDB.stock`
-- **Idempotency:** Duplicate `confirm` requests return existing orders; stock is not double-decremented
-- **Official mock server:** `ONDC-Official/ondc-mock-server` was inspected but could not be started in this environment due to missing retail spec submodules. A local protocol harness is used instead.
+## Integrations
 
-See `ONDC_HACKATHON_DEMO.md` for the demo flow.
+### ONDC
 
-## Known Limitations
+Craftsy implements a minimal Retail BPP (Seller) adapter for demo purposes. It exposes `/api/v1/ondc/search`, `/select`, `/init`, `/confirm`, and `/status` endpoints, and uses real `ProductDB`, `OrderDB`, and `ProductDB.stock` for catalogue, order creation, and stock safety.
 
-- ONDC integration is **mock/hackathon only** — no production registry onboarding, no production signing keys, no production network participation
-- Bhashini WebSocket ASR is blocked by upstream auth/handshake issues; REST ASR is functional
-- Some AI features require external API keys (Groq/Gemini) and degrade gracefully when absent
-- Flutter `flutter analyze` reports pre-existing lint warnings
-- One pre-existing backend test failure: `test_social_channels.py::test_independent_channels_generation_and_lookup`
+The official `ONDC-Official/ondc-mock-server` was inspected but could not be started in this environment because its retail specification submodules did not finish initializing. A local protocol harness is used instead. This is a hackathon/mock integration; production ONDC participant onboarding and signing are not implemented.
+
+See `ONDC_HACKATHON_DEMO.md` and `docs/history/` for implementation evidence.
+
+### Bhashini
+
+Bhashini provides REST ASR for regional-language transcription. The integration is functional for supported audio formats. WebSocket ASR remains blocked by upstream authentication/handshake issues.
+
+### ChromaDB
+
+Pricing uses ChromaDB in cloud mode to retrieve benchmark products by cosine similarity. The index is built from the `benchmark_products.json` dataset and queried with Gemini embeddings.
+
+---
+
+## Current Limitations
+
+- ONDC is hackathon/mock only. No production registry onboarding or signing keys.
+- Bhashini WebSocket ASR is blocked; REST ASR works.
+- Some AI features require Groq/Gemini keys and degrade gracefully without them.
+- Flutter `flutter analyze` reports pre-existing lint warnings.
+- One backend test failure is pre-existing and unrelated to ONDC.
 
 ---
 
 ## License
 
 Licensed under the [MIT License](LICENSE).
-
----
-
-<div align="center">
-<sub>Craftsy — Dignity through technology, not charity.</sub>
-</div>

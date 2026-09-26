@@ -177,31 +177,18 @@ class OrderService:
         payment_method: str = "cod",
     ) -> OrderDB:
         """
-        Create an order from cart items (server-authoritative).
+        Create an order from cart items.
 
-        This method:
-        1. Validates the address belongs to the customer
-        2. Validates each product exists and is live
-        3. Validates stock availability
-        4. Uses ProductDB.price as the authoritative price
-        5. Calculates totals server-side
-        6. Creates OrderDB, OrderItemDB, PaymentDB, ShipmentDB records
-        7. Decrements stock atomically
-        8. Uses a transaction (all-or-nothing)
+        Validates address ownership, product availability, and stock.
+        Uses ProductDB.price as the authoritative price.
+        Creates OrderDB, OrderItemDB, PaymentDB, and ShipmentDB records.
+        Decrements stock atomically inside a transaction.
 
-        Concurrency:
-            Product rows are read with `SELECT ... FOR UPDATE` so that two
-            simultaneous checkouts cannot both pass the stock check and oversell
-            the last unit. PostgreSQL honours the row lock; SQLite ignores
-            `FOR UPDATE` (single-writer) so local development is unaffected.
-
-        Raises:
-            ValueError: If address not found, product not found, product not live,
-                       or insufficient stock.
+        PostgreSQL row locks prevent concurrent oversell; SQLite ignores
+        FOR UPDATE because it uses a single writer.
         """
         from ..models.commerce_foundation_models import AddressDB, OrderItemDB, PaymentDB, ShipmentDB
 
-        # Validate address
         address = db.query(AddressDB).filter(
             AddressDB.id == address_id,
             AddressDB.user_id == customer_id,
@@ -209,13 +196,9 @@ class OrderService:
         if not address:
             raise ValueError("Address not found or does not belong to user")
 
-        # Validate items
         if not items:
             raise ValueError("No items in order")
 
-        # Build order items with server-authoritative pricing.
-        # Everything below runs inside a single transaction; on any failure we
-        # roll back so no partial order/payment/shipment/stock change survives.
         order_items_data = []
         total_amount = 0.0
 
@@ -230,8 +213,6 @@ class OrderService:
                 if quantity < 1:
                     raise ValueError("Quantity must be at least 1")
 
-                # Look up product and take a row lock (no-op on SQLite) to
-                # serialise concurrent stock decrements on PostgreSQL.
                 product = (
                     db.query(ProductDB)
                     .filter(ProductDB.id == product_id)

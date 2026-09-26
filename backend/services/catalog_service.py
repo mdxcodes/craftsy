@@ -1,12 +1,8 @@
 """
-Catalog Service.
+Catalog service.
 
-Integrates:
-1. Speech-to-Text (STT) via ML.voice_pipeline (Whisper + Craft Glossary biasing).
-2. Bilingual AI Catalog Listing Generation (English + Hindi) with craft vocabulary injection.
-3. Cost Cue Extraction from artisan speech.
-4. Non-blocking AI Image Enhancement (rembg / CV pipeline).
-5. Complete Voice-to-Product Pipeline orchestration (Voice -> Listing -> Pricing -> Draft).
+Bridges FastAPI requests to the ML voice/image pipelines and generates
+bilingual product listings from artisan speech or text input.
 """
 
 from __future__ import annotations
