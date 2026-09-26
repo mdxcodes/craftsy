@@ -75,6 +75,16 @@ class BhashiniService:
 
     def _get_config_headers(self) -> Dict[str, str]:
         """Headers for Pipeline Config Call."""
+        headers = {
+            "userID": self._user_id,
+            "ulcaApiKey": "***REDACTED***",
+            "Content-Type": "application/json",
+        }
+        logger.info(
+            "Bhashini config request headers: userID=%s, ulcaApiKey=%s",
+            self._user_id[:8] + "..." if self._user_id else "",
+            "***REDACTED***",
+        )
         return {
             "userID": self._user_id,
             "ulcaApiKey": self._api_key,
@@ -113,10 +123,21 @@ class BhashiniService:
         }
 
         async with httpx.AsyncClient(timeout=self._timeout) as client:
+            logger.debug(
+                "Bhashini config request: url=%s, task_types=%s, language=%s",
+                ULCA_CONFIG_URL,
+                task_types,
+                language_configs,
+            )
             response = await client.post(
                 ULCA_CONFIG_URL,
                 headers=self._get_config_headers(),
                 json=payload,
+            )
+            logger.debug(
+                "Bhashini config response: status=%s, body=%s",
+                response.status_code,
+                response.text[:500],
             )
             response.raise_for_status()
             data = response.json()
