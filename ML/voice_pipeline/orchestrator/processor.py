@@ -189,6 +189,7 @@ class ArtisanVoiceProcessor:
 
         bhashini_language = language_code if language_code not in ("auto", "detect", "none", "") else "hi"
 
+        wav_path = self._convert_to_wav(audio_path)
         try:
             service = BhashiniService(
                 user_id=settings.bhashini_user_id,
@@ -196,10 +197,10 @@ class ArtisanVoiceProcessor:
                 inference_api_key=settings.bhashini_inference_api_key,
                 inference_api_key_name=settings.bhashini_inference_api_key_name,
             )
-            audio_bytes = audio_path.read_bytes()
+            audio_bytes = wav_path.read_bytes()
             logger.info(
                 "Bhashini ASR request: path=%s, size=%d bytes, language=%s",
-                audio_path,
+                wav_path,
                 len(audio_bytes),
                 bhashini_language,
             )

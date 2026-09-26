@@ -7,6 +7,7 @@ Processes voice notes through speech-to-text (Bhashini ASR) with craft glossary 
 import asyncio
 import logging
 import os
+import subprocess
 from pathlib import Path
 from typing import Optional
 
@@ -112,12 +113,37 @@ class ArtisanVoiceProcessor:
         if not api_key or not user_id:
             raise BhashiniConfigError("Bhashini credentials not configured.")
 
+        wav_path = self._convert_to_wav(audio_path)
         service = BhashiniService(
             user_id=user_id,
             ulca_api_key=api_key,
             inference_api_key=inference_api_key,
             inference_api_key_name=inference_api_key_name,
         )
-        audio_bytes = audio_path.read_bytes()
+        audio_bytes = wav_path.read_bytes()
         return await service.transcribe_audio(audio_bytes=audio_bytes, language=language)
+
+    def _convert_to_wav(self, audio_path: Path) -> Path:
+        if audio_path.suffix.lower() == ".wav":
+            return audio_path
+        wav_path = audio_path.with_suffix(".wav")
+        try:
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-i", str(audio_path),
+                    "-ar", "16000",
+                    "-ac", "1",
+                    "-y",
+                    str(wav_path),
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+            if wav_path.exists():
+                return wav_path
+        except Exception as exc:
+            logging.getLogger(__name__).warning("Failed to convert audio to WAV: %s", exc)
+        return audio_path
 

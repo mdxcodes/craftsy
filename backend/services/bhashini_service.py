@@ -39,6 +39,22 @@ class BhashiniConfigError(Exception):
     """Raised when Bhashini credentials are missing or invalid."""
 
 
+class BhashiniAuthenticationError(Exception):
+    """Raised when Bhashini rejects Pipeline Config credentials."""
+
+
+class BhashiniUnsupportedLanguageError(Exception):
+    """Raised when the requested language is not supported by the pipeline."""
+
+
+class BhashiniUnsupportedServiceError(Exception):
+    """Raised when no service is available for the requested task/language."""
+
+
+class BhashiniAudioFormatError(Exception):
+    """Raised when audio format/sampling rate is invalid."""
+
+
 class BhashiniAPIError(Exception):
     """Raised when Bhashini API returns an error response."""
 
@@ -148,6 +164,41 @@ class BhashiniService:
                 response.status_code,
                 response.text[:500],
             )
+
+            if response.status_code == 400:
+                body = response.text
+                logger.warning(
+                    "Bhashini Pipeline Config 400: status=%s, body=%s",
+                    response.status_code,
+                    body[:500],
+                )
+                try:
+                    error_data = response.json()
+                except Exception:
+                    error_data = {"message": body[:500]}
+
+                message = error_data.get("message", "")
+                if message == "Sequence of languages not supported" and language_configs:
+                    logger.info(
+                        "Retrying Pipeline Config without language configs "
+                        "to discover supported languages."
+                    )
+                    return await self._get_pipeline_config(
+                        task_types=task_types,
+                        language_configs=None,
+                    )
+
+                raise BhashiniUnsupportedLanguageError(
+                    f"Bhashini Pipeline Config failed with unsupported language/sequence. "
+                    f"status=400 message={message}"
+                )
+
+            if response.status_code == 401:
+                raise BhashiniAuthenticationError(
+                    "Bhashini Pipeline Config authentication failed. "
+                    "Verify BHASHINI_USER_ID and BHASHINI_ULCA_API_KEY."
+                )
+
             response.raise_for_status()
             data = response.json()
 
@@ -176,6 +227,50 @@ class BhashiniService:
             auth_name: auth_value,
             "Content-Type": "application/json",
         }
+
+    async def _post_compute(
+        self,
+        config: Dict[str, Any],
+        payload: Dict[str, Any],
+        task_label: str,
+    ) -> Dict[str, Any]:
+        """Send a Pipeline Compute request and return parsed JSON.
+
+        Raises structured Bhashini errors with safe logging.
+        """
+        headers = self._get_compute_headers(config)
+        compute_url = self._get_compute_url(config)
+
+        async with httpx.AsyncClient(timeout=self._timeout) as client:
+            logger.info(
+                "Bhashini %s compute request: url=%s",
+                task_label,
+                compute_url,
+            )
+            response = await client.post(
+                compute_url,
+                headers=headers,
+                json=payload,
+            )
+            logger.info(
+                "Bhashini %s compute response: status=%s, content_type=%s",
+                task_label,
+                response.status_code,
+                response.headers.get("content-type"),
+            )
+
+            if response.status_code == 400:
+                raise BhashiniAPIError(
+                    f"Bhashini {task_label} compute failed with 400. "
+                    f"body={response.text[:500]}"
+                )
+            if response.status_code == 401:
+                raise BhashiniAuthenticationError(
+                    f"Bhashini {task_label} compute authentication failed. "
+                    f"Verify inference API key."
+                )
+            response.raise_for_status()
+            return response.json()
 
     def _get_compute_url(self, config: Dict[str, Any]) -> str:
         """Extract callback URL for Pipeline Compute Call from config response."""
@@ -266,7 +361,7 @@ class BhashiniService:
                 }
             ],
             "inputData": {
-                "input": [{"source": ""}],
+                "input": [{"source": None}],
                 "audio": [
                     {"audioContent": self._encode_audio(audio_bytes)}
                 ],
@@ -274,35 +369,11 @@ class BhashiniService:
         }
 
         # Step 3: Call compute endpoint.
-        headers = self._get_compute_headers(config)
-        compute_url = self._get_compute_url(config)
-
-        logger.info(
-            "Bhashini ASR compute request: url=%s, service_id=%s, language=%s, format=%s, rate=%s",
-            compute_url,
-            service_id,
-            language,
-            audio_format,
-            sampling_rate,
+        result = await self._post_compute(
+            config=config,
+            payload=compute_payload,
+            task_label="ASR",
         )
-
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                compute_url,
-                headers=headers,
-                json=compute_payload,
-            )
-            logger.info(
-                "Bhashini ASR compute response: status=%s, content_type=%s",
-                response.status_code,
-                response.headers.get("content-type"),
-            )
-            logger.debug(
-                "Bhashini ASR compute response body: %s",
-                response.text[:500],
-            )
-            response.raise_for_status()
-            result = response.json()
 
         # Parse ASR result.
         pipeline_response = result.get("pipelineResponse", [])
@@ -407,17 +478,11 @@ class BhashiniService:
         }
 
         # Step 3: Call compute endpoint.
-        headers = self._get_compute_headers(config)
-        compute_url = self._get_compute_url(config)
-
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                compute_url,
-                headers=headers,
-                json=compute_payload,
-            )
-            response.raise_for_status()
-            result = response.json()
+        result = await self._post_compute(
+            config=config,
+            payload=compute_payload,
+            task_label="Translation",
+        )
 
         # Parse translation result.
         pipeline_response = result.get("pipelineResponse", [])
@@ -511,17 +576,11 @@ class BhashiniService:
         }
 
         # Step 3: Call compute endpoint.
-        headers = self._get_compute_headers(config)
-        compute_url = self._get_compute_url(config)
-
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                compute_url,
-                headers=headers,
-                json=compute_payload,
-            )
-            response.raise_for_status()
-            result = response.json()
+        result = await self._post_compute(
+            config=config,
+            payload=compute_payload,
+            task_label="TTS",
+        )
 
         # Parse TTS result - audio is base64 encoded.
         pipeline_response = result.get("pipelineResponse", [])
