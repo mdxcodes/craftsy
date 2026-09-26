@@ -127,8 +127,13 @@ class Settings(BaseSettings):
         return self.groq_api_key.strip() or self.whisper_api_key.strip()
 
     # Bhashini Language Services (optional; server-side only)
-    bhashini_api_key: str = Field(default="", description="Bhashini API key (server-side only).")
-    bhashini_user_id: str = Field(default="", description="Bhashini user id.")
+    bhashini_user_id: str = Field(default="", description="Bhashini Udyat user identifier.")
+    bhashini_ulca_api_key: str = Field(default="", description="ULCA API key for Pipeline Config authentication.")
+    bhashini_inference_api_key: str = Field(default="", description="Inference API key for Bhashini compute endpoint.")
+    bhashini_inference_api_key_name: str = Field(
+        default="Authorization",
+        description="HTTP header name for Bhashini inference API key.",
+    )
     bhashini_base_url: str = Field(
         default="https://api.bhashini.gov.in",
         description="Bhashini API base URL.",

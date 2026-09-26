@@ -47,7 +47,12 @@ class BhashiniService:
     """Centralized client for Bhashini ULCA pipeline APIs.
 
     Usage:
-        service = BhashiniService(api_key="...", user_id="...")
+        service = BhashiniService(
+            user_id="...",
+            ulca_api_key="...",         # for Pipeline Config
+            inference_api_key="...",    # fallback for compute auth
+            inference_api_key_name="Authorization",
+        )
         transcript = await service.transcribe_audio(audio_bytes, language="hi")
         translated = await service.translate_text(text, source="hi", target="en")
         audio_bytes = await service.synthesize_speech(text, language="hi")
@@ -55,18 +60,22 @@ class BhashiniService:
 
     def __init__(
         self,
-        api_key: str,
         user_id: str,
+        ulca_api_key: str,
+        inference_api_key: str = "",
+        inference_api_key_name: str = "Authorization",
         pipeline_id: str = DEFAULT_PIPELINE_ID,
         timeout: float = 60.0,
     ) -> None:
-        if not api_key or not user_id:
+        if not user_id or not ulca_api_key:
             raise BhashiniConfigError(
-                "Bhashini API key and user ID are required. "
-                "Set BHASHINI_API_KEY and BHASHINI_USER_ID environment variables."
+                "Bhashini User ID and ULCA API key are required. "
+                "Set BHASHINI_USER_ID and BHASHINI_ULCA_API_KEY environment variables."
             )
-        self._api_key = api_key
         self._user_id = user_id
+        self._ulca_api_key = ulca_api_key
+        self._inference_api_key = inference_api_key
+        self._inference_api_key_name = inference_api_key_name
         self._pipeline_id = pipeline_id
         self._timeout = timeout
         self._config_cache: Optional[Dict[str, Any]] = None
@@ -87,7 +96,7 @@ class BhashiniService:
         )
         return {
             "userID": self._user_id,
-            "ulcaApiKey": self._api_key,
+            "ulcaApiKey": self._ulca_api_key,
             "Content-Type": "application/json",
         }
 
@@ -153,11 +162,16 @@ class BhashiniService:
         return data
 
     def _get_compute_headers(self, config: Dict[str, Any]) -> Dict[str, str]:
-        """Extract auth headers for Pipeline Compute Call from config response."""
+        """Extract auth headers for Pipeline Compute Call from config response.
+
+        Prefers the dynamically returned inferenceApiKey from the Pipeline Config
+        response. Falls back to environment-provided values if the response does
+        not supply them.
+        """
         endpoint = config.get("pipelineInferenceAPIEndPoint", {})
         inference_api_key = endpoint.get("inferenceApiKey", {})
-        auth_name = inference_api_key.get("name", "Authorization")
-        auth_value = inference_api_key.get("value", "")
+        auth_name = inference_api_key.get("name") or self._inference_api_key_name
+        auth_value = inference_api_key.get("value") or self._inference_api_key
         return {
             auth_name: auth_value,
             "Content-Type": "application/json",
@@ -203,7 +217,7 @@ class BhashiniService:
             BhashiniConfigError: If credentials are missing.
             BhashiniAPIError: If Bhashini returns an error response.
         """
-        if not self._api_key or not self._user_id:
+        if not self._ulca_api_key or not self._user_id:
             raise BhashiniConfigError("Bhashini credentials not configured.")
 
         # Step 1: Get pipeline config for ASR.
@@ -332,7 +346,7 @@ class BhashiniService:
             BhashiniConfigError: If credentials are missing.
             BhashiniAPIError: If Bhashini returns an error response.
         """
-        if not self._api_key or not self._user_id:
+        if not self._ulca_api_key or not self._user_id:
             raise BhashiniConfigError("Bhashini credentials not configured.")
 
         # Step 1: Get pipeline config for translation.
@@ -443,7 +457,7 @@ class BhashiniService:
             BhashiniConfigError: If credentials are missing.
             BhashiniAPIError: If Bhashini returns an error response.
         """
-        if not self._api_key or not self._user_id:
+        if not self._ulca_api_key or not self._user_id:
             raise BhashiniConfigError("Bhashini credentials not configured.")
 
         # Step 1: Get pipeline config for TTS.

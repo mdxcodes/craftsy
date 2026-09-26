@@ -13,8 +13,10 @@ Services:
     - TTS (Text-to-Speech)
 
 Configuration:
-    Set BHASHINI_API_KEY and BHASHINI_USER_ID in environment variables.
-    Without credentials, all endpoints return 503 with clear status.
+    Set BHASHINI_USER_ID, BHASHINI_ULCA_API_KEY in environment variables.
+    Optionally set BHASHINI_INFERENCE_API_KEY and BHASHINI_INFERENCE_API_KEY_NAME
+    for compute endpoint authentication. Without credentials, all endpoints
+    return 503 with clear status.
 
 Reference:
     https://dibd-bhashini.gitbook.io/bhashini-apis
@@ -177,23 +179,25 @@ SUPPORTED_LANGUAGE_CODES = set(BHASHINI_LANGUAGES.keys())
 def _get_bhashini_service() -> BhashiniService:
     """Create a BhashiniService from app settings."""
     settings = get_settings()
-    if not settings.bhashini_api_key or not settings.bhashini_user_id:
+    if not settings.bhashini_user_id or not settings.bhashini_ulca_api_key:
         raise HTTPException(
             status_code=503,
             detail=(
                 "Bhashini credentials not configured. "
-                "Set BHASHINI_API_KEY and BHASHINI_USER_ID environment variables."
+                "Set BHASHINI_USER_ID and BHASHINI_ULCA_API_KEY environment variables."
             ),
         )
     return BhashiniService(
-        api_key=settings.bhashini_api_key,
         user_id=settings.bhashini_user_id,
+        ulca_api_key=settings.bhashini_ulca_api_key,
+        inference_api_key=settings.bhashini_inference_api_key,
+        inference_api_key_name=settings.bhashini_inference_api_key_name,
     )
 
 
 def _is_configured() -> bool:
     settings = get_settings()
-    return bool(settings.bhashini_api_key and settings.bhashini_user_id)
+    return bool(settings.bhashini_ulca_api_key and settings.bhashini_user_id)
 
 
 # ── Endpoints ────────────────────────────────────────────────────────────────
@@ -220,8 +224,10 @@ async def get_service_status():
     settings = get_settings()
     return {
         "configured": _is_configured(),
-        "api_key_set": bool(settings.bhashini_api_key),
+        "ulca_api_key_set": bool(settings.bhashini_ulca_api_key),
         "user_id_set": bool(settings.bhashini_user_id),
+        "inference_api_key_set": bool(settings.bhashini_inference_api_key),
+        "inference_api_key_name": settings.bhashini_inference_api_key_name,
         "base_url": settings.bhashini_base_url,
         "services": {
             "asr": _is_configured(),

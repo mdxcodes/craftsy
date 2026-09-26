@@ -105,12 +105,19 @@ class ArtisanVoiceProcessor:
         """Call Bhashini ASR via the centralized service."""
         from backend.services.bhashini_service import BhashiniConfigError, BhashiniService
 
-        api_key = os.environ.get("BHASHINI_API_KEY", "")
+        api_key = os.environ.get("BHASHINI_ULCA_API_KEY", "")
         user_id = os.environ.get("BHASHINI_USER_ID", "")
+        inference_api_key = os.environ.get("BHASHINI_INFERENCE_API_KEY", "")
+        inference_api_key_name = os.environ.get("BHASHINI_INFERENCE_API_KEY_NAME", "Authorization")
         if not api_key or not user_id:
             raise BhashiniConfigError("Bhashini credentials not configured.")
 
-        service = BhashiniService(api_key=api_key, user_id=user_id)
+        service = BhashiniService(
+            user_id=user_id,
+            ulca_api_key=api_key,
+            inference_api_key=inference_api_key,
+            inference_api_key_name=inference_api_key_name,
+        )
         audio_bytes = audio_path.read_bytes()
         return await service.transcribe_audio(audio_bytes=audio_bytes, language=language)
 

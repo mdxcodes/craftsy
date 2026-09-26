@@ -19,7 +19,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Optional
@@ -135,6 +137,38 @@ class ArtisanVoiceProcessor:
 
     # ── Internals ────────────────────────────────────────────────────────
 
+    def _convert_to_wav(self, audio_path: Path) -> Path:
+        """
+        Convert any supported audio format to WAV for Bhashini ASR.
+
+        Bhashini ULCA ASR requires WAV format. If the input is already WAV,
+        return it as-is. Otherwise, use ffmpeg to convert it.
+        """
+        if audio_path.suffix.lower() == ".wav":
+            return audio_path
+
+        wav_path = audio_path.with_suffix(".wav")
+        try:
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-i", str(audio_path),
+                    "-ar", "16000",
+                    "-ac", "1",
+                    "-y",
+                    str(wav_path),
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+            if wav_path.exists():
+                return wav_path
+        except Exception as exc:
+            logger.warning("Failed to convert audio to WAV: %s", exc)
+
+        return audio_path
+
     def _transcribe_with_bhashini(self, audio_path: Path, language_code: str):
         """
         Transcribe audio using Bhashini ASR via the backend service client.
@@ -146,7 +180,7 @@ class ArtisanVoiceProcessor:
         from backend.services.bhashini_service import BhashiniConfigError, BhashiniService
 
         settings = get_settings()
-        if not settings.bhashini_api_key or not settings.bhashini_user_id:
+        if not settings.bhashini_user_id or not settings.bhashini_ulca_api_key:
             logger.error("Bhashini credentials not configured.")
             return self._failed_transcript(
                 language_code=language_code,
@@ -157,8 +191,10 @@ class ArtisanVoiceProcessor:
 
         try:
             service = BhashiniService(
-                api_key=settings.bhashini_api_key,
                 user_id=settings.bhashini_user_id,
+                ulca_api_key=settings.bhashini_ulca_api_key,
+                inference_api_key=settings.bhashini_inference_api_key,
+                inference_api_key_name=settings.bhashini_inference_api_key_name,
             )
             audio_bytes = audio_path.read_bytes()
             logger.info(
