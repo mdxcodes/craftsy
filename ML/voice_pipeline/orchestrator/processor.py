@@ -3,7 +3,7 @@ Artisan Voice Processor.
 
 The main entry point for processing an artisan's voice note:
 1. Validates the recording
-2. Transcribes it in its source language
+2. Transcribes it in its source language using Bhashini ASR
 
 The pipeline stops at the transcript. Listing generation is owned by the
 backend catalog service, which consumes the transcript this module produces —
@@ -16,15 +16,15 @@ locally first and processed whenever connectivity allows.
 
 from __future__ import annotations
 
-import json
+import asyncio
 import logging
-import time
-from datetime import datetime
+import os
+import sys
+from pathlib import Path
 from typing import Optional
 
-from ..config import DATA_DIR, ensure_data_dirs, get_settings
-from ..models import JobStatus, PipelineStage, VoiceNote, VoicePipelineResult
-from ..transcription.runner import TranscriptionRunner
+from ..config import get_settings
+from ..models import JobStatus, PipelineStage, VoiceNote, VoicePipelineResult, STTProvider
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ class ArtisanVoiceProcessor:
 
     def __init__(self):
         self.settings = get_settings()
-        self.transcriber = TranscriptionRunner()
 
     def process_voice_note(
         self,
@@ -62,8 +61,14 @@ class ArtisanVoiceProcessor:
             in the result rather than raised, so a queued job can be retried
             without losing context.
         """
-        ensure_data_dirs()
-        started = time.perf_counter()
+        path = Path(audio_path)
+        if not path.exists():
+            return VoicePipelineResult(
+                voice_note_id=note_id or "error",
+                status=JobStatus.FAILED,
+                failed_stage=PipelineStage.INGESTION,
+                error=f"Audio file not found: {audio_path}",
+            )
 
         note = VoiceNote(
             id=note_id or f"voice-{int(time.time() * 1000)}",
@@ -73,37 +78,32 @@ class ArtisanVoiceProcessor:
         )
         logger.info("Processing voice note %s (lang=%s)", note.id, language_code)
 
-        # ── Step 1: Transcribe ───────────────────────────────────────────
-        logger.info("Step 1: Transcribing audio...")
-        transcript = self.transcriber.run(note, category_hint=category_hint)
+        # ── Step 1: Transcribe via Bhashini ASR ───────────────────────────
+        logger.info("Step 1: Transcribing audio with Bhashini ASR...")
+        transcript = self._transcribe_with_bhashini(path, language_code)
 
         if not transcript.is_usable():
             logger.error("Transcription unusable for %s — aborting.", note.id)
-            return self._failed(
-                note,
-                PipelineStage.TRANSCRIPTION,
-                "Transcription failed or returned empty text.",
-                started,
+            return VoicePipelineResult(
+                voice_note_id=note.id,
+                status=JobStatus.FAILED,
                 transcript=transcript,
+                failed_stage=PipelineStage.TRANSCRIPTION,
+                error="Transcription failed or returned empty text.",
             )
 
-        elapsed = time.perf_counter() - started
         result = VoicePipelineResult(
             voice_note_id=note.id,
             status=JobStatus.COMPLETED,
             transcript=transcript,
-            elapsed_seconds=round(elapsed, 2),
+            elapsed_seconds=0.0,
         )
 
         logger.info(
-            "Pipeline complete for %s: %d characters ready for cataloging (%.1fs)",
+            "Pipeline complete for %s: %d characters ready for cataloging",
             note.id,
             len(result.text_for_listing),
-            elapsed,
         )
-
-        # ── Save result for audit trail ──────────────────────────────────
-        self._save_result(result)
 
         return result
 
@@ -134,38 +134,57 @@ class ArtisanVoiceProcessor:
 
     # ── Internals ────────────────────────────────────────────────────────
 
-    def _failed(
-        self,
-        note: VoiceNote,
-        stage: PipelineStage,
-        error: str,
-        started: float,
-        transcript=None,
-    ) -> VoicePipelineResult:
-        """Build a failed result, preserving whatever the run produced."""
-        return VoicePipelineResult(
-            voice_note_id=note.id,
-            status=JobStatus.FAILED,
-            transcript=transcript,
-            failed_stage=stage,
-            error=error,
-            elapsed_seconds=round(time.perf_counter() - started, 2),
+    def _transcribe_with_bhashini(self, audio_path: Path, language_code: str):
+        """
+        Transcribe audio using Bhashini ASR via the backend service client.
+
+        Returns a Transcript instance. On failure, returns a non-usable fallback
+        transcript so the caller can decide whether to abort.
+        """
+        from backend.services.bhashini_service import BhashiniConfigError, BhashiniService
+
+        api_key = os.environ.get("BHASHINI_API_KEY", "")
+        user_id = os.environ.get("BHASHINI_USER_ID", "")
+        if not api_key or not user_id:
+            logger.error("Bhashini credentials not configured.")
+            return self._failed_transcript(
+                language_code=language_code,
+                error="Bhashini credentials not configured.",
+            )
+
+        try:
+            service = BhashiniService(api_key=api_key, user_id=user_id)
+            audio_bytes = audio_path.read_bytes()
+            text = asyncio.run(
+                service.transcribe_audio(audio_bytes=audio_bytes, language=language_code)
+            )
+        except Exception as exc:
+            logger.error("Bhashini ASR failed: %s", exc)
+            return self._failed_transcript(
+                language_code=language_code,
+                error=f"Bhashini ASR failed: {exc}",
+            )
+
+        if not text or not text.strip():
+            return self._failed_transcript(
+                language_code=language_code,
+                error="No audible speech detected. Please speak closer to the microphone.",
+            )
+
+        from ..models import Transcript
+        return Transcript(
+            text=text.strip(),
+            language_code=language_code,
+            provider=STTProvider.BHASHINI,
+            is_fallback=False,
         )
 
-    def _save_result(self, result: VoicePipelineResult) -> None:
-        """Append the run outcome to the local audit log."""
-        log_file = DATA_DIR / "voice_results.jsonl"
-        entry = {
-            "timestamp": datetime.now().isoformat(),
-            "voice_note_id": result.voice_note_id,
-            "status": result.status.value,
-            "language": result.transcript.language_code if result.transcript else None,
-            "provider": result.transcript.provider.value if result.transcript else None,
-            "transcript_preview": (
-                result.transcript.text[:100] if result.transcript else None
-            ),
-            "elapsed_seconds": result.elapsed_seconds,
-        }
-
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    def _failed_transcript(self, language_code: str, error: str):
+        """Build a non-usable fallback transcript."""
+        from ..models import Transcript
+        return Transcript(
+            text="",
+            language_code=language_code,
+            provider=STTProvider.BHASHINI,
+            is_fallback=True,
+        )

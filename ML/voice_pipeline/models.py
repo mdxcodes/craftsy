@@ -22,6 +22,7 @@ class STTProvider(str, Enum):
 
     WHISPER = "whisper"
     MANUAL = "manual"
+    BHASHINI = "bhashini"
 
 
 class PipelineStage(str, Enum):
