@@ -53,13 +53,29 @@ class Settings(BaseSettings):
     )
 
     # ── ChromaDB ─────────────────────────────────────────────────────────
+    chroma_mode: str = Field(
+        default="cloud",
+        description="Chroma backend mode: 'cloud' or 'local'.",
+    )
     chromadb_path: str = Field(
         default=str(CHROMADB_DIR),
-        description="Path for ChromaDB persistent storage.",
+        description="Path for ChromaDB persistent storage (local mode only).",
     )
     chromadb_collection: str = Field(
         default="benchmark_products",
         description="ChromaDB collection name for benchmark embeddings.",
+    )
+    chroma_api_key: str = Field(
+        default="",
+        description="Chroma Cloud API key (cloud mode).",
+    )
+    chroma_tenant: str = Field(
+        default="",
+        description="Chroma Cloud tenant (cloud mode).",
+    )
+    chroma_database: str = Field(
+        default="",
+        description="Chroma Cloud database (cloud mode).",
     )
 
     # ── Scraping ─────────────────────────────────────────────────────────
@@ -133,4 +149,6 @@ def ensure_data_dirs() -> None:
     """Create runtime data directories if they don't exist."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     BENCHMARK_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-    Path(get_settings().chromadb_path).mkdir(parents=True, exist_ok=True)
+    settings = get_settings()
+    if settings.chroma_mode == "local":
+        Path(settings.chromadb_path).mkdir(parents=True, exist_ok=True)

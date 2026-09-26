@@ -70,24 +70,51 @@ def build_benchmark_index(
         logger.info("Force reindex: clearing existing vector store...")
         vector_store.clear()
 
-    # Determine which products need embedding
+    # Determine which products need embedding (idempotent/resumable)
     existing_count = vector_store.get_count()
+    existing_ids = set()
     if not force_reindex and existing_count > 0:
-        # Get existing IDs to skip
-        # ChromaDB doesn't have a simple "list all IDs" for large collections,
-        # so we'll check by querying
-        logger.info(
-            "Vector store already has %d items. Upserting all (dedup by ID)...",
-            existing_count,
-        )
+        try:
+            existing_result = vector_store.collection.get(
+                ids=None,
+                include=[],
+            )
+            existing_ids = set(existing_result.get("ids", []))
+            logger.info(
+                "Vector store already has %d items. Skipping already-indexed products.",
+                existing_count,
+            )
+        except Exception as exc:
+            logger.warning("Could not list existing IDs: %s. Will re-embed all.", exc)
+            existing_ids = set()
+
+    # Filter to new products only
+    new_products = [p for p in products if p.id not in existing_ids]
+    skipped_count = len(products) - len(new_products)
+    if skipped_count:
+        logger.info("Skipping %d already-indexed products", skipped_count)
+
+    if not new_products:
+        logger.info("All products already indexed. Nothing to do.")
+        return {
+            "products_scraped": len(products),
+            "vectors_generated": 0,
+            "vectors_indexed": 0,
+            "skipped_existing": skipped_count,
+            "total_in_store": vector_store.get_count(),
+            "elapsed_seconds": round((datetime.now() - start_time).total_seconds(), 1),
+            "use_seed": use_seed,
+            "skip_scraping": skip_scraping,
+            "force_reindex": force_reindex,
+        }
 
     # ── Step 3: Generate embeddings ──────────────────────────────────────
-    logger.info("Generating multimodal embeddings for %d products...", len(products))
+    logger.info("Generating multimodal embeddings for %d new products...", len(new_products))
     engine = EmbeddingEngine()
 
     # Prepare embedding inputs
     embedding_items = []
-    for product in products:
+    for product in new_products:
         embedding_items.append({
             "image_path": product.local_image_path,
             "text": product.embedding_text(),
@@ -100,13 +127,15 @@ def build_benchmark_index(
 
     # ── Step 4: Upsert into ChromaDB ─────────────────────────────────────
     logger.info("Upserting %d vectors into ChromaDB...", len(vectors))
-    added = vector_store.add_products(products, vectors)
+    added = vector_store.add_products(new_products, vectors)
 
     # ── Summary ──────────────────────────────────────────────────────────
     elapsed = (datetime.now() - start_time).total_seconds()
 
     summary = {
         "products_scraped": len(products),
+        "new_products_indexed": len(new_products),
+        "skipped_existing": skipped_count,
         "vectors_generated": len(vectors),
         "vectors_indexed": added,
         "total_in_store": vector_store.get_count(),

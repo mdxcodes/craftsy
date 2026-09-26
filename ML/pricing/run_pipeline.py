@@ -70,11 +70,13 @@ def cmd_build(args) -> None:
     )
 
     print("\n✅ Build complete!")
-    print(f"   Products scraped:  {result.get('products_scraped', 0)}")
-    print(f"   Vectors generated: {result.get('vectors_generated', 0)}")
-    print(f"   Vectors indexed:   {result.get('vectors_indexed', 0)}")
-    print(f"   Total in store:    {result.get('total_in_store', 0)}")
-    print(f"   Elapsed:           {result.get('elapsed_seconds', 0)}s")
+    print(f"   Products scraped:       {result.get('products_scraped', 0)}")
+    print(f"   New products indexed:   {result.get('new_products_indexed', 0)}")
+    print(f"   Skipped (already exist): {result.get('skipped_existing', 0)}")
+    print(f"   Vectors generated:      {result.get('vectors_generated', 0)}")
+    print(f"   Vectors indexed:        {result.get('vectors_indexed', 0)}")
+    print(f"   Total in store:         {result.get('total_in_store', 0)}")
+    print(f"   Elapsed:                {result.get('elapsed_seconds', 0)}s")
 
 
 def cmd_price(args) -> None:
@@ -148,8 +150,15 @@ def cmd_price(args) -> None:
 
 def cmd_status(args) -> None:
     """Check the current status of the benchmark index."""
-    from ML.pricing.config import BENCHMARK_PRODUCTS_FILE, CHROMADB_DIR, DATA_DIR
+    from ML.pricing.config import (
+        BENCHMARK_PRODUCTS_FILE,
+        CHROMADB_DIR,
+        DATA_DIR,
+        get_settings,
+    )
     from ML.pricing.embeddings.vector_store import VectorStore
+
+    settings = get_settings()
 
     print("\n📊 Pricing Pipeline Status")
     print("=" * 50)
@@ -170,16 +179,33 @@ def cmd_status(args) -> None:
     else:
         print("  📦 Benchmark products: ❌ No data (run 'build' first)")
 
-    # Check ChromaDB
-    if CHROMADB_DIR.exists():
-        try:
-            store = VectorStore()
-            count = store.get_count()
-            print(f"  🗄️  ChromaDB vectors: ✅ {count} vectors indexed")
-        except Exception as e:
-            print(f"  🗄️  ChromaDB vectors: ⚠️  Error: {e}")
+    # Check Chroma mode and connection
+    print(f"  🔌 Chroma mode: {settings.chroma_mode}")
+    if settings.chroma_mode == "cloud":
+        api_key_set = bool(getattr(settings, "chroma_api_key", ""))
+        tenant_set = bool(getattr(settings, "chroma_tenant", ""))
+        database_set = bool(getattr(settings, "chroma_database", ""))
+        print(f"  🔑 Cloud credentials: {'✅ configured' if all([api_key_set, tenant_set, database_set]) else '❌ missing'}")
+        if not all([api_key_set, tenant_set, database_set]):
+            missing = []
+            if not api_key_set:
+                missing.append("CHROMA_API_KEY")
+            if not tenant_set:
+                missing.append("CHROMA_TENANT")
+            if not database_set:
+                missing.append("CHROMA_DATABASE")
+            print(f"     Missing: {', '.join(missing)}")
     else:
-        print("  🗄️  ChromaDB vectors: ❌ Not initialized")
+        print(f"  📂 Local path: {settings.chromadb_path}")
+
+    # Check ChromaDB connection
+    try:
+        store = VectorStore()
+        count = store.get_count()
+        print(f"  🗄️  ChromaDB vectors: ✅ {count} vectors indexed")
+        print(f"  📋 Collection: {settings.chromadb_collection}")
+    except Exception as e:
+        print(f"  🗄️  ChromaDB vectors: ⚠️  Error: {e}")
 
     # Check pricing results log
     results_log = DATA_DIR / "pricing_results.jsonl"
@@ -187,7 +213,44 @@ def cmd_status(args) -> None:
         line_count = sum(1 for _ in open(results_log))
         print(f"  📝 Pricing results log: ✅ {line_count} entries")
     else:
-        print("  📝 Pricing results log: ❌ No pricing runs yet")
+        print(f"  📝 Pricing results log: ❌ No pricing runs yet")
+
+    print("=" * 50)
+    print()
+
+
+def cmd_test_connection(args) -> None:
+    """Test Chroma connection without seeding."""
+    from ML.pricing.config import get_settings
+    from ML.pricing.embeddings.vector_store import VectorStore
+
+    settings = get_settings()
+
+    print("\n🔌 Testing Chroma Connection")
+    print("=" * 50)
+    print(f"   Mode: {settings.chroma_mode}")
+    print(f"   Collection: {settings.chromadb_collection}")
+
+    if settings.chroma_mode == "cloud":
+        api_key_set = bool(getattr(settings, "chroma_api_key", ""))
+        tenant_set = bool(getattr(settings, "chroma_tenant", ""))
+        database_set = bool(getattr(settings, "chroma_database", ""))
+        print(f"   CHROMA_API_KEY: {'set' if api_key_set else 'MISSING'}")
+        print(f"   CHROMA_TENANT: {'set' if tenant_set else 'MISSING'}")
+        print(f"   CHROMA_DATABASE: {'set' if database_set else 'MISSING'}")
+
+    try:
+        store = VectorStore()
+        count = store.get_count()
+        print(f"   Connection: ✅ OK")
+        print(f"   Collection: {settings.chromadb_collection}")
+        print(f"   Documents: {count}")
+        print("\n✅ Connection test passed!")
+    except Exception as e:
+        print(f"   Connection: ❌ FAILED")
+        print(f"   Error: {e}")
+        print("\n❌ Connection test failed!")
+        raise SystemExit(1)
 
     print("=" * 50)
     print()
@@ -250,6 +313,9 @@ def main():
     # ── status ───────────────────────────────────────────────────────────
     subparsers.add_parser("status", help="Check benchmark index status")
 
+    # ── test-connection ─────────────────────────────────────────────────
+    subparsers.add_parser("test-connection", help="Test Chroma connection without seeding")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -264,6 +330,8 @@ def main():
         cmd_price(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "test-connection":
+        cmd_test_connection(args)
 
 
 if __name__ == "__main__":

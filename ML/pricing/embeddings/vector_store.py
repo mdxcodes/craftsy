@@ -3,16 +3,18 @@ Vector Store — ChromaDB wrapper for benchmark product embeddings.
 
 Provides add/query operations over the benchmark product collection
 using cosine similarity search.
+
+Supports two backend modes:
+- cloud: Chroma Cloud via CloudClient (production)
+- local: ChromaDB PersistentClient (development)
 """
 
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Optional
 
 import chromadb
-from chromadb.config import Settings as ChromaSettings
 
 from ..config import get_settings
 from ..models import BenchmarkProduct, SimilarProduct
@@ -24,31 +26,72 @@ class VectorStore:
     """
     ChromaDB-backed vector store for benchmark product embeddings.
 
-    Uses persistent local storage so the index survives restarts.
-    Cosine similarity is the default distance metric.
+    Uses either Chroma Cloud or local persistent storage depending on
+    the configured chroma_mode. Cosine similarity is the default metric.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         settings = get_settings()
-        db_path = settings.chromadb_path
+        self._mode = settings.chroma_mode
+        self._collection_name = settings.chromadb_collection
 
-        # Ensure the directory exists
-        Path(db_path).mkdir(parents=True, exist_ok=True)
-
-        self.client = chromadb.PersistentClient(
-            path=db_path,
-            settings=ChromaSettings(anonymized_telemetry=False),
-        )
+        self.client = self._create_client(settings)
         self.collection = self.client.get_or_create_collection(
-            name=settings.chromadb_collection,
-            metadata={"hnsw:space": "cosine"},  # Cosine similarity
+            name=self._collection_name,
+            metadata={"hnsw:space": "cosine"},
         )
 
         logger.info(
-            "VectorStore initialized: %s (%d items)",
-            db_path,
+            "VectorStore initialized: mode=%s, collection=%s, items=%d",
+            self._mode,
+            self._collection_name,
             self.collection.count(),
         )
+
+    def _create_client(self, settings) -> chromadb.ClientAPI:
+        """Create the appropriate Chroma client based on chroma_mode."""
+        mode = getattr(settings, "chroma_mode", "cloud")
+
+        if mode == "local":
+            db_path = settings.chromadb_path
+            return chromadb.PersistentClient(
+                path=db_path,
+                settings=chromadb.config.Settings(anonymized_telemetry=False),
+            )
+
+        # Cloud mode (default production)
+        api_key = getattr(settings, "chroma_api_key", "") or ""
+        tenant = getattr(settings, "chroma_tenant", "") or ""
+        database = getattr(settings, "chroma_database", "") or ""
+
+        missing = []
+        if not api_key:
+            missing.append("CHROMA_API_KEY")
+        if not tenant:
+            missing.append("CHROMA_TENANT")
+        if not database:
+            missing.append("CHROMA_DATABASE")
+
+        if missing:
+            raise ValueError(
+                f"Chroma Cloud is configured but missing required environment variables: "
+                f"{', '.join(missing)}. "
+                f"Set them in .env or Railway Variables."
+            )
+
+        return chromadb.CloudClient(
+            tenant=tenant,
+            database=database,
+            api_key=api_key,
+        )
+
+    def _safe_client_operation(self, operation_name: str, operation):
+        """Execute a client operation with mode-aware error handling."""
+        try:
+            return operation()
+        except Exception as exc:
+            logger.error("Chroma %s operation failed [mode=%s]: %s", operation_name, self._mode, exc)
+            raise
 
     def add_products(
         self,
@@ -74,7 +117,6 @@ class VectorStore:
         if not products:
             return 0
 
-        # Prepare batch data for ChromaDB
         ids = [p.id for p in products]
         documents = [p.embedding_text() for p in products]
         metadatas = [
@@ -90,18 +132,20 @@ class VectorStore:
             for p in products
         ]
 
-        # ChromaDB has a batch size limit; process in chunks
         batch_size = 100
         total_added = 0
 
         for i in range(0, len(ids), batch_size):
             batch_end = min(i + batch_size, len(ids))
             try:
-                self.collection.upsert(
-                    ids=ids[i:batch_end],
-                    embeddings=vectors[i:batch_end],
-                    documents=documents[i:batch_end],
-                    metadatas=metadatas[i:batch_end],
+                self._safe_client_operation(
+                    f"upsert batch {i}-{batch_end}",
+                    lambda: self.collection.upsert(
+                        ids=ids[i:batch_end],
+                        embeddings=vectors[i:batch_end],
+                        documents=documents[i:batch_end],
+                        metadatas=metadatas[i:batch_end],
+                    ),
                 )
                 total_added += batch_end - i
                 logger.info(
@@ -110,8 +154,8 @@ class VectorStore:
                     batch_end - 1,
                     batch_end - i,
                 )
-            except Exception as e:
-                logger.error("Failed to index batch %d–%d: %s", i, batch_end - 1, e)
+            except Exception as exc:
+                logger.error("Failed to index batch %d–%d: %s", i, batch_end - 1, exc)
 
         logger.info(
             "VectorStore now contains %d items (added %d)",
@@ -134,44 +178,39 @@ class VectorStore:
             query_vector: The query embedding vector (from artisan's product).
             top_k: Number of results to return (after threshold filtering).
             category_filter: Optional category to restrict search to.
-            similarity_threshold: Minimum cosine similarity (0–1) a comparable
-                must exceed to be included. Products below this cutoff are
-                semantically too distant to be useful price references and are
-                dropped entirely. Default 0.55 strikes a balance between
-                recall and precision for handicraft categories.
+            similarity_threshold: Minimum cosine similarity (0–1).
 
         Returns:
-            List of SimilarProduct instances sorted by similarity (highest first),
-            containing only results above the similarity threshold.
+            List of SimilarProduct instances sorted by similarity (highest first).
         """
         where_filter = None
         if category_filter:
             where_filter = {"category": category_filter}
 
-        # Over-fetch so we still get top_k results after threshold filtering.
         fetch_k = max(top_k * 2, top_k + 5)
 
         try:
-            results = self.collection.query(
-                query_embeddings=[query_vector],
-                n_results=fetch_k,
-                where=where_filter,
-                include=["metadatas", "distances", "documents"],
+            results = self._safe_client_operation(
+                "query",
+                lambda: self.collection.query(
+                    query_embeddings=[query_vector],
+                    n_results=fetch_k,
+                    where=where_filter,
+                    include=["metadatas", "distances", "documents"],
+                ),
             )
-        except Exception as e:
-            logger.error("Vector query failed: %s", e)
+        except Exception as exc:
+            logger.error("Vector query failed [mode=%s]: %s", self._mode, exc)
             return []
 
-        # Parse results
         similar_products: list[SimilarProduct] = []
 
-        if not results["ids"] or not results["ids"][0]:
+        if not results.get("ids") or not results["ids"][0]:
             logger.info("No similar products found")
             return []
 
         for i, product_id in enumerate(results["ids"][0]):
             metadata = results["metadatas"][0][i]
-            # ChromaDB returns distances; for cosine, distance = 1 - similarity
             distance = results["distances"][0][i]
             similarity = 1.0 - distance
 
@@ -215,7 +254,10 @@ class VectorStore:
     def clear(self) -> None:
         """Delete all items from the collection."""
         settings = get_settings()
-        self.client.delete_collection(settings.chromadb_collection)
+        self._safe_client_operation(
+            "delete_collection",
+            lambda: self.client.delete_collection(settings.chromadb_collection),
+        )
         self.collection = self.client.get_or_create_collection(
             name=settings.chromadb_collection,
             metadata={"hnsw:space": "cosine"},
