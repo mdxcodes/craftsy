@@ -219,21 +219,34 @@ class _QuickActions extends StatelessWidget {
                ),
              ],
            ),
-           const SizedBox(height: AppSpacing.md),
-           Row(
-             children: [
-               Expanded(
-                 child: LargeActionCard(
-                   label: 'advisor_title'.tr(),
-                   icon: Icons.lightbulb,
-                   onTap: () => context.pushNamed(AppRouteConstants.businessAdvisor),
-                   backgroundColor: AppColors.indigoLight,
-                   iconColor: AppColors.indigo,
-                 ),
-               ),
-             ],
-           ),
-        ],
+            Row(
+              children: [
+                Expanded(
+                  child: LargeActionCard(
+                    label: 'advisor_title'.tr(),
+                    icon: Icons.lightbulb,
+                    onTap: () => context.pushNamed(AppRouteConstants.businessAdvisor),
+                    backgroundColor: AppColors.indigoLight,
+                    iconColor: AppColors.indigo,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: LargeActionCard(
+                    label: 'marketplace_title'.tr(),
+                    icon: Icons.storefront,
+                    onTap: () => context.pushNamed(AppRouteConstants.marketplace),
+                    backgroundColor: AppColors.tealLight,
+                    iconColor: AppColors.teal,
+                  ),
+                ),
+              ],
+            ),
+         ],
       ),
     );
   }
