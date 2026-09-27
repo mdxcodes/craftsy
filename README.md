@@ -31,14 +31,16 @@ https://web-production-8ece9b.up.railway.app/docs
 https://web-production-8ece9b.up.railway.app/openapi.json
 
 **Android App**
-`frontend/build/app/outputs/flutter-apk/app-release.apk` (v1.0.0, 85 MB, release build)
+[Download Craftsy 1.0.0 (85 MB)](https://github.com/mdxcodes/craftsy/releases/tag/v1.0.0)
 
-To publish a GitHub release, run:
+Published via GitHub Releases. If the link is not live yet, run:
+
 ```bash
+gh auth login
 gh release create v1.0.0 \
   --title "Craftsy 1.0.0 — Android Release" \
   --notes-file /tmp/release-notes.md \
-  frontend/build/app/outputs/flutter-apk/app-release.apk
+  frontend/build/app/outputs/flutter-apk/Craftsy-1.0.0-release.apk
 ```
 
 ---
