@@ -1,6 +1,6 @@
-# KalaSetu — App Walkthrough & Prototype Screenshots
+# Craftsy — App Walkthrough & Prototype Screenshots
 
-This directory contains visual captures and workflow walkthroughs demonstrating the **KalaSetu (कलासेतु)** mobile application interface, multimodal AI pipelines, and artisan-first experience.
+This directory contains visual captures and workflow walkthroughs demonstrating the **Craftsy** mobile application interface, multimodal AI pipelines, and artisan-first experience.
 
 ---
 
@@ -8,7 +8,7 @@ This directory contains visual captures and workflow walkthroughs demonstrating 
 > ### 📁 Cloud Screenshot Gallery (Google Drive)
 > All high-resolution screenshots, complete flow captures, and prototype visual walkthroughs are also beautifully organized and available on Google Drive:
 > 
-> 👉 **[Open KalaSetu Screenshots on Google Drive](https://drive.google.com/drive/u/0/folders/1-xWkvbRUBBh8lHN0tcv4wrhii_e2MibU)**
+> 👉 **[Open Craftsy Screenshots on Google Drive](https://drive.google.com/drive/u/0/folders/1-xWkvbRUBBh8lHN0tcv4wrhii_e2MibU)**
 > 
 > *Full access with direct high-resolution previews for presentation slides and evaluator reviews.*
 

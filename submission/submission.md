@@ -1,4 +1,4 @@
-# KalaSetu (कलासेतु) — SIH 2026 Submission
+# Craftsy — SIH 2026 Submission
 
 **PS ID:** PS-26090 | **Theme:** Heritage & Culture | **Category:** Software  
 **Synopsis:** An offline-first multimodal AI business co-pilot that dismantles digital, linguistic, and economic asymmetries for rural Indian artisans through autonomous photogrammetry, vernacular voice-to-listing synthesis, and deterministic fair-wage pricing floors.
@@ -23,6 +23,6 @@
 
 ## 3. Live Evaluator Sandbox
 
-* **Production Android Release APK:** [Download v1.0.0 APK](https://github.com/kan9667/kalasetu/releases/tag/v1.0.0)
+* **Production Android Release APK:** [Download v1.0.0 APK](https://github.com/mdxcodes/craftsy/releases/tag/v1.0.0)
 * **Curated Visual Gallery:** [Google Drive Screenshot Repository](https://drive.google.com/drive/u/0/folders/1-xWkvbRUBBh8lHN0tcv4wrhii_e2MibU)
 

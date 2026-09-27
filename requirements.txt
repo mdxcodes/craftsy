@@ -1,4 +1,4 @@
-# KalaSetu Root Dependencies (FastAPI Backend + ML Pipelines)
+# Craftsy Root Dependencies (FastAPI Backend + ML Pipelines)
 fastapi>=0.110.0
 uvicorn[standard]>=0.28.0
 sqlalchemy>=2.0.0
