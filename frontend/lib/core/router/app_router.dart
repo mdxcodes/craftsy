@@ -35,7 +35,6 @@ import '../../features/orders/screens/my_orders_screen.dart';
 import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/orders/models/order.dart';
 import '../../features/commerce/screens/unified_commerce_hub_screen.dart';
-import '../../features/chatbot/screens/chatbot_sheet.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../providers/app_providers.dart';
 
@@ -288,7 +287,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/craftmitra',
         name: AppRouteConstants.craftMitra,
         builder: (context, state) {
-          final mode = state.uri.queryParameters['mode'] ?? 'text';
           return Scaffold(
             body: SafeArea(
               child: ChatbotSheet(),

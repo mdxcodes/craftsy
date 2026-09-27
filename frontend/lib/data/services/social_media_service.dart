@@ -200,14 +200,16 @@ class HttpSocialMediaService implements SocialMediaService {
     String? channel,
   }) async {
     try {
+      final queryParameters = <String, dynamic>{
+        'image_url': imageUrl,
+      };
+      if (listingId != null) queryParameters['listing_id'] = listingId;
+      if (draftKey != null) queryParameters['draft_key'] = draftKey;
+      if (channel != null) queryParameters['channel'] = channel;
+
       final response = await _dio.get(
         '$_base/api/v1/social-drafts/lookup',
-        queryParameters: {
-          'image_url': imageUrl,
-          if (listingId != null) 'listing_id': listingId,
-          if (draftKey != null) 'draft_key': draftKey,
-          if (channel != null) 'channel': channel,
-        },
+        queryParameters: queryParameters,
       );
       return SocialDraft.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {

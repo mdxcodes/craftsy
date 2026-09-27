@@ -142,14 +142,17 @@ class HttpPricingService implements PricingService {
       final payload = <String, dynamic>{
         'description': desc,
         'category': category,
-        if (imageUrl != null && imageUrl.trim().isNotEmpty)
-          'image_url': imageUrl.trim(),
-        if (rawMaterialCost != null) 'raw_material_cost': rawMaterialCost,
-        if (rawMaterialCost != null) 'base_cost': rawMaterialCost,
-        if (laborHours != null) 'labor_hours': laborHours,
-        if (hourlyWage != null) 'hourly_wage': hourlyWage,
         'tags': tags,
       };
+      if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+        payload['image_url'] = imageUrl.trim();
+      }
+      if (rawMaterialCost != null) {
+        payload['raw_material_cost'] = rawMaterialCost;
+        payload['base_cost'] = rawMaterialCost;
+      }
+      if (laborHours != null) payload['labor_hours'] = laborHours;
+      if (hourlyWage != null) payload['hourly_wage'] = hourlyWage;
 
       final response = await _dio.post(
         '$_base/api/v1/pricing/suggest',

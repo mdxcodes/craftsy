@@ -46,10 +46,8 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
   Timer? _recordTimer;
 
   // Voice interaction state (Bhashini/Whisper)
-  final CraftsyLanguageService _languageService = CraftsyLanguageService();
-  VoiceState _voiceState = VoiceState.idle;
+  final VoiceState _voiceState = VoiceState.idle;
   String? _voiceTranscript;
-  double _voiceConfidence = 0.0;
 
   // Repeats a CraftMitra reply on tap. One shared engine for the whole
   // conversation — only one message plays at a time — tracked by message id
@@ -81,8 +79,9 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       duration: const Duration(milliseconds: 900),
     );
     _tts.onStateChanged = () {
-      if (!_tts.isSpeaking && mounted)
+      if (!_tts.isSpeaking && mounted) {
         setState(() => _speakingMessageId = null);
+      }
     };
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {

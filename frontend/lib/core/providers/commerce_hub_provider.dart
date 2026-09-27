@@ -2,6 +2,7 @@
 ///
 /// Manages state for the unified commerce experience across
 /// all channels: Craftsy Marketplace, ONDC, and GeM.
+library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

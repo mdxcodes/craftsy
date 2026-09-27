@@ -43,7 +43,7 @@ class PetalRing extends StatelessWidget {
             size: Size(size, size),
             painter: _PetalRingPainter(color: color.withValues(alpha: opacity)),
           ),
-          if (child != null) child!,
+          if (child != null) ...[child!],
         ],
       ),
     );

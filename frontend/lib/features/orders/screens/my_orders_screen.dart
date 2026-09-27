@@ -523,8 +523,9 @@ class _OrderCardState extends State<_OrderCard> {
   String _formatDate(DateTime dt) {
     final now = DateTime.now();
     final diff = now.difference(dt);
-    if (diff.inHours < 24)
+    if (diff.inHours < 24) {
       return 'hours_ago'.tr(namedArgs: {'hours': '${diff.inHours}'});
+    }
     if (diff.inDays == 1) return 'yesterday'.tr();
     return '${dt.day}/${dt.month}';
   }

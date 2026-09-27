@@ -1,11 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/orders/models/order.dart';
-import '../../features/orders/providers/orders_provider.dart';
-import '../../data/models/product.dart';
-import '../../core/providers/app_providers.dart';
 
 /// Widget-safe snapshot model — matches the Kotlin WidgetSnapshot.
 /// This is the ONLY data exposed to Android widgets.

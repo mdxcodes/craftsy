@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../../features/orders/models/order.dart';
@@ -26,7 +24,6 @@ final widgetSnapshotProvider = Provider<WidgetSnapshot>((ref) {
   final orders = ref.watch(ordersProvider);
   final products = ref.watch(productListProvider);
   final authState = ref.watch(authStateProvider);
-  final userProfile = ref.watch(userProfileProvider);
 
   // Project domain models to widget snapshot
   final productList = products.value ?? const <Product>[];

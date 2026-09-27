@@ -1727,10 +1727,11 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
     final listingFuture = generateAiListing(languageCode);
 
     try {
-      await Future.wait([
-        if (enhanceFuture != null) enhanceFuture,
-        listingFuture,
-      ]);
+      if (enhanceFuture != null) {
+        await Future.wait([enhanceFuture, listingFuture]);
+      } else {
+        await listingFuture;
+      }
     } catch (e) {
       debugPrint('[AddProductFlow] Error during regenerateAll: $e');
     } finally {

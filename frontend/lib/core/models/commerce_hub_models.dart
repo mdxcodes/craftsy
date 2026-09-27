@@ -2,6 +2,7 @@
 ///
 /// These models represent the unified commerce experience across
 /// all channels: Craftsy Marketplace, ONDC, and GeM.
+library;
 
 /// Channel status information for a product.
 class ChannelStatusInfo {

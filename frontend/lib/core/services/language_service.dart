@@ -14,7 +14,6 @@ library;
 
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../config/api_config.dart';
@@ -315,12 +314,11 @@ class CraftsyLanguageService implements LanguageService {
 
   CraftsyLanguageService({
     List<LanguageProvider>? providers,
-    String defaultLanguage = 'en',
-  }) : _providers =
-           providers ??
-           [BhashiniLanguageProvider(), FallbackLanguageProvider()],
-       _defaultLanguage = defaultLanguage,
-       _languages = {
+    this._defaultLanguage = 'en',
+  })  : _providers =
+            providers ??
+            [BhashiniLanguageProvider(), FallbackLanguageProvider()],
+        _languages = {
          'en': const LanguageConfig(
            code: 'en',
            displayName: 'English',
