@@ -19,6 +19,19 @@
 
 ---
 
+## Try Craftsy
+
+**Live API**
+https://web-production-8ece9b.up.railway.app/api/v1/health
+
+**Swagger Docs**
+https://web-production-8ece9b.up.railway.app/docs
+
+**Android App**
+[Download Craftsy 1.0.4](https://github.com/mdxcodes/craftsy/releases/tag/v1.0.4)
+
+---
+
 ## What is Craftsy?
 
 Craftsy is a Flutter mobile app paired with a FastAPI backend. It is built for artisans who sell handmade goods but lack the tools to list products online professionally.
