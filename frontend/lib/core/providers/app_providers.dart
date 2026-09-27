@@ -1440,9 +1440,91 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       if (transcript.isEmpty ||
           HttpSpeechService.isSilenceHallucination(transcript)) {
         debugPrint(
-          '[AddProductFlow] Transcription empty or hallucination — skipping listing generation.',
+          '[AddProductFlow] Transcription empty or hallucination — using fallback transcript.',
+        );
+        final fallbackTranscript = state.manualDescription.isNotEmpty
+            ? state.manualDescription
+            : (state.descriptionEn.isNotEmpty
+                ? state.descriptionEn
+                : (state.titleEn.isNotEmpty
+                    ? state.titleEn
+                    : 'Handcrafted traditional artisan product'));
+        state = state.copyWith(
+          voiceTranscript: fallbackTranscript,
+          transcriptionConfidence: 0.0,
         );
         _recomputeAiProcessing();
+        _persistDraft();
+
+        _listingGenerationInFlight = true;
+        _recomputeAiProcessing();
+        try {
+          final speechService = _ref.read(speechServiceProvider);
+          final suggestion = await speechService
+              .generateListingFromTranscript(
+                transcript: fallbackTranscript,
+                languageCode: effectiveLanguage,
+                categoryHint:
+                    (state.category.isNotEmpty && state.category != 'Handicrafts')
+                    ? state.category
+                    : null,
+              )
+              .timeout(
+                const Duration(seconds: 25),
+                onTimeout: () {
+                  debugPrint(
+                    '[AddProductFlow] Fallback listing generation timed out.',
+                  );
+                  return AiListingSuggestion(
+                    titleEn: fallbackTranscript,
+                    titleHi: state.titleHi,
+                    descriptionEn: fallbackTranscript,
+                    descriptionHi: state.descriptionHi,
+                    category: state.category,
+                    tags: state.tags,
+                  );
+                },
+              );
+          _listingGenerationInFlight = false;
+          state = state.copyWith(
+            titleEn: suggestion.titleEn,
+            titleHi: suggestion.titleHi,
+            descriptionEn: suggestion.descriptionEn,
+            descriptionHi: suggestion.descriptionHi,
+            category: suggestion.category,
+            tags: suggestion.tags,
+            rawMaterialCost:
+                (suggestion.rawMaterialCost != null &&
+                    suggestion.rawMaterialCost! > 0)
+                ? suggestion.rawMaterialCost!
+                : state.rawMaterialCost,
+            laborHours:
+                (suggestion.laborHours != null && suggestion.laborHours! > 0)
+                ? suggestion.laborHours!
+                : state.laborHours,
+            hourlyRate:
+                (suggestion.hourlyRate != null && suggestion.hourlyRate! > 0)
+                ? suggestion.hourlyRate!
+                : state.hourlyRate,
+            floorPrice:
+                (suggestion.floorPrice != null && suggestion.floorPrice! > 0)
+                ? suggestion.floorPrice!
+                : state.floorPrice,
+          );
+          _recomputeAiProcessing();
+          _persistDraft();
+        } catch (e) {
+          debugPrint(
+            '[AddProductFlow] Error during fallback listing generation: $e',
+          );
+          _listingGenerationInFlight = false;
+          state = state.copyWith(
+            titleEn: fallbackTranscript,
+            descriptionEn: fallbackTranscript,
+          );
+          _recomputeAiProcessing();
+          _persistDraft();
+        }
         return;
       }
 

@@ -274,32 +274,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
       localeCode = context.locale.languageCode;
     } catch (_) {}
 
-    final draft = ref.read(addProductFlowProvider);
-
-    if (!isOnline ||
-        draft.originalImagePath.isEmpty ||
-        (draft.isEnhanced &&
-            draft.enhancedImagePath.isNotEmpty &&
-            draft.enhancedImagePath != draft.originalImagePath)) {
-      ref
-          .read(addProductFlowProvider.notifier)
-          .submitForAiProcessing(isOnline, languageCode: localeCode);
-      ref.read(addProductFlowProvider.notifier).nextStep();
-      return;
-    }
-
+    ref.read(addProductFlowProvider.notifier).submitForAiProcessing(isOnline, languageCode: localeCode);
     ref.read(addProductFlowProvider.notifier).nextStep();
-
-    try {
-      await ref
-          .read(addProductFlowProvider.notifier)
-          .enhanceProductImageAndWait();
-      ref
-          .read(addProductFlowProvider.notifier)
-          .submitForAiProcessing(isOnline, languageCode: localeCode);
-    } catch (e) {
-      debugPrint('[Step2] Error waiting for image enhancement: $e');
-    }
   }
 
   @override
