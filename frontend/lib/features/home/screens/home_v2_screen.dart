@@ -17,6 +17,7 @@ import '../../../core/widgets/sync_status_banner.dart';
 import '../../../core/widgets/draft_resume_card.dart';
 import '../../orders/models/order.dart';
 import '../../orders/providers/orders_provider.dart';
+import 'business_advisor_screen.dart';
 
 /// V2 Home Screen — the artisan's daily command center.
 ///
@@ -229,7 +230,7 @@ class _QuickActions extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const BusinessAdvisorScreen(),
+                          builder: (context) => BusinessAdvisorScreen(),
                         ),
                       );
                     },
