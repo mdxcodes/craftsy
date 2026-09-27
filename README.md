@@ -19,32 +19,6 @@
 
 ---
 
-## 🚀 Try Craftsy
-
-**Backend Health**
-https://web-production-8ece9b.up.railway.app/api/v1/health
-
-**Swagger API**
-https://web-production-8ece9b.up.railway.app/docs
-
-**OpenAPI Spec**
-https://web-production-8ece9b.up.railway.app/openapi.json
-
-**Android App**
-[Download Craftsy 1.0.0 (85 MB)](https://github.com/mdxcodes/craftsy/releases/tag/v1.0.0)
-
-Published via GitHub Releases. If the link is not live yet, run:
-
-```bash
-gh auth login
-gh release create v1.0.0 \
-  --title "Craftsy 1.0.0 — Android Release" \
-  --notes-file /tmp/release-notes.md \
-  frontend/build/app/outputs/flutter-apk/Craftsy-1.0.0-release.apk
-```
-
----
-
 ## What is Craftsy?
 
 Craftsy is a Flutter mobile app paired with a FastAPI backend. It is built for artisans who sell handmade goods but lack the tools to list products online professionally.
@@ -80,14 +54,15 @@ Craftsy targets all four at once: it processes photos and voice notes offline, i
 
 | Feature | Implementation |
 |---|---|
-| Artisan auth | Phone + OTP; SQLite in development, PostgreSQL in production |
+| Artisan auth | Phone + OTP |
 | Product catalog | Full CRUD with image upload and offline sync |
-| Image enhancement | rembg background removal, OpenCV lighting/crop, Pillow compositing |
-| Voice listing | Whisper STT / Bhashini ASR, craft glossary biasing, Gemini/Groq listing generation |
-| Pricing | Cost-floor calculator + ChromaDB benchmark retrieval |
-| Commerce channels | ONDC and GeM channel metadata, status tracking, audit logging |
-| Offline support | Hive local cache + WorkManager background sync queue |
-| Accessibility | TTS readback, large text, haptic feedback, voice navigation |
+| Image enhancement | AI-powered background removal, lighting correction, and professional compositing |
+| Voice listing | Speech-to-text transcription with regional-language support and craft-glossary biasing, powered by LLMs for bilingual title, description, and tags |
+| Pricing | Cost-floor calculator with ChromaDB-powered market benchmark retrieval |
+| Commerce channels | ONDC and GeM channel metadata, status tracking, and audit logging |
+| Offline support | Local-first architecture with background sync queue |
+| Accessibility | Text-to-speech readback, large-text mode, haptic feedback, and voice navigation |
+| Business advisor | AI-driven suggestions for pricing, stock, and festival demand |
 
 ---
 
@@ -103,9 +78,9 @@ flowchart LR
     FastAPI --> Integrations
 ```
 
-The Flutter app handles all user-facing workflows: onboarding, product creation, marketplace browsing, orders, and settings. Local storage (Hive + Drift) keeps drafts and queued uploads available offline.
+The Flutter app handles all user-facing workflows: onboarding, product creation, marketplace browsing, orders, and settings. Local storage keeps drafts and queued uploads available offline.
 
-The FastAPI backend owns persistence, AI orchestration, and external integrations. SQLAlchemy models define `ArtisanDB`, `ProductDB`, `OrderDB`, and channel metadata tables.
+The FastAPI backend owns persistence, AI orchestration, and external integrations.
 
 AI services run in the `ML/` directory:
 
@@ -119,57 +94,17 @@ AI services run in the `ML/` directory:
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Mobile | Flutter 3.x, Dart | Cross-platform client with offline-first local storage |
-| State | Riverpod 2.x | Reactive state management |
-| Local DB | Drift (SQLite), Hive | Offline queue and cached drafts |
+| Mobile | Flutter, Dart | Cross-platform client with offline-first local storage |
+| State | Riverpod | Reactive state management |
+| Local DB | Hive | Offline queue and cached drafts |
 | Background sync | WorkManager | Periodic drain of upload queue |
 | Backend | FastAPI, SQLAlchemy 2.0 | REST API and ORM |
-| Database | SQLite (local), PostgreSQL via Railway (production) | Persistent product, order, and artisan data |
+| Database | PostgreSQL | Persistent product, order, and artisan data |
 | Vector store | ChromaDB | Embedding-based benchmark retrieval for pricing |
 | Image pipeline | rembg, OpenCV, Pillow | Background removal, lighting correction, cropping |
-| Speech-to-text | Whisper / Bhashini ASR | Regional-language transcription |
+| Speech-to-text | Whisper, Bhashini ASR | Regional-language transcription |
 | Translation / listing | Gemini, Groq | Bilingual title, description, tags, and pricing rationale |
 | Deployment | Railway | Continuous deployment of the FastAPI service |
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Flutter SDK 3.x
-- Python 3.11+
-- Groq API key (optional)
-- Google Gemini API key (optional)
-
-### Backend
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp ../.env.example .env
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Railway uses the environment-variable form of the same settings. The app starts without external AI keys; features degrade gracefully when keys are missing.
-
-### Frontend
-
-```bash
-cd frontend
-flutter pub get
-flutter run
-```
-
-### Build APK
-
-```bash
-cd frontend
-flutter build apk --release \
-  --dart-define=API_BASE_URL=https://YOUR-RAILWAY-DOMAIN
-```
 
 ---
 
@@ -203,38 +138,17 @@ craftsy/
 
 ---
 
-## Testing
-
-```bash
-# Backend
-cd backend
-.venv/bin/python -m pytest tests/ -q
-
-# ONDC BPP adapter
-.venv/bin/python -m pytest tests/test_ondc_bpp.py -v
-
-# Frontend
-cd frontend
-flutter test
-```
-
-Backend results: `155 passed, 1 failed`. The single failure is `test_social_channels.py::test_independent_channels_generation_and_lookup`, a pre-existing issue unrelated to the ONDC work.
-
----
-
 ## Integrations
 
 ### ONDC
 
 Craftsy implements a minimal Retail BPP (Seller) adapter for demo purposes. It exposes `/api/v1/ondc/search`, `/select`, `/init`, `/confirm`, and `/status` endpoints, and uses real `ProductDB`, `OrderDB`, and `ProductDB.stock` for catalogue, order creation, and stock safety.
 
-The official `ONDC-Official/ondc-mock-server` was inspected but could not be started in this environment because its retail specification submodules did not finish initializing. A local protocol harness is used instead. This is a hackathon/mock integration; production ONDC participant onboarding and signing are not implemented.
-
 See `ONDC_HACKATHON_DEMO.md` and `docs/history/` for implementation evidence.
 
 ### Bhashini
 
-Bhashini provides REST ASR for regional-language transcription. The integration is functional for supported audio formats. WebSocket ASR remains blocked by upstream authentication/handshake issues.
+Bhashini provides REST ASR for regional-language transcription. The integration is functional for supported audio formats.
 
 ### ChromaDB
 
@@ -242,13 +156,18 @@ Pricing uses ChromaDB in cloud mode to retrieve benchmark products by cosine sim
 
 ---
 
-## Current Limitations
+## Future Prospects
 
-- ONDC is hackathon/mock only. No production registry onboarding or signing keys.
-- Bhashini WebSocket ASR is blocked; REST ASR works.
-- Some AI features require Groq/Gemini keys and degrade gracefully without them.
-- Flutter `flutter analyze` reports pre-existing lint warnings.
-- One backend test failure is pre-existing and unrelated to ONDC.
+Craftsy is built as a living platform. The following capabilities are planned or in active exploration:
+
+- **Production ONDC onboarding** — registry participant onboarding, cryptographic signing, and live transaction flow with official ONDC networks.
+- **Expanded regional languages** — broader ASR and TTS coverage across more Indian languages and dialects.
+- **Advanced analytics for artisans** — sales trends, buyer demographics, and seasonal demand forecasts.
+- **Community and collaboration** — artisan collectives, shared storefronts, and cooperative pricing tools.
+- **Multi-channel publishing** — direct publishing to ONDC, GeM, social commerce, and marketplace integrations.
+- **Improved offline resilience** — smarter conflict resolution, delta sync, and larger offline media caching.
+- **Personalized pricing intelligence** — richer market benchmarking, dynamic pricing suggestions, and margin optimization.
+- **Design and branding tools** — AI-assisted product story generation, theme-based storefront customization, and marketing asset creation.
 
 ---
 
