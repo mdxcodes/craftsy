@@ -106,3 +106,5 @@ local.properties
 # Freebuff local pipeline state
 .freebuff/
 ONDC_guide.pdf
+*.apk
+Craftsy-1.0.0-release.apk
