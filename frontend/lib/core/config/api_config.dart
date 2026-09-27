@@ -38,9 +38,7 @@ class ApiConfig {
     if (configuredBaseUrl.isNotEmpty) return configuredBaseUrl;
 
     if (Platform.isAndroid) {
-      // Default to LAN IP for physical device connectivity;
-      // discoverWorkingUrl() will verify and update during app init.
-      return 'http://$hostLanIp:8000';
+      return 'https://web-production-8ece9b.up.railway.app';
     }
     return 'http://127.0.0.1:8000';
   }
