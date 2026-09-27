@@ -225,7 +225,14 @@ class _QuickActions extends StatelessWidget {
                   child: LargeActionCard(
                     label: 'advisor_title'.tr(),
                     icon: Icons.lightbulb,
-                    onTap: () => context.pushNamed(AppRouteConstants.businessAdvisor),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BusinessAdvisorScreen(),
+                        ),
+                      );
+                    },
                     backgroundColor: AppColors.indigoLight,
                     iconColor: AppColors.indigo,
                   ),

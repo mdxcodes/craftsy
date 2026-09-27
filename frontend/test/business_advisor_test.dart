@@ -7,7 +7,6 @@ import 'package:craftsy/features/home/screens/business_advisor_screen.dart';
 import 'package:craftsy/data/models/product.dart';
 import 'package:craftsy/data/services/api_service.dart';
 import 'package:craftsy/core/providers/app_providers.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 class _FakeProductListNotifier extends StateNotifier<AsyncValue<List<Product>>>
     implements ProductListNotifier {
@@ -43,7 +42,7 @@ void main() {
   });
 
   testWidgets(
-    'Business Advisor renders with products from canonical provider',
+    'Business Advisor renders suggestion cards',
     (WidgetTester tester) async {
       final products = [
         Product(
@@ -79,12 +78,6 @@ void main() {
             ),
           ],
           child: const MaterialApp(
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: [Locale('en')],
             home: BusinessAdvisorScreen(),
           ),
         ),
@@ -92,29 +85,18 @@ void main() {
 
       await tester.pump(const Duration(seconds: 2));
 
-      // Verify screen renders — product titles are plain data, not localized
-      // Products may appear in multiple sections (price review, low stock, slow moving)
-      expect(find.text('Handcrafted Vase'), findsWidgets);
-      expect(find.text('Bamboo Basket'), findsWidgets);
-      expect(find.text('₹500'), findsOneWidget);
-
-      // Verify section headers (Easy Localization returns key when not loaded)
-      expect(find.text('advisor_price_review'), findsOneWidget);
-      expect(find.text('advisor_low_stock'), findsOneWidget);
-      expect(find.text('advisor_slow_moving'), findsOneWidget);
-
-      // Scroll to find CTA button at bottom
-      await tester.scrollUntilVisible(
-        find.text('advisor_ask_craftmitra'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.text('advisor_ask_craftmitra'), findsOneWidget);
+      expect(find.text('AI Business Advisor'), findsOneWidget);
+      expect(find.text('Here are some suggestions for your business'), findsOneWidget);
+      expect(find.text('Price Review Needed'), findsOneWidget);
+      expect(find.text('Low Stock Alert'), findsOneWidget);
+      expect(find.text('Slow Moving Products'), findsOneWidget);
+      expect(find.text('Festival Demand Opportunity'), findsOneWidget);
+      expect(find.text('Ask AI Advisor'), findsOneWidget);
     },
   );
 
   testWidgets(
-    'Business Advisor shows empty state when no products',
+    'Business Advisor shows empty message when no products',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -125,12 +107,6 @@ void main() {
             ),
           ],
           child: const MaterialApp(
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: [Locale('en')],
             home: BusinessAdvisorScreen(),
           ),
         ),
@@ -138,9 +114,8 @@ void main() {
 
       await tester.pump(const Duration(seconds: 2));
 
-      expect(find.text('advisor_title'), findsOneWidget);
-      expect(find.text('advisor_no_products'), findsOneWidget);
-      expect(find.text('advisor_add_product'), findsOneWidget);
+      expect(find.text('AI Business Advisor'), findsOneWidget);
+      expect(find.text('Add a product to get a price recommendation.'), findsOneWidget);
     },
   );
 }
