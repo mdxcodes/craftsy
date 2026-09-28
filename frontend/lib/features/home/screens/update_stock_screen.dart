@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class UpdateStockScreen extends StatefulWidget {
+import '../../../core/providers/app_providers.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../data/models/product.dart';
+
+class UpdateStockScreen extends ConsumerStatefulWidget {
   final String productName;
+  final Product product;
 
   const UpdateStockScreen({
     super.key,
     required this.productName,
+    required this.product,
   });
 
   @override
-  State<UpdateStockScreen> createState() => _UpdateStockScreenState();
+  ConsumerState<UpdateStockScreen> createState() => _UpdateStockScreenState();
 }
 
-class _UpdateStockScreenState extends State<UpdateStockScreen> {
-  final TextEditingController stockController =
-      TextEditingController(text: '15');
+class _UpdateStockScreenState extends ConsumerState<UpdateStockScreen> {
+  late final TextEditingController stockController;
+
+  @override
+  void initState() {
+    super.initState();
+    stockController = TextEditingController(
+      text: widget.product.stock.toString(),
+    );
+  }
 
   @override
   void dispose() {
@@ -22,15 +38,22 @@ class _UpdateStockScreenState extends State<UpdateStockScreen> {
     super.dispose();
   }
 
-  void _saveStock() {
-    if (stockController.text.trim().isEmpty) {
+  Future<void> _saveStock() async {
+    final newStock = int.tryParse(stockController.text.trim());
+    if (newStock == null || newStock < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid stock quantity')),
+      );
       return;
     }
 
+    final updated = widget.product.copyWith(stock: newStock);
+    await ref.read(productListProvider.notifier).updateProduct(updated);
+
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Stock updated successfully'),
-      ),
+      const SnackBar(content: Text('Stock updated successfully')),
     );
 
     Navigator.pop(context);
@@ -42,8 +65,8 @@ class _UpdateStockScreenState extends State<UpdateStockScreen> {
       appBar: AppBar(
         title: const Text('Update Stock'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,69 +74,60 @@ class _UpdateStockScreenState extends State<UpdateStockScreen> {
               'Product',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: AppColors.inkSoft,
               ),
             ),
-
             const SizedBox(height: 6),
-
             Text(
               widget.productName,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: FontWeight.w600,
+                color: AppColors.ink,
               ),
             ),
-
             const SizedBox(height: 28),
-
             const Text(
               'Current Stock',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: AppColors.inkSoft,
               ),
             ),
-
             const SizedBox(height: 6),
-
-            const Text(
-              '4',
-              style: TextStyle(
+            Text(
+              widget.product.stock.toString(),
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
+                color: AppColors.ink,
               ),
             ),
-
             const SizedBox(height: 24),
-
             const Text(
               'New Stock',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: AppColors.inkSoft,
               ),
             ),
-
             const SizedBox(height: 8),
-
             TextField(
               controller: stockController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 hintText: 'Enter new stock',
-                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: AppColors.surface,
               ),
             ),
-
             const SizedBox(height: 28),
-
             SizedBox(
               width: double.infinity,
               height: 50,
-              child: ElevatedButton(
+              child: AppButton(
+                label: 'Save Stock',
                 onPressed: _saveStock,
-                child: const Text('Save Stock'),
               ),
             ),
           ],

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../chatbot/screens/chatbot_sheet.dart';
 import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
+import '../../../data/services/advisor_service.dart';
 import 'update_price_screen.dart';
 import 'update_stock_screen.dart';
 
@@ -15,326 +15,274 @@ class BusinessAdvisorScreen extends ConsumerWidget {
     final productsAsync = ref.watch(productListProvider);
     final products = productsAsync.valueOrNull ?? [];
 
-    final liveProducts = products.where((p) => p.status == ProductStatus.live).toList();
-
-    final lowStockProducts = <Product>[];
-    final priceReviewProducts = <Product>[];
-    final slowMovingProducts = <Product>[];
-    final festivalOpportunities = <String>[];
-
-    final now = DateTime.now();
-
-    for (final product in products) {
-      if (product.stock > 0 && product.stock < 5) {
-        lowStockProducts.add(product);
-      }
-
-      final ageDays = now.difference(product.createdAt).inDays;
-      if (product.status == ProductStatus.draft && ageDays > 14) {
-        slowMovingProducts.add(product);
-      }
-      if (product.status == ProductStatus.listingRemoved && ageDays > 30) {
-        slowMovingProducts.add(product);
-      }
-    }
-
-    if (liveProducts.length >= 2) {
-      final categoryPrices = <String, List<double>>{};
-      for (final product in liveProducts) {
-        categoryPrices.putIfAbsent(product.category, () => []).add(product.price);
-      }
-      for (final product in liveProducts) {
-        final prices = categoryPrices[product.category] ?? [];
-        if (prices.length < 2) continue;
-        final avgPrice = prices.reduce((a, b) => a + b) / prices.length;
-        if (product.price < avgPrice * 0.7) {
-          priceReviewProducts.add(product);
-        }
-      }
-    }
-
-    final currentMonth = now.month;
-    if (currentMonth >= 9 && currentMonth <= 11) {
-      festivalOpportunities.addAll([
-        'Diwali: Hand-painted items, diyas, and home decor see high demand.',
-        'Dussehra: Traditional textiles and handicrafts are popular gifts.',
-        'Wedding season: Jewelry and decorative items gain traction.',
-      ]);
-    } else if (currentMonth >= 12 || currentMonth <= 2) {
-      festivalOpportunities.addAll([
-        'New Year: Festive home decor and gift items are in demand.',
-        'Makar Sankranti: Kite-making materials and traditional sweets crafts sell well.',
-        'Republic Day: Patriotic-themed crafts and textiles see interest.',
-      ]);
-    } else if (currentMonth >= 3 && currentMonth <= 5) {
-      festivalOpportunities.addAll([
-        'Holi: Brightly colored textiles and eco-friendly celebration items.',
-        'Summer: Terracotta coolers, hand fans, and cotton crafts.',
-        'Wedding season continues: Jewelry and home decor.',
-      ]);
-    } else {
-      festivalOpportunities.addAll([
-        'Monsoon: Bamboo crafts and waterproof home items.',
-        'Upcoming festivals: Stock up on traditional crafts early.',
-        'Seasonal shift: Consider refreshing product photos and descriptions.',
-      ]);
-    }
-
-    final priceReview = priceReviewProducts.isNotEmpty ? priceReviewProducts.first : null;
-    final lowStock = lowStockProducts.isNotEmpty ? lowStockProducts.first : null;
-    final slowMoving = slowMovingProducts.isNotEmpty ? slowMovingProducts.first : null;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Business Advisor'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Here are some suggestions for your business',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            _SuggestionCard(
-              icon: Icons.currency_rupee,
-              title: 'Price Review Needed',
-              description: priceReview != null
-                  ? '${priceReview.title}\n'
-                      'Current Price: ₹${priceReview.price.toStringAsFixed(0)}\n'
-                      'Suggested Price: ₹${(priceReview.price * 1.2).toStringAsFixed(0)}\n'
-                      'Reason: Similar products in ${priceReview.category} are priced higher.'
-                  : products.isEmpty
-                      ? 'Add products to get price recommendations.'
-                      : 'Your current pricing looks competitive for your catalog.',
-              buttonText: priceReview != null ? 'Update Price' : 'Review Catalog',
-              primary: Theme.of(context).primaryColor,
-              onPressed: priceReview != null
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => UpdatePriceScreen(
-                            product: priceReview,
-                          ),
-                        ),
-                      );
-                    }
-                  : () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Keep monitoring your prices against market trends.',
-                          ),
-                        ),
-                      );
-                    },
-            ),
-            const SizedBox(height: 14),
-
-            _SuggestionCard(
-              icon: Icons.inventory_2_outlined,
-              title: 'Low Stock Alert',
-              description: lowStock != null
-                  ? '${lowStock.title}\n'
-                      'Current Stock: ${lowStock.stock}\n'
-                      'Demand is expected to increase during the upcoming season.\n'
-                      'Suggested Stock: ${(lowStock.stock * 3).clamp(10, 50)}'
-                  : 'No low-stock products detected. Keep monitoring inventory levels.',
-              buttonText: lowStock != null ? 'Update Stock' : 'View Inventory',
-              primary: Theme.of(context).primaryColor,
-              onPressed: lowStock != null
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => UpdateStockScreen(
-                            productName: lowStock.title,
-                          ),
-                        ),
-                      );
-                    }
-                  : () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Check your inventory regularly to avoid stockouts.',
-                          ),
-                        ),
-                      );
-                    },
-            ),
-            const SizedBox(height: 14),
-
-            _SuggestionCard(
-              icon: Icons.hourglass_empty_outlined,
-              title: 'Slow Moving Products',
-              description: slowMoving != null
-                  ? '${slowMoving.title}\n'
-                      'This product has been in your catalog for ${now.difference(slowMoving.createdAt).inDays} days.\n'
-                      'AI suggests refreshing the photos or adjusting the price.'
-                  : slowMovingProducts.isEmpty
-                      ? 'No slow-moving products detected. Great job!'
-                      : '${slowMovingProducts.length} products may need attention.',
-              buttonText: slowMoving != null ? 'Refresh Listing' : 'View All Products',
-              primary: Theme.of(context).primaryColor,
-              onPressed: () {
-                if (slowMoving != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Consider updating photos or price for ${slowMoving.title}.',
-                      ),
+      body: products.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.storefront_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.outlineVariant,
                     ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Add products to get personalized business advice.',
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : FutureBuilder<AdvisorAnalysisResponse>(
+              future: _loadAdvice(ref, products),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Browse your catalog to identify products that need a refresh.',
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.wifi_off_rounded, size: 48),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Unable to load advisor right now.',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            onPressed: () {
+                              if (products.isNotEmpty) {
+                                _loadAdvice(ref, products, forceRefresh: true);
+                              }
+                            },
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Retry'),
+                          ),
+                        ],
                       ),
                     ),
                   );
                 }
-              },
-            ),
 
-            const SizedBox(height: 14),
-
-            _SuggestionCard(
-              icon: Icons.celebration_outlined,
-              title: 'Festival Demand Opportunity',
-              description: festivalOpportunities.isNotEmpty
-                  ? festivalOpportunities.join('\n\n')
-                  : 'Check back during festival season for personalized suggestions.',
-              buttonText: 'View Suggestions',
-              primary: Theme.of(context).primaryColor,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Festival Demand Suggestions'),
-                    content: Text(
-                      festivalOpportunities.isNotEmpty
-                          ? festivalOpportunities.join('\n\n')
-                          : 'No specific festival suggestions at this time.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Close'),
+                final response = snapshot.data;
+                if (response == null || response.advice.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline,
+                            size: 64,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Your catalog looks healthy right now.',
+                            style: Theme.of(context).textTheme.titleMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: response.advice.length,
+                  itemBuilder: (context, index) {
+                    final item = response.advice[index];
+                    return _AdviceCard(
+                      advice: item,
+                      products: products,
+                    );
+                  },
                 );
               },
             ),
+    );
+  }
 
-            const SizedBox(height: 24),
+  Future<AdvisorAnalysisResponse> _loadAdvice(
+    WidgetRef ref,
+    List<Product> products, {
+    bool forceRefresh = false,
+  }) async {
+    final service = ref.read(advisorServiceProvider);
+    final summaries = products.map(AdvisorProductSummary.fromProduct).toList();
+    return service.analyzeCatalog(summaries);
+  }
+}
 
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  ChatbotSheet.show(context);
-                },
-                icon: const Icon(Icons.smart_toy_outlined),
-                label: const Text(
-                  'Ask AI Advisor',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
+class _AdviceCard extends StatelessWidget {
+  final AdvisorSuggestion advice;
+  final List<Product> products;
+
+  const _AdviceCard({
+    required this.advice,
+    required this.products,
+  });
+
+  Product? _findProduct() {
+    try {
+      return products.firstWhere((p) => p.id == advice.productId);
+    } on StateError {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final product = _findProduct();
+    final colorScheme = Theme.of(context).colorScheme;
+    final icon = switch (advice.adviceType) {
+      'price_review' => Icons.currency_rupee,
+      'low_stock' => Icons.inventory_2_outlined,
+      'slow_moving' => Icons.hourglass_empty_outlined,
+      'festival_opportunity' => Icons.celebration_outlined,
+      _ => Icons.lightbulb_outlined,
+    };
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: colorScheme.primary, size: 24),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    advice.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _priorityColor(advice.priority).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    advice.priority.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: _priorityColor(advice.priority),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              advice.description,
+              style: TextStyle(
+                fontSize: 14,
+                color: colorScheme.onSurfaceVariant,
+                height: 1.4,
               ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (advice.suggestedAction == 'update_price' && product != null)
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => UpdatePriceScreen(product: product),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.edit, size: 18),
+                    label: Text('Update Price'),
+                  ),
+                if (advice.suggestedAction == 'update_stock' && product != null)
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                           builder: (_) => UpdateStockScreen(
+                             productName: product.title,
+                             product: product,
+                           ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.inventory, size: 18),
+                    label: Text('Update Stock'),
+                  ),
+                if (advice.suggestedAction == 'refresh_listing' && product != null)
+                  FilledButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Open ${product.title} to refresh photos/price.'),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text('Refresh Listing'),
+                  ),
+                if (advice.suggestedAction == 'boost_listing' && product != null)
+                  FilledButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Consider featuring ${product.title} in promotions.'),
+                        ),
+                      );
+                    },
+                     icon: const Icon(Icons.auto_awesome, size: 18),
+                     label: const Text('Boost Listing'),
+                  ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class _SuggestionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  final String buttonText;
-  final Color primary;
-  final VoidCallback onPressed;
-
-  const _SuggestionCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.buttonText,
-    required this.primary,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                color: primary,
-                size: 24,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: onPressed,
-              child: Text(buttonText),
-            ),
-          ),
-        ],
-      ),
-    );
+  Color _priorityColor(String priority) {
+    switch (priority) {
+      case 'high':
+        return Colors.red;
+      case 'medium':
+        return Colors.orange;
+      case 'low':
+      default:
+        return Colors.green;
+    }
   }
 }

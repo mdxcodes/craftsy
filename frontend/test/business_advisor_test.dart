@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:craftsy/features/home/screens/business_advisor_screen.dart';
 import 'package:craftsy/data/models/product.dart';
 import 'package:craftsy/data/services/api_service.dart';
+import 'package:craftsy/data/services/advisor_service.dart';
 import 'package:craftsy/core/providers/app_providers.dart';
 
 class _FakeProductListNotifier extends StateNotifier<AsyncValue<List<Product>>>
@@ -15,6 +16,16 @@ class _FakeProductListNotifier extends StateNotifier<AsyncValue<List<Product>>>
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeAdvisorService implements AdvisorService {
+  _FakeAdvisorService(this._response);
+  final AdvisorAnalysisResponse _response;
+
+  @override
+  Future<AdvisorAnalysisResponse> analyzeCatalog(List<AdvisorProductSummary> products) async {
+    return _response;
+  }
 }
 
 void main() {
@@ -42,7 +53,7 @@ void main() {
   });
 
   testWidgets(
-    'Business Advisor renders suggestion cards',
+    'Business Advisor renders with products',
     (WidgetTester tester) async {
       final products = [
         Product(
@@ -56,18 +67,27 @@ void main() {
           stock: 3,
           createdAt: DateTime.now(),
         ),
-        Product(
-          id: 'p2',
-          title: 'Bamboo Basket',
-          description: 'Woven basket',
-          price: 300.0,
-          photoPath: '/tmp/basket.jpg',
-          category: 'Bamboo',
-          status: ProductStatus.soldOut,
-          stock: 0,
-          createdAt: DateTime.now(),
-        ),
       ];
+
+      final fakeService = _FakeAdvisorService(
+        AdvisorAnalysisResponse(
+          advice: [
+            AdvisorSuggestion(
+              productId: 'p1',
+              productTitle: 'Handcrafted Vase',
+              adviceType: 'low_stock',
+              priority: 'high',
+              title: 'Low Stock Alert',
+              description: 'Handcrafted Vase\nCurrent Stock: 3\nSuggested Stock: 10',
+              suggestedAction: 'update_stock',
+              suggestedStock: 10,
+              currentStock: 3,
+            ),
+          ],
+          totalProducts: 1,
+          productsNeedingAttention: 1,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -76,6 +96,7 @@ void main() {
             productListProvider.overrideWith(
               (ref) => _FakeProductListNotifier(products),
             ),
+            advisorServiceProvider.overrideWith((_) => fakeService),
           ],
           child: const MaterialApp(
             home: BusinessAdvisorScreen(),
@@ -83,20 +104,16 @@ void main() {
         ),
       );
 
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
 
       expect(find.text('AI Business Advisor'), findsOneWidget);
-      expect(find.text('Here are some suggestions for your business'), findsOneWidget);
-      expect(find.text('Price Review Needed'), findsOneWidget);
       expect(find.text('Low Stock Alert'), findsOneWidget);
-      expect(find.text('Slow Moving Products'), findsOneWidget);
-      expect(find.text('Festival Demand Opportunity'), findsOneWidget);
-      expect(find.text('Ask AI Advisor'), findsOneWidget);
+      expect(find.text('Update Stock'), findsOneWidget);
     },
   );
 
   testWidgets(
-    'Business Advisor shows empty message when no products',
+    'Business Advisor shows empty state when no products',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -112,10 +129,10 @@ void main() {
         ),
       );
 
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
 
       expect(find.text('AI Business Advisor'), findsOneWidget);
-      expect(find.text('Add products to get price recommendations.'), findsOneWidget);
+      expect(find.text('Add products to get personalized business advice.'), findsOneWidget);
     },
   );
 }

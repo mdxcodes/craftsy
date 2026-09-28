@@ -269,6 +269,27 @@ class VoiceGlossaryResponse(BaseModel):
     categories: List[str]
 
 
+class ProductAdviceResponse(BaseModel):
+    product_id: str
+    product_title: str
+    advice_type: str
+    priority: str
+    title: str
+    description: str
+    suggested_action: str
+    suggested_price: Optional[float] = None
+    suggested_stock: Optional[int] = None
+    current_price: Optional[float] = None
+    current_stock: Optional[int] = None
+    category: Optional[str] = None
+
+
+class AdvisorAnalyzeResponse(BaseModel):
+    advice: List[ProductAdviceResponse]
+    total_products: int
+    products_needing_attention: int
+
+
 # ── Social Media Helper Schemas ──────────────────────────────────────────────
 
 

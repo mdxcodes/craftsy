@@ -168,6 +168,8 @@ app.include_router(address_router)
 app.include_router(checkout_router)
 app.include_router(marketplace_router)
 app.include_router(ondc_router)
+from backend.routers.advisor import router as advisor_router
+app.include_router(advisor_router)
 
 
 @app.get("/", tags=["Root"])
