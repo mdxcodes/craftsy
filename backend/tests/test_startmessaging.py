@@ -107,6 +107,23 @@ class TestStartMessagingOtpProvider:
         assert result.request_id == "req_123"
 
     @patch("backend.services.startmessaging_service.requests.post")
+    def test_send_otp_with_template_id(self, mock_post):
+        self.provider.settings.startmessaging_template_id = "6990f1b1-6a28-4cb4-a8ed-35a450a6b59d"
+        mock_post.return_value.status_code = 201
+        mock_post.return_value.json.return_value = {
+            "success": True,
+            "requestId": "req_template",
+        }
+        mock_post.return_value.text = '{"success":true,"requestId":"req_template"}'
+
+        result = self.provider.send_otp("+919876543210")
+        assert result.success is True
+        assert result.request_id == "req_template"
+        mock_post.assert_called_once()
+        call_payload = mock_post.call_args[1]["json"]
+        assert call_payload["templateId"] == "6990f1b1-6a28-4cb4-a8ed-35a450a6b59d"
+
+    @patch("backend.services.startmessaging_service.requests.post")
     def test_send_otp_provider_failure(self, mock_post):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {

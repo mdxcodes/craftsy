@@ -151,6 +151,10 @@ class Settings(BaseSettings):
         default="",
         description="StartMessaging API key for OTP delivery and verification.",
     )
+    startmessaging_template_id: str = Field(
+        default="",
+        description="StartMessaging OTP template ID for SMS delivery (optional).",
+    )
 
     # Models
     llm_model: str = "gemini-3.6-flash"

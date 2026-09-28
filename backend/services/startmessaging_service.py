@@ -110,6 +110,9 @@ class StartMessagingOtpProvider:
 
     # ── Configuration helpers ──────────────────────────────────────────────────
 
+    def _default_template_id(self) -> Optional[str]:
+        return (self.settings.startmessaging_template_id or "").strip() or None
+
     def _api_key(self) -> str:
         key = (self.settings.startmessaging_api_key or "").strip()
         if not key:
@@ -167,13 +170,17 @@ class StartMessagingOtpProvider:
 
         otp = _generate_otp(6)
         api_key = self._api_key()
-        payload = {
+        payload: Dict[str, object] = {
             "phoneNumber": normalized,
             "variables": {
                 "otp": otp,
                 "appName": "Craftsy",
             },
         }
+
+        effective_template = self._default_template_id()
+        if effective_template:
+            payload["templateId"] = effective_template
 
         logger.info(
             "StartMessaging send OTP request: phone=%s",
