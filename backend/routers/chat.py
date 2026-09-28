@@ -176,6 +176,27 @@ async def send_voice_chat_message(
                 language_code="auto",
                 category_hint=None,
             )
+            if transcribe_res.status == "failed":
+                return VoiceChatResponseSchema(
+                    user_transcript="",
+                    reply=(
+                        "आपकी आवाज़ स्पष्ट नहीं सुनाई दी। कृपया माइक्रोफ़ोन के पास आकर दोबारा बोलें।"
+                        if is_hi
+                        else "I could not hear your voice clearly. Please speak closer to the microphone and try again."
+                    ),
+                    action=None,
+                    suggested_queries=[
+                        "नया उत्पाद कैसे जोड़ें?",
+                        "सामान की कीमत कैसे तय होती है?",
+                        "माय कैटलॉग खोलें",
+                    ]
+                    if is_hi
+                    else [
+                        "How do I add a product?",
+                        "How does pricing work?",
+                        "Open my catalogue",
+                    ],
+                )
             user_transcript = (transcribe_res.transcript or "").strip()
             detected_lang = transcribe_res.detected_language or transcribe_res.language_code or "hi"
         except ValueError as ve:

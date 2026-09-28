@@ -120,6 +120,14 @@ async def suggest_price_from_voice(
             language_code=language_code,
             category_hint=category_hint,
         )
+        if transcribe_res.status == "failed":
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error_code": transcribe_res.error_code or "transcription_failed",
+                    "message": "Voice transcription failed. Please try again.",
+                },
+            )
 
         # 4. Generate listing for English description & category
         listing_res = await catalog_service.generate_listing(

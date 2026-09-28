@@ -1432,7 +1432,7 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
             const Duration(seconds: 20),
             onTimeout: () {
               debugPrint('[AddProductFlow] Direct transcription timed out.');
-              return const TranscriptionResult(transcript: '', confidence: 0);
+              return const TranscriptionResult(transcript: '', confidence: 0, errorCode: 'transcription_failed');
             },
           );
       final transcript = result.transcript;

@@ -89,6 +89,15 @@ class Settings(BaseSettings):
         ),
     )
 
+    # ── Silence Detection ───────────────────────────────────────────────
+    silence_threshold_db: float = Field(
+        default=-50.0,
+        description=(
+            "Maximum volume in dB below which audio is considered silent. "
+            "Mobile recordings in noisy environments may have max_volume between -40dB and -50dB."
+        ),
+    )
+
     model_config = {
         "env_file": str(VOICE_ROOT.parents[1] / ".env"),
         "env_file_encoding": "utf-8",

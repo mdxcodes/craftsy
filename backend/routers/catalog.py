@@ -99,15 +99,35 @@ async def transcribe_voice_note(
         if not local_path:
             raise HTTPException(status_code=500, detail="Failed to locate saved audio")
 
-        return await catalog_service.transcribe_audio(
+        response = await catalog_service.transcribe_audio(
             audio_file_path=str(local_path),
             language_code=language_code,
             category_hint=category_hint,
         )
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+        if response.status == "failed" and response.error_code:
+            raise HTTPException(status_code=400, detail={
+                "error_code": response.error_code,
+                "message": _get_error_message(response.error_code),
+            })
+        return response
+    except HTTPException:
+        raise
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=400, detail={"error_code": "invalid_audio", "message": str(e)})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Audio transcription failed: {str(e)}")
+
+
+def _get_error_message(error_code: str) -> str:
+    """Map error codes to user-friendly messages."""
+    messages = {
+        "silent_audio": "No audible speech detected. Please speak closer to the microphone.",
+        "invalid_audio": "Invalid or empty audio file. Please try recording again.",
+        "missing_transcription_config": "Speech transcription is not configured. Please contact support.",
+        "transcription_failed": "Transcription failed. Please try again.",
+        "empty_transcript": "No speech was detected in the recording. Please try again.",
+    }
+    return messages.get(error_code, "Voice transcription failed.")
 
 
 @router.post("/generate-listing", response_model=ListingGenerateResponse)
@@ -145,6 +165,11 @@ async def voice_to_listing(
             language_code=language_code,
             category_hint=category_hint,
         )
+        if transcribe_res.status == "failed" and transcribe_res.error_code:
+            raise HTTPException(status_code=400, detail={
+                "error_code": transcribe_res.error_code,
+                "message": _get_error_message(transcribe_res.error_code),
+            })
 
         return await catalog_service.generate_listing(
             ListingGenerateRequest(
@@ -153,8 +178,8 @@ async def voice_to_listing(
                 category_hint=category_hint,
             )
         )
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Voice to listing failed: {str(e)}")
 

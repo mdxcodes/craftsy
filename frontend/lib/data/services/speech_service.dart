@@ -8,10 +8,12 @@ import '../../core/config/api_config.dart';
 class TranscriptionResult {
   final String transcript;
   final double confidence; // 0.0–1.0
+  final String? errorCode;
 
   const TranscriptionResult({
     required this.transcript,
     required this.confidence,
+    this.errorCode,
   });
 }
 
@@ -276,12 +278,28 @@ class HttpSpeechService implements SpeechService {
           debugPrint(
             '[HttpSpeechService] Filtered silence hallucination: "$transcript"',
           );
-          return const TranscriptionResult(transcript: '', confidence: 0.0);
+          return const TranscriptionResult(transcript: '', confidence: 0.0, errorCode: 'silent_audio');
         }
 
         return TranscriptionResult(
           transcript: transcript,
           confidence: transcript.isNotEmpty ? 0.95 : 0.0,
+        );
+      }
+
+      if (response.statusCode == 400 && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final detail = data['detail'];
+        String? errorCode;
+        if (detail is Map<String, dynamic>) {
+          errorCode = detail['error_code'] as String?;
+        }
+        final message = detail is String ? detail : (detail?['message'] as String? ?? 'Transcription failed');
+        debugPrint('[HttpSpeechService] Transcription error: $errorCode - $message');
+        return TranscriptionResult(
+          transcript: '',
+          confidence: 0.0,
+          errorCode: errorCode,
         );
       }
     } catch (e) {

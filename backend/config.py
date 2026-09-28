@@ -103,6 +103,13 @@ class Settings(BaseSettings):
         default=["hi", "ta", "bn", "mr", "te", "gu", "kn", "ml", "pa", "or"],
         description="Language codes accepted by the voice pipeline.",
     )
+    silence_threshold_db: float = Field(
+        default=-50.0,
+        description=(
+            "Maximum volume in dB below which audio is considered silent. "
+            "Mobile recordings in noisy environments may have max_volume between -40dB and -50dB."
+        ),
+    )
 
     # Groq Cloud LLM Settings
     groq_api_key: str = Field(

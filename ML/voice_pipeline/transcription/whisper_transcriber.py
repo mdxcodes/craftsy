@@ -69,10 +69,15 @@ class WhisperTranscriber(BaseTranscriber):
         self.settings = get_settings()
 
     @staticmethod
-    def _is_audio_silent(path: Path) -> bool:
+    def _is_audio_silent(path: Path, threshold_db: float = -50.0) -> bool:
         """
         Quick volume check using ffmpeg's volumedetect filter.
-        Returns True if max volume is below -40dB (essentially silent/ambient).
+        Returns True if max volume is below threshold_db (essentially silent/ambient).
+
+        Args:
+            path: Path to the audio file.
+            threshold_db: Maximum volume in dB below which audio is considered silent.
+                         Defaults to -50.0 to accommodate mobile recordings in noisy environments.
         """
         try:
             cmd = [
@@ -89,7 +94,7 @@ class WhisperTranscriber(BaseTranscriber):
                 if "max_volume:" in line:
                     val_str = line.split("max_volume:")[1].replace("dB", "").strip()
                     max_vol = float(val_str)
-                    return max_vol < -40.0
+                    return max_vol < threshold_db
         except Exception:
             pass
         return False
@@ -135,8 +140,9 @@ class WhisperTranscriber(BaseTranscriber):
 
         url = f"{self.settings.whisper_base_url.rstrip('/')}/audio/transcriptions"
         path = Path(note.audio_path)
-        if self._is_audio_silent(path):
-            logger.warning("Audio note %s has no audible sound (silent). Skipping Whisper.", note.id)
+        silence_threshold = getattr(self.settings, 'silence_threshold_db', -50.0)
+        if self._is_audio_silent(path, silence_threshold):
+            logger.warning("Audio note %s has no audible sound (silent, threshold=%.1fdB). Skipping Whisper.", note.id, silence_threshold)
             return self.fallback_transcript(
                 note, "No audible speech detected. Please speak closer to the microphone."
             )

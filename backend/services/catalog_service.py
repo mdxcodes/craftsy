@@ -117,8 +117,14 @@ class CatalogService:
     # ── Voice Transcription (ML Voice Pipeline) ─────────────────────────────
 
     @staticmethod
-    def _is_audio_silent(path: Path) -> bool:
-        """Check if audio has no audible sound using ffmpeg volumedetect."""
+    def _is_audio_silent(path: Path, threshold_db: float = -50.0) -> bool:
+        """Check if audio has no audible sound using ffmpeg volumedetect.
+
+        Args:
+            path: Path to the audio file.
+            threshold_db: Maximum volume in dB below which audio is considered silent.
+                         Defaults to -50.0 to accommodate mobile recordings in noisy environments.
+        """
         try:
             result = subprocess.run(
                 [
@@ -136,7 +142,7 @@ class CatalogService:
                     if len(parts) > 1:
                         vol_str = parts[1].replace("dB", "").strip()
                         max_vol = float(vol_str)
-                        return max_vol < -40.0
+                        return max_vol < threshold_db
         except Exception:
             pass
         return False
@@ -183,11 +189,25 @@ class CatalogService:
         if not path.exists():
             raise FileNotFoundError(f"Audio file not found: {audio_file_path}")
 
-        # Check for silent audio before running heavy Whisper processing (non-blocking threadpool)
-        is_silent = await run_in_threadpool(self._is_audio_silent, path)
+        if path.stat().st_size == 0:
+            return AudioTranscribeResponse(
+                transcript="",
+                language_code=language_code,
+                status="failed",
+                error_code="invalid_audio",
+            )
+
+        silence_threshold = getattr(self.settings, 'silence_threshold_db', -50.0)
+
+        is_silent = await run_in_threadpool(self._is_audio_silent, path, silence_threshold)
         if is_silent:
-            logger.warning("Audio file %s is silent (volume < -40dB). Aborting transcription.", path.name)
-            raise ValueError("No audible speech detected. Please speak closer to the microphone.")
+            logger.warning("Audio file %s is silent (volume < %.1fdB). Aborting transcription.", path.name, silence_threshold)
+            return AudioTranscribeResponse(
+                transcript="",
+                language_code=language_code,
+                status="failed",
+                error_code="silent_audio",
+            )
 
         result = await run_in_threadpool(
             self.voice_processor.process_voice_note,
@@ -200,12 +220,23 @@ class CatalogService:
         if result.status == JobStatus.FAILED or not result.transcript or not result.transcript.is_usable():
             error_msg = result.error or "Voice transcription failed or returned empty transcript."
             logger.error("Voice pipeline transcription failure: %s", error_msg)
-            raise ValueError(error_msg)
+            error_code = "missing_transcription_config" if "not configured" in (error_msg or "").lower() else "transcription_failed"
+            return AudioTranscribeResponse(
+                transcript="",
+                language_code=language_code,
+                status="failed",
+                error_code=error_code,
+            )
 
         transcript_text = result.transcript.text.strip()
         if self._is_silence_hallucination(transcript_text):
             logger.warning("Whisper silence hallucination detected: '%s'. Aborting transcription.", transcript_text)
-            raise ValueError("No audible speech detected. Please speak closer to the microphone.")
+            return AudioTranscribeResponse(
+                transcript="",
+                language_code=language_code,
+                status="failed",
+                error_code="silent_audio",
+            )
 
         return AudioTranscribeResponse(
             transcript=transcript_text,
@@ -617,6 +648,8 @@ Return ONLY a valid JSON object matching keys: materials, labor_hours, hourly_ra
             language_code=language_code,
             category_hint=category_hint,
         )
+        if transcribe_res.status == "failed":
+            raise ValueError(transcribe_res.error_code or "transcription_failed")
         transcript = transcribe_res.transcript
 
         # Step 2: Generate Bilingual Listing (Description, Tags, Title, Category)

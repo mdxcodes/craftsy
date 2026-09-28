@@ -214,6 +214,7 @@ class AudioTranscribeResponse(BaseModel):
     provider: Optional[str] = "whisper"
     is_fallback: bool = False
     status: str = "completed"
+    error_code: Optional[str] = None
 
 
 class ListingGenerateRequest(BaseModel):
