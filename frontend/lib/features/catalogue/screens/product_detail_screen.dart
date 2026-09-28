@@ -11,6 +11,7 @@ import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
 import '../../../core/widgets/visual_status_chip.dart';
 import '../../../core/widgets/motifs/craft_category_badge.dart';
+import '../../../core/widgets/formatted_description.dart';
 import '../../commerce/widgets/where_i_sell_section.dart';
 import '../../../core/providers/commerce_hub_provider.dart';
 import '../../../core/providers/app_providers.dart';
@@ -1033,8 +1034,8 @@ class ProductDetailScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            product.description,
+                          FormattedDescription(
+                            text: product.description,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.ink,
                               height: 1.5,
@@ -1042,8 +1043,8 @@ class ProductDetailScreen extends ConsumerWidget {
                           ),
                           if (product.descriptionHi.isNotEmpty) ...[
                             const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              product.descriptionHi,
+                            FormattedDescription(
+                              text: product.descriptionHi,
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.inkSoft,
                                 height: 1.5,

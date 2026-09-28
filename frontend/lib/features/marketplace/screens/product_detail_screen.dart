@@ -11,6 +11,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/accessibility/accessibility_tokens.dart';
+import '../../../core/widgets/formatted_description.dart';
 
 /// Fetches one live product by id from the public marketplace API.
 final productDetailProvider = FutureProvider.autoDispose
@@ -244,14 +245,14 @@ class _ProductDetailBody extends StatelessWidget {
                         ],
                       ),
 
-                      // Description
-                      if (product.description.isNotEmpty) ...[
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          product.description,
-                          style: AppTextStyles.bodyMedium,
-                        ),
-                      ],
+                       // Description
+                       if (product.description.isNotEmpty) ...[
+                         const SizedBox(height: AppSpacing.lg),
+                         FormattedDescription(
+                           text: product.description,
+                           style: AppTextStyles.bodyMedium,
+                         ),
+                       ],
 
                       // Quantity selector
                       const SizedBox(height: AppSpacing.lg),

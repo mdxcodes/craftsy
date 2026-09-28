@@ -295,7 +295,11 @@ class CatalogService:
         result = re.sub(r"\s+([,.;:?!।])", r"\1", result)
         result = re.sub(r"[,;]\s*[,;]+", ", ", result)
         result = re.sub(r"\.\s*\.+", ". ", result)
-        result = re.sub(r"\s{2,}", " ", result)
+        # Preserve paragraph breaks, but collapse multiple blank lines to exactly two newlines
+        result = re.sub(r"\n{3,}", "\n\n", result)
+        result = re.sub(r"[ \t]+\n", "\n", result)
+        result = re.sub(r"\n[ \t]+", "\n", result)
+        result = "\n\n".join(p.strip() for p in result.split("\n\n") if p.strip())
         return result.strip(" ,.-;")
 
     @staticmethod
@@ -379,11 +383,13 @@ CRITICAL DIRECTIVES & COMPREHENSIVE RULES:
    - NEVER put prices, discounts, cost words, or marketing hyperbole ("Best", "Cheap", "Only ₹500") in titles.
 
 3. RICH BILINGUAL E-COMMERCE STORYTELLING DESCRIPTIONS:
-   - description_en: 2-3 engaging, cohesive paragraphs covering:
-     * Paragraph 1 - Art Heritage & Identity: The cultural story, regional tradition, and distinctive personality of the handcrafted piece.
-     * Paragraph 2 - Materials & Artisanal Craftsmanship: Specific materials (e.g., seasoned Indian rosewood, pure mulberry silk, organic natural dyes, hand-hammered brass) and master techniques employed.
-     * Paragraph 3 - Utility, Decor & Styling: Practical dimensions, styling ideas for contemporary home decor, gifting occasions, and care instructions.
-   - description_hi: Expressive, dignified, warm Hindi in Devanagari script honoring the artisan's skill (शिल्प कौशल), traditional heritage (पारंपरिक धरोहर), and natural materials (प्राकृतिक सामग्री). Do NOT use literal robotic translations.
+    - description_en: 2-3 engaging, cohesive paragraphs covering:
+      * Paragraph 1 - Art Heritage & Identity: The cultural story, regional tradition, and distinctive personality of the handcrafted piece.
+      * Paragraph 2 - Materials & Artisanal Craftsmanship: Specific materials (e.g., seasoned Indian rosewood, pure mulberry silk, organic natural dyes, hand-hammered brass) and master techniques employed.
+      * Paragraph 3 - Utility, Decor & Styling: Practical dimensions, styling ideas for contemporary home decor, gifting occasions, and care instructions.
+      FORMATTING RULE: Separate every paragraph with exactly two newlines (\n\n). Do NOT return a single solid wall of text. Use clear paragraph breaks so the description is easy to read on mobile.
+    - description_hi: Expressive, dignified, warm Hindi in Devanagari script honoring the artisan's skill (शिल्प कौशल), traditional heritage (पारंपरिक धरोहर), and natural materials (प्राकृतिक सामग्री). Do NOT use literal robotic translations.
+      FORMATTING RULE: Separate every paragraph with exactly two newlines (\n\n). Do NOT return a single solid wall of text.
 
 4. PRECISE CATEGORY CLASSIFICATION & ANTI-BIAS ENFORCEMENT:
    - Identify the exact craft category from standard Indian crafts:
