@@ -1161,9 +1161,8 @@ class AddProductFlowNotifier extends StateNotifier<AddProductDraft> {
       final pricing = result?['pricing'] as Map<String, dynamic>?;
       final suggestedPrice = (pricing?['suggested_price'] as num?)?.toDouble();
       final floorPrice = (pricing?['floor_price'] as num?)?.toDouble();
-      final priceRange = pricing?['price_range'] as Map<String, dynamic>?;
-      final minPrice = (priceRange?['min'] as num?)?.toDouble();
-      final maxPrice = (priceRange?['max'] as num?)?.toDouble();
+      final minPrice = (pricing?['min_price'] as num?)?.toDouble();
+      final maxPrice = (pricing?['max_price'] as num?)?.toDouble();
       final reasoning = pricing?['reasoning'] as String?;
       final reasoningHi = pricing?['reasoning_hi'] as String?;
 

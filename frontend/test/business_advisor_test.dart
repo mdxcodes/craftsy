@@ -115,7 +115,7 @@ void main() {
       await tester.pump(const Duration(seconds: 2));
 
       expect(find.text('AI Business Advisor'), findsOneWidget);
-      expect(find.text('Add a product to get a price recommendation.'), findsOneWidget);
+      expect(find.text('Add products to get price recommendations.'), findsOneWidget);
     },
   );
 }

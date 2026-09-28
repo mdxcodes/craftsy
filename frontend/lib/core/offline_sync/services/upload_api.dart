@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+
 import '../../config/api_config.dart';
-import '../../../../data/services/speech_service.dart';
 import '../models/queue_item.dart';
 
 /// Result of the initial upload call.
@@ -249,45 +249,30 @@ class RealUploadApi implements UploadApi {
       'language_code': 'auto',
     });
 
-    try {
-      final response = await _dio.post(
-        '/api/v1/voice/transcribe',
-        data: formData,
-      );
-      final data = response.data as Map<String, dynamic>;
+    final response = await _dio.post(
+      '/api/v1/catalog/voice-to-product',
+      data: formData,
+    );
+    final data = response.data as Map<String, dynamic>;
 
-      final rawTranscript = (data['transcript'] as String? ?? '').trim();
-      final cleanTranscript =
-          HttpSpeechService.isSilenceHallucination(rawTranscript)
-          ? ''
-          : rawTranscript;
+    final resultPayload = <String, dynamic>{
+      'transcript': (data['transcript'] as String? ?? '').trim(),
+      'language_code': data['language_code'] ?? 'hi',
+      'status': data['status'] ?? 'completed',
+      'title_en': data['title_en'] as String? ?? '',
+      'title_hi': data['title_hi'] as String? ?? '',
+      'description_en': data['description_en'] as String? ?? '',
+      'description_hi': data['description_hi'] as String? ?? '',
+      'category': data['category'] as String? ?? '',
+      'tags': List<String>.from(data['tags'] as List<dynamic>? ?? const []),
+      'pricing': data['pricing'] as Map<String, dynamic>? ?? const {},
+    };
 
-      return UploadResult(
-        jobId: idempotencyKey,
-        immediatelyCompleted: data['status'] == 'completed',
-        resultPayload: {
-          'transcript': cleanTranscript,
-          'language_code': data['language_code'] ?? 'hi',
-          'status': data['status'] ?? 'completed',
-        },
-      );
-    } catch (e) {
-      // Fallback to /api/v1/voice/process if transcribe endpoint differs
-      try {
-        final fallbackResponse = await _dio.post(
-          '/api/v1/voice/process',
-          data: formData,
-        );
-        final data = fallbackResponse.data as Map<String, dynamic>;
-        return UploadResult(
-          jobId: idempotencyKey,
-          immediatelyCompleted: data['status'] == 'completed',
-          resultPayload: data,
-        );
-      } catch (_) {
-        rethrow;
-      }
-    }
+    return UploadResult(
+      jobId: idempotencyKey,
+      immediatelyCompleted: (data['status'] as String? ?? 'completed') == 'completed',
+      resultPayload: resultPayload,
+    );
   }
 
   @override
