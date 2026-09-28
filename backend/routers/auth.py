@@ -1,16 +1,19 @@
 """
 Authentication and User Profile Router for Craftsy.
 
-Uses the ArtisanDB table for persistent artisan registration and lookup.
-OTP verification is still demo-mode (accepts any 6-digit code).
+Integrates with MSG91 for real OTP delivery and verification.
+Craftsy remains responsible for its own users, sessions, and JWTs;
+MSG91 is used only for OTP delivery and verification.
 """
 
-import uuid
-from datetime import datetime
-from typing import Optional
+import logging
+import time
+from typing import Dict, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from ..config import get_settings
 from ..database import get_db
 from ..models.db_models import ArtisanDB
 from ..models.schemas import (
@@ -19,7 +22,10 @@ from ..models.schemas import (
     OtpVerifyRequest,
     ArtisanProfileResponse,
 )
+from ..services.msg91_service import Msg91ConfigError, Msg91Service, Msg91VerifyResult
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 
 class CustomerRegisterRequest(BaseModel):
@@ -28,7 +34,35 @@ class CustomerRegisterRequest(BaseModel):
     preferred_language: Optional[str] = Field(default="en", description="Preferred app language")
 
 
+class ResendOtpRequest(BaseModel):
+    phone: str = Field(..., description="10-digit mobile number")
+
+
+class AuthResponse(BaseModel):
+    status: str
+    access_token: str
+    token_type: str = "bearer"
+    artisan: ArtisanProfileResponse
+
+
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication & Artisans"])
+
+
+def _normalize_phone(phone: str) -> str:
+    """Normalize phone to a consistent 10-digit string."""
+    digits = "".join(ch for ch in (phone or "") if ch.isdigit())
+    if len(digits) >= 10:
+        return digits[-10:]
+    return digits
+
+
+def _get_msg91() -> Msg91Service:
+    return Msg91Service()
+
+
+def _issue_token_for_artisan(artisan: ArtisanDB) -> str:
+    """Return the existing mock token for the artisan."""
+    return f"mock_jwt_token_{artisan.phone}"
 
 
 @router.post(
@@ -42,14 +76,13 @@ async def register_artisan(
     request: ArtisanRegisterRequest,
     db: Session = Depends(get_db),
 ):
-    phone_clean = request.phone.strip()
-    if len(phone_clean) < 10:
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid phone number. Must be at least 10 digits.",
+            detail="Invalid phone number. Must be exactly 10 digits.",
         )
 
-    # Check if phone already registered
     existing = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
     if existing:
         raise HTTPException(
@@ -58,7 +91,7 @@ async def register_artisan(
         )
 
     artisan = ArtisanDB(
-        id=f"artisan_{uuid.uuid4().hex[:10]}",
+        id=f"artisan_{_normalize_phone(request.phone)}",
         name=request.name,
         phone=phone_clean,
         craft_type=request.craft_type,
@@ -86,14 +119,13 @@ async def register_consumer(
     request: CustomerRegisterRequest,
     db: Session = Depends(get_db),
 ):
-    phone_clean = request.phone.strip()
-    if len(phone_clean) < 10:
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid phone number. Must be at least 10 digits.",
+            detail="Invalid phone number. Must be exactly 10 digits.",
         )
 
-    # Check if phone already registered
     existing = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
     if existing:
         raise HTTPException(
@@ -102,7 +134,7 @@ async def register_consumer(
         )
 
     artisan = ArtisanDB(
-        id=f"customer_{uuid.uuid4().hex[:10]}",
+        id=f"customer_{phone_clean}",
         name=request.name,
         phone=phone_clean,
         preferred_language=request.preferred_language or "en",
@@ -118,20 +150,19 @@ async def register_consumer(
 @router.post(
     "/login",
     summary="Request login OTP",
-    description="Requests an OTP for an existing registered phone number.",
+    description="Sends a real OTP to the registered phone number via MSG91.",
 )
 async def login_artisan(
     request: ArtisanLoginRequest,
     db: Session = Depends(get_db),
 ):
-    phone_clean = request.phone.strip()
-    if len(phone_clean) < 10:
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid phone number.",
+            detail="Invalid phone number. Must be exactly 10 digits.",
         )
 
-    # Verify phone exists in database
     artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
     if not artisan:
         raise HTTPException(
@@ -139,26 +170,52 @@ async def login_artisan(
             detail="No artisan registered with this phone number.",
         )
 
+    msg91 = _get_msg91()
+    if not msg91.is_configured():
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="OTP service is not configured on the server.",
+        )
+
+    send_result = msg91.send_otp(f"+91{phone_clean}")
+    if not send_result.success:
+        status_code = status.HTTP_502_BAD_GATEWAY
+        if send_result.error_code == "MISSING_CONFIG":
+            status_code = status.HTTP_501_NOT_IMPLEMENTED
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "error_code": send_result.error_code,
+                "message": send_result.message,
+            },
+        )
+
     return {
         "status": "success",
-        "message": "OTP sent for login.",
+        "message": "OTP sent successfully.",
         "phone": phone_clean,
         "otp_sent": True,
-        "demo_otp": "123456",
     }
 
 
 @router.post(
     "/verify-otp",
+    response_model=AuthResponse,
     summary="Verify phone OTP",
-    description="Validates OTP and returns artisan session profile.",
+    description="Verifies OTP with MSG91 and returns artisan session profile.",
 )
 async def verify_otp(
     request: OtpVerifyRequest,
     db: Session = Depends(get_db),
 ):
-    phone_clean = request.phone.strip()
-    if len(request.otp) != 6:
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    if not request.otp or not request.otp.isdigit() or len(request.otp) != 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid OTP format. Must be 6 digits.",
@@ -171,11 +228,72 @@ async def verify_otp(
             detail="No artisan registered with this phone number. Please register first.",
         )
 
+    msg91 = _get_msg91()
+    if not msg91.is_configured():
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="OTP service is not configured on the server.",
+        )
+
+    verify_result: Msg91VerifyResult = msg91.verify_otp(
+        f"+91{phone_clean}", request.otp
+    )
+    if not verify_result.success:
+        status_code = status.HTTP_400_BAD_REQUEST
+        if verify_result.error_code == "OTP_PROVIDER_UNAVAILABLE":
+            status_code = status.HTTP_502_BAD_GATEWAY
+        detail = {
+            "error_code": verify_result.error_code,
+            "message": verify_result.message,
+        }
+        raise HTTPException(status_code=status_code, detail=detail)
+
+    return AuthResponse(
+        status="success",
+        access_token=_issue_token_for_artisan(artisan),
+        artisan=ArtisanProfileResponse.model_validate(artisan),
+    )
+
+
+@router.post(
+    "/resend-otp",
+    summary="Resend OTP",
+    description="Resends the current OTP to the registered phone number via MSG91.",
+)
+async def resend_otp(
+    request: ResendOtpRequest,
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    msg91 = _get_msg91()
+    if not msg91.is_configured():
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="OTP service is not configured on the server.",
+        )
+
+    send_result = msg91.resend_otp(f"+91{phone_clean}")
+    if not send_result.success:
+        status_code = status.HTTP_502_BAD_GATEWAY
+        if send_result.error_code == "MISSING_CONFIG":
+            status_code = status.HTTP_501_NOT_IMPLEMENTED
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "error_code": send_result.error_code,
+                "message": send_result.message,
+            },
+        )
+
     return {
         "status": "success",
-        "access_token": f"mock_jwt_token_{phone_clean}",
-        "token_type": "bearer",
-        "artisan": ArtisanProfileResponse.model_validate(artisan).model_dump(),
+        "message": "OTP resent successfully.",
+        "phone": phone_clean,
     }
 
 

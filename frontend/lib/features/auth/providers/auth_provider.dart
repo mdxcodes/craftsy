@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/repositories/auth_repository.dart';
 
@@ -10,6 +12,8 @@ class AuthState {
   final String? phoneNumber;
   final bool isLoading;
   final UserProfile? pendingRegistration;
+  final String? errorMessage;
+  final int? resendCooldownSeconds;
 
   const AuthState({
     this.isAuthenticated = false,
@@ -17,6 +21,8 @@ class AuthState {
     this.phoneNumber,
     this.isLoading = false,
     this.pendingRegistration,
+    this.errorMessage,
+    this.resendCooldownSeconds,
   });
 
   AuthState copyWith({
@@ -25,6 +31,10 @@ class AuthState {
     String? phoneNumber,
     bool? isLoading,
     UserProfile? Function()? pendingRegistration,
+    String? errorMessage,
+    int? resendCooldownSeconds,
+    bool clearErrorMessage = false,
+    bool clearResendCooldown = false,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -34,6 +44,10 @@ class AuthState {
       pendingRegistration: pendingRegistration != null
           ? pendingRegistration()
           : this.pendingRegistration,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+      resendCooldownSeconds: clearResendCooldown
+          ? null
+          : (resendCooldownSeconds ?? this.resendCooldownSeconds),
     );
   }
 }
@@ -59,11 +73,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signInWithPhone(String phoneNumber) async {
-    state = state.copyWith(isLoading: true, pendingRegistration: () => null);
+    state = state.copyWith(
+      isLoading: true,
+      pendingRegistration: () => null,
+      errorMessage: null,
+      resendCooldownSeconds: null,
+    );
     await _authRepository.savePhoneNumber(phoneNumber);
     // Request OTP from backend (if server is reachable)
-    await _authRepository.requestOtp(phoneNumber);
-    state = state.copyWith(phoneNumber: phoneNumber, isLoading: false);
+    final result = await _authRepository.requestOtp(phoneNumber);
+    if (result == null) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'otp_send_failed'.tr(),
+      );
+      return;
+    }
+    state = state.copyWith(
+      phoneNumber: phoneNumber,
+      isLoading: false,
+      errorMessage: null,
+    );
   }
 
   Future<void> registerWithDetails(UserProfile profile) async {
@@ -71,6 +101,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isLoading: true,
       pendingRegistration: () => profile,
       phoneNumber: profile.phone,
+      errorMessage: null,
+      resendCooldownSeconds: null,
     );
     await _authRepository.savePhoneNumber(profile.phone);
     // Attempt registration on backend
@@ -86,7 +118,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String otp, {
     UserProfile? profileOverride,
   }) async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+      resendCooldownSeconds: null,
+    );
 
     final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
     final registrationProfile = profileOverride ?? state.pendingRegistration;
@@ -102,18 +138,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
 
     // 2. Call backend /api/v1/auth/verify-otp
-    final (backendProfile, token) = await _authRepository.verifyOtpWithBackend(
-      effectivePhone,
-      otp,
-    );
+    UserProfile? backendProfile;
+    String? token;
+    try {
+      (backendProfile, token) = await _authRepository.verifyOtpWithBackend(
+        effectivePhone,
+        otp,
+      );
+    } on DioException catch (e) {
+      String message = 'otp_send_failed'.tr();
+      if (e.response?.data is Map) {
+        final detail = (e.response?.data as Map)['detail'];
+        if (detail is Map) {
+          message = detail['message'] as String? ?? message;
+        } else if (detail is String) {
+          message = detail;
+        }
+      } else if (e.error is String && (e.error as String).isNotEmpty) {
+        message = e.error as String;
+      }
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: message,
+      );
+      return false;
+    }
 
     // 3. Resolve profile: backend response > pending registration > local fallback
+    final currentPending = state.pendingRegistration;
     final resolvedProfile =
         backendProfile ??
-        (registrationProfile != null
-            ? registrationProfile.copyWith(
-                id: registrationProfile.id.isNotEmpty
-                    ? registrationProfile.id
+        (currentPending != null
+            ? currentPending.copyWith(
+                id: currentPending.id.isNotEmpty
+                    ? currentPending.id
                     : 'artisan_${DateTime.now().millisecondsSinceEpoch}',
                 phone: effectivePhone,
               )
@@ -147,6 +205,63 @@ class AuthNotifier extends StateNotifier<AuthState> {
       pendingRegistration: () => null,
     );
     return true;
+  }
+
+  Future<void> resendOtp(String phoneNumber) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+      resendCooldownSeconds: null,
+    );
+
+    final result = await _authRepository.resendOtp(phoneNumber);
+    state = state.copyWith(isLoading: false);
+
+    if (result == null) {
+      state = state.copyWith(
+        errorMessage: 'otp_send_failed'.tr(),
+      );
+      return;
+    }
+
+    final cooldown = result['cooldown_seconds'] as int?;
+    if (cooldown != null && cooldown > 0) {
+      state = state.copyWith(
+        resendCooldownSeconds: cooldown,
+      );
+      _startCooldown(cooldown);
+      return;
+    }
+
+    state = state.copyWith(
+      errorMessage: null,
+    );
+  }
+
+  void _startCooldown(int seconds) {
+    Future.doWhile(() async {
+      if (state.resendCooldownSeconds == null) {
+        return false;
+      }
+      await Future.delayed(const Duration(seconds: 1));
+      final remaining = (state.resendCooldownSeconds ?? 1) - 1;
+      if (remaining <= 0) {
+        state = state.copyWith(
+          resendCooldownSeconds: null,
+          clearResendCooldown: true,
+        );
+        return false;
+      }
+      state = state.copyWith(resendCooldownSeconds: remaining);
+      return true;
+    });
+  }
+
+  void clearError() {
+    state = state.copyWith(
+      errorMessage: null,
+      clearErrorMessage: true,
+    );
   }
 
   Future<void> signInWithCoordinator(String coordinatorId) async {

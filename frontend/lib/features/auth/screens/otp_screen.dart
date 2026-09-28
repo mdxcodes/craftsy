@@ -44,9 +44,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   void _handleOtpComplete() async {
-    var otp = _controllers.map((c) => c.text).join();
+    final otp = _controllers.map((c) => c.text).join();
     if (otp.isEmpty) {
-      otp = '123456';
+      return;
     }
     final notifier = ref.read(authStateProvider.notifier);
     await notifier.verifyOtp(
@@ -54,14 +54,34 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       otp,
     );
     await ref.read(userProfileProvider.notifier).reloadProfile();
-    if (mounted) {
+    if (mounted && ref.read(authStateProvider).isAuthenticated) {
       context.goNamed(AppRouteConstants.home);
+    }
+  }
+
+  Future<void> _handleResendOtp() async {
+    final authState = ref.read(authStateProvider);
+    if (authState.resendCooldownSeconds != null && authState.resendCooldownSeconds! > 0) {
+      return;
+    }
+    final notifier = ref.read(authStateProvider.notifier);
+    await notifier.resendOtp(
+      widget.phoneNumber.isEmpty ? '9876543210' : widget.phoneNumber,
+    );
+    if (mounted) {
+      final result = ref.read(authStateProvider);
+      if (result.errorMessage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('otp_resent'.tr())),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
+    final cooldown = authState.resendCooldownSeconds ?? 0;
 
     return AppScaffold(
       rawAppBar: AppBar(
@@ -99,7 +119,24 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             ),
             const SizedBox(height: AppSpacing.xxl),
 
-            // OTP Input Boxes
+            if (authState.errorMessage != null)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppRadii.md),
+                ),
+                child: Text(
+                  authState.errorMessage!,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.error,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            if (authState.errorMessage != null)
+              const SizedBox(height: AppSpacing.md),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(6, (index) {
@@ -145,31 +182,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
             const SizedBox(height: AppSpacing.md),
 
-            AppButton(
-              label: 'resend_otp'.tr(),
-              type: AppButtonType.text,
-              onPressed: () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('otp_resent_mock'.tr())));
-              },
+            TextButton(
+              onPressed: cooldown > 0 ? null : _handleResendOtp,
+              child: Text(
+                cooldown > 0
+                    ? 'resend_otp_cooldown'.tr(args: [cooldown.toString()])
+                    : 'resend_otp'.tr(),
+              ),
             ),
 
             const SizedBox(height: AppSpacing.xxl),
-
-            // Debug hint
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(AppRadii.sm),
-              ),
-              child: Text(
-                'debug_otp_hint'.tr(),
-                style: AppTextStyles.caption,
-                textAlign: TextAlign.center,
-              ),
-            ),
           ],
         ),
       ),

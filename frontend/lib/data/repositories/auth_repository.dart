@@ -144,6 +144,29 @@ class AuthRepository {
     return null;
   }
 
+  /// Resends OTP via `/api/v1/auth/resend-otp`
+  Future<Map<String, dynamic>?> resendOtp(String phoneNumber) async {
+    _syncBaseUrl();
+    final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    try {
+      debugPrint(
+        '[AuthRepository] POST ${_dio.options.baseUrl}/api/v1/auth/resend-otp',
+      );
+      final response = await _dio.post(
+        '/api/v1/auth/resend-otp',
+        data: {'phone': cleanPhone},
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        return Map<String, dynamic>.from(response.data as Map);
+      }
+    } on DioException catch (e) {
+      debugPrint('[AuthRepository] resendOtp failed: ${e.message}');
+    } catch (e) {
+      debugPrint('[AuthRepository] resendOtp unexpected error: $e');
+    }
+    return null;
+  }
+
   /// Verifies OTP with backend `/api/v1/auth/verify-otp`
   Future<(UserProfile?, String?)> verifyOtpWithBackend(
     String phoneNumber,
@@ -171,6 +194,26 @@ class AuthRepository {
             ? UserProfile.fromJson(artisanMap)
             : null;
         return (profile, token);
+      }
+
+      if (response.statusCode == 400 && response.data != null) {
+        final data = Map<String, dynamic>.from(response.data as Map);
+        final detail = data['detail'];
+        String message;
+        if (detail is Map<String, dynamic>) {
+          message = detail['message'] as String? ?? 'OTP verification failed.';
+        } else if (detail is String) {
+          message = detail;
+        } else {
+          message = 'OTP verification failed.';
+        }
+        debugPrint('[AuthRepository] verifyOtpWithBackend client error: $message');
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: message,
+        );
       }
     } on DioException catch (e) {
       debugPrint('[AuthRepository] verifyOtpWithBackend failed: ${e.message}');
