@@ -14,6 +14,7 @@ class AuthState {
   final UserProfile? pendingRegistration;
   final String? errorMessage;
   final int? resendCooldownSeconds;
+  final String? otpRequestId;
 
   const AuthState({
     this.isAuthenticated = false,
@@ -23,6 +24,7 @@ class AuthState {
     this.pendingRegistration,
     this.errorMessage,
     this.resendCooldownSeconds,
+    this.otpRequestId,
   });
 
   AuthState copyWith({
@@ -33,8 +35,10 @@ class AuthState {
     UserProfile? Function()? pendingRegistration,
     String? errorMessage,
     int? resendCooldownSeconds,
+    String? otpRequestId,
     bool clearErrorMessage = false,
     bool clearResendCooldown = false,
+    bool clearOtpRequestId = false,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
@@ -48,6 +52,7 @@ class AuthState {
       resendCooldownSeconds: clearResendCooldown
           ? null
           : (resendCooldownSeconds ?? this.resendCooldownSeconds),
+      otpRequestId: clearOtpRequestId ? null : (otpRequestId ?? this.otpRequestId),
     );
   }
 }
@@ -78,6 +83,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       pendingRegistration: () => null,
       errorMessage: null,
       resendCooldownSeconds: null,
+      otpRequestId: null,
+      clearOtpRequestId: true,
     );
     await _authRepository.savePhoneNumber(phoneNumber);
     // Request OTP from backend (if server is reachable)
@@ -91,6 +98,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
     state = state.copyWith(
       phoneNumber: phoneNumber,
+      otpRequestId: result['request_id'] as String?,
       isLoading: false,
       errorMessage: null,
     );
@@ -126,6 +134,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
     final registrationProfile = profileOverride ?? state.pendingRegistration;
+    final requestId = state.otpRequestId;
 
     // 1. If registering and not yet assigned a backend ID, attempt registration
     if (registrationProfile != null && registrationProfile.id.isEmpty) {
@@ -143,6 +152,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       (backendProfile, token) = await _authRepository.verifyOtpWithBackend(
         effectivePhone,
+        requestId ?? '',
         otp,
       );
     } on DioException catch (e) {
@@ -203,6 +213,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       phoneNumber: effectivePhone,
       isLoading: false,
       pendingRegistration: () => null,
+      otpRequestId: null,
+      clearOtpRequestId: true,
     );
     return true;
   }
@@ -212,6 +224,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isLoading: true,
       errorMessage: null,
       resendCooldownSeconds: null,
+      otpRequestId: null,
+      clearOtpRequestId: true,
     );
 
     final result = await _authRepository.resendOtp(phoneNumber);
@@ -235,6 +249,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     state = state.copyWith(
       errorMessage: null,
+      otpRequestId: result['request_id'] as String?,
     );
   }
 
@@ -276,6 +291,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       phoneNumber: '',
       isLoading: false,
       pendingRegistration: () => null,
+      otpRequestId: null,
+      clearOtpRequestId: true,
     );
   }
 

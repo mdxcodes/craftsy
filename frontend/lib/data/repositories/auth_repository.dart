@@ -170,6 +170,7 @@ class AuthRepository {
   /// Verifies OTP with backend `/api/v1/auth/verify-otp`
   Future<(UserProfile?, String?)> verifyOtpWithBackend(
     String phoneNumber,
+    String requestId,
     String otp,
   ) async {
     _syncBaseUrl();
@@ -180,7 +181,11 @@ class AuthRepository {
       );
       final response = await _dio.post(
         '/api/v1/auth/verify-otp',
-        data: {'phone': cleanPhone, 'otp': otp},
+        data: {
+          'phone': cleanPhone,
+          'request_id': requestId,
+          'otp': otp,
+        },
       );
 
       if (response.statusCode == 200 && response.data != null) {

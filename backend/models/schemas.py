@@ -33,6 +33,7 @@ class ArtisanLoginRequest(BaseModel):
 
 class OtpVerifyRequest(BaseModel):
     phone: str = Field(..., description="10-digit mobile number")
+    request_id: Optional[str] = Field(default=None, description="OTP request ID returned by login/resend")
     otp: str = Field(..., description="6-digit OTP code")
 
 

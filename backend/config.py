@@ -146,18 +146,10 @@ class Settings(BaseSettings):
         description="Bhashini API base URL.",
     )
 
-    # MSG91 OTP Service (optional; server-side only)
-    msg91_auth_key: str = Field(
+    # StartMessaging OTP Service (optional; server-side only)
+    startmessaging_api_key: str = Field(
         default="",
-        description="MSG91 authentication key for OTP APIs.",
-    )
-    msg91_template_id: str = Field(
-        default="",
-        description="MSG91 OTP template ID for SMS delivery.",
-    )
-    msg91_otp_expire_seconds: int = Field(
-        default=300,
-        description="OTP validity duration in seconds (default: 5 minutes).",
+        description="StartMessaging API key for OTP delivery and verification.",
     )
 
     # Models

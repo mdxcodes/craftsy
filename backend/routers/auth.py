@@ -1,14 +1,13 @@
 """
 Authentication and User Profile Router for Craftsy.
 
-Integrates with MSG91 for real OTP delivery and verification.
+Integrates with StartMessaging for real OTP delivery and verification.
 Craftsy remains responsible for its own users, sessions, and JWTs;
-MSG91 is used only for OTP delivery and verification.
+StartMessaging is used only for OTP delivery and verification.
 """
 
 import logging
-import time
-from typing import Dict, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -22,7 +21,11 @@ from ..models.schemas import (
     OtpVerifyRequest,
     ArtisanProfileResponse,
 )
-from ..services.msg91_service import Msg91ConfigError, Msg91Service, Msg91VerifyResult
+from ..services.startmessaging_service import (
+    OtpProviderConfigError,
+    OtpProviderError,
+    StartMessagingOtpProvider,
+)
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -56,8 +59,8 @@ def _normalize_phone(phone: str) -> str:
     return digits
 
 
-def _get_msg91() -> Msg91Service:
-    return Msg91Service()
+def _get_otp_provider() -> StartMessagingOtpProvider:
+    return StartMessagingOtpProvider()
 
 
 def _issue_token_for_artisan(artisan: ArtisanDB) -> str:
@@ -150,7 +153,7 @@ async def register_consumer(
 @router.post(
     "/login",
     summary="Request login OTP",
-    description="Sends a real OTP to the registered phone number via MSG91.",
+    description="Sends a real OTP to the registered phone number via StartMessaging.",
 )
 async def login_artisan(
     request: ArtisanLoginRequest,
@@ -170,17 +173,17 @@ async def login_artisan(
             detail="No artisan registered with this phone number.",
         )
 
-    msg91 = _get_msg91()
-    if not msg91.is_configured():
+    provider = _get_otp_provider()
+    if not provider.is_configured():
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="OTP service is not configured on the server.",
         )
 
-    send_result = msg91.send_otp(f"+91{phone_clean}")
+    send_result = provider.send_otp(f"+91{phone_clean}")
     if not send_result.success:
         status_code = status.HTTP_502_BAD_GATEWAY
-        if send_result.error_code == "MISSING_CONFIG":
+        if send_result.error_code in {"MISSING_CONFIG", "AUTHENTICATION_FAILED"}:
             status_code = status.HTTP_501_NOT_IMPLEMENTED
         raise HTTPException(
             status_code=status_code,
@@ -194,6 +197,7 @@ async def login_artisan(
         "status": "success",
         "message": "OTP sent successfully.",
         "phone": phone_clean,
+        "request_id": send_result.request_id,
         "otp_sent": True,
     }
 
@@ -202,7 +206,7 @@ async def login_artisan(
     "/verify-otp",
     response_model=AuthResponse,
     summary="Verify phone OTP",
-    description="Verifies OTP with MSG91 and returns artisan session profile.",
+    description="Verifies OTP with StartMessaging and returns artisan session profile.",
 )
 async def verify_otp(
     request: OtpVerifyRequest,
@@ -213,6 +217,12 @@ async def verify_otp(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    if not request.request_id or not str(request.request_id).strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid OTP request ID.",
         )
 
     if not request.otp or not request.otp.isdigit() or len(request.otp) != 6:
@@ -228,15 +238,16 @@ async def verify_otp(
             detail="No artisan registered with this phone number. Please register first.",
         )
 
-    msg91 = _get_msg91()
-    if not msg91.is_configured():
+    provider = _get_otp_provider()
+    if not provider.is_configured():
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="OTP service is not configured on the server.",
         )
 
-    verify_result: Msg91VerifyResult = msg91.verify_otp(
-        f"+91{phone_clean}", request.otp
+    verify_result = provider.verify_otp(
+        request_id=str(request.request_id).strip(),
+        otp=request.otp,
     )
     if not verify_result.success:
         status_code = status.HTTP_400_BAD_REQUEST
@@ -258,7 +269,7 @@ async def verify_otp(
 @router.post(
     "/resend-otp",
     summary="Resend OTP",
-    description="Resends the current OTP to the registered phone number via MSG91.",
+    description="Resends the current OTP to the registered phone number via StartMessaging.",
 )
 async def resend_otp(
     request: ResendOtpRequest,
@@ -270,17 +281,17 @@ async def resend_otp(
             detail="Invalid phone number. Must be exactly 10 digits.",
         )
 
-    msg91 = _get_msg91()
-    if not msg91.is_configured():
+    provider = _get_otp_provider()
+    if not provider.is_configured():
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="OTP service is not configured on the server.",
         )
 
-    send_result = msg91.resend_otp(f"+91{phone_clean}")
+    send_result = provider.resend_otp(f"+91{phone_clean}")
     if not send_result.success:
         status_code = status.HTTP_502_BAD_GATEWAY
-        if send_result.error_code == "MISSING_CONFIG":
+        if send_result.error_code in {"MISSING_CONFIG", "AUTHENTICATION_FAILED"}:
             status_code = status.HTTP_501_NOT_IMPLEMENTED
         raise HTTPException(
             status_code=status_code,
@@ -294,6 +305,7 @@ async def resend_otp(
         "status": "success",
         "message": "OTP resent successfully.",
         "phone": phone_clean,
+        "request_id": send_result.request_id,
     }
 
 
