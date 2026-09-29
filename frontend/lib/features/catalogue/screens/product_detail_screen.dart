@@ -53,7 +53,7 @@ class ProductDetailScreen extends ConsumerWidget {
                   Text(
                     'edit_product_title'.tr(),
                     style: AppTextStyles.headlineSmall.copyWith(
-                      color: AppColors.ink,
+                      color: AppColors.espresso,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
@@ -64,7 +64,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'product_title_label'.tr(),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: AppColors.cardSurface,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -75,7 +75,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       labelText: '${'price_label'.tr()} (₹)',
                       prefixText: '₹ ',
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: AppColors.cardSurface,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -85,7 +85,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     decoration: InputDecoration(
                       labelText: 'product_desc_label'.tr(),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: AppColors.cardSurface,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -157,7 +157,7 @@ class ProductDetailScreen extends ConsumerWidget {
       message: 'mark_sold_out_dialog_msg'.tr(),
       icon: Icons.pause_circle_outline_rounded,
       confirmLabel: 'mark_sold_out_btn'.tr(),
-      confirmColor: AppColors.terracotta,
+      confirmColor: AppColors.sienna,
       onConfirm: () async {
         final updated = product.copyWith(
           status: ProductStatus.soldOut,
@@ -169,7 +169,7 @@ class ProductDetailScreen extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('product_marked_sold_out'.tr()),
-              backgroundColor: AppColors.terracotta,
+              backgroundColor: AppColors.sienna,
             ),
           );
         }
@@ -194,14 +194,14 @@ class ProductDetailScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             'remove_listing_dialog_msg'.tr(),
-            style: const TextStyle(fontSize: 14, color: AppColors.ink),
+            style: const TextStyle(fontSize: 14, color: AppColors.espresso),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.sm),
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.parchmentDeep,
+              color: AppColors.warmMist,
               borderRadius: BorderRadius.circular(AppRadii.sm),
               border: Border.all(color: AppColors.line),
             ),
@@ -209,7 +209,7 @@ class ProductDetailScreen extends ConsumerWidget {
               '• ${'remove_listing_note_1'.tr()}\n• ${'remove_listing_note_2'.tr()}\n• ${'remove_listing_note_3'.tr()}',
               style: const TextStyle(
                 fontSize: 13,
-                color: AppColors.inkSoft,
+                color: AppColors.taupe,
                 height: 1.4,
               ),
             ),
@@ -227,7 +227,7 @@ class ProductDetailScreen extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('product_removed_ondc'.tr()),
-              backgroundColor: AppColors.ink,
+              backgroundColor: AppColors.espresso,
             ),
           );
         }
@@ -276,7 +276,7 @@ class ProductDetailScreen extends ConsumerWidget {
               Text(
                 'listing_guide_title'.tr(),
                 style: AppTextStyles.headlineSmall.copyWith(
-                  color: AppColors.ink,
+                  color: AppColors.espresso,
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
@@ -286,23 +286,23 @@ class ProductDetailScreen extends ConsumerWidget {
                 '• ${'mark_sold_out_dialog_title'.tr()}:',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.ink,
+                  color: AppColors.espresso,
                 ),
               ),
               Text(
                 '${'mark_sold_out_dialog_msg'.tr()}\n',
-                style: const TextStyle(color: AppColors.inkSoft),
+                style: const TextStyle(color: AppColors.taupe),
               ),
               Text(
                 '• ${'remove_listing_dialog_title'.tr()}:',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.ink,
+                  color: AppColors.espresso,
                 ),
               ),
               Text(
                 '${'remove_vs_delete_hint'.tr()}\n',
-                style: const TextStyle(color: AppColors.inkSoft),
+                style: const TextStyle(color: AppColors.taupe),
               ),
               Text(
                 '• ${'delete_product_confirm_title'.tr()}:',
@@ -313,7 +313,7 @@ class ProductDetailScreen extends ConsumerWidget {
               ),
               Text(
                 'delete_product_confirm_msg'.tr(),
-                style: const TextStyle(color: AppColors.inkSoft),
+                style: const TextStyle(color: AppColors.taupe),
               ),
               const SizedBox(height: AppSpacing.lg),
               AppButton(
@@ -424,7 +424,7 @@ class ProductDetailScreen extends ConsumerWidget {
                 const Icon(
                   Icons.error_outline,
                   size: 48,
-                  color: AppColors.coralDark,
+                  color: AppColors.siennaDark,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
@@ -478,7 +478,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       onTap: () => Navigator.of(context).pop(),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: AppColors.ink,
+                        color: AppColors.espresso,
                         size: 20,
                       ),
                     ),
@@ -491,7 +491,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       onTap: () => _showEditDialog(context, ref, product),
                       child: const Icon(
                         Icons.edit_outlined,
-                        color: AppColors.ink,
+                        color: AppColors.espresso,
                         size: 19,
                       ),
                     ),
@@ -515,7 +515,7 @@ class ProductDetailScreen extends ConsumerWidget {
                           padding: EdgeInsets.zero,
                           icon: const Icon(
                             Icons.more_vert,
-                            color: AppColors.ink,
+                            color: AppColors.espresso,
                             size: 20,
                           ),
                           tooltip: 'listing_actions'.tr(),
@@ -551,7 +551,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   children: [
                                     const Icon(
                                       Icons.refresh,
-                                      color: AppColors.teal,
+                                      color: AppColors.sage,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 8),
@@ -566,7 +566,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   children: [
                                     const Icon(
                                       Icons.remove_shopping_cart_outlined,
-                                      color: AppColors.coral,
+                                      color: AppColors.sienna,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 8),
@@ -580,7 +580,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   children: [
                                     const Icon(
                                       Icons.visibility_off_outlined,
-                                      color: AppColors.inkSoft,
+                                      color: AppColors.taupe,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 8),
@@ -597,7 +597,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   const Icon(
                                     Icons.info_outline,
                                     size: 18,
-                                    color: AppColors.inkSoft,
+                                    color: AppColors.taupe,
                                   ),
                                   const SizedBox(width: 8),
                                   Text('listing_info_btn'.tr()),
@@ -748,7 +748,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             Text(
                               primaryTitle,
                               style: AppTextStyles.headlineMedium.copyWith(
-                                color: AppColors.ink,
+                                color: AppColors.espresso,
                                 fontWeight: FontWeight.w600,
                                 height: 1.25,
                               ),
@@ -759,7 +759,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               Text(
                                 secondaryTitle,
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.inkSoft,
+                                  color: AppColors.taupe,
                                 ),
                               ),
                             ],
@@ -775,8 +775,8 @@ class ProductDetailScreen extends ConsumerWidget {
                       '₹${product.price.toStringAsFixed(0)}',
                       style: AppTextStyles.headlineLarge.copyWith(
                         color: isNonLive
-                            ? AppColors.inkSoft
-                            : AppColors.indigoDark,
+                            ? AppColors.taupe
+                            : AppColors.burgundyDark,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -809,7 +809,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(AppSpacing.cardPadding),
                       decoration: BoxDecoration(
                         color: isNonLive
-                            ? AppColors.parchmentDeep.withValues(alpha: 0.6)
+                            ? AppColors.warmMist.withValues(alpha: 0.6)
                             : AppColors.cardSurface,
                         borderRadius: BorderRadius.circular(AppRadii.card),
                         border: Border.all(color: AppColors.line),
@@ -825,7 +825,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 child: Text(
                                   'listing_status_header'.tr(),
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: AppColors.inkFaint,
+                                    color: AppColors.taupe,
                                     letterSpacing: 0.8,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -844,7 +844,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                       },
                                     ),
                                     style: AppTextStyles.caption.copyWith(
-                                      color: AppColors.inkFaint,
+                                      color: AppColors.taupe,
                                     ),
                                     textAlign: TextAlign.end,
                                     maxLines: 1,
@@ -877,7 +877,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                       ),
                                       style: OutlinedButton.styleFrom(
                                         backgroundColor:
-                                            AppColors.parchmentDeep,
+                                            AppColors.warmMist,
                                         side: const BorderSide(
                                           color: AppColors.line,
                                         ),
@@ -898,7 +898,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                           const Icon(
                                             Icons.remove_shopping_cart_outlined,
                                             size: 16,
-                                            color: AppColors.coral,
+                                            color: AppColors.sienna,
                                           ),
                                           const SizedBox(width: 6),
                                           Flexible(
@@ -908,7 +908,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                               maxLines: 2,
                                               style: AppTextStyles.labelMedium
                                                   .copyWith(
-                                                    color: AppColors.coral,
+                                                    color: AppColors.sienna,
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 12,
                                                     height: 1.2,
@@ -929,7 +929,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                       ),
                                       style: OutlinedButton.styleFrom(
                                         backgroundColor:
-                                            AppColors.parchmentDeep,
+                                            AppColors.warmMist,
                                         side: const BorderSide(
                                           color: AppColors.line,
                                         ),
@@ -950,7 +950,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                           const Icon(
                                             Icons.visibility_off_outlined,
                                             size: 16,
-                                            color: AppColors.inkSoft,
+                                            color: AppColors.taupe,
                                           ),
                                           const SizedBox(width: 6),
                                           Flexible(
@@ -960,7 +960,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                               maxLines: 2,
                                               style: AppTextStyles.labelMedium
                                                   .copyWith(
-                                                    color: AppColors.inkSoft,
+                                                    color: AppColors.taupe,
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 12,
                                                     height: 1.2,
@@ -982,14 +982,14 @@ class ProductDetailScreen extends ConsumerWidget {
                               const Icon(
                                 Icons.info_outline,
                                 size: 14,
-                                color: AppColors.inkFaint,
+                                color: AppColors.taupe,
                               ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   'remove_vs_delete_hint'.tr(),
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.inkFaint,
+                                    color: AppColors.taupe,
                                     fontSize: 11,
                                   ),
                                 ),
@@ -1028,7 +1028,7 @@ class ProductDetailScreen extends ConsumerWidget {
                           Text(
                             'product_desc_label'.tr(),
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.inkFaint,
+                              color: AppColors.taupe,
                               letterSpacing: 0.8,
                               fontWeight: FontWeight.w700,
                             ),
@@ -1037,7 +1037,7 @@ class ProductDetailScreen extends ConsumerWidget {
                           FormattedDescription(
                             text: product.description,
                             style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.ink,
+                              color: AppColors.espresso,
                               height: 1.5,
                             ),
                           ),
@@ -1046,7 +1046,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             FormattedDescription(
                               text: product.descriptionHi,
                               style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.inkSoft,
+                                color: AppColors.taupe,
                                 height: 1.5,
                               ),
                             ),
@@ -1072,7 +1072,7 @@ class ProductDetailScreen extends ConsumerWidget {
                             Text(
                               'tags_label'.tr(),
                               style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.inkFaint,
+                                color: AppColors.taupe,
                                 letterSpacing: 0.8,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -1088,7 +1088,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.parchmentDeep,
+                                    color: AppColors.warmMist,
                                     borderRadius: BorderRadius.circular(
                                       AppRadii.chip,
                                     ),
@@ -1097,7 +1097,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   child: Text(
                                     '#$tag',
                                     style: AppTextStyles.labelSmall.copyWith(
-                                      color: AppColors.inkSoft,
+                                      color: AppColors.taupe,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -1115,7 +1115,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       child: Text(
                         '${'created_on'.tr()}: ${product.createdAt.day}/${product.createdAt.month}/${product.createdAt.year}',
                         style: AppTextStyles.caption.copyWith(
-                          color: AppColors.inkFaint,
+                          color: AppColors.taupe,
                         ),
                       ),
                     ),

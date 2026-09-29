@@ -33,10 +33,10 @@ class ProfileScreen extends ConsumerWidget {
             // Compact Profile Header Card — V2 design
             Container(
               padding: const EdgeInsets.all(AppSpacing.cardPadding),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
+                 decoration: BoxDecoration(
+                color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
-                border: Border.all(color: AppColors.divider),
+                border: Border.all(color: AppColors.line),
               ),
               child: Row(
                 children: [
@@ -44,11 +44,11 @@ class ProfileScreen extends ConsumerWidget {
                     label: 'profile_avatar'.tr(),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundColor: AppColors.indigo,
+                      backgroundColor: AppColors.burgundy,
                       child: const Icon(
                         Icons.person,
                         size: 32,
-                        color: AppColors.textOnPrimary,
+                        color: AppColors.cardSurface,
                       ),
                     ),
                   ),
@@ -71,8 +71,8 @@ class ProfileScreen extends ConsumerWidget {
                           profile.phone.isNotEmpty
                               ? profile.phone
                               : (authState.phoneNumber ?? 'no_phone'.tr()),
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
+                           style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.taupe,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -85,20 +85,18 @@ class ProfileScreen extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.indigoLight.withValues(
-                                alpha: 0.25,
-                              ),
+                              color: AppColors.burgundyLight,
                               borderRadius: BorderRadius.circular(
                                 AppRadii.chip,
                               ),
                               border: Border.all(
-                                color: AppColors.indigo.withValues(alpha: 0.3),
+                                color: AppColors.burgundy,
                               ),
                             ),
                             child: Text(
                               profile.craftType,
                               style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.indigoDark,
+                                color: AppColors.burgundy,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 11,
                               ),
@@ -375,7 +373,7 @@ class _MenuTile extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(icon, color: AppColors.indigo, size: 24),
+                Icon(icon, color: AppColors.burgundy, size: 24),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
@@ -386,8 +384,8 @@ class _MenuTile extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           subtitle!,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.inkFaint,
+                           style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.taupe,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -396,7 +394,7 @@ class _MenuTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.inkFaint),
+                const Icon(Icons.chevron_right, color: AppColors.taupe),
               ],
             ),
           ),

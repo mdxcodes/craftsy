@@ -29,9 +29,9 @@ class AppImage extends StatelessWidget {
         Container(
           width: width,
           height: height,
-          color: AppColors.surfaceVariant,
+          color: AppColors.linen,
           child: const Center(
-            child: Icon(Icons.palette_outlined, size: 40, color: AppColors.oak),
+            child: Icon(Icons.palette_outlined, size: 40, color: AppColors.warmStone),
           ),
         );
 
@@ -94,14 +94,14 @@ class AppImage extends StatelessWidget {
             return Container(
               width: width,
               height: height,
-              color: AppColors.parchmentDeep,
+              color: AppColors.warmMist,
               child: const Center(
                 child: SizedBox(
                   width: 28,
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: AppColors.terracotta,
+                    color: AppColors.burgundy,
                   ),
                 ),
               ),
@@ -129,7 +129,7 @@ class AppImage extends StatelessWidget {
           placeholder: (context, url) => Container(
             width: width,
             height: height,
-            color: AppColors.surfaceVariant,
+            color: AppColors.linen,
             child: const Center(
               child: CircularProgressIndicator(strokeWidth: 2),
             ),

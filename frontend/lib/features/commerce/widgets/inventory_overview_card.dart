@@ -30,7 +30,7 @@ class InventoryOverviewCard extends StatelessWidget {
                   'Some products are running low on stock'.tr(),
                   style: Theme.of(
                     context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.amber),
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.gold),
                 ),
               ),
           ],

@@ -49,7 +49,7 @@ class WhereISellSection extends ConsumerWidget {
           ),
           error: (error, stack) => Text(
             'Error: $error',
-            style: const TextStyle(color: AppColors.coral),
+            style: const TextStyle(color: AppColors.sienna),
           ),
           data: (channels) => Column(
             children: channels.map((ch) {
@@ -244,16 +244,16 @@ class WhereISellSection extends ConsumerWidget {
     }
     if (channel.displayStatus.toLowerCase() == 'problem' ||
         channel.displayStatus.toLowerCase() == 'error') {
-      return AppColors.coral;
+      return AppColors.sienna;
     }
     if (channel.displayStatus.toLowerCase() == 'needs information' ||
         channel.displayStatus.toLowerCase() == 'needs_information') {
-      return AppColors.amber;
+      return AppColors.gold;
     }
     if (channel.displayStatus.toLowerCase() == 'not started' ||
         channel.displayStatus.toLowerCase() == 'not_started') {
       return AppColors.inkFaint;
     }
-    return AppColors.indigo;
+    return AppColors.burgundy;
   }
 }

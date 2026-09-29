@@ -80,7 +80,7 @@ class _OrderSummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
-          border: Border.all(color: AppColors.parchmentDeep),
+          border: Border.all(color: AppColors.warmMist),
         ),
         child: Row(
           children: [
@@ -94,9 +94,9 @@ class _OrderSummaryCard extends StatelessWidget {
                 child: AppImage(
                   imageUrl: order.firstItemImageUrl,
                   fallbackWidget: Container(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     child: const Icon(Icons.image,
-                        color: AppColors.textSecondary),
+                        color: AppColors.taupe),
                   ),
                 ),
               ),
@@ -120,7 +120,7 @@ class _OrderSummaryCard extends StatelessWidget {
                   Text(
                     _placedLabel(order.placedAt),
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.taupe,
                     ),
                   ),
                 ],
@@ -136,7 +136,7 @@ class _OrderSummaryCard extends StatelessWidget {
                 Text(
                   '₹${order.totalAmount.toStringAsFixed(0)}',
                   style: AppTextStyles.headlineSmall.copyWith(
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -173,10 +173,10 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (status) {
-      'delivered' => (AppColors.tealLight, AppColors.teal),
-      'cancelled' => (AppColors.coralLight, AppColors.coralDark),
-      'shipped' => (AppColors.indigoLight, AppColors.indigoDark),
-      _ => (AppColors.amberLight, AppColors.amberDark),
+      'delivered' => (AppColors.sageLight, AppColors.sage),
+      'cancelled' => (AppColors.siennaLight, AppColors.siennaDark),
+      'shipped' => (AppColors.burgundyLight, AppColors.burgundyDark),
+      _ => (AppColors.goldLight, AppColors.goldDark),
     };
 
     return Container(

@@ -95,7 +95,7 @@ class _ProductChannelSelectorScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Publishing to ${status.label}...'),
-        backgroundColor: AppColors.indigo,
+        backgroundColor: AppColors.burgundy,
       ),
     );
   }
@@ -161,7 +161,7 @@ class _ProductChannelSelectorScreenState
               Text(
                 'Choose one or more channels. You can change this later.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.taupe,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -295,7 +295,7 @@ class _ProductChannelSelectorScreenState
                             const Icon(
                               Icons.circle,
                               size: 8,
-                              color: AppColors.amber,
+                              color: AppColors.gold,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -348,8 +348,8 @@ class _ProductChannelSelectorScreenState
   Color _getStatusColor(ChannelStatus status) {
     if (status.isLive) return AppColors.success;
     if (status.hasFailed) return AppColors.error;
-    if (status.needsInfo) return AppColors.amber;
-    if (status.isPending) return AppColors.indigo;
+    if (status.needsInfo) return AppColors.gold;
+    if (status.isPending) return AppColors.burgundy;
     return AppColors.inkSoft;
   }
 }

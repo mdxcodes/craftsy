@@ -79,7 +79,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 color: AppColors.textOnPrimary,
               ),
             ),
-            backgroundColor: AppColors.teal,
+            backgroundColor: AppColors.sage,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadii.md),
@@ -98,7 +98,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     return AppScaffold(
       rawAppBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -118,7 +118,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               'verify_phone_title'.tr(),
-              style: AppTextStyles.displayMedium,
+              style: AppTextStyles.displaySmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -127,7 +127,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   ? 'verify_phone_subtitle_new'.tr()
                   : 'verify_phone_subtitle'.tr(),
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.warmGray,
               ),
               textAlign: TextAlign.center,
             ),
@@ -137,14 +137,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.coralLight,
+                  color: AppColors.siennaLight,
                   borderRadius: BorderRadius.circular(AppRadii.md),
-                  border: Border.all(color: AppColors.error, width: 1),
+                  border: Border.all(color: AppColors.sienna, width: 1),
                 ),
                 child: Text(
                   authState.errorMessage!,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.coralDark,
+                    color: AppColors.siennaDark,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -171,6 +171,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       contentPadding: EdgeInsets.zero,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.md),
+                        borderSide: BorderSide(color: AppColors.warmMist),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadii.md),
+                        borderSide: BorderSide(color: AppColors.burgundy, width: 2),
                       ),
                     ),
                     onChanged: (value) {
@@ -204,6 +209,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 cooldown > 0
                     ? 'resend_otp_cooldown'.tr(args: [cooldown.toString()])
                     : 'resend_otp'.tr(),
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: cooldown > 0 ? AppColors.taupe : AppColors.burgundy,
+                ),
               ),
             ),
 

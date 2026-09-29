@@ -109,8 +109,8 @@ class ConfirmRejectRow extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isLoading
-                        ? AppColors.parchmentDeep
-                        : AppColors.success,
+                        ? AppColors.warmMist
+                        : AppColors.sage,
                     borderRadius: BorderRadius.circular(
                       AccessibilityTokens.radiusFull,
                     ),
@@ -118,7 +118,7 @@ class ConfirmRejectRow extends StatelessWidget {
                         ? []
                         : [
                             BoxShadow(
-                              color: AppColors.success.withValues(alpha: 0.3),
+                              color: AppColors.sage.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
@@ -133,21 +133,21 @@ class ConfirmRejectRow extends StatelessWidget {
                           height: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: AppColors.textOnPrimary,
+                            color: AppColors.cardSurface,
                           ),
                         )
                       else
                         Icon(
                           Icons.check_rounded,
                           size: 22,
-                          color: AppColors.textOnPrimary,
+                          color: AppColors.cardSurface,
                         ),
                       const SizedBox(width: AccessibilityTokens.spacingSm),
                       Flexible(
                         child: Text(
                           confirmLabel,
                           style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.textOnPrimary,
+                            color: AppColors.cardSurface,
                             fontWeight: FontWeight.w700,
                           ),
                           textAlign: TextAlign.center,

@@ -340,13 +340,13 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.indigo.withValues(alpha: 0.2),
+                        color: AppColors.burgundy.withValues(alpha: 0.2),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
                     ],
                     border: Border.all(
-                      color: AppColors.indigo.withValues(alpha: 0.3),
+                      color: AppColors.burgundy.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
@@ -359,7 +359,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                       errorBuilder: (_, _, _) => const Center(
                         child: Icon(
                           Icons.smart_toy_outlined,
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           size: 22,
                         ),
                       ),
@@ -465,7 +465,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
           if (chatState.quickTopics.isNotEmpty)
             Container(
               height: 46,
-              color: AppColors.parchmentDeep.withValues(alpha: 0.4),
+              color: AppColors.warmMist.withValues(alpha: 0.4),
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(
@@ -511,7 +511,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
           // ── Message History ───────────────────────────────────────────────
           Expanded(
             child: Container(
-              color: AppColors.parchment,
+              color: AppColors.cream,
               child: ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -575,7 +575,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: AppColors.parchment,
+                              color: AppColors.cream,
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(color: AppColors.line),
                             ),
@@ -602,7 +602,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                         // Send text button
                         Container(
                           decoration: const BoxDecoration(
-                            color: AppColors.indigo,
+                            color: AppColors.burgundy,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -635,16 +635,16 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.indigoLight.withValues(alpha: 0.2),
+              color: AppColors.burgundyLight.withValues(alpha: 0.2),
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.indigo.withValues(alpha: 0.5),
+                color: AppColors.burgundy.withValues(alpha: 0.5),
                 width: 1.2,
               ),
             ),
             child: const Icon(
               Icons.mic_none_rounded,
-              color: AppColors.indigo,
+              color: AppColors.burgundy,
               size: 22,
             ),
           ),
@@ -728,7 +728,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                color: AppColors.indigo,
+                color: AppColors.burgundy,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -758,7 +758,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                   vertical: 10,
                 ),
                 decoration: const BoxDecoration(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
@@ -794,7 +794,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.indigo.withValues(alpha: 0.25),
+                color: AppColors.burgundy.withValues(alpha: 0.25),
                 width: 1,
               ),
               boxShadow: const [
@@ -812,7 +812,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => Container(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   child: const Center(
                     child: Icon(
                       Icons.smart_toy_outlined,
@@ -899,7 +899,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                             color: AppColors.cardSurface,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: AppColors.indigo.withValues(alpha: 0.35),
+                              color: AppColors.burgundy.withValues(alpha: 0.35),
                             ),
                             boxShadow: const [
                               BoxShadow(
@@ -915,7 +915,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                               const Icon(
                                 Icons.chat_bubble_outline_rounded,
                                 size: 12,
-                                color: AppColors.indigo,
+                                color: AppColors.burgundy,
                               ),
                               const SizedBox(width: 5),
                               Flexible(
@@ -978,12 +978,12 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
         border: Border.all(
           color: isSuccessGreen
               ? AppColors.success
-              : AppColors.indigo.withValues(alpha: 0.6),
+              : AppColors.burgundy.withValues(alpha: 0.6),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isSuccessGreen ? AppColors.success : AppColors.indigo)
+            color: (isSuccessGreen ? AppColors.success : AppColors.burgundy)
                 .withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -1008,7 +1008,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                   decoration: BoxDecoration(
                     color: isSuccessGreen
                         ? AppColors.success
-                        : AppColors.indigo,
+                        : AppColors.burgundy,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: AppColors.cardSurface, size: 16),
@@ -1025,7 +1025,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                           fontWeight: FontWeight.w600,
                           color: isSuccessGreen
                               ? AppColors.forestGreenDark
-                              : AppColors.indigoDark,
+                              : AppColors.burgundyDark,
                         ),
                       ),
                       Text(
@@ -1062,7 +1062,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.indigo, width: 1.2),
+                        border: Border.all(color: AppColors.burgundy, width: 1.2),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1070,7 +1070,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                           const Icon(
                             Icons.undo_rounded,
                             size: 14,
-                            color: AppColors.indigo,
+                            color: AppColors.burgundy,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -1078,7 +1078,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.indigo,
+                              color: AppColors.burgundy,
                             ),
                           ),
                         ],
@@ -1089,7 +1089,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                   const Icon(
                     Icons.arrow_forward_ios,
                     size: 14,
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                   ),
               ],
             ),
@@ -1112,7 +1112,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.indigo.withValues(alpha: 0.2),
+                color: AppColors.burgundy.withValues(alpha: 0.2),
                 width: 1,
               ),
               boxShadow: [
@@ -1130,7 +1130,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
                 height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => Container(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   child: const Center(
                     child: Icon(
                       Icons.smart_toy_outlined,
@@ -1170,7 +1170,7 @@ class _ChatbotSheetState extends ConsumerState<ChatbotSheet>
       width: 6,
       height: 6,
       decoration: const BoxDecoration(
-        color: AppColors.indigo,
+        color: AppColors.burgundy,
         shape: BoxShape.circle,
       ),
     );

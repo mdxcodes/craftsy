@@ -9,7 +9,6 @@ import '../../../core/router/app_route_constants.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../providers/auth_provider.dart';
-
 import '../../../core/widgets/language_picker.dart';
 
 class NgoAuthScreen extends ConsumerStatefulWidget {
@@ -51,9 +50,10 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
 
     return AppScaffold(
       showConnectivityPill: false,
+      showBackgroundPattern: false,
       rawAppBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.pop(),
         ),
         actions: const [
@@ -73,15 +73,15 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
               child: Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
-                  color: AppColors.terracottaLight,
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(
+                  color: AppColors.goldLight,
+                  borderRadius: BorderRadius.circular(AppRadii.lg),
                 ),
                 child: const Center(
                   child: Icon(
-                    Icons.support_agent,
+                    Icons.support_agent_rounded,
                     size: 36,
-                    color: AppColors.terracottaDark,
+                    color: AppColors.goldDark,
                   ),
                 ),
               ),
@@ -89,24 +89,20 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
             const SizedBox(height: AppSpacing.md),
             Text(
               'ngo_assist_title'.tr(),
-              style: AppTextStyles.headlineLarge.copyWith(
-                color: AppColors.ink,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.headlineLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'ngo_assist_description'.tr(),
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.inkSoft,
-                height: 1.45,
+                color: AppColors.warmGray,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // QR container
             Center(
               child: Container(
                 height: 210,
@@ -115,16 +111,16 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(AppRadii.card),
-                  border: Border.all(color: AppColors.line, width: 1.5),
+                  border: Border.all(color: AppColors.warmMist, width: 1.5),
                   boxShadow: AppElevation.cardShadow,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.qr_code_2,
-                      size: 110,
-                      color: AppColors.ink,
+                    Icon(
+                      Icons.qr_code_2_rounded,
+                      size: 100,
+                      color: AppColors.espresso,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Padding(
@@ -134,7 +130,7 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                       child: Text(
                         'qr_placeholder_label'.tr(),
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.inkSoft,
+                          color: AppColors.warmGray,
                           fontWeight: FontWeight.w600,
                         ),
                         textAlign: TextAlign.center,
@@ -147,7 +143,6 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
 
             const SizedBox(height: AppSpacing.md),
 
-            // Reassurance info callout card
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
@@ -163,7 +158,7 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.info_outline,
+                    Icons.info_outline_rounded,
                     size: 20,
                     color: AppColors.goldDark,
                   ),
@@ -172,7 +167,7 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                     child: Text(
                       'ngo_assist_explanation'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.ink,
+                        color: AppColors.espresso,
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                       ),
@@ -186,7 +181,12 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
 
             Row(
               children: [
-                const Expanded(child: Divider(color: AppColors.line)),
+                Expanded(
+                  child: Divider(
+                    color: AppColors.warmMist,
+                    thickness: 1,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
@@ -194,12 +194,17 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                   child: Text(
                     'or_enter_coordinator_id'.tr(),
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.inkSoft,
+                      color: AppColors.warmGray,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                const Expanded(child: Divider(color: AppColors.line)),
+                Expanded(
+                  child: Divider(
+                    color: AppColors.warmMist,
+                    thickness: 1,
+                  ),
+                ),
               ],
             ),
 
@@ -213,20 +218,20 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                   TextFormField(
                     controller: _coordinatorIdController,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.ink,
+                      color: AppColors.espresso,
                     ),
                     decoration: InputDecoration(
                       labelText: 'coordinator_id_label'.tr(),
                       hintText: 'coordinator_id_hint'.tr(),
                       labelStyle: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.inkSoft,
+                        color: AppColors.warmGray,
                       ),
                       hintStyle: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.inkFaint,
+                        color: AppColors.taupe,
                       ),
                       prefixIcon: const Icon(
                         Icons.badge_outlined,
-                        color: AppColors.terracotta,
+                        color: AppColors.burgundy,
                       ),
                       filled: true,
                       fillColor: AppColors.cardSurface,
@@ -236,24 +241,15 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(
-                          color: AppColors.line,
-                          width: 1.5,
-                        ),
+                        borderSide: BorderSide(color: AppColors.warmMist, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(
-                          color: AppColors.line,
-                          width: 1.5,
-                        ),
+                        borderSide: BorderSide(color: AppColors.warmMist, width: 1.5),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadii.button),
-                        borderSide: const BorderSide(
-                          color: AppColors.terracotta,
-                          width: 2,
-                        ),
+                        borderSide: BorderSide(color: AppColors.burgundy, width: 2),
                       ),
                     ),
                     validator: (value) {
@@ -271,17 +267,17 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.info_outline,
+                        Icon(
+                          Icons.info_outline_rounded,
                           size: 14,
-                          color: AppColors.inkSoft,
+                          color: AppColors.warmGray,
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         Expanded(
                           child: Text(
                             'ngo_assist_explained'.tr(),
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.inkSoft,
+                              color: AppColors.warmGray,
                               fontSize: 12,
                             ),
                           ),
@@ -297,7 +293,7 @@ class _NgoAuthScreenState extends ConsumerState<NgoAuthScreen> {
 
             AppButton(
               label: 'start_assisted_signin_btn'.tr(),
-              icon: Icons.how_to_reg,
+              icon: Icons.how_to_reg_rounded,
               isLoading: _isSubmitting,
               onPressed: _handleAssistedSignIn,
             ),

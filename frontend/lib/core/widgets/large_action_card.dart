@@ -36,7 +36,7 @@ class _LargeActionCardState extends State<LargeActionCard> {
   @override
   Widget build(BuildContext context) {
     final effectiveBg = widget.backgroundColor ?? AppColors.cardSurface;
-    final effectiveIconColor = widget.iconColor ?? AppColors.indigo;
+    final effectiveIconColor = widget.iconColor ?? AppColors.burgundy;
 
     return Semantics(
       button: true,
@@ -54,17 +54,17 @@ class _LargeActionCardState extends State<LargeActionCard> {
             ),
             padding: const EdgeInsets.all(AccessibilityTokens.spacingLg),
             decoration: BoxDecoration(
-              color: widget.isEnabled ? effectiveBg : AppColors.parchmentDeep,
+              color: widget.isEnabled ? effectiveBg : AppColors.warmMist,
               borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
               border: Border.all(
                 color: widget.isEnabled
-                    ? AppColors.indigo.withValues(alpha: 0.2)
-                    : AppColors.line,
+                    ? AppColors.burgundy.withValues(alpha: 0.2)
+                    : AppColors.warmMist,
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadow,
+                  color: AppColors.warmShadow,
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -80,7 +80,7 @@ class _LargeActionCardState extends State<LargeActionCard> {
                   decoration: BoxDecoration(
                     color: widget.isEnabled
                         ? effectiveIconColor.withValues(alpha: 0.12)
-                        : AppColors.parchmentDeep,
+                        : AppColors.warmMist,
                     borderRadius: BorderRadius.circular(
                       AccessibilityTokens.radiusMd,
                     ),
@@ -90,7 +90,7 @@ class _LargeActionCardState extends State<LargeActionCard> {
                     size: 32,
                     color: widget.isEnabled
                         ? effectiveIconColor
-                        : AppColors.inkFaint,
+                        : AppColors.taupe,
                   ),
                 ),
                 const SizedBox(height: AccessibilityTokens.spacingMd),
@@ -99,8 +99,8 @@ class _LargeActionCardState extends State<LargeActionCard> {
                   widget.label,
                   style: AppTextStyles.labelLarge.copyWith(
                     color: widget.isEnabled
-                        ? AppColors.textPrimary
-                        : AppColors.inkFaint,
+                        ? AppColors.espresso
+                        : AppColors.taupe,
                     fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,

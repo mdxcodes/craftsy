@@ -106,20 +106,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       Container(
                         padding: EdgeInsets.all(AppSpacing.cardPadding),
                         decoration: BoxDecoration(
-                          color: AppColors.amberLight,
+                          color: AppColors.goldLight,
                           borderRadius: BorderRadius.circular(
                               AccessibilityTokens.radiusMd),
                         ),
                         child: Row(
                           children: [
                             const Icon(Icons.info_outline,
-                                color: AppColors.amberDark),
+                                color: AppColors.goldDark),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Text(
                                 'checkout_upi_coming_later'.tr(),
                                 style: AppTextStyles.labelMedium.copyWith(
-                                  color: AppColors.amberDark,
+                                  color: AppColors.goldDark,
                                 ),
                               ),
                             ),
@@ -159,7 +159,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             ),
                           ),
                         ),
-                        Divider(color: AppColors.parchmentDeep),
+                        Divider(color: AppColors.warmMist),
                         Row(
                           children: [
                             Text(
@@ -170,7 +170,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             Text(
                               '₹${cart.subtotal.toStringAsFixed(0)}',
                               style: AppTextStyles.headlineMedium.copyWith(
-                                color: AppColors.indigo,
+                                color: AppColors.burgundy,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -187,7 +187,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
                     border:
-                        Border(top: BorderSide(color: AppColors.parchmentDeep)),
+                        Border(top: BorderSide(color: AppColors.warmMist)),
                   ),
                   child: SafeArea(
                     top: false,
@@ -198,7 +198,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           Text(
                             _errorMessage!,
                             style: AppTextStyles.labelMedium
-                                .copyWith(color: AppColors.coral),
+                                .copyWith(color: AppColors.gold),
                           ),
                           const SizedBox(height: AppSpacing.sm),
                         ],
@@ -210,7 +210,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                 ? null
                                 : () => _placeOrder(addresses),
                             style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.indigo,
+                              backgroundColor: AppColors.burgundy,
                               foregroundColor: AppColors.textOnPrimary,
                               minimumSize: const Size.fromHeight(
                                   AccessibilityTokens.minTouchTarget),
@@ -332,8 +332,8 @@ class _EmptyAddressCard extends StatelessWidget {
           FilledButton.icon(
             onPressed: onAdd,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.amber,
-              foregroundColor: AppColors.indigoDark,
+              backgroundColor: AppColors.gold,
+              foregroundColor: AppColors.burgundyDark,
             ),
             icon: const Icon(Icons.add_location_alt_outlined),
             label: Text('address_add_new'.tr()),
@@ -366,12 +366,12 @@ class _AddressCard extends StatelessWidget {
         padding: EdgeInsets.all(AppSpacing.cardPadding),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.indigoLight
+              ? AppColors.burgundyLight
               : AppColors.cardSurface,
           borderRadius:
               BorderRadius.circular(AccessibilityTokens.radiusLg),
           border: Border.all(
-            color: selected ? AppColors.indigo : AppColors.parchmentDeep,
+            color: selected ? AppColors.burgundy : AppColors.warmMist,
             width: selected ? 2 : 1,
           ),
         ),
@@ -381,7 +381,7 @@ class _AddressCard extends StatelessWidget {
               selected
                   ? Icons.radio_button_checked
                   : Icons.radio_button_unchecked,
-              color: selected ? AppColors.indigo : AppColors.textSecondary,
+              color: selected ? AppColors.burgundy : AppColors.taupe,
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
@@ -403,14 +403,14 @@ class _AddressCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.tealLight,
+                            color: AppColors.sageLight,
                             borderRadius: BorderRadius.circular(
                                 AccessibilityTokens.radiusFull),
                           ),
                           child: Text(
                             'address_default'.tr(),
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.teal,
+                              color: AppColors.sage,
                             ),
                           ),
                         ),
@@ -421,7 +421,7 @@ class _AddressCard extends StatelessWidget {
                   Text(
                     address.oneLine,
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.taupe,
                     ),
                   ),
                 ],
@@ -452,10 +452,10 @@ class _PaymentMethodCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: selected ? AppColors.indigoLight : AppColors.cardSurface,
+        color: selected ? AppColors.burgundyLight : AppColors.cardSurface,
         borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
         border: Border.all(
-          color: selected ? AppColors.indigo : AppColors.parchmentDeep,
+          color: selected ? AppColors.burgundy : AppColors.warmMist,
           width: selected ? 2 : 1,
         ),
       ),
@@ -465,7 +465,7 @@ class _PaymentMethodCard extends StatelessWidget {
             selected
                 ? Icons.radio_button_checked
                 : Icons.radio_button_unchecked,
-            color: selected ? AppColors.indigo : AppColors.textSecondary,
+            color: selected ? AppColors.burgundy : AppColors.taupe,
           ),
           const SizedBox(width: AppSpacing.md),
           const Icon(Icons.payments_outlined),
@@ -481,7 +481,7 @@ class _PaymentMethodCard extends StatelessWidget {
                 Text(
                   'checkout_cod_desc'.tr(),
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: AppColors.taupe,
                   ),
                 ),
               ],
@@ -651,12 +651,12 @@ class _AddressFormSheetState extends ConsumerState<_AddressFormSheet> {
               contentPadding: EdgeInsets.zero,
             ),
             if (_error != null)
-              Text(_error!, style: const TextStyle(color: AppColors.coral)),
+              Text(_error!, style: const TextStyle(color: AppColors.gold)),
             const SizedBox(height: AppSpacing.md),
             FilledButton(
               onPressed: _saving ? null : _save,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.indigo,
+                backgroundColor: AppColors.burgundy,
                 foregroundColor: AppColors.textOnPrimary,
                 minimumSize: const Size.fromHeight(
                     AccessibilityTokens.minTouchTarget),

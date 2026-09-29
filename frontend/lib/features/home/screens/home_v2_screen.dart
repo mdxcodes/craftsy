@@ -99,7 +99,7 @@ class _GreetingHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.indigo, AppColors.indigoLight],
+          colors: [AppColors.burgundy, AppColors.burgundyLight],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
@@ -117,47 +117,47 @@ class _GreetingHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (name != null && name!.isNotEmpty)
-                        Semantics(
-                          label: 'home_greeting'.tr(args: [name!]),
-                          child: Text(
-                            'home_greeting'.tr(args: [name!]),
-                            style: AppTextStyles.headlineLarge.copyWith(
-                              color: AppColors.parchment,
-                            ),
-                          ),
-                        )
-                      else
-                        Semantics(
-                          label: 'home_greeting_no_name'.tr(),
-                          child: Text(
-                            'home_greeting_no_name'.tr(),
-                            style: AppTextStyles.headlineLarge.copyWith(
-                              color: AppColors.parchment,
-                            ),
-                          ),
-                        ),
+                       if (name != null && name!.isNotEmpty)
+                         Semantics(
+                           label: 'home_greeting'.tr(args: [name!]),
+                           child: Text(
+                             'home_greeting'.tr(args: [name!]),
+                             style: AppTextStyles.headlineLarge.copyWith(
+                               color: AppColors.cardSurface,
+                             ),
+                           ),
+                         )
+                       else
+                         Semantics(
+                           label: 'home_greeting_no_name'.tr(),
+                           child: Text(
+                             'home_greeting_no_name'.tr(),
+                             style: AppTextStyles.headlineLarge.copyWith(
+                               color: AppColors.cardSurface,
+                             ),
+                           ),
+                         ),
                       const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        'home_subtitle'.tr(),
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.parchmentDeep,
-                        ),
-                      ),
+                       Text(
+                         'home_subtitle'.tr(),
+                         style: AppTextStyles.bodyLarge.copyWith(
+                           color: AppColors.cream,
+                         ),
+                       ),
                     ],
                   ),
                 ),
                 // Profile avatar
-                Container(
+                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.parchment.withValues(alpha: 0.2),
+                    color: AppColors.gold,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.person,
-                    color: AppColors.parchment,
+                    color: AppColors.burgundy,
                     size: 28,
                   ),
                 ),
@@ -191,8 +191,8 @@ class _QuickActions extends StatelessWidget {
                   label: 'home_add_product'.tr(),
                   icon: Icons.add_a_photo,
                   onTap: () => context.pushNamed(AppRouteConstants.addProduct),
-                  backgroundColor: AppColors.indigoLight,
-                  iconColor: AppColors.indigo,
+                  backgroundColor: AppColors.goldLight,
+                  iconColor: AppColors.gold,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -201,8 +201,8 @@ class _QuickActions extends StatelessWidget {
                   label: 'home_my_catalogue'.tr(),
                   icon: Icons.grid_view,
                   onTap: () => context.pushNamed(AppRouteConstants.catalogue),
-                  backgroundColor: AppColors.amberLight,
-                  iconColor: AppColors.amber,
+                  backgroundColor: AppColors.sageLight,
+                  iconColor: AppColors.sage,
                 ),
               ),
             ],
@@ -210,25 +210,25 @@ class _QuickActions extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
            Row(
              children: [
-               Expanded(
-                 child: LargeActionCard(
-                   label: 'home_my_orders'.tr(),
-                   icon: Icons.receipt_long,
-                   onTap: () => context.pushNamed(AppRouteConstants.myOrders),
-                   backgroundColor: AppColors.tealLight,
-                   iconColor: AppColors.teal,
-                 ),
-               ),
-               const SizedBox(width: AppSpacing.md),
-               Expanded(
-                 child: LargeActionCard(
-                   label: 'home_my_stats'.tr(),
-                   icon: Icons.trending_up,
-                   onTap: () => context.pushNamed(AppRouteConstants.myStats),
-                   backgroundColor: AppColors.coralLight,
-                   iconColor: AppColors.coral,
-                 ),
-               ),
+                Expanded(
+                  child: LargeActionCard(
+                    label: 'home_my_orders'.tr(),
+                    icon: Icons.receipt_long,
+                    onTap: () => context.pushNamed(AppRouteConstants.myOrders),
+                    backgroundColor: AppColors.burgundyLight,
+                    iconColor: AppColors.burgundy,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: LargeActionCard(
+                    label: 'home_my_stats'.tr(),
+                    icon: Icons.trending_up,
+                    onTap: () => context.pushNamed(AppRouteConstants.myStats),
+                    backgroundColor: AppColors.sageLight,
+                    iconColor: AppColors.sage,
+                  ),
+                ),
              ],
            ),
             Row(
@@ -245,8 +245,8 @@ class _QuickActions extends StatelessWidget {
                         ),
                       );
                     },
-                    backgroundColor: AppColors.indigoLight,
-                    iconColor: AppColors.indigo,
+                    backgroundColor: AppColors.goldLight,
+                    iconColor: AppColors.gold,
                   ),
                 ),
               ],
@@ -259,8 +259,8 @@ class _QuickActions extends StatelessWidget {
                     label: 'marketplace_title'.tr(),
                     icon: Icons.storefront,
                     onTap: () => context.pushNamed(AppRouteConstants.marketplace),
-                    backgroundColor: AppColors.tealLight,
-                    iconColor: AppColors.teal,
+                    backgroundColor: AppColors.goldLight,
+                    iconColor: AppColors.gold,
                   ),
                 ),
               ],
@@ -347,11 +347,11 @@ class _OrderCard extends StatelessWidget {
             child: Row(
               children: [
                 // Product image placeholder
-                Container(
+                 Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: order.productImagePath.isNotEmpty
@@ -364,7 +364,7 @@ class _OrderCard extends StatelessWidget {
                         )
                       : Icon(
                           Icons.inventory_2,
-                          color: AppColors.inkFaint,
+                          color: AppColors.taupe,
                           size: 28,
                         ),
                 ),
@@ -385,7 +385,7 @@ class _OrderCard extends StatelessWidget {
                           args: [_formatDate(order.placedAt)],
                         ),
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.inkFaint,
+                          color: AppColors.taupe,
                         ),
                       ),
                     ],
@@ -481,22 +481,22 @@ class _EarningsSnapshot extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.amberLight,
-                  AppColors.amber.withValues(alpha: 0.1),
+                  AppColors.goldLight,
+                  AppColors.gold.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'home_earnings_subtitle'.tr(),
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.inkSoft,
-                  ),
-                ),
+                 Text(
+                   'home_earnings_subtitle'.tr(),
+                   style: AppTextStyles.bodyMedium.copyWith(
+                     color: AppColors.taupe,
+                   ),
+                 ),
                 const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
@@ -543,11 +543,11 @@ class _EarningsMetric extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.amber),
+            Icon(icon, size: 20, color: AppColors.gold),
             const SizedBox(width: AppSpacing.xs),
             Text(
               label,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.taupe),
             ),
           ],
         ),

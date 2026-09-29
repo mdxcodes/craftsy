@@ -39,7 +39,7 @@ class DraftResumeCard extends ConsumerWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.card),
-          side: BorderSide(color: AppColors.amber.withValues(alpha: 0.4)),
+          side: BorderSide(color: AppColors.gold.withValues(alpha: 0.4)),
         ),
         child: InkWell(
           onTap: () {
@@ -58,12 +58,12 @@ class DraftResumeCard extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.amberLight,
+                    color: AppColors.goldLight,
                     borderRadius: BorderRadius.circular(AppRadii.sm),
                   ),
                   child: const Icon(
                     Icons.edit_note_rounded,
-                    color: AppColors.amber,
+                    color: AppColors.gold,
                     size: 24,
                   ),
                 ),
@@ -76,14 +76,14 @@ class DraftResumeCard extends ConsumerWidget {
                         'draft_resume_title'.tr(),
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.ink,
+                          color: AppColors.espresso,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'draft_resume_desc'.tr(),
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.inkSoft,
+                          color: AppColors.taupe,
                         ),
                       ),
                     ],

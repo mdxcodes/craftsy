@@ -82,7 +82,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               'Product',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.inkSoft,
+                color: AppColors.taupe,
               ),
             ),
             const SizedBox(height: 6),
@@ -92,7 +92,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+                color: AppColors.espresso,
               ),
             ),
 
@@ -102,7 +102,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               'Current Price',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.inkSoft,
+                color: AppColors.taupe,
               ),
             ),
             const SizedBox(height: 6),
@@ -112,7 +112,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink,
+                color: AppColors.espresso,
               ),
             ),
 
@@ -122,7 +122,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.parchmentDeep,
+                color: AppColors.warmMist,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Column(
@@ -132,7 +132,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
                     'AI Suggested Price',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.inkSoft,
+                      color: AppColors.taupe,
                     ),
                   ),
                   SizedBox(height: 6),
@@ -141,7 +141,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.ink,
+                      color: AppColors.espresso,
                     ),
                   ),
                   SizedBox(height: 6),
@@ -149,7 +149,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
                     'Similar products are selling at higher prices.',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.inkSoft,
+                      color: AppColors.taupe,
                     ),
                   ),
                 ],
@@ -162,7 +162,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
               'New Price',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.inkSoft,
+                color: AppColors.taupe,
               ),
             ),
             const SizedBox(height: 8),
@@ -174,7 +174,7 @@ class _UpdatePriceScreenState extends ConsumerState<UpdatePriceScreen> {
                 prefixText: '₹ ',
                 hintText: 'Enter new price',
                 filled: true,
-                fillColor: AppColors.surface,
+                fillColor: AppColors.cardSurface,
               ),
             ),
 

@@ -144,10 +144,10 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: AppColors.indigo),
+                  child: const Icon(Icons.camera_alt, color: AppColors.burgundy),
                 ),
                 title: Text(
                   'take_photo'.tr(),
@@ -169,15 +169,15 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   }
                 },
               ),
-              const Divider(color: AppColors.line),
+              const Divider(color: AppColors.warmMist),
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_library, color: AppColors.ink),
+                  child: const Icon(Icons.photo_library, color: AppColors.espresso),
                 ),
                 title: Text(
                   'upload_gallery'.tr(),
@@ -358,12 +358,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       size: 18,
-                      color: AppColors.indigoDark,
+                      color: AppColors.burgundyDark,
                     ),
                     label: Text(
                       'retake_photo_title'.tr(),
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.indigoDark,
+                        color: AppColors.burgundyDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -377,7 +377,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                 children: [
                   const Icon(
                     Icons.auto_awesome,
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -397,7 +397,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               Text(
                 'ai_review_subtitle'.tr(),
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.inkSoft,
+                  color: AppColors.taupe,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -406,9 +406,9 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppColors.parchmentDeep,
+                  color: AppColors.warmMist,
                   borderRadius: BorderRadius.circular(AppRadii.button),
-                  border: Border.all(color: AppColors.line),
+                  border: Border.all(color: AppColors.warmMist),
                 ),
                 child: Row(
                   children: [
@@ -442,8 +442,8 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _selectedLanguageIndex == 0
-                                  ? AppColors.indigo
-                                  : AppColors.inkSoft,
+                                  ? AppColors.burgundy
+                                  : AppColors.taupe,
                             ),
                           ),
                         ),
@@ -479,8 +479,8 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                             style: AppTextStyles.labelMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _selectedLanguageIndex == 1
-                                  ? AppColors.indigo
-                                  : AppColors.inkSoft,
+                                  ? AppColors.burgundy
+                                  : AppColors.taupe,
                             ),
                           ),
                         ),
@@ -494,24 +494,24 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               // ── Product Title ──────────────────────────────────────────
               TextField(
                 controller: _titleController,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.espresso),
                 decoration: InputDecoration(
                   labelText: 'product_title_label'.tr(),
                   labelStyle: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.inkSoft,
+                    color: AppColors.taupe,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.line),
+                    borderSide: const BorderSide(color: AppColors.warmMist),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.line),
+                    borderSide: const BorderSide(color: AppColors.warmMist),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
                     borderSide: const BorderSide(
-                      color: AppColors.indigo,
+                      color: AppColors.burgundy,
                       width: 1.5,
                     ),
                   ),
@@ -536,25 +536,25 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               TextField(
                 controller: _descController,
                 maxLines: 3,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.espresso),
                 decoration: InputDecoration(
                   labelText: 'product_desc_label'.tr(),
                   labelStyle: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.inkSoft,
+                    color: AppColors.taupe,
                   ),
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.line),
+                    borderSide: const BorderSide(color: AppColors.warmMist),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
-                    borderSide: const BorderSide(color: AppColors.line),
+                    borderSide: const BorderSide(color: AppColors.warmMist),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadii.card),
                     borderSide: const BorderSide(
-                      color: AppColors.indigo,
+                      color: AppColors.burgundy,
                       width: 1.5,
                     ),
                   ),
@@ -584,12 +584,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     label: Text(
                       '#$tag',
                       style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.indigoDark,
+                        color: AppColors.burgundyDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    backgroundColor: AppColors.indigoLight,
-                    deleteIconColor: AppColors.indigoDark,
+                    backgroundColor: AppColors.burgundyLight,
+                    deleteIconColor: AppColors.burgundyDark,
                     side: BorderSide.none,
                     onDeleted: () => ref
                         .read(addProductFlowProvider.notifier)
@@ -609,12 +609,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     child: TextField(
                       controller: _customTagController,
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.ink,
+                        color: AppColors.espresso,
                       ),
                       decoration: InputDecoration(
                         hintText: 'add_custom_tag_hint'.tr(),
                         hintStyle: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.inkFaint,
+                          color: AppColors.taupe,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -622,16 +622,16 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadii.button),
-                          borderSide: const BorderSide(color: AppColors.line),
+                          borderSide: const BorderSide(color: AppColors.warmMist),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadii.button),
-                          borderSide: const BorderSide(color: AppColors.line),
+                          borderSide: const BorderSide(color: AppColors.warmMist),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AppRadii.button),
                           borderSide: const BorderSide(
-                            color: AppColors.indigo,
+                            color: AppColors.burgundy,
                             width: 1.5,
                           ),
                         ),
@@ -669,12 +669,12 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                   icon: const Icon(
                     Icons.mic_none_outlined,
                     size: 18,
-                    color: AppColors.indigoDark,
+                    color: AppColors.burgundyDark,
                   ),
                   label: Text(
                     're_record'.tr(),
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.indigoDark,
+                      color: AppColors.burgundyDark,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -726,7 +726,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppRadii.card),
               ),
-              color: AppColors.parchment,
+              color: AppColors.cream,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -740,8 +740,8 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                       height: 52,
                       child: CircularProgressIndicator(
                         strokeWidth: 4,
-                        color: AppColors.indigo,
-                        backgroundColor: AppColors.parchmentDeep,
+                        color: AppColors.burgundy,
+                        backgroundColor: AppColors.warmMist,
                       ),
                     ),
                     const SizedBox(height: 22),
@@ -756,7 +756,7 @@ class _Step3AiReviewWidgetState extends ConsumerState<Step3AiReviewWidget> {
                     Text(
                       'ai_regenerating_subtitle'.tr(),
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.inkSoft,
+                        color: AppColors.taupe,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -799,7 +799,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppRadii.card),
         child: Container(
-          color: AppColors.parchmentDeep,
+          color: AppColors.warmMist,
           child: LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
@@ -819,7 +819,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                         imageUrl: widget.afterPath,
                         fit: BoxFit.cover,
                         fallbackWidget: Container(
-                          color: AppColors.parchmentDeep,
+                          color: AppColors.warmMist,
                           child: const Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -829,7 +829,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                                   height: 28,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: AppColors.indigo,
+                                    color: AppColors.burgundy,
                                   ),
                                 ),
                                 SizedBox(height: 8),
@@ -837,7 +837,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                                   'Loading enhanced photo...',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColors.inkSoft,
+                                    color: AppColors.taupe,
                                   ),
                                 ),
                               ],
@@ -880,7 +880,7 @@ class _BeforeAfterSliderState extends State<_BeforeAfterSlider> {
                           child: const Icon(
                             Icons.drag_indicator,
                             size: 18,
-                            color: AppColors.ink,
+                            color: AppColors.espresso,
                           ),
                         ),
                       ),

@@ -271,7 +271,7 @@ class _SocialMediaLaunchpadSheetState
                           fit: BoxFit.cover,
                         )
                       : Container(
-                          color: AppColors.parchmentDeep,
+                          color: AppColors.warmMist,
                           child: const Icon(
                             Icons.image,
                             color: AppColors.inkFaint,

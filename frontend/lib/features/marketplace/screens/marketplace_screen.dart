@@ -219,13 +219,13 @@ class _CategoryChip extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.indigo : AppColors.cardSurface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? AppColors.indigo : AppColors.parchmentDeep,
-            ),
-          ),
+             decoration: BoxDecoration(
+             color: isSelected ? AppColors.burgundy : AppColors.cardSurface,
+             borderRadius: BorderRadius.circular(20),
+             border: Border.all(
+               color: isSelected ? AppColors.burgundy : AppColors.warmMist,
+             ),
+           ),
           child: Text(
             label,
             style: AppTextStyles.labelLarge.copyWith(
@@ -248,10 +248,10 @@ class _ProductCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/marketplace/product/${product.id}'),
       child: Container(
-        decoration: BoxDecoration(
+         decoration: BoxDecoration(
           color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.parchmentDeep),
+          border: Border.all(color: AppColors.warmMist),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,14 +264,14 @@ class _ProductCard extends StatelessWidget {
                 ),
                 child: AppImage(
                   imageUrl: product.imageUrl,
-                  fallbackWidget: Container(
-                    color: AppColors.parchmentDeep,
-                    child: const Icon(
-                      Icons.image,
-                      size: 48,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
+                   fallbackWidget: Container(
+                     color: AppColors.warmMist,
+                     child: const Icon(
+                       Icons.image,
+                       size: 48,
+                       color: AppColors.taupe,
+                     ),
+                   ),
                 ),
               ),
             ),
@@ -292,21 +292,21 @@ class _ProductCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       product.artisanName!,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 11,
-                      ),
+                       style: AppTextStyles.bodySmall.copyWith(
+                         color: AppColors.taupe,
+                         fontSize: 11,
+                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                   const SizedBox(height: 4),
-                  Text(
-                    '₹${product.price.toStringAsFixed(0)}',
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      color: AppColors.indigo,
-                    ),
-                  ),
+                   Text(
+                     '₹${product.price.toStringAsFixed(0)}',
+                     style: AppTextStyles.headlineSmall.copyWith(
+                       color: AppColors.burgundy,
+                     ),
+                   ),
                 ],
               ),
             ),

@@ -154,7 +154,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                     title: 'total_listings'.tr(),
                     value: '$totalListings',
                     icon: Icons.inventory_2_outlined,
-                    iconColor: AppColors.indigo,
+                    iconColor: AppColors.burgundy,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -163,7 +163,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                     title: 'average_order_value'.tr(),
                     value: '₹${aov.toStringAsFixed(0)}',
                     icon: Icons.payments_outlined,
-                    iconColor: AppColors.amber,
+                    iconColor: AppColors.gold,
                   ),
                 ),
               ],
@@ -184,7 +184,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                 children: [
                   const Icon(
                     Icons.insights_rounded,
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                     size: 24,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -220,12 +220,12 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                     width: 42,
                     height: 42,
                     decoration: const BoxDecoration(
-                      color: AppColors.tealLight,
+                      color: AppColors.sageLight,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.security_rounded,
-                      color: AppColors.teal,
+                      color: AppColors.sage,
                       size: 24,
                     ),
                   ),
@@ -237,7 +237,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                         Text(
                           'floor_price_guarantee'.tr(),
                           style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.teal,
+                            color: AppColors.sage,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -245,7 +245,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                         Text(
                           'floor_price_guarantee_desc'.tr(),
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.inkSoft,
+                            color: AppColors.taupe,
                           ),
                         ),
                       ],
@@ -267,7 +267,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
       scrollDirection: Axis.horizontal,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.parchmentDeep,
+          color: AppColors.warmMist,
           borderRadius: BorderRadius.circular(999),
         ),
         padding: const EdgeInsets.all(4),
@@ -317,7 +317,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
           style: AppTextStyles.labelSmall.copyWith(
             fontSize: 11.0,
             fontWeight: FontWeight.w700,
-            color: isSelected ? AppColors.ink : AppColors.inkSoft,
+            color: isSelected ? AppColors.ink : AppColors.taupe,
           ),
         ),
       ),
@@ -331,7 +331,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.indigo,
+        color: AppColors.burgundy,
         borderRadius: BorderRadius.circular(AppRadii.card),
         boxShadow: AppElevation.cardShadow,
       ),
@@ -436,7 +436,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                             width: 24,
                             height: height.clamp(2, 80),
                             decoration: BoxDecoration(
-                              color: AppColors.indigo,
+                              color: AppColors.burgundy,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -445,7 +445,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                             labels[i],
                             style: AppTextStyles.caption.copyWith(
                               fontSize: 10,
-                              color: AppColors.inkSoft,
+                              color: AppColors.taupe,
                             ),
                           ),
                         ],
@@ -456,7 +456,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
                     child: Text(
                       'no_sales_data'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.inkSoft,
+                        color: AppColors.taupe,
                       ),
                     ),
                   ),
@@ -495,9 +495,9 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
               _buildSummaryItem(
                 'in_progress'.tr(),
                 inProgress,
-                AppColors.amber,
+                AppColors.gold,
               ),
-              _buildSummaryItem('cancelled'.tr(), cancelled, AppColors.coral),
+              _buildSummaryItem('cancelled'.tr(), cancelled, AppColors.gold),
             ],
           ),
         ],
@@ -528,7 +528,7 @@ class _MyStatsScreenState extends ConsumerState<MyStatsScreen> {
         const SizedBox(height: AppSpacing.xs),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(color: AppColors.inkSoft),
+          style: AppTextStyles.caption.copyWith(color: AppColors.taupe),
         ),
       ],
     );
@@ -584,7 +584,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             title,
-            style: AppTextStyles.labelSmall.copyWith(color: AppColors.inkSoft),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.taupe),
           ),
         ],
       ),

@@ -67,7 +67,7 @@ class ChannelStatusCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: AppColors.espresso,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -78,7 +78,7 @@ class ChannelStatusCard extends StatelessWidget {
                           'Missing: ${status.missingRequirements.join(', ')}',
                           style: const TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: AppColors.taupe,
                           ),
                         ),
                       ],
@@ -91,8 +91,8 @@ class ChannelStatusCard extends StatelessWidget {
                   FilledButton(
                     onPressed: onPublish,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.indigo,
-                      foregroundColor: AppColors.textOnPrimary,
+                      backgroundColor: AppColors.burgundy,
+                      foregroundColor: AppColors.cardSurface,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
@@ -129,12 +129,12 @@ class ChannelStatusCard extends StatelessWidget {
   }
 
   Color get _statusColor {
-    if (status.isLive) return AppColors.success;
+    if (status.isLive) return AppColors.sage;
     if (status.hasFailed) return AppColors.error;
-    if (status.needsInfo) return AppColors.amber;
-    if (status.isPending) return AppColors.indigo;
-    if (status.isNotConnected) return AppColors.inkFaint;
-    return AppColors.inkSoft;
+    if (status.needsInfo) return AppColors.gold;
+    if (status.isPending) return AppColors.burgundy;
+    if (status.isNotConnected) return AppColors.taupe;
+    return AppColors.taupe;
   }
 
   IconData get _channelIcon {

@@ -52,10 +52,10 @@ class _ListeningStateState extends State<ListeningState>
               vertical: AccessibilityTokens.spacingMd,
             ),
             decoration: BoxDecoration(
-              color: AppColors.coral.withValues(alpha: 0.1),
+              color: AppColors.sienna.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
               border: Border.all(
-                color: AppColors.coral.withValues(alpha: 0.3),
+                color: AppColors.sienna.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -68,10 +68,10 @@ class _ListeningStateState extends State<ListeningState>
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.coral.withValues(
+                    color: AppColors.sienna.withValues(
                       alpha: 0.2 + 0.3 * _controller.value,
                     ),
-                    border: Border.all(color: AppColors.coral, width: 2),
+                    border: Border.all(color: AppColors.sienna, width: 2),
                   ),
                   child: Center(
                     child: Container(
@@ -79,7 +79,7 @@ class _ListeningStateState extends State<ListeningState>
                       height: 12,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.coral,
+                        color: AppColors.sienna,
                       ),
                     ),
                   ),
@@ -88,7 +88,7 @@ class _ListeningStateState extends State<ListeningState>
                 Text(
                   effectiveLabel,
                   style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.coral,
+                    color: AppColors.sienna,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

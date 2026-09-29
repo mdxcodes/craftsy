@@ -356,7 +356,7 @@ class _PackagingSuggestionsSheetState extends State<PackagingSuggestionsSheet> {
                     width: 48,
                     height: 48,
                     decoration: const BoxDecoration(
-                      color: AppColors.parchmentDeep,
+                      color: AppColors.warmMist,
                       shape: BoxShape.circle,
                     ),
                     child: const Center(

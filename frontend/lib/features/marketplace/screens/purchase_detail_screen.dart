@@ -127,7 +127,7 @@ class _PurchaseDetailBody extends StatelessWidget {
                 color: AppColors.cardSurface,
                 borderRadius:
                     BorderRadius.circular(AccessibilityTokens.radiusLg),
-                border: Border.all(color: AppColors.parchmentDeep),
+                border: Border.all(color: AppColors.warmMist),
               ),
               child: Row(
                 children: [
@@ -140,9 +140,9 @@ class _PurchaseDetailBody extends StatelessWidget {
                       child: AppImage(
                         imageUrl: item.imageUrl,
                         fallbackWidget: Container(
-                          color: AppColors.parchmentDeep,
+                          color: AppColors.warmMist,
                           child: const Icon(Icons.image,
-                              color: AppColors.textSecondary),
+                              color: AppColors.taupe),
                         ),
                       ),
                     ),
@@ -162,7 +162,7 @@ class _PurchaseDetailBody extends StatelessWidget {
                         Text(
                           '₹${item.unitPrice.toStringAsFixed(0)} × ${item.quantity}',
                           style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.textSecondary,
+                            color: AppColors.taupe,
                           ),
                         ),
                       ],
@@ -171,7 +171,7 @@ class _PurchaseDetailBody extends StatelessWidget {
                   Text(
                     '₹${item.totalPrice.toStringAsFixed(0)}',
                     style: AppTextStyles.labelLarge.copyWith(
-                      color: AppColors.indigo,
+                      color: AppColors.burgundy,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -224,7 +224,7 @@ class _PurchaseDetailBody extends StatelessWidget {
                 Text(
                   order.address!.oneLine,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
+                    color: AppColors.taupe,
                   ),
                 ),
               ],
@@ -258,18 +258,18 @@ class _TrackingTimeline extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(AppSpacing.cardPadding),
         decoration: BoxDecoration(
-          color: AppColors.coralLight,
+          color: AppColors.siennaLight,
           borderRadius:
               BorderRadius.circular(AccessibilityTokens.radiusMd),
         ),
         child: Row(
           children: [
-            const Icon(Icons.cancel_outlined, color: AppColors.coral),
+            const Icon(Icons.cancel_outlined, color: AppColors.sienna),
             const SizedBox(width: AppSpacing.sm),
             Text(
               'order_status_cancelled'.tr(),
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.coralDark,
+                color: AppColors.siennaDark,
               ),
             ),
           ],
@@ -285,7 +285,7 @@ class _TrackingTimeline extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
-        border: Border.all(color: AppColors.parchmentDeep),
+        border: Border.all(color: AppColors.warmMist),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,7 +342,7 @@ class _TimelineStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDone ? AppColors.teal : AppColors.inkFaint;
+    final color = isDone ? AppColors.sage : AppColors.taupe;
 
     return IntrinsicHeight(
       child: Row(
@@ -355,8 +355,8 @@ class _TimelineStep extends StatelessWidget {
                   child: Container(
                     width: 2,
                     color: isDone
-                        ? AppColors.teal.withValues(alpha: 0.4)
-                        : AppColors.parchmentDeep,
+                        ? AppColors.sage.withValues(alpha: 0.4)
+                        : AppColors.warmMist,
                   ),
                 ),
             ],
@@ -368,7 +368,7 @@ class _TimelineStep extends StatelessWidget {
               child: Text(
                 label,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: isDone ? AppColors.textPrimary : AppColors.textTertiary,
+                  color: isDone ? AppColors.espresso : AppColors.taupe,
                   fontWeight: isDone ? FontWeight.w700 : FontWeight.w400,
                 ),
               ),
@@ -395,7 +395,7 @@ class _InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
-        border: Border.all(color: AppColors.parchmentDeep),
+        border: Border.all(color: AppColors.warmMist),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,14 +422,14 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.textSecondary),
+        Icon(icon, size: 20, color: AppColors.taupe),
         const SizedBox(width: AppSpacing.sm),
         Expanded(child: Text(label, style: AppTextStyles.bodyMedium)),
         Text(
           value,
           style: isTotal
               ? AppTextStyles.headlineMedium.copyWith(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   fontWeight: FontWeight.w800,
                 )
               : AppTextStyles.bodyMedium,
@@ -447,10 +447,10 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (status) {
-      'delivered' => (AppColors.tealLight, AppColors.teal),
-      'cancelled' => (AppColors.coralLight, AppColors.coralDark),
-      'shipped' => (AppColors.indigoLight, AppColors.indigoDark),
-      _ => (AppColors.amberLight, AppColors.amberDark),
+      'delivered' => (AppColors.sageLight, AppColors.sage),
+      'cancelled' => (AppColors.siennaLight, AppColors.siennaDark),
+      'shipped' => (AppColors.burgundyLight, AppColors.burgundyDark),
+      _ => (AppColors.goldLight, AppColors.goldDark),
     };
 
     String label() {

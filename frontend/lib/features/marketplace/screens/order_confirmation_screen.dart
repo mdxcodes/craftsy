@@ -31,13 +31,13 @@ class OrderConfirmationScreen extends StatelessWidget {
                 width: 88,
                 height: 88,
                 decoration: const BoxDecoration(
-                  color: AppColors.tealLight,
+                  color: AppColors.sageLight,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.check_circle_outline,
                   size: 48,
-                  color: AppColors.teal,
+                  color: AppColors.sage,
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -67,7 +67,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   color: AppColors.cardSurface,
                   borderRadius:
                       BorderRadius.circular(AccessibilityTokens.radiusLg),
-                  border: Border.all(color: AppColors.parchmentDeep),
+                  border: Border.all(color: AppColors.warmMist),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +77,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                         Text(
                           'order_id_label'.tr(),
                           style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.textSecondary,
+                            color: AppColors.taupe,
                           ),
                         ),
                         const Spacer(),
@@ -91,7 +91,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Divider(color: AppColors.parchmentDeep),
+                    Divider(color: AppColors.warmMist),
                     ...order.items.map(
                       (item) => Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -106,10 +106,10 @@ class OrderConfirmationScreen extends StatelessWidget {
                                 child: AppImage(
                                   imageUrl: item.imageUrl,
                                   fallbackWidget: Container(
-                                    color: AppColors.parchmentDeep,
+                                    color: AppColors.warmMist,
                                     child: const Icon(Icons.image,
                                         size: 20,
-                                        color: AppColors.textSecondary),
+                                        color: AppColors.taupe),
                                   ),
                                 ),
                               ),
@@ -130,7 +130,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Divider(color: AppColors.parchmentDeep),
+                    Divider(color: AppColors.warmMist),
                     _SummaryRow(
                       label: 'cart_subtotal'.tr(),
                       value: '₹${order.totalAmount.toStringAsFixed(0)}',
@@ -158,7 +158,7 @@ class OrderConfirmationScreen extends StatelessWidget {
               FilledButton(
                 onPressed: () => context.pushReplacement('/my-purchases'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.indigo,
+                  backgroundColor: AppColors.burgundy,
                   foregroundColor: AppColors.textOnPrimary,
                   minimumSize: const Size.fromHeight(
                       AccessibilityTokens.minTouchTarget),
@@ -173,7 +173,7 @@ class OrderConfirmationScreen extends StatelessWidget {
               OutlinedButton(
                 onPressed: () => context.go('/marketplace'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.indigo,
+                  foregroundColor: AppColors.burgundy,
                   minimumSize: const Size.fromHeight(
                       AccessibilityTokens.minTouchTarget),
                   shape: RoundedRectangleBorder(
@@ -234,7 +234,7 @@ class _SummaryRow extends StatelessWidget {
           value,
           style: isTotal
               ? AppTextStyles.headlineMedium.copyWith(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   fontWeight: FontWeight.w800,
                 )
               : AppTextStyles.bodyMedium,

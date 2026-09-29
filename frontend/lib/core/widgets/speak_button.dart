@@ -57,7 +57,7 @@ class _SpeakButtonState extends State<SpeakButton> {
   @override
   Widget build(BuildContext context) {
     final isSpeaking = _ttsService.isSpeaking;
-    final effectiveColor = widget.color ?? AppColors.indigo;
+    final effectiveColor = widget.color ?? AppColors.burgundy;
     final effectiveLabel =
         widget.label ?? (isSpeaking ? 'stop_audio'.tr() : 'tap_to_hear'.tr());
 

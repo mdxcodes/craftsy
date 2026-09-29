@@ -105,7 +105,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
               width: 5,
               height: 5,
               decoration: const BoxDecoration(
-                color: AppColors.success,
+                color: AppColors.sage,
                 shape: BoxShape.circle,
               ),
             ),
@@ -113,7 +113,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
             Text(
               'status_live'.tr(),
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.success,
+                color: AppColors.sage,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
               ),
@@ -130,14 +130,14 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
 
     switch (status) {
       case ProductStatus.pendingSync:
-        bg = AppColors.statusPendingBg;
-        fg = AppColors.statusPendingFg;
+        bg = AppColors.goldLight;
+        fg = AppColors.goldDark;
         labelKey = 'status_pending_sync';
         icon = Icons.cloud_queue;
         break;
       case ProductStatus.draft:
-        bg = AppColors.parchmentDeep;
-        fg = AppColors.inkSoft;
+        bg = AppColors.warmMist;
+        fg = AppColors.taupe;
         labelKey = 'status_draft';
         icon = Icons.edit_note;
         break;
@@ -148,20 +148,20 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
         icon = Icons.sell;
         break;
       case ProductStatus.soldOut:
-        bg = AppColors.terracottaLight;
-        fg = AppColors.terracottaDark;
+        bg = AppColors.siennaLight;
+        fg = AppColors.siennaDark;
         labelKey = 'status_sold_out';
         icon = Icons.remove_shopping_cart_outlined;
         break;
       case ProductStatus.listingRemoved:
-        bg = AppColors.parchmentDeep;
-        fg = AppColors.inkFaint;
+        bg = AppColors.warmMist;
+        fg = AppColors.taupe;
         labelKey = 'status_listing_removed';
         icon = Icons.visibility_off_outlined;
         break;
       case ProductStatus.live:
-        bg = AppColors.statusSuccessBg;
-        fg = AppColors.statusSuccessFg;
+        bg = AppColors.sageLight;
+        fg = AppColors.sage;
         labelKey = 'status_live';
         icon = Icons.check_circle;
         break;
@@ -290,11 +290,11 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
               decoration: InputDecoration(
                 hintText: 'search_products_hint'.tr(),
                 hintStyle: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.inkFaint,
+                  color: AppColors.taupe,
                 ),
                 prefixIcon: const Icon(
                   Icons.search,
-                  color: AppColors.inkFaint,
+                  color: AppColors.taupe,
                   size: 20,
                 ),
                 suffixIcon: _searchQuery.isNotEmpty
@@ -305,7 +305,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                           icon: const Icon(
                             Icons.clear,
                             size: 18,
-                            color: AppColors.inkSoft,
+                            color: AppColors.taupe,
                           ),
                           tooltip: 'clear_search'.tr(),
                           onPressed: () {
@@ -341,7 +341,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadii.button),
                   borderSide: const BorderSide(
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                     width: 2,
                   ),
                 ),
@@ -384,7 +384,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
           Expanded(
             child: productsAsync.when(
               loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.indigo),
+                child: CircularProgressIndicator(color: AppColors.burgundy),
               ),
               error: (err, stack) => Center(
                 child: Padding(
@@ -395,7 +395,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                       const Icon(
                         Icons.error_outline,
                         size: 48,
-                        color: AppColors.coralDark,
+                        color: AppColors.siennaDark,
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
@@ -431,7 +431,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.xl),
                             decoration: BoxDecoration(
-                              color: AppColors.parchmentDeep,
+                              color: AppColors.warmMist,
                               borderRadius: BorderRadius.circular(
                                 AppRadii.card,
                               ),
@@ -442,7 +442,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                                 const Icon(
                                   Icons.shopping_bag_outlined,
                                   size: 64,
-                                  color: AppColors.indigo,
+                                  color: AppColors.burgundy,
                                 ),
                                 const SizedBox(height: AppSpacing.md),
                                 Text(
@@ -454,7 +454,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                                 Text(
                                   'no_products_desc'.tr(),
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.inkSoft,
+                                    color: AppColors.taupe,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -490,7 +490,7 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                 }
 
                 return RefreshIndicator(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   onRefresh: () => ref
                       .read(productListProvider.notifier)
                       .loadProducts(forceRefresh: true),
@@ -645,7 +645,7 @@ class _GridProductCard extends StatelessWidget {
                     Text(
                       '₹${product.price.toStringAsFixed(0)}',
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.indigo,
+                        color: AppColors.burgundy,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -661,14 +661,14 @@ class _GridProductCard extends StatelessWidget {
                               const Icon(
                                 Icons.share_outlined,
                                 size: 14,
-                                color: AppColors.indigo,
+                                color: AppColors.burgundy,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   'social_media_helper'.tr(),
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.indigo,
+                                    color: AppColors.burgundy,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 11,
                                   ),
@@ -697,23 +697,23 @@ class _GridProductCard extends StatelessWidget {
     if (cat.contains('pot') ||
         cat.contains('clay') ||
         cat.contains('ceramic')) {
-      painter = CraftCategoryIcons.pottery(color: AppColors.terracottaDark);
+      painter = CraftCategoryIcons.pottery(color: AppColors.siennaDark);
     } else if (cat.contains('silk') ||
         cat.contains('textile') ||
         cat.contains('saree')) {
-      painter = CraftCategoryIcons.textile(color: AppColors.terracottaDark);
+      painter = CraftCategoryIcons.textile(color: AppColors.siennaDark);
     } else if (cat.contains('wood') || cat.contains('toy')) {
-      painter = CraftCategoryIcons.woodwork(color: AppColors.terracottaDark);
+      painter = CraftCategoryIcons.woodwork(color: AppColors.siennaDark);
     } else if (cat.contains('jewel') ||
         cat.contains('gold') ||
         cat.contains('silver')) {
-      painter = CraftCategoryIcons.jewelry(color: AppColors.terracottaDark);
+      painter = CraftCategoryIcons.jewelry(color: AppColors.siennaDark);
     } else {
-      painter = CraftCategoryIcons.pottery(color: AppColors.terracottaDark);
+      painter = CraftCategoryIcons.pottery(color: AppColors.siennaDark);
     }
 
     return Container(
-      color: AppColors.parchmentDeep,
+      color: AppColors.warmMist,
       child: Center(
         child: CustomPaint(size: const Size(40, 40), painter: painter),
       ),

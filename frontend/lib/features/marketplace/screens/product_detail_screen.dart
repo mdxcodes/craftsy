@@ -49,7 +49,7 @@ class _ProductDetailScreenState
           content: Text(
             'cart_stock_limit'.tr(namedArgs: {'count': '${product.stock}'}),
           ),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.sienna,
         ),
       );
       return;
@@ -64,7 +64,7 @@ class _ProductDetailScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('cart_added'.tr()),
-          backgroundColor: AppColors.teal,
+          backgroundColor: AppColors.sage,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -81,7 +81,7 @@ class _ProductDetailScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(key.tr()),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.sienna,
         ),
       );
     } catch (_) {
@@ -89,7 +89,7 @@ class _ProductDetailScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('cart_add_failed'.tr()),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.sienna,
         ),
       );
     }
@@ -188,11 +188,11 @@ class _ProductDetailBody extends StatelessWidget {
                   child: AppImage(
                     imageUrl: product.imageUrl,
                     fallbackWidget: Container(
-                      color: AppColors.parchmentDeep,
+                      color: AppColors.warmMist,
                       child: const Icon(
                         Icons.image,
                         size: 64,
-                        color: AppColors.textSecondary,
+                        color: AppColors.taupe,
                       ),
                     ),
                   ),
@@ -214,7 +214,7 @@ class _ProductDetailBody extends StatelessWidget {
                       Text(
                         '₹${product.price.toStringAsFixed(0)}',
                         style: AppTextStyles.displayLarge.copyWith(
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -239,8 +239,8 @@ class _ProductDetailBody extends StatelessWidget {
                                 : 'product_in_stock'
                                     .tr(namedArgs: {'count': '${product.stock}'}),
                             color: outOfStock
-                                ? AppColors.coral
-                                : AppColors.teal,
+                                ? AppColors.sienna
+                                : AppColors.sage,
                           ),
                         ],
                       ),
@@ -300,7 +300,7 @@ class _ProductDetailBody extends StatelessWidget {
           padding: EdgeInsets.all(AppSpacing.screenPadding),
           decoration: BoxDecoration(
             color: AppColors.cardSurface,
-            border: Border(top: BorderSide(color: AppColors.parchmentDeep)),
+            border: Border(top: BorderSide(color: AppColors.warmMist)),
           ),
           child: Row(
             children: [
@@ -311,8 +311,8 @@ class _ProductDetailBody extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: outOfStock ? null : onAddToCart,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.amber,
-                      foregroundColor: AppColors.indigoDark,
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.burgundyDark,
                       minimumSize: const Size.fromHeight(
                           AccessibilityTokens.minTouchTarget),
                       shape: RoundedRectangleBorder(
@@ -333,8 +333,8 @@ class _ProductDetailBody extends StatelessWidget {
                   child: FilledButton(
                     onPressed: outOfStock ? null : onBuyNow,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.indigo,
-                      foregroundColor: AppColors.textOnPrimary,
+                      backgroundColor: AppColors.burgundy,
+                      foregroundColor: AppColors.cardSurface,
                       minimumSize: const Size.fromHeight(
                           AccessibilityTokens.minTouchTarget),
                       shape: RoundedRectangleBorder(
@@ -373,7 +373,7 @@ class _RoundIconButton extends StatelessWidget {
     return Material(
       color: AppColors.cardSurface,
       shape: const CircleBorder(
-        side: BorderSide(color: AppColors.parchmentDeep),
+        side: BorderSide(color: AppColors.warmMist),
       ),
       child: Tooltip(
         message: tooltip,
@@ -400,11 +400,11 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? AppColors.textSecondary;
+    final effectiveColor = color ?? AppColors.taupe;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.parchmentDeep,
+        color: AppColors.warmMist,
         borderRadius: BorderRadius.circular(AccessibilityTokens.radiusFull),
       ),
       child: Row(

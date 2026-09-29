@@ -42,7 +42,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
     final screenPadding = AppSpacing.getScreenPadding(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.cream,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(screenPadding),
@@ -50,18 +50,31 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              const Icon(Icons.language, size: 48, color: AppColors.indigo),
-              const SizedBox(height: AppSpacing.md),
+              // Hero icon
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.burgundyLight,
+                  borderRadius: BorderRadius.circular(AppRadii.lg),
+                ),
+                child: Icon(
+                  Icons.language_rounded,
+                  size: 32,
+                  color: AppColors.burgundy,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'choose_language_title'.tr(),
-                style: AppTextStyles.headlineLarge,
+                style: AppTextStyles.displaySmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'choose_language_subtitle'.tr(),
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.warmGray,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -82,7 +95,9 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                             onTap: () =>
                                 setState(() => _selectedCode = lang['code']!),
                             borderRadius: BorderRadius.circular(AppRadii.xl),
-                            child: Container(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut,
                               constraints: const BoxConstraints(
                                 minHeight: AppSpacing.minTouchTarget,
                               ),
@@ -92,16 +107,27 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: _selectedCode == lang['code']
-                                    ? AppColors.indigo
-                                    : AppColors.surface,
+                                    ? AppColors.burgundy
+                                    : AppColors.cardSurface,
                                 borderRadius: BorderRadius.circular(
                                   AppRadii.xl,
                                 ),
                                 border: Border.all(
                                   color: _selectedCode == lang['code']
-                                      ? AppColors.indigoDark
-                                      : AppColors.oak,
+                                      ? AppColors.burgundyDark
+                                      : AppColors.warmMist,
+                                  width: _selectedCode == lang['code'] ? 0 : 1.5,
                                 ),
+                                boxShadow: _selectedCode == lang['code']
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.burgundy.withValues(
+                                              alpha: 0.2),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
                               ),
                               child: Text(
                                 lang['native']!,
@@ -120,7 +146,10 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              AppButton(label: 'continue_btn'.tr(), onPressed: _handleContinue),
+              AppButton(
+                label: 'continue_btn'.tr(),
+                onPressed: _handleContinue,
+              ),
               const SizedBox(height: AppSpacing.md),
             ],
           ),

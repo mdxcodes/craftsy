@@ -1,132 +1,142 @@
 import 'package:flutter/material.dart';
 
-/// Craftsy v4 design-token palette — "Indigo Loom"
+/// Craftsy "Kosa Silk" design-token palette — warm, handcrafted, regal.
 ///
-/// A deep, premium indigo base with warm amber accents.
-/// Completely distinct from the previous terracotta/gold/berry scheme.
+/// Inspired by Indian textile traditions: deep burgundy, warm gold,
+/// natural sage, and cream backgrounds. Distinct from the previous
+/// Indigo Loom scheme.
 ///
 /// Role hierarchy:
-///   indigo       → every primary action button, app bar, FAB
-///   amber        → every secondary/alternate-path button, highlights
-///   teal         → accent only (success states, info cards)
-///   coral        → accent only (warnings, error states)
+///   burgundy       → every primary action button, app bar, FAB
+///   gold           → every secondary/alternate-path button, highlights
+///   sage           → accent only (success states, info cards)
+///   sienna         → accent only (warnings, error states)
 class AppColors {
   // ---------------------------------------------------------------------------
-  // Core palette — Indigo Loom
+  // Core palette — Kosa Silk
   // ---------------------------------------------------------------------------
 
-  /// Primary action (deep indigo)
-  static const indigo = Color(0xFF2D3A8C);
-  static const indigoDark = Color(0xFF1A1A2E);
-  static const indigoLight = Color(0xFFE8EAF6);
+  /// Primary action (deep burgundy/wine)
+  static const burgundy = Color(0xFF7B2D3E);
+  static const burgundyDark = Color(0xFF5A1F2D);
+  static const burgundyLight = Color(0xFFF5E6EB);
 
-  /// Secondary action (warm amber) — drives every secondary / alternate-path button
-  static const amber = Color(0xFFE8912D);
-  static const amberDark = Color(0xFFC75B39);
-  static const amberLight = Color(0xFFFFF3E0);
+  /// Secondary action (warm gold/ochre) — drives every secondary / alternate-path button
+  static const gold = Color(0xFFC9973E);
+  static const goldDark = Color(0xFFA67C2E);
+  static const goldLight = Color(0xFFFFF3E0);
 
-  /// Accent 1 (teal) — success states, info cards; never a button fill
-  static const teal = Color(0xFF00696E);
-  static const tealDark = Color(0xFF004F52);
-  static const tealLight = Color(0xFFE0F2F1);
+  /// Accent 1 (sage) — success states, info cards; never a button fill
+  static const sage = Color(0xFF6B8E5A);
+  static const sageDark = Color(0xFF4D6B3A);
+  static const sageLight = Color(0xFFE8F0E4);
 
-  /// Accent 2 (coral) — warnings, error states; never a button fill
-  static const coral = Color(0xFFD84343);
-  static const coralDark = Color(0xFFB71C1C);
-  static const coralLight = Color(0xFFFFEBEE);
-
-  // ---------------------------------------------------------------------------
-  // Ink — cool near-black text
-  // ---------------------------------------------------------------------------
-  static const ink = Color(0xFF1A1A2E);
-  static const inkSoft = Color(0xFF545468);
-  static const inkFaint = Color(0xFF9E9EB0);
+  /// Accent 2 (sienna) — warnings, error states; never a button fill
+  static const sienna = Color(0xFFC04F3A);
+  static const siennaDark = Color(0xFF9E3B2A);
+  static const siennaLight = Color(0xFFFFEBEE);
 
   // ---------------------------------------------------------------------------
-  // Surfaces
+  // Neutrals — warm cream / espresso / taupe family
   // ---------------------------------------------------------------------------
-  static const parchment = Color(0xFFF5F5FA);
-  static const parchmentDeep = Color(0xFFE8E8F0);
+
+  /// Backgrounds
+  static const cream = Color(0xFFFAF7F2);
+  static const linen = Color(0xFFF5F0E8);
   static const cardSurface = Color(0xFFFFFFFF);
 
-  // ---------------------------------------------------------------------------
-  // Structural
-  // ---------------------------------------------------------------------------
-  static const dottedBorder = Color(0xFFD0D0E0);
-  static const line = Color(0x241A1A2E);
-  static const shadow = Color(0x141A1A2E);
-  static const shadowLifted = Color(0x471A1A2E);
-  static const overlay = Color(0x6B0A0A1A);
+  /// Text
+  static const espresso = Color(0xFF2A1F1B);
+  static const warmGray = Color(0xFF6B635E);
+  static const taupe = Color(0xFF9E968F);
+
+  /// Structural
+  static const warmStone = Color(0xFFD9D2C7);
+  static const warmMist = Color(0xFFE8E2D9);
+  static const warmShadow = Color(0x1A2A1F1B);
 
   // ---------------------------------------------------------------------------
   // Semantic convenience aliases
   // ---------------------------------------------------------------------------
-  static const textPrimary = ink;
-  static const textSecondary = inkSoft;
-  static const textTertiary = inkFaint;
+  static const textPrimary = espresso;
+  static const textSecondary = warmGray;
+  static const textTertiary = taupe;
   static const textOnPrimary = Color(0xFFFFFFFF);
 
-  static const background = parchment;
+  static const background = cream;
   static const surface = cardSurface;
-  static const surfaceVariant = parchmentDeep;
+  static const surfaceVariant = linen;
 
-  static const error = coral;
-  static const warning = amber;
-  static const border = dottedBorder;
-  static const divider = line;
+  static const error = sienna;
+  static const warning = gold;
+  static const border = warmStone;
+  static const divider = warmMist;
+
+  static const success = sage;
+  static const successLight = sageLight;
 
   // ---------------------------------------------------------------------------
   // Status badge roles
   // ---------------------------------------------------------------------------
-  static const statusActionBg = indigoLight;
-  static const statusActionFg = indigoDark;
-  static const statusPendingBg = amberLight;
-  static const statusPendingFg = amberDark;
-  static const statusSuccessBg = tealLight;
-  static const statusSuccessFg = teal;
+  static const statusActionBg = goldLight;
+  static const statusActionFg = goldDark;
+  static const statusPendingBg = linen;
+  static const statusPendingFg = warmGray;
+  static const statusSuccessBg = sageLight;
+  static const statusSuccessFg = sage;
 
   // ---------------------------------------------------------------------------
   // Legacy aliases — kept so un-migrated screens still compile.
-  // Updated to point to new v4 token values.
+  // Updated to point to new Kosa Silk token values.
   // ---------------------------------------------------------------------------
-  static const terracotta = indigo;
-  static const terracottaDark = indigoDark;
-  static const terracottaLight = indigoLight;
-  static const gold = amber;
-  static const goldDark = amberDark;
-  static const goldLight = amberLight;
-  static const berry = teal;
-  static const berryDark = tealDark;
-  static const berryLight = tealLight;
-  static const blueAccent = indigo;
-  static const blueAccentDark = indigoDark;
-  static const blueAccentLight = indigoLight;
-  static const success = teal;
-  static const successLight = tealLight;
-
-  static const plaster = parchment;
-  static const plasterDark = parchmentDeep;
-  static const charcoal = ink;
-  static const charcoalSoft = inkSoft;
-  static const cream = cardSurface;
-  static const oak = dottedBorder;
-  static const mustard = amber;
-  static const brick = indigoDark;
-  static const aboveRange = teal;
-  static const online = teal;
-  static const syncing = amber;
-  static const offline = inkSoft;
-  static const statusLive = teal;
-  static const statusPending = amber;
-  static const statusDraft = inkSoft;
-  static const statusSold = amber;
-  static const turmeric = amber;
-  static const turmericLight = amberLight;
-  static const turmericDark = amberDark;
-  static const forestGreen = teal;
-  static const forestGreenLight = tealLight;
-  static const forestGreenDark = tealDark;
-  static const info = indigo;
+  static const indigo = burgundy;
+  static const indigoDark = burgundyDark;
+  static const indigoLight = burgundyLight;
+  static const amber = gold;
+  static const amberDark = goldDark;
+  static const amberLight = goldLight;
+  static const teal = sage;
+  static const tealDark = sageDark;
+  static const tealLight = sageLight;
+  static const coral = sienna;
+  static const coralDark = siennaDark;
+  static const coralLight = siennaLight;
+  static const ink = espresso;
+  static const inkSoft = warmGray;
+  static const inkFaint = taupe;
+  static const parchment = cream;
+  static const parchmentDeep = linen;
+  static const dottedBorder = warmStone;
+  static const line = warmMist;
+  static const shadow = warmShadow;
+  static const shadowLifted = Color(0x332A1F1B);
+  static const overlay = Color(0x6B0A0A1A);
+  static const terracotta = burgundy;
+  static const terracottaDark = burgundyDark;
+  static const terracottaLight = burgundyLight;
+  static const blueAccent = burgundy;
+  static const blueAccentDark = burgundyDark;
+  static const blueAccentLight = burgundyLight;
+  static const plaster = cream;
+  static const plasterDark = linen;
+  static const oak = warmStone;
+  static const mustard = gold;
+  static const brick = burgundyDark;
+  static const aboveRange = sage;
+  static const online = sage;
+  static const syncing = gold;
+  static const offline = warmGray;
+  static const statusLive = sage;
+  static const statusPending = gold;
+  static const statusDraft = warmGray;
+  static const statusSold = gold;
+  static const turmeric = gold;
+  static const turmericLight = goldLight;
+  static const turmericDark = goldDark;
+  static const forestGreen = sage;
+  static const forestGreenLight = sageLight;
+  static const forestGreenDark = sageDark;
+  static const info = burgundy;
 
   AppColors._();
 }

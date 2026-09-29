@@ -33,16 +33,16 @@ class OfflineState extends StatelessWidget {
           vertical: AccessibilityTokens.spacingMd,
         ),
         decoration: BoxDecoration(
-          color: AppColors.parchmentDeep,
+          color: AppColors.warmMist,
           borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
           border: Border.all(
-            color: AppColors.inkSoft.withValues(alpha: 0.2),
+            color: AppColors.taupe.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(Icons.wifi_off_rounded, size: 24, color: AppColors.inkSoft),
+            Icon(Icons.wifi_off_rounded, size: 24, color: AppColors.taupe),
             const SizedBox(width: AccessibilityTokens.spacingMd),
             Expanded(
               child: Column(
@@ -51,7 +51,7 @@ class OfflineState extends StatelessWidget {
                   Text(
                     effectiveLabel,
                     style: AppTextStyles.labelLarge.copyWith(
-                      color: AppColors.textPrimary,
+                      color: AppColors.espresso,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -60,7 +60,7 @@ class OfflineState extends StatelessWidget {
                     Text(
                       effectiveMessage,
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
+                        color: AppColors.taupe,
                       ),
                     ),
                   ],

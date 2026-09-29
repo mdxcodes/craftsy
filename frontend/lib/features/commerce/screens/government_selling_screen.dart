@@ -76,15 +76,15 @@ class _GovernmentSellingScreenState
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: AppColors.amber.withValues(alpha: 0.1),
+            color: AppColors.gold.withValues(alpha: 0.1),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, color: AppColors.amber),
+                const Icon(Icons.info_outline, color: AppColors.gold),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'gem_info_banner'.tr(),
-                    style: TextStyle(fontSize: 13, color: AppColors.amberDark),
+                    style: TextStyle(fontSize: 13, color: AppColors.goldDark),
                   ),
                 ),
               ],
@@ -149,10 +149,10 @@ class _GovernmentSellingScreenState
                 height: 32,
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? AppColors.success
+                      ? AppColors.sage
                       : isActive
-                      ? AppColors.indigo
-                      : AppColors.inkFaint.withValues(alpha: 0.2),
+                      ? AppColors.burgundy
+                      : AppColors.taupe.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -163,7 +163,7 @@ class _GovernmentSellingScreenState
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isActive ? Colors.white : AppColors.inkSoft,
+                            color: isActive ? Colors.white : AppColors.taupe,
                           ),
                         ),
                 ),
@@ -173,8 +173,8 @@ class _GovernmentSellingScreenState
                   child: Container(
                     height: 2,
                     color: index < _currentStep
-                        ? AppColors.success
-                        : AppColors.inkFaint.withValues(alpha: 0.2),
+                        ? AppColors.sage
+                        : AppColors.taupe.withValues(alpha: 0.2),
                   ),
                 ),
             ],
@@ -196,10 +196,10 @@ class _GovernmentSellingScreenState
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColors.indigo.withValues(alpha: 0.1),
+                color: AppColors.burgundy.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(step.icon, size: 28, color: AppColors.indigo),
+              child: Icon(step.icon, size: 28, color: AppColors.burgundy),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -285,7 +285,7 @@ class _GovernmentSellingScreenState
               const Icon(
                 Icons.check_circle_outline,
                 size: 20,
-                color: AppColors.indigo,
+                color: AppColors.burgundy,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -345,18 +345,18 @@ class _GovernmentSellingScreenState
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.amber.withValues(alpha: 0.1),
+          color: AppColors.gold.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.warning_amber, color: AppColors.amber),
+            const Icon(Icons.warning_amber, color: AppColors.gold),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'gem_proceed_dialog_msg'.tr(),
-                style: TextStyle(fontSize: 13, color: AppColors.amberDark),
+                style: TextStyle(fontSize: 13, color: AppColors.goldDark),
               ),
             ),
           ],
@@ -376,7 +376,7 @@ class _GovernmentSellingScreenState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 24, color: AppColors.indigo),
+          Icon(icon, size: 24, color: AppColors.burgundy),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -437,7 +437,7 @@ class _GovernmentSellingScreenState
                         const Icon(
                           Icons.circle,
                           size: 8,
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                         ),
                         const SizedBox(width: 12),
                         Text(item, style: const TextStyle(fontSize: 14)),
@@ -480,7 +480,7 @@ class _GovernmentSellingScreenState
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('gem_opening_instructions'.tr()),
-                    backgroundColor: AppColors.indigo,
+                    backgroundColor: AppColors.burgundy,
                   ),
                 );
               },

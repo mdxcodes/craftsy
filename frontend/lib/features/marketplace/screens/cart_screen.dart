@@ -99,7 +99,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(key.tr()),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.gold,
         ),
       );
       ref.invalidate(cartProvider);
@@ -108,7 +108,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text((errorKey ?? 'cart_update_failed').tr()),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.gold,
         ),
       );
     }
@@ -128,7 +128,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.coral,
+              backgroundColor: AppColors.gold,
             ),
             child: Text('cart_clear'.tr()),
           ),
@@ -174,7 +174,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
           padding: EdgeInsets.all(AppSpacing.screenPadding),
           decoration: BoxDecoration(
             color: AppColors.cardSurface,
-            border: Border(top: BorderSide(color: AppColors.parchmentDeep)),
+            border: Border(top: BorderSide(color: AppColors.warmMist)),
           ),
           child: SafeArea(
             top: false,
@@ -191,7 +191,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
                     Text(
                       '₹${cart.subtotal.toStringAsFixed(0)}',
                       style: AppTextStyles.headlineMedium.copyWith(
-                        color: AppColors.indigo,
+                        color: AppColors.burgundy,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -203,7 +203,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
                   child: Text(
                     'cart_totals_note'.tr(),
                     style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.taupe,
                     ),
                   ),
                 ),
@@ -221,8 +221,8 @@ class _CartContentState extends ConsumerState<_CartContent> {
                             AccessibilityTokens.minTouchTargetLarge,
                             AccessibilityTokens.minTouchTarget,
                           ),
-                          foregroundColor: AppColors.coral,
-                          side: const BorderSide(color: AppColors.coral),
+                          foregroundColor: AppColors.gold,
+                          side: const BorderSide(color: AppColors.gold),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
                                 AccessibilityTokens.radiusFull),
@@ -239,8 +239,8 @@ class _CartContentState extends ConsumerState<_CartContent> {
                         child: FilledButton(
                           onPressed: () => context.push('/checkout'),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.indigo,
-                            foregroundColor: AppColors.textOnPrimary,
+                            backgroundColor: AppColors.burgundy,
+                            foregroundColor: AppColors.cardSurface,
                             minimumSize: const Size.fromHeight(
                                 AccessibilityTokens.minTouchTarget),
                             shape: RoundedRectangleBorder(
@@ -269,7 +269,7 @@ class _CartContentState extends ConsumerState<_CartContent> {
           content: Text(
             'cart_stock_limit'.tr(namedArgs: {'count': '${item.stock}'}),
           ),
-          backgroundColor: AppColors.coral,
+          backgroundColor: AppColors.gold,
         ),
       );
       return;
@@ -308,7 +308,7 @@ class _CartItemCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
-        border: Border.all(color: AppColors.parchmentDeep),
+        border: Border.all(color: AppColors.warmMist),
       ),
       child: Opacity(
         opacity: isBusy ? 0.5 : 1,
@@ -324,9 +324,9 @@ class _CartItemCard extends StatelessWidget {
                 child: AppImage(
                   imageUrl: item.imageUrl,
                   fallbackWidget: Container(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     child: const Icon(Icons.image,
-                        color: AppColors.textSecondary),
+                        color: AppColors.taupe),
                   ),
                 ),
               ),
@@ -350,7 +350,7 @@ class _CartItemCard extends StatelessWidget {
                   Text(
                     '₹${item.unitPrice.toStringAsFixed(0)}',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.taupe,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -383,7 +383,7 @@ class _CartItemCard extends StatelessWidget {
                       Text(
                         '₹${item.lineTotal.toStringAsFixed(0)}',
                         style: AppTextStyles.headlineSmall.copyWith(
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           fontWeight: FontWeight.w700,
                         ),
                       ),

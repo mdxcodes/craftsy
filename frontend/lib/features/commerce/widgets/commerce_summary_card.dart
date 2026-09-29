@@ -30,14 +30,14 @@ class CommerceSummaryCard extends StatelessWidget {
                 context,
                 'Needs Attention',
                 '${summary.productsNeedingAttention}',
-                color: AppColors.coral,
+                color: AppColors.sienna,
               ),
             if (summary.lowStock > 0)
               _buildRow(
                 context,
                 'Low Stock',
                 '${summary.lowStock}',
-                color: AppColors.amber,
+                color: AppColors.gold,
               ),
           ],
         ),

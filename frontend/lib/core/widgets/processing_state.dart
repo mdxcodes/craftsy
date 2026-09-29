@@ -52,10 +52,10 @@ class _ProcessingStateState extends State<ProcessingState>
               vertical: AccessibilityTokens.spacingMd,
             ),
             decoration: BoxDecoration(
-              color: AppColors.amber.withValues(alpha: 0.1),
+              color: AppColors.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AccessibilityTokens.radiusLg),
               border: Border.all(
-                color: AppColors.amber.withValues(alpha: 0.3),
+                color: AppColors.gold.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -68,14 +68,14 @@ class _ProcessingStateState extends State<ProcessingState>
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: AppColors.amber,
+                    color: AppColors.gold,
                   ),
                 ),
                 const SizedBox(width: AccessibilityTokens.spacingMd),
                 Text(
                   effectiveLabel,
                   style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.amber,
+                    color: AppColors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

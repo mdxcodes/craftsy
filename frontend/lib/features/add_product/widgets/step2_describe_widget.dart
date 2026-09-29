@@ -125,11 +125,11 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                     '${lang['name']} (${lang['native']})',
                     style: AppTextStyles.bodyLarge.copyWith(
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: isSelected ? AppColors.terracotta : AppColors.ink,
+                      color: isSelected ? AppColors.burgundy : AppColors.espresso,
                     ),
                   ),
                   trailing: isSelected
-                      ? Icon(Icons.check_circle, color: AppColors.terracotta)
+                      ? Icon(Icons.check_circle, color: AppColors.burgundy)
                       : Icon(Icons.circle_outlined, color: AppColors.border),
                   onTap: () {
                     setState(() {
@@ -309,7 +309,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
           const SizedBox(height: AppSpacing.xs),
           Text(
             'describe_subtitle'.tr(),
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.taupe),
           ),
           const SizedBox(height: AppSpacing.xl),
 
@@ -337,13 +337,13 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                     Icon(
                       Icons.language,
                       size: 18,
-                      color: AppColors.terracotta,
+                      color: AppColors.burgundy,
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       _getCurrentVoiceLanguageName(),
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.ink,
+                        color: AppColors.espresso,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -390,8 +390,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                       String labelText;
 
                       if (_isRecording) {
-                        circleColor = AppColors.coral;
-                        shadowColor = AppColors.coral;
+                        circleColor = AppColors.sienna;
+                        shadowColor = AppColors.sienna;
                         iconData = Icons.stop_rounded;
                         labelText = 'stop_recording'.tr();
                       } else if (_showCheckmark) {
@@ -400,8 +400,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                         iconData = Icons.check_circle_rounded;
                         labelText = 'recorded_success'.tr();
                       } else if (hasAudio) {
-                        circleColor = AppColors.ink;
-                        shadowColor = AppColors.inkFaint;
+                        circleColor = AppColors.espresso;
+                        shadowColor = AppColors.taupe;
                         iconData = _isPlayingAudio
                             ? Icons.pause_rounded
                             : Icons.play_arrow_rounded;
@@ -409,8 +409,8 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                             ? 'audio_playing'.tr()
                             : 'tap_to_replay'.tr();
                       } else {
-                        circleColor = AppColors.indigo;
-                        shadowColor = AppColors.indigoLight;
+                        circleColor = AppColors.burgundy;
+                        shadowColor = AppColors.burgundyLight;
                         iconData = Icons.mic;
                         labelText = 'tap_to_speak'.tr();
                       }
@@ -472,7 +472,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                   SpeakButton(
                     text: 'tap_to_replay'.tr(),
                     compact: true,
-                    color: AppColors.indigo,
+                    color: AppColors.burgundy,
                   ),
                 ],
 
@@ -501,7 +501,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                 child: Text(
                   'or_type_description'.tr(),
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.inkSoft,
+                    color: AppColors.taupe,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -530,12 +530,12 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             controller: _textController,
             focusNode: _textFocusNode,
             maxLines: 4,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.ink),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.espresso),
             decoration: InputDecoration(
               hintText: 'type_desc_hint'.tr(),
               labelText: 'transcript_label'.tr(),
               labelStyle: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.inkSoft,
+                color: AppColors.taupe,
               ),
               alignLabelWithHint: true,
               border: OutlineInputBorder(
@@ -549,7 +549,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadii.card),
                 borderSide: const BorderSide(
-                  color: AppColors.indigo,
+                  color: AppColors.burgundy,
                   width: 1.5,
                 ),
               ),
@@ -569,17 +569,17 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.amberLight,
+                color: AppColors.goldLight,
                 borderRadius: BorderRadius.circular(AppRadii.sm),
                 border: Border.all(
-                  color: AppColors.amber.withValues(alpha: 0.3),
+                  color: AppColors.gold.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.info_outline,
-                    color: AppColors.amberDark,
+                    color: AppColors.goldDark,
                     size: 18,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -587,7 +587,7 @@ class _Step2DescribeWidgetState extends ConsumerState<Step2DescribeWidget>
                     child: Text(
                       'Some words might need review. You can edit the text above.',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.amberDark,
+                        color: AppColors.goldDark,
                       ),
                     ),
                   ),

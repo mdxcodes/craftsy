@@ -134,7 +134,7 @@ class _UnifiedOrdersScreenState extends ConsumerState<UnifiedOrdersScreen> {
                       namedArgs: {'status': next.labelKey.tr()},
                     ),
                   ),
-                  backgroundColor: AppColors.indigo,
+                  backgroundColor: AppColors.burgundy,
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -175,9 +175,9 @@ class _FilterChip extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       backgroundColor: AppColors.cardSurface,
-      selectedColor: AppColors.indigo,
+      selectedColor: AppColors.burgundy,
       side: BorderSide(
-        color: selected ? AppColors.indigo : AppColors.line,
+        color: selected ? AppColors.burgundy : AppColors.line,
         width: 1.5,
       ),
       shape: RoundedRectangleBorder(
@@ -291,21 +291,21 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
       background: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.itemSpacing),
         decoration: BoxDecoration(
-          color: AppColors.indigoLight,
+          color: AppColors.burgundyLight,
           borderRadius: BorderRadius.circular(AppRadii.card),
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSpacing.lg),
         child: Row(
           children: [
-            const Icon(Icons.arrow_forward, color: AppColors.indigoDark),
+            const Icon(Icons.arrow_forward, color: AppColors.burgundyDark),
             const SizedBox(width: AppSpacing.xs),
             Text(
               'mark_as_status'.tr(
                 namedArgs: {'status': order.status.next?.labelKey.tr() ?? ''},
               ),
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.indigoDark,
+                color: AppColors.burgundyDark,
               ),
             ),
           ],
@@ -336,7 +336,7 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -441,7 +441,7 @@ class _UnifiedOrderCardState extends State<_UnifiedOrderCard> {
                                 TextSpan(
                                   text: '₹${order.amount.toStringAsFixed(0)}',
                                   style: AppTextStyles.labelMedium.copyWith(
-                                    color: AppColors.indigo,
+                                    color: AppColors.burgundy,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
                                   ),
@@ -539,21 +539,21 @@ class _ChannelBadge extends StatelessWidget {
 
     switch (channel) {
       case 'ondc':
-        bg = AppColors.tealLight;
-        fg = AppColors.tealDark;
+        bg = AppColors.sageLight;
+        fg = AppColors.sageDark;
         icon = Icons.public;
         label = 'ONDC';
         break;
       case 'gem':
-        bg = AppColors.amberLight;
-        fg = AppColors.amberDark;
+        bg = AppColors.goldLight;
+        fg = AppColors.goldDark;
         icon = Icons.account_balance;
         label = 'Govt';
         break;
       case 'craftsy':
       default:
-        bg = AppColors.indigoLight;
-        fg = AppColors.indigoDark;
+        bg = AppColors.burgundyLight;
+        fg = AppColors.burgundyDark;
         icon = Icons.shopping_bag_outlined;
         label = 'Craftsy';
         break;
@@ -598,27 +598,27 @@ class _StatusBadge extends StatelessWidget {
 
     switch (status) {
       case OrderStatus.newOrder:
-        bg = AppColors.amberLight;
-        fg = AppColors.amberDark;
+        bg = AppColors.goldLight;
+        fg = AppColors.goldDark;
         icon = Icons.fiber_new_outlined;
         break;
       case OrderStatus.packed:
-        bg = AppColors.indigoLight;
-        fg = AppColors.indigoDark;
+        bg = AppColors.burgundyLight;
+        fg = AppColors.burgundyDark;
         icon = Icons.inventory_2_outlined;
         break;
       case OrderStatus.shipped:
-        bg = AppColors.tealLight;
-        fg = AppColors.tealDark;
+        bg = AppColors.sageLight;
+        fg = AppColors.sageDark;
         icon = Icons.local_shipping_outlined;
         break;
       case OrderStatus.delivered:
         bg = AppColors.successLight;
-        fg = AppColors.teal;
+        fg = AppColors.sage;
         icon = Icons.check_circle_outline;
         break;
       case OrderStatus.cancelled:
-        bg = AppColors.parchmentDeep;
+        bg = AppColors.warmMist;
         fg = AppColors.inkSoft;
         icon = Icons.cancel_outlined;
         break;

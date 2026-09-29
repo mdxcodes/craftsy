@@ -49,13 +49,13 @@ class StepProgressBar extends StatelessWidget {
                   child: isCompleted
                       ? const CustomPaint(
                           painter: TankaStitchPainter(
-                            color: AppColors.success,
+                            color: AppColors.sage,
                             strokeWidth: 2,
                             dashLength: 5,
                             dashGap: 4,
                           ),
                         )
-                      : Container(height: 2, color: AppColors.line),
+                      : Container(height: 2, color: AppColors.warmMist),
                 ),
               ),
             );
@@ -68,18 +68,18 @@ class StepProgressBar extends StatelessWidget {
                 : '⚪';
 
             Color bgColor = AppColors.cardSurface;
-            Color borderColor = AppColors.line;
+            Color borderColor = AppColors.warmMist;
             List<BoxShadow>? shadows;
 
             if (isCompleted) {
-              bgColor = AppColors.success;
-              borderColor = AppColors.success;
+              bgColor = AppColors.sage;
+              borderColor = AppColors.sage;
             } else if (isCurrent) {
-              bgColor = AppColors.indigo;
-              borderColor = AppColors.indigo;
+              bgColor = AppColors.burgundy;
+              borderColor = AppColors.burgundy;
               shadows = [
                 BoxShadow(
-                  color: AppColors.indigoLight,
+                  color: AppColors.burgundyLight,
                   spreadRadius: 4,
                   blurRadius: 0,
                 ),

@@ -109,10 +109,10 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: AppColors.indigo),
+                  child: const Icon(Icons.camera_alt, color: AppColors.burgundy),
                 ),
                 title: Text(
                   'take_photo'.tr(),
@@ -127,15 +127,15 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                   _pickImage(ImageSource.camera);
                 },
               ),
-              const Divider(color: AppColors.line),
+              const Divider(color: AppColors.warmMist),
               ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_library, color: AppColors.ink),
+                  child: const Icon(Icons.photo_library, color: AppColors.espresso),
                 ),
                 title: Text(
                   'upload_gallery'.tr(),
@@ -184,7 +184,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
           const SizedBox(height: AppSpacing.xs),
           Text(
             hasImage ? 'review_photo_subtitle'.tr() : 'capture_subtitle'.tr(),
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.taupe),
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -198,7 +198,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
             DottedBorderBox(
               width: double.infinity,
               height: 220,
-              backgroundColor: AppColors.parchmentDeep,
+              backgroundColor: AppColors.warmMist,
               radius: AppRadii.card,
               borderColor: AppColors.dottedBorder,
               child: Column(
@@ -212,7 +212,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.shadow,
+                          color: AppColors.warmShadow,
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -221,7 +221,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                     child: const Icon(
                       Icons.camera_alt_rounded,
                       size: 40,
-                      color: AppColors.indigo,
+                      color: AppColors.burgundy,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -232,7 +232,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                     child: Text(
                       'capture_instructions'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.inkSoft,
+                        color: AppColors.taupe,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
@@ -289,7 +289,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
             const SizedBox(height: AppSpacing.xs),
             Text(
               'additional_angles_subtitle'.tr(),
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.inkSoft),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.taupe),
             ),
             const SizedBox(height: AppSpacing.sm),
 
@@ -306,7 +306,7 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                           margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(AppRadii.sm),
-                            border: Border.all(color: AppColors.line),
+                            border: Border.all(color: AppColors.warmMist),
                             image: DecorationImage(
                               image: FileImage(File(path)),
                               fit: BoxFit.cover,
@@ -344,9 +344,9 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                         width: 72,
                         height: 72,
                         decoration: BoxDecoration(
-                          color: AppColors.parchmentDeep,
+                          color: AppColors.warmMist,
                           borderRadius: BorderRadius.circular(AppRadii.sm),
-                          border: Border.all(color: AppColors.line),
+                          border: Border.all(color: AppColors.warmMist),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -354,14 +354,14 @@ class _Step1CaptureWidgetState extends ConsumerState<Step1CaptureWidget> {
                             const Icon(
                               Icons.add_a_photo_outlined,
                               size: 20,
-                              color: AppColors.indigo,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(height: 2),
                             Text(
                               'add_another_angle'.tr(),
                               textAlign: TextAlign.center,
                               style: AppTextStyles.labelSmall.copyWith(
-                                color: AppColors.inkSoft,
+                                color: AppColors.taupe,
                                 fontSize: 10,
                               ),
                             ),

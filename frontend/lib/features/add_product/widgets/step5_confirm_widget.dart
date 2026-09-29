@@ -111,7 +111,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         barrierDismissible: false,
         builder: (dialogCtx) {
           return AlertDialog(
-            backgroundColor: AppColors.parchment,
+            backgroundColor: AppColors.cream,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadii.card),
             ),
@@ -143,7 +143,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         ? 'listing_online_desc'.tr()
                         : 'listing_offline_desc'.tr(),
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.ink,
+                      color: AppColors.espresso,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -163,7 +163,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                             const Icon(
                               Icons.savings_outlined,
                               size: 18,
-                              color: AppColors.terracotta,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(width: 6),
                             Expanded(
@@ -171,7 +171,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 'profit_popup_title'.tr(),
                                 style: AppTextStyles.labelMedium.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.terracotta,
+                                  color: AppColors.burgundy,
                                 ),
                               ),
                             ),
@@ -186,7 +186,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               child: Text(
                                 'final_selling_price_label'.tr(),
                                 style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.inkSoft,
+                                  color: AppColors.taupe,
                                 ),
                               ),
                             ),
@@ -198,7 +198,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 child: Text(
                                   '₹${finalPrice.toStringAsFixed(0)}',
                                   style: AppTextStyles.headlineSmall.copyWith(
-                                    color: AppColors.ink,
+                                    color: AppColors.espresso,
                                   ),
                                   maxLines: 1,
                                 ),
@@ -215,7 +215,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               child: Text(
                                 'floor_cost_label'.tr(),
                                 style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.inkSoft,
+                                  color: AppColors.taupe,
                                 ),
                               ),
                             ),
@@ -227,7 +227,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 child: Text(
                                   '₹${floorCost.toStringAsFixed(0)}',
                                   style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.inkSoft,
+                                    color: AppColors.taupe,
                                   ),
                                   maxLines: 1,
                                 ),
@@ -258,7 +258,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                       'profit_earned_label'.tr(),
                                       style: AppTextStyles.labelMedium.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.ink,
+                                        color: AppColors.espresso,
                                       ),
                                     ),
                                   ),
@@ -313,7 +313,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               namedArgs: {'profit': profit.toStringAsFixed(0)},
                             ),
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.inkSoft,
+                              color: AppColors.taupe,
                               fontSize: 11.5,
                               height: 1.3,
                             ),
@@ -381,7 +381,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
             children: [
               const Icon(
                 Icons.fact_check_outlined,
-                color: AppColors.indigo,
+                color: AppColors.burgundy,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -396,7 +396,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'confirm_subtitle'.tr(),
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.inkSoft),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.taupe),
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -419,7 +419,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                   child: Container(
                     height: 220,
                     width: double.infinity,
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.linen,
                     child: AppImage(imageUrl: displayImage, fit: BoxFit.cover),
                   ),
                 ),
@@ -470,7 +470,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.parchmentDeep,
+                                color: AppColors.linen,
                                 borderRadius: BorderRadius.circular(
                                   AppRadii.button,
                                 ),
@@ -479,7 +479,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               child: Text(
                                 draft.category,
                                 style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.ink,
+                                  color: AppColors.espresso,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 maxLines: 1,
@@ -540,7 +540,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                           text:
                               '$primaryTitle. ₹${draft.finalPrice.toStringAsFixed(0)}',
                           compact: true,
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                         ),
                       ),
 
@@ -554,7 +554,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                         Text(
                           secondaryTitle,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.inkSoft,
+                            color: AppColors.taupe,
                           ),
                         ),
                       ],
@@ -565,7 +565,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                       Text(
                         '₹${draft.finalPrice.toStringAsFixed(0)}',
                         style: AppTextStyles.displaySmall.copyWith(
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -576,7 +576,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                       Text(
                         displayDescription,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.inkSoft,
+                          color: AppColors.taupe,
                           height: 1.4,
                         ),
                         maxLines: 3,

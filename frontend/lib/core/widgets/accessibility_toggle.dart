@@ -85,14 +85,14 @@ class AccessibilityToggle extends ConsumerWidget {
               Icon(
                 icon,
                 size: 22,
-                color: value ? AppColors.indigo : AppColors.inkFaint,
+                color: value ? AppColors.burgundy : AppColors.taupe,
               ),
               const SizedBox(width: AccessibilityTokens.spacingMd),
               Expanded(
                 child: Text(
                   label,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: value ? AppColors.textPrimary : AppColors.inkFaint,
+                    color: value ? AppColors.espresso : AppColors.taupe,
                   ),
                 ),
               ),
@@ -100,9 +100,9 @@ class AccessibilityToggle extends ConsumerWidget {
               Switch(
                 value: value,
                 onChanged: onChanged,
-                activeThumbColor: AppColors.indigo,
-                inactiveThumbColor: AppColors.inkFaint,
-                inactiveTrackColor: AppColors.parchmentDeep,
+                activeThumbColor: AppColors.burgundy,
+                inactiveThumbColor: AppColors.taupe,
+                inactiveTrackColor: AppColors.warmMist,
               ),
             ],
           ),

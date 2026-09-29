@@ -3,45 +3,43 @@ import 'app_colors.dart';
 import 'app_text_styles.dart';
 import 'app_spacing.dart';
 
-/// Centralized ThemeData for Craftsy v3
+/// Centralized ThemeData for Craftsy "Kosa Silk"
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
 
-      // Color scheme — v4 Indigo Loom palette
       colorScheme: ColorScheme.light(
-        primary: AppColors.indigo,
+        primary: AppColors.burgundy,
         onPrimary: AppColors.textOnPrimary,
-        primaryContainer: AppColors.indigoLight,
-        onPrimaryContainer: AppColors.indigoDark,
+        primaryContainer: AppColors.burgundyLight,
+        onPrimaryContainer: AppColors.burgundyDark,
 
-        secondary: AppColors.amber,
+        secondary: AppColors.gold,
         onSecondary: AppColors.textOnPrimary,
-        secondaryContainer: AppColors.amberLight,
-        onSecondaryContainer: AppColors.amberDark,
+        secondaryContainer: AppColors.goldLight,
+        onSecondaryContainer: AppColors.goldDark,
 
-        tertiary: AppColors.teal, // accent — rarely used
+        tertiary: AppColors.sage,
         onTertiary: AppColors.textOnPrimary,
-        tertiaryContainer: AppColors.tealLight,
-        onTertiaryContainer: AppColors.tealDark,
+        tertiaryContainer: AppColors.sageLight,
+        onTertiaryContainer: AppColors.sageDark,
 
-        error: AppColors.coral,
+        error: AppColors.sienna,
         onError: AppColors.textOnPrimary,
 
         surface: AppColors.cardSurface,
         onSurface: AppColors.textPrimary,
-        surfaceContainerHighest: AppColors.parchmentDeep,
+        surfaceContainerHighest: AppColors.linen,
 
-        outline: AppColors.dottedBorder,
-        outlineVariant: AppColors.line,
-        shadow: AppColors.shadow,
+        outline: AppColors.warmStone,
+        outlineVariant: AppColors.warmMist,
+        shadow: AppColors.warmShadow,
       ),
 
-      scaffoldBackgroundColor: AppColors.parchment,
+      scaffoldBackgroundColor: AppColors.cream,
 
-      // Typography — Fraunces + Manrope (bundled assets, no GoogleFonts)
       textTheme: TextTheme(
         displayLarge: AppTextStyles.displayLarge,
         displayMedium: AppTextStyles.displayMedium,
@@ -57,9 +55,8 @@ class AppTheme {
         labelSmall: AppTextStyles.labelSmall,
       ),
 
-      // AppBar — flat parchment background
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.parchment,
+        backgroundColor: AppColors.cream,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
@@ -70,14 +67,13 @@ class AppTheme {
         ),
       ),
 
-      // Card — warm shadow instead of border
       cardTheme: CardThemeData(
         color: AppColors.cardSurface,
         elevation: 0,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.card),
-          side: BorderSide(color: AppColors.line, width: 1),
+          side: BorderSide(color: AppColors.warmMist, width: 1),
         ),
         margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.screenPadding,
@@ -85,10 +81,9 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button — primary action: indigo pill with inset shadow
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.indigo,
+          backgroundColor: AppColors.burgundy,
           foregroundColor: AppColors.textOnPrimary,
           minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
           padding: const EdgeInsets.symmetric(
@@ -104,11 +99,10 @@ class AppTheme {
         ),
       ),
 
-      // Outlined Button — card surface bg, line border, ink text — pill
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           backgroundColor: AppColors.cardSurface,
-          foregroundColor: AppColors.ink,
+          foregroundColor: AppColors.espresso,
           minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -117,22 +111,20 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadii.button),
           ),
-          side: BorderSide(color: AppColors.line, width: 1.5),
+          side: BorderSide(color: AppColors.warmMist, width: 1.5),
           textStyle: AppTextStyles.labelLarge,
         ),
       ),
 
-      // Text Button — ghost / link style
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.indigo,
+          foregroundColor: AppColors.burgundy,
           minimumSize: const Size(0, AppSpacing.minTouchTarget),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           textStyle: AppTextStyles.labelMedium,
         ),
       ),
 
-      // Input Decoration — card surface, line border, indigo focus ring
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardSurface,
@@ -142,23 +134,23 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: BorderSide(color: AppColors.line, width: 1.5),
+          borderSide: BorderSide(color: AppColors.warmMist, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: BorderSide(color: AppColors.line, width: 1.5),
+          borderSide: BorderSide(color: AppColors.warmMist, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.indigo, width: 2),
+          borderSide: const BorderSide(color: AppColors.burgundy, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.coral, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.sienna, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadii.inputField),
-          borderSide: const BorderSide(color: AppColors.coral, width: 2),
+          borderSide: const BorderSide(color: AppColors.sienna, width: 2),
         ),
         labelStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textSecondary,
@@ -166,15 +158,13 @@ class AppTheme {
         hintStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textTertiary,
         ),
-        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.coral),
+        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.sienna),
       ),
 
-      // Chip — pill shape; selected = indigo fill
-      // NOTE: cascades globally — accepted risk per design brief.
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.parchmentDeep,
-        selectedColor: AppColors.indigo,
-        disabledColor: AppColors.parchmentDeep,
+        backgroundColor: AppColors.linen,
+        selectedColor: AppColors.burgundy,
+        disabledColor: AppColors.linen,
         labelStyle: AppTextStyles.labelSmall.copyWith(
           color: AppColors.textPrimary,
         ),
@@ -187,26 +177,24 @@ class AppTheme {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.chip),
-          side: BorderSide(color: AppColors.line, width: 1.5),
+          side: BorderSide(color: AppColors.warmMist, width: 1.5),
         ),
         elevation: 0,
         pressElevation: 0,
       ),
 
-      // Bottom Navigation Bar
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardSurface,
-        selectedItemColor: AppColors.indigo,
-        unselectedItemColor: AppColors.inkFaint,
+        selectedItemColor: AppColors.burgundy,
+        unselectedItemColor: AppColors.taupe,
         selectedLabelStyle: AppTextStyles.labelSmall,
         unselectedLabelStyle: AppTextStyles.labelSmall,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
 
-      // FAB
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.indigo,
+        backgroundColor: AppColors.burgundy,
         foregroundColor: AppColors.textOnPrimary,
         elevation: AppElevation.subtle,
         shape: RoundedRectangleBorder(
@@ -214,7 +202,6 @@ class AppTheme {
         ),
       ),
 
-      // Dialog
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.cardSurface,
         shape: RoundedRectangleBorder(
@@ -224,8 +211,6 @@ class AppTheme {
         contentTextStyle: AppTextStyles.bodyMedium,
       ),
 
-      // Bottom Sheet — the MehrabClipper replaces the plain rounded rect in
-      // packaging_suggestions_sheet.dart; this theme applies to all other sheets.
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.cardSurface,
         modalBackgroundColor: AppColors.cardSurface,
@@ -238,9 +223,8 @@ class AppTheme {
         shadowColor: AppColors.shadowLifted,
       ),
 
-      // Snackbar
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.ink,
+        backgroundColor: AppColors.espresso,
         contentTextStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textOnPrimary,
         ),
@@ -250,14 +234,12 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
 
-      // Progress Indicator
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.indigo,
+        color: AppColors.burgundy,
       ),
 
-      // Divider
       dividerTheme: const DividerThemeData(
-        color: AppColors.line,
+        color: AppColors.warmMist,
         thickness: 1,
         space: 1,
       ),

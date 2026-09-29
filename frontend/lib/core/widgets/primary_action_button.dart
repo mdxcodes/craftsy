@@ -28,7 +28,7 @@ class PrimaryActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveOnPressed = AppSoundFeedback.wrap(onPressed);
-    final bgColor = backgroundColor ?? AppColors.indigo;
+    final bgColor = backgroundColor ?? AppColors.burgundy;
 
     return Semantics(
       button: true,
@@ -51,7 +51,7 @@ class PrimaryActionButton extends StatelessWidget {
               vertical: AccessibilityTokens.spacingMd,
             ),
             decoration: BoxDecoration(
-              color: isLoading ? AppColors.parchmentDeep : bgColor,
+              color: isLoading ? AppColors.warmMist : bgColor,
               borderRadius: BorderRadius.circular(
                 AccessibilityTokens.radiusFull,
               ),
@@ -72,7 +72,7 @@ class PrimaryActionButton extends StatelessWidget {
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: AppColors.textOnPrimary,
+                        color: AppColors.cardSurface,
                       ),
                     ),
                   )
@@ -81,14 +81,14 @@ class PrimaryActionButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, size: 24, color: AppColors.textOnPrimary),
+                        Icon(icon, size: 24, color: AppColors.cardSurface),
                         const SizedBox(width: AccessibilityTokens.spacingSm),
                       ],
                       Flexible(
                         child: Text(
                           label,
                           style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.textOnPrimary,
+                            color: AppColors.cardSurface,
                             fontWeight: FontWeight.w700,
                           ),
                           textAlign: TextAlign.center,

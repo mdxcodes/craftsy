@@ -70,14 +70,14 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: const BoxDecoration(
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
                             unreadCount > 99 ? '99+' : '$unreadCount',
                             style: const TextStyle(
-                              color: AppColors.textOnPrimary,
+                              color: AppColors.cardSurface,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               height: 1,

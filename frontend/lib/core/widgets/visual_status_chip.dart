@@ -73,41 +73,41 @@ class VisualStatusChip extends StatelessWidget {
       case VisualStatusType.success:
         return _StatusConfig(
           icon: Icons.check_circle_outline_rounded,
-          backgroundColor: AppColors.successLight,
-          foregroundColor: AppColors.success,
-          borderColor: AppColors.success.withValues(alpha: 0.3),
+          backgroundColor: AppColors.sageLight,
+          foregroundColor: AppColors.sage,
+          borderColor: AppColors.sage.withValues(alpha: 0.3),
           semanticLabel: 'status_success'.tr(),
         );
       case VisualStatusType.warning:
         return _StatusConfig(
           icon: Icons.warning_amber_rounded,
-          backgroundColor: AppColors.amberLight,
-          foregroundColor: AppColors.amber,
-          borderColor: AppColors.amber.withValues(alpha: 0.3),
+          backgroundColor: AppColors.goldLight,
+          foregroundColor: AppColors.gold,
+          borderColor: AppColors.gold.withValues(alpha: 0.3),
           semanticLabel: 'status_warning'.tr(),
         );
       case VisualStatusType.pending:
         return _StatusConfig(
           icon: Icons.hourglass_top_rounded,
-          backgroundColor: AppColors.amberLight,
-          foregroundColor: AppColors.amber,
-          borderColor: AppColors.amber.withValues(alpha: 0.3),
+          backgroundColor: AppColors.goldLight,
+          foregroundColor: AppColors.gold,
+          borderColor: AppColors.gold.withValues(alpha: 0.3),
           semanticLabel: 'status_pending'.tr(),
         );
       case VisualStatusType.error:
         return _StatusConfig(
           icon: Icons.error_outline_rounded,
-          backgroundColor: AppColors.coralLight,
-          foregroundColor: AppColors.coral,
-          borderColor: AppColors.coral.withValues(alpha: 0.3),
+          backgroundColor: AppColors.siennaLight,
+          foregroundColor: AppColors.sienna,
+          borderColor: AppColors.sienna.withValues(alpha: 0.3),
           semanticLabel: 'status_error'.tr(),
         );
       case VisualStatusType.offline:
         return _StatusConfig(
           icon: Icons.wifi_off_rounded,
-          backgroundColor: AppColors.parchmentDeep,
-          foregroundColor: AppColors.inkSoft,
-          borderColor: AppColors.inkSoft.withValues(alpha: 0.3),
+          backgroundColor: AppColors.warmMist,
+          foregroundColor: AppColors.taupe,
+          borderColor: AppColors.taupe.withValues(alpha: 0.3),
           semanticLabel: 'status_offline'.tr(),
         );
     }

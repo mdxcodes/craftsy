@@ -74,19 +74,19 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
             namedArgs: {'count': '$failedCount'},
           );
           statusIcon = Icons.error_outline_rounded;
-          statusColor = AppColors.coral;
+          statusColor = AppColors.sienna;
         } else if (processingCount > 0) {
           statusLabel = 'syncing_status'.tr(
             namedArgs: {'count': '$processingCount'},
           );
           statusIcon = Icons.sync_rounded;
-          statusColor = AppColors.amber;
+          statusColor = AppColors.gold;
         } else {
           statusLabel = 'sync_pending_status'.tr(
             namedArgs: {'count': '$pendingCount'},
           );
           statusIcon = Icons.cloud_queue_rounded;
-          statusColor = AppColors.indigo;
+          statusColor = AppColors.burgundy;
         }
 
         return Semantics(
@@ -134,7 +134,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
                                 Text(
                                   'sync_tap_to_expand'.tr(),
                                   style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.inkFaint,
+                                    color: AppColors.taupe,
                                   ),
                                 ),
                             ],
@@ -150,7 +150,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
                   ),
                 ),
                 if (_expanded) ...[
-                  const Divider(height: 1, color: AppColors.divider),
+                  const Divider(height: 1, color: AppColors.warmMist),
                   Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Column(
@@ -161,28 +161,28 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
                             icon: Icons.cloud_queue_rounded,
                             label: 'queue_pending'.tr(),
                             count: pendingCount,
-                            color: AppColors.indigo,
+                            color: AppColors.burgundy,
                           ),
                         if (processingCount > 0)
                           _QueueItemRow(
                             icon: Icons.sync_rounded,
                             label: 'queue_processing'.tr(),
                             count: processingCount,
-                            color: AppColors.amber,
+                            color: AppColors.gold,
                           ),
                         if (failedCount > 0)
                           _QueueItemRow(
                             icon: Icons.error_outline_rounded,
                             label: 'queue_failed'.tr(),
                             count: failedCount,
-                            color: AppColors.coral,
+                            color: AppColors.sienna,
                           ),
                         if (completedCount > 0)
                           _QueueItemRow(
                             icon: Icons.check_circle_outline_rounded,
                             label: 'queue_completed'.tr(),
                             count: completedCount,
-                            color: AppColors.teal,
+                            color: AppColors.sage,
                           ),
                         const SizedBox(height: AppSpacing.sm),
                         if (failedCount > 0 && isOnline)
@@ -198,7 +198,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
                           Text(
                             'sync_retry_when_online'.tr(),
                             style: AppTextStyles.caption.copyWith(
-                              color: AppColors.inkFaint,
+                              color: AppColors.taupe,
                             ),
                             textAlign: TextAlign.center,
                           ),

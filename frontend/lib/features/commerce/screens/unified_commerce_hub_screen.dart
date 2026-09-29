@@ -74,7 +74,7 @@ class _UnifiedCommerceHubScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.coral),
+              Icon(Icons.error_outline, size: 48, color: AppColors.sienna),
               const SizedBox(height: 16),
               Text('commerce_hub_error'.tr()),
               const SizedBox(height: 8),

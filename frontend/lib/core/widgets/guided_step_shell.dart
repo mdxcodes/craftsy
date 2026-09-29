@@ -52,7 +52,7 @@ class _GuidedStepShellState extends State<GuidedStepShell> {
                 child: IconButton(
                   onPressed: widget.onBack,
                   icon: const Icon(Icons.arrow_back_rounded),
-                  color: AppColors.textPrimary,
+                  color: AppColors.espresso,
                 ),
               )
             : null,
@@ -66,7 +66,7 @@ class _GuidedStepShellState extends State<GuidedStepShell> {
               child: IconButton(
                 onPressed: widget.onCancel,
                 icon: const Icon(Icons.close_rounded),
-                color: AppColors.textSecondary,
+                color: AppColors.taupe,
               ),
             ),
         ],
@@ -92,7 +92,7 @@ class _GuidedStepShellState extends State<GuidedStepShell> {
                         ],
                       ),
                       style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.textSecondary,
+                        color: AppColors.taupe,
                       ),
                     ),
                     if (widget.spokenGuidance != null)
@@ -108,8 +108,8 @@ class _GuidedStepShellState extends State<GuidedStepShell> {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: AccessibilityTokens.progressBarHeight,
-                    backgroundColor: AppColors.parchmentDeep,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.indigo),
+                    backgroundColor: AppColors.warmMist,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.burgundy),
                   ),
                 ),
               ],
@@ -130,7 +130,7 @@ class _GuidedStepShellState extends State<GuidedStepShell> {
                 color: AppColors.cardSurface,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.shadow,
+                    color: AppColors.warmShadow,
                     blurRadius: 8,
                     offset: const Offset(0, -2),
                   ),

@@ -77,15 +77,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   (IconData, Color) _iconAndColorFor(NotificationType type) {
     switch (type) {
       case NotificationType.listingLive:
-        return (Icons.check_circle, AppColors.success);
+        return (Icons.check_circle, AppColors.sage);
       case NotificationType.pendingSync:
-        return (Icons.cloud_queue, AppColors.indigo);
+        return (Icons.cloud_queue, AppColors.burgundy);
       case NotificationType.buyerView:
-        return (Icons.visibility, AppColors.indigo);
+        return (Icons.visibility, AppColors.burgundy);
       case NotificationType.priceSuggestion:
-        return (Icons.trending_up, AppColors.amber);
+        return (Icons.trending_up, AppColors.gold);
       case NotificationType.newOrder:
-        return (Icons.receipt_long, AppColors.indigoDark);
+        return (Icons.receipt_long, AppColors.burgundyDark);
     }
   }
 
@@ -162,7 +162,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     const Icon(
                       Icons.notifications_none,
                       size: 56,
-                      color: AppColors.textTertiary,
+                      color: AppColors.taupe,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Text(
@@ -173,7 +173,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     Text(
                       'notif_local_only'.tr(),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.inkFaint,
+                        color: AppColors.taupe,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -194,7 +194,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     child: Text(
                       'notif_local_only'.tr(),
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.inkFaint,
+                        color: AppColors.taupe,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -217,10 +217,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: AppColors.cardSurface,
                             borderRadius: BorderRadius.circular(AppRadii.card),
                             border: Border.all(
-                              color: AppColors.oak,
+                              color: AppColors.warmStone,
                               width: 0.6,
                             ),
                           ),

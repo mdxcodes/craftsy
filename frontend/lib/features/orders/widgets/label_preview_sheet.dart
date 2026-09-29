@@ -170,7 +170,7 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
                           width: 48,
                           height: 48,
                           decoration: const BoxDecoration(
-                            color: AppColors.parchmentDeep,
+                            color: AppColors.warmMist,
                             shape: BoxShape.circle,
                           ),
                           child: const Center(
@@ -198,7 +198,7 @@ class _LabelPreviewSheetState extends ConsumerState<_LabelPreviewSheet> {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.cardPadding),
                       decoration: BoxDecoration(
-                        color: AppColors.parchment,
+                        color: AppColors.cream,
                         borderRadius: BorderRadius.circular(AppRadii.card),
                         border: Border.all(color: AppColors.line, width: 1.5),
                         boxShadow: AppElevation.cardShadow,

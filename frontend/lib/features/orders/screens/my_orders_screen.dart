@@ -114,7 +114,7 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
                                     namedArgs: {'status': next.labelKey.tr()},
                                   ),
                                 ),
-                                backgroundColor: AppColors.indigo,
+                                 backgroundColor: AppColors.burgundy,
                                 duration: const Duration(seconds: 2),
                               ),
                             );
@@ -132,15 +132,15 @@ class _MyOrdersScreenState extends ConsumerState<MyOrdersScreen> {
   Color _statusDotColor(OrderStatus status) {
     switch (status) {
       case OrderStatus.newOrder:
-        return AppColors.amber;
+        return AppColors.gold;
       case OrderStatus.packed:
-        return AppColors.indigo;
+        return AppColors.burgundy;
       case OrderStatus.shipped:
-        return AppColors.teal;
+        return AppColors.sage;
       case OrderStatus.delivered:
         return AppColors.success;
       case OrderStatus.cancelled:
-        return AppColors.inkSoft;
+        return AppColors.taupe;
     }
   }
 }
@@ -187,9 +187,9 @@ class _FilterChip extends StatelessWidget {
       labelPadding: EdgeInsets.only(left: dotColor != null ? 2 : 6, right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       backgroundColor: AppColors.cardSurface,
-      selectedColor: AppColors.terracotta,
+      selectedColor: AppColors.burgundy,
       side: BorderSide(
-        color: selected ? AppColors.terracotta : AppColors.line,
+        color: selected ? AppColors.burgundy : AppColors.line,
         width: 1.5,
       ),
       shape: RoundedRectangleBorder(
@@ -298,21 +298,21 @@ class _OrderCardState extends State<_OrderCard> {
       background: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.itemSpacing),
         decoration: BoxDecoration(
-          color: AppColors.terracottaLight,
+          color: AppColors.goldLight,
           borderRadius: BorderRadius.circular(AppRadii.card),
         ),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSpacing.lg),
         child: Row(
           children: [
-            const Icon(Icons.arrow_forward, color: AppColors.terracottaDark),
+            const Icon(Icons.arrow_forward, color: AppColors.goldDark),
             const SizedBox(width: AppSpacing.xs),
             Text(
               'mark_as_status'.tr(
                 namedArgs: {'status': order.status.next?.labelKey.tr() ?? ''},
               ),
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.terracottaDark,
+                color: AppColors.goldDark,
               ),
             ),
           ],
@@ -343,7 +343,7 @@ class _OrderCardState extends State<_OrderCard> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: AppColors.parchmentDeep,
+                    color: AppColors.warmMist,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -446,7 +446,7 @@ class _OrderCardState extends State<_OrderCard> {
                                 TextSpan(
                                   text: '₹${order.amount.toStringAsFixed(0)}',
                                   style: AppTextStyles.labelMedium.copyWith(
-                                    color: AppColors.indigo,
+                                    color: AppColors.burgundy,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
                                   ),
@@ -491,7 +491,7 @@ class _OrderCardState extends State<_OrderCard> {
         cat.contains('ceramic')) {
       return CustomPaint(
         size: const Size(22, 22),
-        painter: CraftCategoryIcons.pottery(color: AppColors.terracottaDark),
+        painter: CraftCategoryIcons.pottery(color: AppColors.ink),
       );
     }
     if (cat.contains('silk') ||
@@ -500,13 +500,13 @@ class _OrderCardState extends State<_OrderCard> {
         cat.contains('cloth')) {
       return CustomPaint(
         size: const Size(22, 22),
-        painter: CraftCategoryIcons.textile(color: AppColors.terracottaDark),
+        painter: CraftCategoryIcons.textile(color: AppColors.ink),
       );
     }
     if (cat.contains('wood') || cat.contains('toy') || cat.contains('carv')) {
       return CustomPaint(
         size: const Size(22, 22),
-        painter: CraftCategoryIcons.woodwork(color: AppColors.terracottaDark),
+        painter: CraftCategoryIcons.woodwork(color: AppColors.ink),
       );
     }
     if (cat.contains('jewel') ||
@@ -514,10 +514,10 @@ class _OrderCardState extends State<_OrderCard> {
         cat.contains('brass')) {
       return CustomPaint(
         size: const Size(22, 22),
-        painter: CraftCategoryIcons.jewelry(color: AppColors.terracottaDark),
+        painter: CraftCategoryIcons.jewelry(color: AppColors.ink),
       );
     }
-    return const Icon(Icons.brush, size: 22, color: AppColors.terracottaDark);
+    return const Icon(Icons.brush, size: 22, color: AppColors.ink);
   }
 
   String _formatDate(DateTime dt) {
@@ -543,28 +543,28 @@ class _StatusBadge extends StatelessWidget {
 
     switch (status) {
       case OrderStatus.newOrder:
-        bg = AppColors.amberLight;
-        fg = AppColors.amberDark;
+        bg = AppColors.goldLight;
+        fg = AppColors.goldDark;
         icon = Icons.fiber_new_outlined;
         break;
       case OrderStatus.packed:
-        bg = AppColors.indigoLight;
-        fg = AppColors.indigoDark;
+        bg = AppColors.burgundyLight;
+        fg = AppColors.burgundy;
         icon = Icons.inventory_2_outlined;
         break;
       case OrderStatus.shipped:
-        bg = AppColors.tealLight;
-        fg = AppColors.tealDark;
+        bg = AppColors.sageLight;
+        fg = AppColors.sage;
         icon = Icons.local_shipping_outlined;
         break;
       case OrderStatus.delivered:
         bg = AppColors.successLight;
-        fg = AppColors.teal;
+        fg = AppColors.sage;
         icon = Icons.check_circle_outline;
         break;
       case OrderStatus.cancelled:
-        bg = AppColors.parchmentDeep;
-        fg = AppColors.inkSoft;
+        bg = AppColors.warmMist;
+        fg = AppColors.taupe;
         icon = Icons.cancel_outlined;
         break;
     }

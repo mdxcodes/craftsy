@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -18,20 +18,20 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
-  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3200), // 3.2s glow pulse loop
+      duration: const Duration(milliseconds: 2400),
     );
-    _scaleAnimation = CurvedAnimation(
+    _fadeAnimation = CurvedAnimation(
       parent: _animController,
-      curve: Curves.easeOutBack,
+      curve: Curves.easeInOut,
     );
-    _animController.repeat(reverse: true); // softly pulsing glow
+    _animController.forward();
     _navigateToNext();
   }
 
@@ -42,7 +42,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _navigateToNext() async {
-    await Future.delayed(const Duration(milliseconds: 1800));
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
 
     final hasLanguage = ref.read(hasSelectedLanguageProvider);
@@ -56,56 +56,56 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.cream,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xl,
-                    vertical: AppSpacing.lg,
-                  ),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo with warm burgundy ring
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: AppColors.cardSurface,
-                    borderRadius: BorderRadius.circular(AppRadii.xl),
+                    borderRadius: BorderRadius.circular(AppRadii.xxl),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.indigo.withValues(alpha: 0.1),
-                        blurRadius: 24,
+                        color: AppColors.burgundy.withValues(alpha: 0.12),
+                        blurRadius: 28,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
                   child: Image.asset(
                     'assets/images/app_logo.png',
-                    width: 200,
+                    width: 180,
                     fit: BoxFit.contain,
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                'app_tagline_full'.tr(),
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  'app_tagline_full'.tr(),
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.warmGray,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              const SizedBox(
-                width: 32,
-                height: 32,
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  color: AppColors.indigo,
+                const SizedBox(height: AppSpacing.xxl),
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: AppColors.burgundy,
+                    backgroundColor: AppColors.linen,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

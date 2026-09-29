@@ -77,8 +77,8 @@ class _VoiceActionButtonState extends ConsumerState<VoiceActionButton> {
   Color get _stateColor {
     if (widget.hasError) return AppColors.error;
     if (widget.isProcessing) return AppColors.warning;
-    if (widget.isListening) return AppColors.coral;
-    return AppColors.indigo;
+    if (widget.isListening) return AppColors.sienna;
+    return AppColors.burgundy;
   }
 
   Future<void> _speakHint() async {
@@ -184,13 +184,13 @@ class _VoiceActionButtonState extends ConsumerState<VoiceActionButton> {
                             ? Icons.stop_circle_outlined
                             : Icons.volume_up_rounded,
                         size: 16,
-                        color: AppColors.indigo,
+                        color: AppColors.burgundy,
                       ),
                       const SizedBox(width: AccessibilityTokens.spacingXs),
                       Text(
                         isSpeaking ? 'stop_audio'.tr() : 'tap_to_hear'.tr(),
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.indigo,
+                          color: AppColors.burgundy,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
