@@ -38,7 +38,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       final authState = ref.read(authStateProvider);
       if (authState.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authState.errorMessage!)),
+          SnackBar(
+            content: Text(
+              authState.errorMessage!,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textOnPrimary,
+              ),
+            ),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.md),
+            ),
+          ),
         );
         return;
       }

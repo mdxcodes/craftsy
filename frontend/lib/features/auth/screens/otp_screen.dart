@@ -72,7 +72,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       final result = ref.read(authStateProvider);
       if (result.errorMessage == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('otp_resent'.tr())),
+          SnackBar(
+            content: Text(
+              'otp_resent'.tr(),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textOnPrimary,
+              ),
+            ),
+            backgroundColor: AppColors.teal,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadii.md),
+            ),
+          ),
         );
       }
     }
@@ -125,13 +137,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: AppColors.coralLight,
                   borderRadius: BorderRadius.circular(AppRadii.md),
+                  border: Border.all(color: AppColors.error, width: 1),
                 ),
                 child: Text(
                   authState.errorMessage!,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.error,
+                    color: AppColors.coralDark,
+                    fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
                 ),
