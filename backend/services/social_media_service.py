@@ -28,6 +28,7 @@ from google.genai import types
 
 from .groq_client import GroqClient
 from ..config import get_settings, ensure_upload_dir
+from ..services.cloudinary_service import cloudinary_service
 
 logger = logging.getLogger(__name__)
 
@@ -314,13 +315,63 @@ class SocialMediaService:
 
     def _local_image_path(self, image_url: str) -> Path:
         """
-        Resolve only this backend's localhost upload URLs to local files.
+        Resolve only this backend's localhost upload URLs or Cloudinary URLs
+        to local files. Arbitrary filesystem paths are rejected.
 
-        Arbitrary filesystem paths are rejected. The resolved file must
-        remain inside the configured upload directory.
+        For Cloudinary URLs, the image is downloaded to a temporary local path
+        so Gemini vision can read it.
         """
         parsed = urlparse(image_url)
 
+        # --- Cloudinary URL: download to temporary local path ---
+        if "res.cloudinary.com" in parsed.netloc:
+            if not cloudinary_service.enabled:
+                logger.warning(
+                    "[SocialMedia] Received Cloudinary URL but Cloudinary is not configured: %s",
+                    image_url,
+                )
+                return Path()
+
+            try:
+                import hashlib
+                import tempfile
+
+                public_id = cloudinary_service.extract_public_id_from_url(image_url)
+                if not public_id:
+                    logger.warning(
+                        "[SocialMedia] Could not extract Cloudinary public_id from URL: %s",
+                        image_url,
+                    )
+                    return Path()
+
+                # Stable temporary filename based on public_id
+                tmp_name = hashlib.sha256(public_id.encode()).hexdigest()[:16]
+                tmp_dir = Path(tempfile.gettempdir()) / "craftsy_social"
+                tmp_dir.mkdir(parents=True, exist_ok=True)
+                local_path = tmp_dir / f"{tmp_name}.jpg"
+
+                # Download via requests
+                import requests
+
+                resp = requests.get(image_url, timeout=30)
+                resp.raise_for_status()
+                local_path.write_bytes(resp.content)
+
+                logger.info(
+                    "[SocialMedia] Downloaded Cloudinary image to: %s (public_id=%s)",
+                    local_path,
+                    public_id,
+                )
+                return local_path
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "[SocialMedia] Failed to download Cloudinary image %s: %s",
+                    image_url,
+                    exc,
+                )
+                return Path()
+
+        # --- Localhost upload URL: resolve inside upload directory ---
         if parsed.hostname not in {"localhost", "127.0.0.1", "0.0.0.0"}:
             return Path()
 
@@ -329,8 +380,8 @@ class SocialMediaService:
             return Path()
 
         relative_path = unquote(parsed.path[len(upload_prefix):]).lstrip("/")
-        
-        # 1. Block obvious traversal characters
+
+        # Block obvious traversal characters
         if not relative_path or ".." in relative_path or "\\" in relative_path:
             logger.warning(
                 "[SocialMedia] Rejected invalid image path segment: %s",
@@ -338,12 +389,11 @@ class SocialMediaService:
             )
             return Path()
 
-        # 2. CodeQL-compliant resolution
-        # We must use os.path functions because CodeQL explicitly looks for them
+        # CodeQL-compliant resolution
         safe_dir = os.path.realpath(str(ensure_upload_dir()))
         target_path = os.path.realpath(os.path.join(safe_dir, relative_path))
 
-        # 3. CodeQL-compliant boundary check using .startswith()
+        # CodeQL-compliant boundary check using .startswith()
         if not target_path.startswith(safe_dir):
             logger.warning(
                 "[SocialMedia] Rejected image path outside upload directory: %s",
@@ -351,7 +401,6 @@ class SocialMediaService:
             )
             return Path()
 
-        # Return a Path object to keep the rest of your app functioning as normal
         return Path(target_path)
 
 # ── JSON Parsing ─────────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ hard-wired to a single database implementation. SQLite-only upgrade helpers
 run *only* when the active dialect is SQLite.
 """
 
+import json
 import logging
 from typing import Generator
 
@@ -104,33 +105,37 @@ def check_database_connection() -> tuple[bool, str]:
         return False, str(exc)
 
 
-def _migrate_sqlite_columns(engine: Engine) -> None:
-    """Add new columns to existing SQLite tables if they are missing.
+def _run_schema_migrations(engine: Engine) -> None:
+    """Run dialect-appropriate schema migrations for existing tables.
 
-    SQLite's Base.metadata.create_all() only creates missing tables.
-    It does NOT add new columns to existing tables. This function
-    manually checks for and adds columns that may be missing from
-    a pre-existing craftsy.db file.
-
-    This runs ONLY for SQLite. PostgreSQL never executes these statements.
+    SQLite: add missing columns via ALTER TABLE.
+    PostgreSQL: adjust column nullability via ALTER TABLE.
     """
-    if not str(engine.url).startswith("sqlite"):
+    dialect = engine.dialect.name
+    if dialect not in {"sqlite", "postgresql"}:
         return
 
     inspector = inspect(engine)
     existing_tables = {t for t in inspector.get_table_names()}
 
-    # Use a raw connection for DDL (ALTER TABLE) — no ORM session needed
     with engine.connect() as conn:
-        # ── ArtisanDB.role ───────────────────────────────────────────────────
+        # ── ArtisanDB.name nullable ─────────────────────────────────────────────
         if "artisans" in existing_tables:
             existing_cols = {c["name"] for c in inspector.get_columns("artisans")}
-            if "role" not in existing_cols:
+            if dialect == "sqlite" and "name" not in existing_cols:
+                conn.execute(text("ALTER TABLE artisans ADD COLUMN name VARCHAR(255)"))
+            elif dialect == "postgresql":
+                conn.execute(text("ALTER TABLE artisans ALTER COLUMN name DROP NOT NULL"))
+
+        # ── ArtisanDB.role (SQLite only) ────────────────────────────────────────
+        if "artisans" in existing_tables:
+            existing_cols = {c["name"] for c in inspector.get_columns("artisans")}
+            if dialect == "sqlite" and "role" not in existing_cols:
                 conn.execute(
                     text("ALTER TABLE artisans ADD COLUMN role VARCHAR(32) DEFAULT 'artisan' NOT NULL")
                 )
 
-        # ── OrderDB new columns ───────────────────────────────────────────────
+        # ── OrderDB new columns ─────────────────────────────────────────────────
         if "orders" in existing_tables:
             order_cols = {c["name"] for c in inspector.get_columns("orders")}
             migrations = [
@@ -141,6 +146,14 @@ def _migrate_sqlite_columns(engine: Engine) -> None:
             for col_name, col_type in migrations:
                 if col_name not in order_cols:
                     conn.execute(text(f"ALTER TABLE orders ADD COLUMN {col_name} {col_type}"))
+
+        # ── ProductDB Cloudinary columns ────────────────────────────────────────
+        if "products" in existing_tables:
+            product_cols = {c["name"] for c in inspector.get_columns("products")}
+            if "cloudinary_public_id" not in product_cols:
+                conn.execute(
+                    text("ALTER TABLE products ADD COLUMN cloudinary_public_id VARCHAR(255)")
+                )
 
         conn.commit()
 
@@ -176,11 +189,7 @@ def init_db() -> None:
 
     Base.metadata.create_all(bind=engine)
 
-    # ── SQLite migrations for existing databases ──────────────────────────────
-    # SQLite's create_all only creates missing tables; it does NOT add new
-    # columns to existing tables. We manually add columns that may be missing
-    # from a pre-existing craftsy.db file. Guarded to SQLite only.
-    _migrate_sqlite_columns(engine)
+    _run_schema_migrations(engine)
 
     # Ensure demo artisan exists so demo login and FK constraints always succeed
     db = SessionLocal()
@@ -203,8 +212,112 @@ def init_db() -> None:
             )
             db.add(demo_artisan)
             db.commit()
+
+        seed_demo_products(db, demo_artisan.id if existing else "artisan_01")
     except Exception as e:
         db.rollback()
-        logger.warning("Could not seed demo artisan: %s", e)
+        logger.warning("Could not seed demo data: %s", e)
     finally:
         db.close()
+
+
+def seed_demo_products(db: Session, artisan_id: str) -> None:
+    """Seed initial marketplace catalog products for demo/testing."""
+    from .models.db_models import ProductDB
+
+    existing_count = db.query(ProductDB).filter(ProductDB.artisan_id == artisan_id).count()
+    if existing_count > 0:
+        return
+
+    demo_products = [
+        {
+            "id": "prod_dupatta_01",
+            "artisan_id": artisan_id,
+            "title": "Handwoven Cotton Dupatta",
+            "title_hi": "हाथ से बुना हुआ कॉटन दुपट्टा",
+            "description": "A beautifully handwoven cotton dupatta featuring traditional geometric patterns. Lightweight and breathable, perfect for everyday wear.",
+            "description_hi": "पारंपरिक ज्यामितीय पैटर्न वाला सुंदर हाथ से बुना हुआ कॉटन दुपट्टा। हल्का और श्वसन योग्य, रोजमर्रा के लिए उपयुक्त।",
+            "price": 899.0,
+            "image_url": "/uploads/images/dupatta_demo.jpg",
+            "category": "Textiles",
+            "tags": ["handwoven", "cotton", "dupatta", "traditional"],
+            "status": "live",
+            "stock": 25,
+        },
+        {
+            "id": "prod_vase_02",
+            "artisan_id": artisan_id,
+            "title": "Terracotta Decorative Vase",
+            "title_hi": "टेराकोटा सजावटी फूलदान",
+            "description": "Handcrafted terracotta vase with intricate tribal motifs. Each piece is unique, shaped on the potter's wheel and fired in a traditional kiln.",
+            "description_hi": "जटिल जनजातीय अलंकारों वाली हाथ से बनी टेराकोटा फूलदान। प्रत्येक टुकड़ा अद्वितीय है, कुम्हार के चाकी पर आकार दिया गया है और पारंपरिक भट्ठी में पकाया गया है।",
+            "price": 1450.0,
+            "image_url": "/uploads/images/vase_demo.jpg",
+            "category": "Pottery",
+            "tags": ["terracotta", "vase", "handcrafted", "pottery"],
+            "status": "live",
+            "stock": 12,
+        },
+        {
+            "id": "prod_tray_03",
+            "artisan_id": artisan_id,
+            "title": "Hand-Painted Wooden Tray",
+            "title_hi": "हाथ से पेंट किया हुआ लकड़ी का ट्रे",
+            "description": "A sturdy wooden tray hand-painted with vibrant Madhubani art patterns. Perfect for serving snacks or as a decorative wall piece.",
+            "description_hi": "जीवंत मधुबनी कला पैटर्न से हाथ से पेंट किया हुआ मजबूत लकड़ी का ट्रे। स्नैक्स परोसने या सजावटी दीवार के टुकड़े के रूप में उपयुक्त।",
+            "price": 650.0,
+            "image_url": "/uploads/images/tray_demo.jpg",
+            "category": "Woodwork",
+            "tags": ["wooden", "tray", "madhubani", "hand-painted"],
+            "status": "live",
+            "stock": 18,
+        },
+        {
+            "id": "prod_panel_04",
+            "artisan_id": artisan_id,
+            "title": "Madhubani Art Panel",
+            "title_hi": "मधुबनी कला पैनल",
+            "description": "Traditional Madhubani painting on handmade paper. Features nature-inspired motifs including fish, birds, and floral patterns. Ready to frame.",
+            "description_hi": "हाथ से बनے कागज पर पारंपरिक मधुबनी चित्रकला। मछली, पक्षी और फूलों के पैटर्न सहित प्रकृति से प्रेरित अलंकार शामिल हैं। फ्रेम करने के लिए तैयार।",
+            "price": 2200.0,
+            "image_url": "/uploads/images/panel_demo.jpg",
+            "category": "Paintings",
+            "tags": ["madhubani", "painting", "handmade", "art"],
+            "status": "live",
+            "stock": 8,
+        },
+        {
+            "id": "prod_basket_05",
+            "artisan_id": artisan_id,
+            "title": "Bamboo Storage Basket",
+            "title_hi": "बांस का भंडारण टोकरी",
+            "description": "Eco-friendly bamboo storage basket with sturdy weave. Ideal for storing clothes, toys, or kitchen essentials. Natural and chemical-free.",
+            "description_hi": "मजबूत बुनाई वाली पर्यावरण के अनुकूल बांस की भंडारण टोकरी। कपड़े, खिलौने या किचन सामान स्टोर करने के लिए आदर्श। प्राकृतिक और रसायन मुक्त।",
+            "price": 450.0,
+            "image_url": "/uploads/images/basket_demo.jpg",
+            "category": "Bamboo & Cane",
+            "tags": ["bamboo", "basket", "storage", "eco-friendly"],
+            "status": "live",
+            "stock": 30,
+        },
+    ]
+
+    for product_data in demo_products:
+        product = ProductDB(
+            id=product_data["id"],
+            artisan_id=product_data["artisan_id"],
+            title=product_data["title"],
+            title_hi=product_data["title_hi"],
+            description=product_data["description"],
+            description_hi=product_data["description_hi"],
+            price=product_data["price"],
+            image_url=product_data["image_url"],
+            category=product_data["category"],
+            tags=json.dumps(product_data["tags"]),
+            status=product_data["status"],
+            stock=product_data["stock"],
+            created_at=datetime.now(),
+        )
+        db.add(product)
+
+    db.commit()

@@ -29,13 +29,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
-  void _handleContinue() {
+  void _handleContinue() async {
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
-      ref.read(authStateProvider.notifier).signInWithPhone(phone);
+      final notifier = ref.read(authStateProvider.notifier);
+      await notifier.signInWithPhone(phone);
+      if (!mounted) return;
+      final authState = ref.read(authStateProvider);
+      if (authState.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(authState.errorMessage!)),
+        );
+        return;
+      }
       context.pushNamed(
         AppRouteConstants.otp,
-        queryParameters: {'phone': phone},
+        queryParameters: {
+          'phone': phone,
+          'isNewUser': authState.isNewUser ? 'true' : 'false',
+        },
       );
     }
   }

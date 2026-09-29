@@ -13,6 +13,9 @@ class MarketplaceProduct {
   final List<String> tags;
   final int stock;
   final String? artisanId;
+  final String? artisanName;
+  final String? artisanCraft;
+  final String? cloudinaryPublicId;
 
   MarketplaceProduct({
     required this.id,
@@ -26,6 +29,9 @@ class MarketplaceProduct {
     this.tags = const [],
     this.stock = 0,
     this.artisanId,
+    this.artisanName,
+    this.artisanCraft,
+    this.cloudinaryPublicId,
   });
 
   factory MarketplaceProduct.fromJson(Map<String, dynamic> json) {
@@ -41,6 +47,9 @@ class MarketplaceProduct {
       tags: List<String>.from(json['tags'] ?? []),
       stock: json['stock'] ?? 0,
       artisanId: json['artisan_id'],
+      artisanName: json['artisan_name'],
+      artisanCraft: json['artisan_craft'],
+      cloudinaryPublicId: json['cloudinary_public_id'],
     );
   }
 }

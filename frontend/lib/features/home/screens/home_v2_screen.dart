@@ -34,7 +34,7 @@ class HomeV2Screen extends ConsumerWidget {
 
     final artisanName = userProfile.name.isNotEmpty
         ? userProfile.name.split(' ').first
-        : 'Artisan';
+        : null;
 
     return AppScaffold(
       body: RefreshIndicator(
@@ -87,9 +87,9 @@ class HomeV2Screen extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _GreetingHeader extends StatelessWidget {
-  final String name;
+  final String? name;
 
-  const _GreetingHeader({required this.name});
+  const _GreetingHeader({this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +117,26 @@ class _GreetingHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Semantics(
-                        label: 'home_greeting'.tr(args: [name]),
-                        child: Text(
-                          'home_greeting'.tr(args: [name]),
-                          style: AppTextStyles.headlineLarge.copyWith(
-                            color: AppColors.parchment,
+                      if (name != null && name!.isNotEmpty)
+                        Semantics(
+                          label: 'home_greeting'.tr(args: [name!]),
+                          child: Text(
+                            'home_greeting'.tr(args: [name!]),
+                            style: AppTextStyles.headlineLarge.copyWith(
+                              color: AppColors.parchment,
+                            ),
+                          ),
+                        )
+                      else
+                        Semantics(
+                          label: 'home_greeting_no_name'.tr(),
+                          child: Text(
+                            'home_greeting_no_name'.tr(),
+                            style: AppTextStyles.headlineLarge.copyWith(
+                              color: AppColors.parchment,
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         'home_subtitle'.tr(),

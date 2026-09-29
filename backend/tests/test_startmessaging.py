@@ -258,17 +258,17 @@ def client(db):
     app.dependency_overrides.clear()
 
 
-def _create_artisan(db, phone="9876543210"):
+def _create_artisan(db, phone="9876543210", name="Test Artisan", role="artisan"):
     artisan = ArtisanDB(
         id=f"artisan_{phone[-4:]}",
-        name="Test Artisan",
+        name=name,
         phone=phone,
         craft_type="Test Craft",
         location_cluster="Test Cluster",
         state="Test State",
         experience_years="5",
         preferred_language="en",
-        role="artisan",
+        role=role,
     )
     db.add(artisan)
     db.commit()
@@ -429,3 +429,102 @@ class TestAuthRouterStartMessaging:
         assert response.status_code == 502
         data = response.json()
         assert data["detail"]["error_code"] == "RATE_LIMITED"
+
+
+# ── New Auto-Create User Flow ─────────────────────────────────────────────────
+
+
+class TestAutoCreateUserFlow:
+    """Tests for phone-only login with auto-created users."""
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_login_new_phone_returns_is_new_user(self, mock_provider_cls, client, db):
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider.send_otp.return_value = OtpSendResult(
+            success=True, request_id="req_new_123"
+        )
+        mock_provider_cls.return_value = mock_provider
+
+        response = client.post(
+            "/api/v1/auth/login",
+            json={"phone": "9999999999"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["is_new_user"] is True
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_login_existing_phone_returns_is_not_new_user(
+        self, mock_provider_cls, client, db
+    ):
+        _create_artisan(db, phone="9876543210")
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider.send_otp.return_value = OtpSendResult(
+            success=True, request_id="req_existing_123"
+        )
+        mock_provider_cls.return_value = mock_provider
+
+        response = client.post(
+            "/api/v1/auth/login",
+            json={"phone": "9876543210"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["is_new_user"] is False
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_verify_otp_creates_user_if_not_exists(self, mock_provider_cls, client, db):
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider.verify_otp.return_value = OtpVerifyResult(success=True)
+        mock_provider_cls.return_value = mock_provider
+
+        response = client.post(
+            "/api/v1/auth/verify-otp",
+            json={"phone": "8888888888", "request_id": "req_new_123", "otp": "123456"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert "access_token" in data
+        assert data["artisan"]["phone"] == "8888888888"
+        assert data["artisan"]["name"] is None
+
+        artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == "8888888888").first()
+        assert artisan is not None
+        assert artisan.role == "customer"
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_verify_otp_returns_existing_user(self, mock_provider_cls, client, db):
+        existing = _create_artisan(db, phone="9876543210", name="Existing User")
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider.verify_otp.return_value = OtpVerifyResult(success=True)
+        mock_provider_cls.return_value = mock_provider
+
+        response = client.post(
+            "/api/v1/auth/verify-otp",
+            json={"phone": "9876543210", "request_id": "req_123", "otp": "123456"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["artisan"]["name"] == "Existing User"
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_update_profile(self, mock_provider_cls, client, db):
+        artisan = _create_artisan(db, phone="9876543210")
+        token = f"mock_jwt_token_{artisan.phone}"
+
+        response = client.patch(
+            "/api/v1/auth/profile",
+            json={"name": "Updated Name", "craft_type": "Woodwork"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["name"] == "Updated Name"
+        assert data["craft_type"] == "Woodwork"

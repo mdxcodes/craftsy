@@ -111,7 +111,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '${'verify_phone_subtitle'.tr()}\n+91 ${widget.phoneNumber}',
+              widget.isNewUser
+                  ? 'verify_phone_subtitle_new'.tr()
+                  : 'verify_phone_subtitle'.tr(),
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),

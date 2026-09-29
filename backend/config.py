@@ -156,6 +156,20 @@ class Settings(BaseSettings):
         description="StartMessaging OTP template ID for SMS delivery (optional).",
     )
 
+    # Cloudinary Image Storage (optional; falls back to local uploads if absent)
+    cloudinary_cloud_name: str = Field(
+        default="",
+        description="Cloudinary cloud name for persistent image storage.",
+    )
+    cloudinary_api_key: str = Field(
+        default="",
+        description="Cloudinary API key.",
+    )
+    cloudinary_api_secret: str = Field(
+        default="",
+        description="Cloudinary API secret.",
+    )
+
     # Models
     llm_model: str = "gemini-3.6-flash"
     embedding_model: str = "gemini-embedding-001"

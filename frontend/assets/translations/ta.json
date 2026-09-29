@@ -968,5 +968,11 @@
   "action_edit": "திருத்தவும்",
   "action_optional": "விருப்பப்படி",
   "replay_audio": "ஆடியோவை மீண்டும் இயக்கவும்",
-  "select_voice_language": "குரல் மொழியைத் தேர்ந்தெடுக்கவும்"
+  "select_voice_language": "குரல் மொழியைத் தேர்ந்தெடுக்கவும்",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

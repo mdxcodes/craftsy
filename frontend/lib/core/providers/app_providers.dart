@@ -274,11 +274,11 @@ class UserProfileNotifier extends StateNotifier<UserProfile> {
   UserProfileNotifier()
     : super(
         UserProfile(
-          id: 'artisan_01',
-          name: 'Rameshwar Lal Kumhar',
-          phone: '+91 98765 43210',
-          craftType: 'Terracotta Pottery',
-          locationCluster: 'Kumhar Gram, Delhi NCR',
+          id: '',
+          name: '',
+          phone: '',
+          craftType: '',
+          locationCluster: '',
           preferredLanguage: 'en',
         ),
       ) {

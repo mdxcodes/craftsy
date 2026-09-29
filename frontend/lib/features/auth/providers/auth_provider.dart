@@ -15,6 +15,7 @@ class AuthState {
   final String? errorMessage;
   final int? resendCooldownSeconds;
   final String? otpRequestId;
+  final bool isNewUser;
 
   const AuthState({
     this.isAuthenticated = false,
@@ -25,6 +26,7 @@ class AuthState {
     this.errorMessage,
     this.resendCooldownSeconds,
     this.otpRequestId,
+    this.isNewUser = false,
   });
 
   AuthState copyWith({
@@ -36,6 +38,7 @@ class AuthState {
     String? errorMessage,
     int? resendCooldownSeconds,
     String? otpRequestId,
+    bool? isNewUser,
     bool clearErrorMessage = false,
     bool clearResendCooldown = false,
     bool clearOtpRequestId = false,
@@ -53,6 +56,7 @@ class AuthState {
           ? null
           : (resendCooldownSeconds ?? this.resendCooldownSeconds),
       otpRequestId: clearOtpRequestId ? null : (otpRequestId ?? this.otpRequestId),
+      isNewUser: isNewUser ?? this.isNewUser,
     );
   }
 }
@@ -85,9 +89,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       resendCooldownSeconds: null,
       otpRequestId: null,
       clearOtpRequestId: true,
+      isNewUser: false,
     );
     await _authRepository.savePhoneNumber(phoneNumber);
-    // Request OTP from backend (if server is reachable)
     final result = await _authRepository.requestOtp(phoneNumber);
     if (result == null) {
       state = state.copyWith(
@@ -99,6 +103,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       phoneNumber: phoneNumber,
       otpRequestId: result['request_id'] as String?,
+      isNewUser: result['is_new_user'] as bool? ?? false,
       isLoading: false,
       errorMessage: null,
     );
@@ -136,8 +141,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final registrationProfile = profileOverride ?? state.pendingRegistration;
     final requestId = state.otpRequestId;
 
-    // 1. If registering and not yet assigned a backend ID, attempt registration
-    if (registrationProfile != null && registrationProfile.id.isEmpty) {
+    final isNewUser = state.isNewUser;
+
+    if (!isNewUser && registrationProfile != null && registrationProfile.id.isEmpty) {
       final regResult = await _authRepository.registerArtisan(
         registrationProfile,
       );
@@ -146,7 +152,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
     }
 
-    // 2. Call backend /api/v1/auth/verify-otp
     UserProfile? backendProfile;
     String? token;
     try {
@@ -174,7 +179,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    // 3. Resolve profile: backend response > pending registration > local fallback
     final currentPending = state.pendingRegistration;
     final resolvedProfile =
         backendProfile ??
@@ -187,21 +191,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
               )
             : UserProfile(
                 id: 'artisan_${DateTime.now().millisecondsSinceEpoch}',
-                name: 'Artisan',
+                name: '',
                 phone: effectivePhone,
-                craftType: 'Handicraft',
-                locationCluster: 'Rural Cluster',
+                craftType: '',
+                locationCluster: '',
                 preferredLanguage: 'en',
               ));
 
-    // 4. Save to auth repository
     await _authRepository.saveAuthData(
       resolvedProfile.id,
       effectivePhone,
       token: token,
     );
 
-    // 5. Persist to Hive user_profile_box as active profile
     if (Hive.isBoxOpen('user_profile_box')) {
       final box = Hive.box<UserProfile>('user_profile_box');
       await box.put('current_profile', resolvedProfile);
@@ -215,6 +217,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       pendingRegistration: () => null,
       otpRequestId: null,
       clearOtpRequestId: true,
+      isNewUser: false,
     );
     return true;
   }
@@ -226,6 +229,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       resendCooldownSeconds: null,
       otpRequestId: null,
       clearOtpRequestId: true,
+      isNewUser: false,
     );
 
     final result = await _authRepository.resendOtp(phoneNumber);
@@ -299,6 +303,33 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     await _authRepository.clearAuthData();
     state = const AuthState();
+  }
+
+  Future<UserProfile?> updateProfile(UserProfile profile) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    final updated = await _authRepository.updateProfile(profile);
+    if (updated != null) {
+      await _authRepository.saveAuthData(
+        updated.id,
+        updated.phone,
+        token: await _authRepository.getAccessToken(),
+      );
+      if (Hive.isBoxOpen('user_profile_box')) {
+        final box = Hive.box<UserProfile>('user_profile_box');
+        await box.put('current_profile', updated);
+      }
+      state = state.copyWith(
+        userId: updated.id,
+        phoneNumber: updated.phone,
+        isLoading: false,
+      );
+    } else {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'profile_update_failed'.tr(),
+      );
+    }
+    return updated;
   }
 }
 

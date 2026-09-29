@@ -973,5 +973,11 @@
   "action_edit": "Edit",
   "action_optional": "optional",
   "replay_audio": "Replay audio",
-  "select_voice_language": "Select voice language"
+  "select_voice_language": "Select voice language",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

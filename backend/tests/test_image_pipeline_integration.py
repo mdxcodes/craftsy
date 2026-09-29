@@ -90,7 +90,11 @@ def test_stage2_fastapi_multipart_endpoint(tmp_path):
     assert "enhanced_url" in data
     assert data["status"] == "success"
     assert "/uploads/raw/" in data["original_url"] or "/uploads/" in data["original_url"]
-    assert "/uploads/enhanced/" in data["enhanced_url"]
+    # enhanced_url can be either a local /uploads/enhanced/ URL or a Cloudinary HTTPS URL
+    assert (
+        "/uploads/enhanced/" in data["enhanced_url"]
+        or data["enhanced_url"].startswith("https://")
+    )
 
     print(f"✅ Stage 2 Passed: FastAPI endpoint returned 200 OK with original_url={data['original_url']} & enhanced_url={data['enhanced_url']}")
 

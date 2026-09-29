@@ -288,6 +288,18 @@ class _ProductCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (product.artisanName != null && product.artisanName!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      product.artisanName!,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 4),
                   Text(
                     '₹${product.price.toStringAsFixed(0)}',

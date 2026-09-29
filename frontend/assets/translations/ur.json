@@ -968,5 +968,11 @@
   "action_edit": "ترمیم کریں",
   "action_optional": "اختیاری",
   "replay_audio": "آڈیو دوبارہ چلائیں",
-  "select_voice_language": "آواز کی زبان منتخب کریں"
+  "select_voice_language": "آواز کی زبان منتخب کریں",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

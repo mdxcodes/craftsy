@@ -968,5 +968,11 @@
   "action_edit": "ସମ୍ପାଦନା କରନ୍ତୁ",
   "action_optional": "ଇଚ୍ଛାଧୀନ",
   "replay_audio": "ଅଡିଓକୁ ପୁନଃପ୍ରୟୋଗ କରନ୍ତୁ",
-  "select_voice_language": "ସ୍ୱର ଭାଷା ବାଛନ୍ତୁ"
+  "select_voice_language": "ସ୍ୱର ଭାଷା ବାଛନ୍ତୁ",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

@@ -14,6 +14,7 @@ import '../../../core/providers/app_providers.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../orders/providers/orders_provider.dart';
 import '../../orders/models/order.dart';
+import '../../../data/models/user_profile.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -57,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          profile.name,
+                          profile.name.isNotEmpty ? profile.name : 'Namaste',
                           style: AppTextStyles.headlineMedium.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -108,6 +109,11 @@ class ProfileScreen extends ConsumerWidget {
                         ],
                       ],
                     ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined),
+                    tooltip: 'edit_profile'.tr(),
+                    onPressed: () => _showEditProfileDialog(context, ref, profile),
                   ),
                 ],
               ),
@@ -236,6 +242,102 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile profile) {
+  final nameController = TextEditingController(text: profile.name);
+  final craftController = TextEditingController(text: profile.craftType);
+  final clusterController = TextEditingController(text: profile.locationCluster);
+  final stateController = TextEditingController(text: profile.state);
+  final experienceController = TextEditingController(text: profile.experienceYears ?? '');
+  final formKey = GlobalKey<FormState>();
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text('edit_profile'.tr()),
+      content: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'full_name_label'.tr(),
+                  hintText: 'full_name_hint'.tr(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: craftController,
+                decoration: InputDecoration(
+                  labelText: 'craft_type_label'.tr(),
+                  hintText: 'craft_type_label'.tr(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: clusterController,
+                decoration: InputDecoration(
+                  labelText: 'cluster_location_label'.tr(),
+                  hintText: 'cluster_location_hint'.tr(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: stateController,
+                decoration: InputDecoration(
+                  labelText: 'state_label'.tr(),
+                  hintText: 'state_label'.tr(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: experienceController,
+                decoration: InputDecoration(
+                  labelText: 'experience_label'.tr(),
+                  hintText: 'experience_hint'.tr(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text('cancel_btn'.tr()),
+        ),
+        FilledButton(
+          onPressed: () async {
+            final form = formKey.currentState;
+            if (form == null || !form.validate()) return;
+            final updated = profile.copyWith(
+              name: nameController.text.trim(),
+              craftType: craftController.text.trim(),
+              locationCluster: clusterController.text.trim(),
+              state: stateController.text.trim(),
+              experienceYears: experienceController.text.trim().isEmpty
+                  ? null
+                  : experienceController.text.trim(),
+            );
+            final result = await ref.read(authStateProvider.notifier).updateProfile(updated);
+            if (context.mounted) {
+              Navigator.pop(ctx);
+              if (result != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('profile_updated'.tr())),
+                );
+              }
+            }
+          },
+          child: Text('save_btn'.tr()),
+        ),
+      ],
+    ),
+  );
 }
 
 class _MenuTile extends StatelessWidget {

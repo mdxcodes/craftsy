@@ -5,6 +5,7 @@ Handles photo enhancement, speech-to-text audio transcription via ML voice pipel
 bilingual listing generation, and complete voice-to-product draft creation.
 """
 
+import logging
 from pathlib import Path
 from typing import Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
@@ -21,8 +22,11 @@ from ..models.schemas import (
 )
 from ..services.catalog_service import CatalogService
 from ..services.storage_service import StorageService
+from ..services.cloudinary_service import cloudinary_service
 
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/catalog", tags=["Cataloger AI"])
 catalog_service = CatalogService()
@@ -40,13 +44,13 @@ async def enhance_image(
     Serialized with Semaphore(1) to avoid concurrent memory spikes on cloud containers.
     """
     try:
-        # 1. Save original raw upload
+        # 1. Save original raw upload (temporary local processing storage)
         raw_url = await storage_service.save_upload(image, subfolder="raw")
         raw_path = storage_service.get_local_path_from_url(raw_url)
         if not raw_path:
             raise HTTPException(status_code=500, detail="Failed to locate stored raw image")
 
-        # 2. Prepare destination path for enhanced image
+        # 2. Prepare destination path for enhanced image (temporary local processing storage)
         enhanced_dir = storage_service.upload_dir / "enhanced"
         enhanced_dir.mkdir(parents=True, exist_ok=True)
         enhanced_filename = f"{raw_path.stem}_enhanced.jpg"
@@ -62,8 +66,36 @@ async def enhance_image(
                 import shutil
                 shutil.copy2(str(result_path), str(enhanced_path))
 
+        # 4. Upload enhanced image to Cloudinary (permanent storage)
+        enhanced_cloudinary_url = None
+        enhanced_public_id = None
+        if cloudinary_service.enabled:
+            try:
+                product_hint = raw_path.stem
+                folder = f"craftsy/products/{product_hint}"
+                upload_result = cloudinary_service.upload_image(
+                    file_path=str(enhanced_path),
+                    folder=folder,
+                    public_id="original",
+                )
+                enhanced_public_id = upload_result.get("public_id")
+                enhanced_cloudinary_url = upload_result.get("secure_url")
+                logger.info(
+                    "Enhanced image uploaded to Cloudinary: public_id=%s, url=%s",
+                    enhanced_public_id,
+                    enhanced_cloudinary_url,
+                )
+            except Exception as cloud_exc:  # noqa: BLE001
+                logger.warning(
+                    "Cloudinary upload failed, falling back to local URL: %s",
+                    cloud_exc,
+                )
 
-        enhanced_url = f"{storage_service.settings.static_url_prefix}/enhanced/{enhanced_filename}" if hasattr(storage_service, 'settings') else f"/uploads/enhanced/{enhanced_filename}"
+        # 5. Determine the enhanced image URL to return
+        if enhanced_cloudinary_url:
+            enhanced_url = enhanced_cloudinary_url
+        else:
+            enhanced_url = f"{storage_service.settings.static_url_prefix}/enhanced/{enhanced_filename}" if hasattr(storage_service, 'settings') else f"/uploads/enhanced/{enhanced_filename}"
 
         return ImageEnhanceResponse(
             original_url=raw_url,
@@ -76,10 +108,34 @@ async def enhance_image(
 
 @router.post("/upload-image", response_model=dict)
 async def upload_image(image: UploadFile = File(...)):
-    """Store a client-local image and return a backend-accessible URL."""
+    """Store a client-local image, upload to Cloudinary, and return the Cloudinary HTTPS URL."""
     try:
-        image_url = await storage_service.save_upload(image, subfolder="social")
-        return {"image_url": image_url}
+        # Save to temporary local processing storage
+        local_url = await storage_service.save_upload(image, subfolder="social")
+        local_path = storage_service.get_local_path_from_url(local_url)
+        if not local_path:
+            raise HTTPException(status_code=500, detail="Failed to locate stored image")
+
+        # Upload to Cloudinary for permanent storage
+        if cloudinary_service.enabled:
+            try:
+                upload_result = cloudinary_service.upload_image(
+                    file_path=str(local_path),
+                    folder="craftsy/social",
+                    public_id=local_path.stem,
+                )
+                cloudinary_url = upload_result.get("secure_url")
+                if cloudinary_url:
+                    return {"image_url": cloudinary_url}
+            except Exception as cloud_exc:  # noqa: BLE001
+                logger.warning(
+                    "Cloudinary upload failed for social image, returning local URL: %s",
+                    cloud_exc,
+                )
+
+        return {"image_url": local_url}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
@@ -210,7 +266,26 @@ async def voice_to_product(
 
         image_url = None
         if image:
-            image_url = await storage_service.save_upload(image, subfolder="products")
+            local_image_url = await storage_service.save_upload(image, subfolder="products")
+            local_image_path = storage_service.get_local_path_from_url(local_image_url)
+
+            # Upload to Cloudinary for permanent storage
+            if cloudinary_service.enabled and local_image_path:
+                try:
+                    upload_result = cloudinary_service.upload_image(
+                        file_path=str(local_image_path),
+                        folder="craftsy/products",
+                        public_id=local_image_path.stem,
+                    )
+                    image_url = upload_result.get("secure_url")
+                except Exception as cloud_exc:  # noqa: BLE001
+                    logger.warning(
+                        "Cloudinary upload failed for voice-to-product image, using local URL: %s",
+                        cloud_exc,
+                    )
+                    image_url = local_image_url
+            else:
+                image_url = local_image_url
 
         cost_override = None
         if raw_material_cost is not None or labor_hours is not None or hourly_wage is not None:

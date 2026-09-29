@@ -19,7 +19,7 @@ class ArtisanDB(Base):
     __tablename__ = "artisans"
 
     id = Column(String(64), primary_key=True, index=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=True)
     phone = Column(String(15), unique=True, nullable=False, index=True)
     craft_type = Column(String(128), default="")
     location_cluster = Column(String(255), default="")
@@ -59,6 +59,7 @@ class ProductDB(Base):
     description_hi = Column(Text, default="")
     price = Column(Float, nullable=False, default=0.0)
     image_url = Column(String(512), default="")
+    cloudinary_public_id = Column(String(255), nullable=True, index=True)
     category = Column(String(128), default="General", index=True)
     tags = Column(Text, default="[]")  # JSON encoded list of strings
     status = Column(String(32), default="live", index=True)  # live, draft, archived

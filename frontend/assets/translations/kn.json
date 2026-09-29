@@ -968,5 +968,11 @@
   "action_edit": "ಸಂಪಾದಿಸಿ",
   "action_optional": "ಐಚ್ಛಿಕ",
   "replay_audio": "ಧ್ವನಿಯನ್ನು ಮರುಬಳಕೆ ಮಾಡಿ",
-  "select_voice_language": "ಧ್ವನಿ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+  "select_voice_language": "ಧ್ವನಿ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

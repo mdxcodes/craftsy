@@ -10,9 +10,31 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
+from ..models.db_models import ArtisanDB, ProductDB
 from ..services.marketplace_service import marketplace_service
 
 router = APIRouter(prefix="/api/v1/marketplace", tags=["Marketplace"])
+
+
+def _product_to_response(product: ProductDB, db: Session) -> dict:
+    artisan = db.query(ArtisanDB).filter(ArtisanDB.id == product.artisan_id).first()
+    return {
+        "id": product.id,
+        "title": product.title,
+        "title_hi": product.title_hi or "",
+        "description": product.description or "",
+        "description_hi": product.description_hi or "",
+        "price": product.price,
+        "image_url": product.image_url,
+        "cloudinary_public_id": product.cloudinary_public_id,
+        "category": product.category,
+        "tags": product.tags_list,
+        "stock": product.stock,
+        "artisan_id": product.artisan_id,
+        "artisan_name": artisan.name if artisan else None,
+        "artisan_craft": artisan.craft_type if artisan else None,
+        "created_at": product.created_at.isoformat() if product.created_at else None,
+    }
 
 
 @router.get("/products")
@@ -29,23 +51,7 @@ async def list_products(
     Public endpoint — no authentication required.
     """
     products = marketplace_service.list_products(db, category, search, limit, offset)
-    return [
-        {
-            "id": p.id,
-            "title": p.title,
-            "title_hi": p.title_hi or "",
-            "description": p.description or "",
-            "description_hi": p.description_hi or "",
-            "price": p.price,
-            "image_url": p.image_url,
-            "category": p.category,
-            "tags": p.tags_list,
-            "stock": p.stock,
-            "artisan_id": p.artisan_id,
-            "created_at": p.created_at.isoformat() if p.created_at else None,
-        }
-        for p in products
-    ]
+    return [_product_to_response(p, db) for p in products]
 
 
 @router.get("/products/{product_id}")
@@ -63,20 +69,7 @@ async def get_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    return {
-        "id": product.id,
-        "title": product.title,
-        "title_hi": product.title_hi or "",
-        "description": product.description or "",
-        "description_hi": product.description_hi or "",
-        "price": product.price,
-        "image_url": product.image_url,
-        "category": product.category,
-        "tags": product.tags_list,
-        "stock": product.stock,
-        "artisan_id": product.artisan_id,
-        "created_at": product.created_at.isoformat() if product.created_at else None,
-    }
+    return _product_to_response(product, db)
 
 
 @router.get("/categories")

@@ -5,11 +5,14 @@ Provides product CRUD endpoints and batch sync for Flutter offline queue.
 """
 
 import json
+import logging
 import uuid
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from ..database import get_db
 from ..models.db_models import ProductDB
@@ -61,6 +64,7 @@ async def list_products(
             status=item.status,
             created_at=item.created_at,
             updated_at=item.updated_at,
+            cloudinary_public_id=item.cloudinary_public_id,
         )
         for item in items
     ]
@@ -87,6 +91,7 @@ async def get_product(product_id: str, db: Session = Depends(get_db)):
         status=item.status,
         created_at=item.created_at,
         updated_at=item.updated_at,
+        cloudinary_public_id=item.cloudinary_public_id,
     )
 
 
@@ -149,6 +154,7 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
         stock=db_item.stock,
         created_at=db_item.created_at,
         updated_at=db_item.updated_at,
+        cloudinary_public_id=db_item.cloudinary_public_id,
     )
 
 
@@ -174,7 +180,48 @@ async def update_product(
     if update_data.price is not None:
         db_item.price = update_data.price
     if update_data.image_url is not None:
+        old_image_url = db_item.image_url
+        old_cloudinary_public_id = db_item.cloudinary_public_id
+
         db_item.image_url = update_data.image_url
+
+        # Update cloudinary_public_id if the new URL is a Cloudinary URL
+        new_cloudinary_public_id = None
+        if update_data.image_url.startswith("https://") and "res.cloudinary.com" in update_data.image_url:
+            from ..services.cloudinary_service import cloudinary_service
+            new_cloudinary_public_id = cloudinary_service.extract_public_id_from_url(update_data.image_url)
+
+        if new_cloudinary_public_id:
+            db_item.cloudinary_public_id = new_cloudinary_public_id
+            # Delete old Cloudinary image if it was a different asset
+            if old_cloudinary_public_id and old_cloudinary_public_id != new_cloudinary_public_id:
+                try:
+                    from ..services.cloudinary_service import cloudinary_service
+                    if cloudinary_service.enabled:
+                        cloudinary_service.delete_image(old_cloudinary_public_id)
+                except Exception as cloud_exc:  # noqa: BLE001
+                    logger.warning(
+                        "Failed to delete old Cloudinary image for product %s (old_public_id=%s): %s",
+                        product_id,
+                        old_cloudinary_public_id,
+                        cloud_exc,
+                    )
+        else:
+            # New image is not from Cloudinary, clear the public_id
+            db_item.cloudinary_public_id = None
+            # Delete old Cloudinary image if it existed
+            if old_cloudinary_public_id:
+                try:
+                    from ..services.cloudinary_service import cloudinary_service
+                    if cloudinary_service.enabled:
+                        cloudinary_service.delete_image(old_cloudinary_public_id)
+                except Exception as cloud_exc:  # noqa: BLE001
+                    logger.warning(
+                        "Failed to delete old Cloudinary image for product %s (old_public_id=%s): %s",
+                        product_id,
+                        old_cloudinary_public_id,
+                        cloud_exc,
+                    )
     if update_data.category is not None:
         db_item.category = update_data.category
     if update_data.tags is not None:
@@ -203,15 +250,31 @@ async def update_product(
         stock=db_item.stock,
         created_at=db_item.created_at,
         updated_at=db_item.updated_at,
+        cloudinary_public_id=db_item.cloudinary_public_id,
     )
 
 
 @router.delete("/{product_id}")
 async def delete_product(product_id: str, db: Session = Depends(get_db)):
-    """Delete product from database."""
+    """Delete product from database and remove associated Cloudinary image if present."""
     db_item = db.query(ProductDB).filter(ProductDB.id == product_id).first()
     if not db_item:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    # Delete Cloudinary image before removing the database record
+    cloudinary_public_id = db_item.cloudinary_public_id
+    if cloudinary_public_id:
+        try:
+            from ..services.cloudinary_service import cloudinary_service
+            if cloudinary_service.enabled:
+                cloudinary_service.delete_image(cloudinary_public_id)
+        except Exception as cloud_exc:  # noqa: BLE001
+            logger.warning(
+                "Cloudinary image deletion failed for product %s (public_id=%s): %s",
+                product_id,
+                cloudinary_public_id,
+                cloud_exc,
+            )
 
     db.delete(db_item)
     db.commit()
@@ -280,6 +343,7 @@ async def sync_offline_products(
             status=s.status,
             created_at=s.created_at,
             updated_at=s.updated_at,
+            cloudinary_public_id=s.cloudinary_public_id,
         )
         for s in synced_items
     ]

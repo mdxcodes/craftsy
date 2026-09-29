@@ -968,5 +968,11 @@
   "action_edit": "সম্পাদনা কৰক",
   "action_optional": "ঐচ্ছিক",
   "replay_audio": "অডিঅ 'পুনৰ বজোৱা",
-  "select_voice_language": "কণ্ঠস্বৰৰ ভাষা বাছনি কৰক"
+  "select_voice_language": "কণ্ঠস্বৰৰ ভাষা বাছনি কৰক",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

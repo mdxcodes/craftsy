@@ -17,11 +17,11 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class ArtisanRegisterRequest(BaseModel):
-    name: str = Field(..., description="Artisan full name")
+    name: Optional[str] = Field(default=None, description="Artisan full name (optional)")
     phone: str = Field(..., description="10-digit mobile number")
-    craft_type: str = Field(..., description="Primary craft category")
-    location_cluster: str = Field(..., description="Artisan cluster / town location")
-    state: Optional[str] = Field(default="", description="State / Region")
+    craft_type: Optional[str] = Field(default=None, description="Primary craft category")
+    location_cluster: Optional[str] = Field(default=None, description="Artisan cluster / town location")
+    state: Optional[str] = Field(default=None, description="State / Region")
     experience_years: Optional[str] = Field(default=None, description="Craft experience in years")
     pehchan_id: Optional[str] = Field(default=None, description="Pehchan card / Artisan ID")
     preferred_language: Optional[str] = Field(default="en", description="Preferred app language")
@@ -41,7 +41,7 @@ class ArtisanProfileResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    name: str
+    name: Optional[str] = None
     phone: str
     craft_type: str
     location_cluster: str
@@ -96,6 +96,7 @@ class ProductResponse(ProductBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
     stock: int = 0
+    cloudinary_public_id: Optional[str] = None
 
 
 class ProductSyncBatch(BaseModel):

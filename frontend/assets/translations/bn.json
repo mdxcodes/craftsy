@@ -968,5 +968,11 @@
   "action_edit": "সম্পাদনা করুন",
   "action_optional": "ঐচ্ছিক",
   "replay_audio": "অডিও পুনরায় চালান",
-  "select_voice_language": "কণ্ঠস্বরের ভাষা নির্বাচন করুন"
+  "select_voice_language": "কণ্ঠস্বরের ভাষা নির্বাচন করুন",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

@@ -968,5 +968,11 @@
   "action_edit": "సవరించండి",
   "action_optional": "ఐచ్ఛికం",
   "replay_audio": "ఆడియోను తిరిగి ప్లే చేయండి",
-  "select_voice_language": "వాయిస్ లాంగ్వేజ్ ఎంచుకోండి"
+  "select_voice_language": "వాయిస్ లాంగ్వేజ్ ఎంచుకోండి",
+  "home_greeting_no_name": "Namaste",
+  "verify_phone_subtitle_new": "Verify your number to create your account",
+  "edit_profile": "Edit Profile",
+  "profile_updated": "Profile Updated",
+  "cancel_btn": "Cancel Btn",
+  "save_btn": "Save Btn"
 }

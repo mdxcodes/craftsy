@@ -7,6 +7,7 @@ StartMessaging is used only for OTP delivery and verification.
 """
 
 import logging
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from ..config import get_settings
 from ..database import get_db
+from ..middleware.auth import get_current_artisan
 from ..models.db_models import ArtisanDB
 from ..models.schemas import (
     ArtisanRegisterRequest,
@@ -29,6 +31,16 @@ from ..services.startmessaging_service import (
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
+
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = Field(default=None, description="Full name")
+    craft_type: Optional[str] = Field(default=None, description="Primary craft category")
+    location_cluster: Optional[str] = Field(default=None, description="Artisan cluster / town location")
+    state: Optional[str] = Field(default=None, description="State / Region")
+    experience_years: Optional[str] = Field(default=None, description="Craft experience in years")
+    pehchan_id: Optional[str] = Field(default=None, description="Pehchan card / Artisan ID")
+    preferred_language: Optional[str] = Field(default=None, description="Preferred app language")
 
 
 class CustomerRegisterRequest(BaseModel):
@@ -153,7 +165,8 @@ async def register_consumer(
 @router.post(
     "/login",
     summary="Request login OTP",
-    description="Sends a real OTP to the registered phone number via StartMessaging.",
+    description="Sends a real OTP to the phone number via StartMessaging. "
+                "Creates a new user if the phone number is not registered.",
 )
 async def login_artisan(
     request: ArtisanLoginRequest,
@@ -167,11 +180,7 @@ async def login_artisan(
         )
 
     artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
-    if not artisan:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No artisan registered with this phone number.",
-        )
+    is_new_user = artisan is None
 
     provider = _get_otp_provider()
     if not provider.is_configured():
@@ -199,6 +208,7 @@ async def login_artisan(
         "phone": phone_clean,
         "request_id": send_result.request_id,
         "otp_sent": True,
+        "is_new_user": is_new_user,
     }
 
 
@@ -206,7 +216,8 @@ async def login_artisan(
     "/verify-otp",
     response_model=AuthResponse,
     summary="Verify phone OTP",
-    description="Verifies OTP with StartMessaging and returns artisan session profile.",
+    description="Verifies OTP with StartMessaging and returns artisan session profile. "
+                "Creates a new user if the phone number is not registered.",
 )
 async def verify_otp(
     request: OtpVerifyRequest,
@@ -232,11 +243,20 @@ async def verify_otp(
         )
 
     artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
-    if not artisan:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No artisan registered with this phone number. Please register first.",
+    is_new_user = artisan is None
+
+    if is_new_user:
+        artisan = ArtisanDB(
+            id=f"artisan_{phone_clean}",
+            name=None,
+            phone=phone_clean,
+            preferred_language="en",
+            role="customer",
+            created_at=datetime.now(),
         )
+        db.add(artisan)
+        db.commit()
+        db.refresh(artisan)
 
     provider = _get_otp_provider()
     if not provider.is_configured():
@@ -326,3 +346,30 @@ async def get_artisan_profile(
             detail="Artisan not found.",
         )
     return artisan
+
+
+@router.patch(
+    "/profile",
+    response_model=ArtisanProfileResponse,
+    summary="Update current user profile",
+    description="Update the authenticated user's own profile fields.",
+)
+async def update_own_profile(
+    request: ProfileUpdateRequest,
+    db: Session = Depends(get_db),
+    current_artisan: ArtisanDB = Depends(get_current_artisan),
+):
+    update_data = request.model_dump(exclude_none=True)
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields provided for update.",
+        )
+
+    for field, value in update_data.items():
+        if hasattr(current_artisan, field):
+            setattr(current_artisan, field, value)
+
+    db.commit()
+    db.refresh(current_artisan)
+    return current_artisan

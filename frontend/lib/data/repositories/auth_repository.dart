@@ -227,4 +227,38 @@ class AuthRepository {
     }
     return (null, null);
   }
+
+  Future<UserProfile?> updateProfile(UserProfile profile) async {
+    _syncBaseUrl();
+    try {
+      final payload = <String, dynamic>{
+        'name': profile.name,
+        'craft_type': profile.craftType,
+        'location_cluster': profile.locationCluster,
+        'state': profile.state,
+        'experience_years': profile.experienceYears,
+        'pehchan_id': profile.pehchanId,
+        'preferred_language': profile.preferredLanguage,
+      };
+      payload.removeWhere((key, value) => value == null);
+
+      debugPrint(
+        '[AuthRepository] PATCH ${_dio.options.baseUrl}/api/v1/auth/profile',
+      );
+      final response = await _dio.patch(
+        '/api/v1/auth/profile',
+        data: payload,
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        return UserProfile.fromJson(
+          Map<String, dynamic>.from(response.data as Map),
+        );
+      }
+    } on DioException catch (e) {
+      debugPrint('[AuthRepository] updateProfile network error: ${e.message}');
+    } catch (e) {
+      debugPrint('[AuthRepository] updateProfile unexpected error: $e');
+    }
+    return null;
+  }
 }
