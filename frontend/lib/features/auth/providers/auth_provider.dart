@@ -179,7 +179,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    if (backendProfile == null && token == null) {
+    if (backendProfile == null || token == null) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'otp_verification_failed'.tr(),
@@ -187,24 +187,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    final currentPending = state.pendingRegistration;
-    final resolvedProfile =
-        backendProfile ??
-        (currentPending != null
-            ? currentPending.copyWith(
-                id: currentPending.id.isNotEmpty
-                    ? currentPending.id
-                    : 'artisan_${DateTime.now().millisecondsSinceEpoch}',
-                phone: effectivePhone,
-              )
-            : UserProfile(
-                id: 'artisan_${DateTime.now().millisecondsSinceEpoch}',
-                name: '',
-                phone: effectivePhone,
-                craftType: '',
-                locationCluster: '',
-                preferredLanguage: 'en',
-              ));
+    final resolvedProfile = backendProfile;
 
     await _authRepository.saveAuthData(
       resolvedProfile.id,

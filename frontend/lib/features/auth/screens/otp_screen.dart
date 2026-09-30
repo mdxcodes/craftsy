@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -47,13 +48,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   bool get _isOtpComplete => _otpValue.length == 6;
 
-  void _clearOtpFields() {
-    for (var controller in _controllers) {
-      controller.clear();
-    }
-    _focusNodes[0].requestFocus();
-  }
-
   void _submitOtp() async {
     final otp = _otpValue;
     if (otp.length != 6) {
@@ -67,12 +61,28 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     );
 
     if (!success && mounted) {
-      _clearOtpFields();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ref.read(authStateProvider).errorMessage ?? 'otp_verification_failed'.tr(),
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textOnPrimary,
+            ),
+          ),
+          backgroundColor: AppColors.sienna,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.md),
+          ),
+        ),
+      );
     }
 
-    await ref.read(userProfileProvider.notifier).reloadProfile();
     if (mounted && ref.read(authStateProvider).isAuthenticated) {
-      context.goNamed(AppRouteConstants.home);
+      await ref.read(userProfileProvider.notifier).reloadProfile();
+      if (mounted) {
+        context.goNamed(AppRouteConstants.home);
+      }
     }
   }
 
@@ -129,6 +139,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     } else if (index == 5 && trimmed.isNotEmpty) {
       _submitOtp();
     }
+  }
+
+  KeyEventResult _onOtpFieldKey(int index, RawKeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace &&
+        _controllers[index].text.isEmpty &&
+        index > 0) {
+      _focusNodes[index - 1].requestFocus();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -200,26 +221,31 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 return SizedBox(
                   width: 48,
                   height: 56,
-                  child: TextField(
-                    controller: _controllers[index],
+                  child: RawKeyboardListener(
                     focusNode: _focusNodes[index],
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    maxLength: 1,
-                    style: AppTextStyles.headlineLarge,
-                    decoration: InputDecoration(
-                      counterText: '',
-                      contentPadding: EdgeInsets.zero,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadii.md),
-                        borderSide: BorderSide(color: AppColors.warmMist),
+                    onKey: (event) => _onOtpFieldKey(index, event),
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      autofillHints: const [AutofillHints.oneTimeCode],
+                      style: AppTextStyles.headlineLarge,
+                      decoration: InputDecoration(
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          borderSide: BorderSide(color: AppColors.warmMist),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          borderSide: BorderSide(color: AppColors.burgundy, width: 2),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadii.md),
-                        borderSide: BorderSide(color: AppColors.burgundy, width: 2),
-                      ),
+                      onChanged: (value) => _onOtpFieldChanged(index, value),
                     ),
-                    onChanged: (value) => _onOtpFieldChanged(index, value),
                   ),
                 );
               }),

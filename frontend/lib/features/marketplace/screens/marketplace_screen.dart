@@ -189,7 +189,13 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                   child: CircularProgressIndicator(),
                 ),
                 error: (error, _) => Center(
-                  child: Text('Error: $error'),
+                  child: Text(
+                    'marketplace_load_error'.tr(),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.taupe,
+                    ),
+                  ),
                 ),
               ),
             ),

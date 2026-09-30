@@ -174,7 +174,7 @@ class IntentExecutor {
   }
 
   IntentResult _executeOpenOrders() {
-    _ref.read(homeTabIndexProvider.notifier).state = 1;
+    _ref.read(homeTabIndexProvider.notifier).state = 2;
     _closeChatbotSheet();
     return IntentResult.success(
       _isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.',
@@ -182,7 +182,7 @@ class IntentExecutor {
   }
 
   IntentResult _executeOpenEarnings() {
-    _ref.read(homeTabIndexProvider.notifier).state = 3;
+    _context.push('/my-stats');
     _closeChatbotSheet();
     return IntentResult.success(
       _isHindi() ? 'आपकी कमाई खोल रहा हूँ।' : 'Opening your earnings.',
@@ -259,7 +259,7 @@ class IntentExecutor {
   // ── Product Executors ───────────────────────────────────────────────
 
   IntentResult _executeAddProduct() {
-    _ref.read(homeTabIndexProvider.notifier).state = 2;
+    _ref.read(homeTabIndexProvider.notifier).state = 3;
     _closeChatbotSheet();
     return IntentResult.success(
       _isHindi() ? 'नया सामान जोड़ते हैं।' : 'Let\'s add a new product.',
@@ -521,7 +521,7 @@ class IntentExecutor {
     final orderId = intent.parameters['order_id'] as String?;
     if (orderId == null || orderId.isEmpty) {
       // Navigate to orders screen
-      _ref.read(homeTabIndexProvider.notifier).state = 1;
+      _ref.read(homeTabIndexProvider.notifier).state = 2;
       _closeChatbotSheet();
       return IntentResult.success(
         _isHindi() ? 'आपके ऑर्डर खोल रहा हूँ।' : 'Opening your orders.',
@@ -545,7 +545,7 @@ class IntentExecutor {
   // ── Draft Executors ─────────────────────────────────────────────────
 
   IntentResult _executeResumeDraft() {
-    _ref.read(homeTabIndexProvider.notifier).state = 2;
+    _ref.read(homeTabIndexProvider.notifier).state = 3;
     _closeChatbotSheet();
     return IntentResult.success(
       _isHindi() ? 'ड्राफ्ट फिर से शुरू कर रहा हूँ।' : 'Resuming your draft.',

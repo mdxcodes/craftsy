@@ -14,7 +14,6 @@ import '../../../core/providers/app_providers.dart';
 import '../../../data/models/product.dart';
 import '../../social_media/providers/social_media_provider.dart';
 import '../../social_media/widgets/social_media_launchpad_sheet.dart';
-import '../../home/screens/home_shell.dart';
 import '../providers/catalogue_filter_provider.dart';
 
 class CatalogueScreen extends ConsumerStatefulWidget {
@@ -419,71 +418,74 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
               data: (products) {
                 final filtered = _filterProducts(products);
                 if (filtered.isEmpty) {
-                  return Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.screenPadding,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Empty state — friendly, not technical
-                          Container(
-                            padding: const EdgeInsets.all(AppSpacing.xl),
-                            decoration: BoxDecoration(
-                              color: AppColors.warmMist,
-                              borderRadius: BorderRadius.circular(
-                                AppRadii.card,
+                  return SingleChildScrollView(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.screenPadding,
+                          vertical: AppSpacing.xl,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Empty state — friendly, not technical
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.xl),
+                              decoration: BoxDecoration(
+                                color: AppColors.warmMist,
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.card,
+                                ),
+                                border: Border.all(color: AppColors.line),
                               ),
-                              border: Border.all(color: AppColors.line),
-                            ),
-                            child: Column(
-                              children: [
-                                const Icon(
-                                  Icons.shopping_bag_outlined,
-                                  size: 64,
-                                  color: AppColors.burgundy,
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  'no_products_title'.tr(),
-                                  style: AppTextStyles.headlineMedium,
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  'no_products_desc'.tr(),
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.taupe,
+                              child: Column(
+                                children: [
+                                  const Icon(
+                                    Icons.shopping_bag_outlined,
+                                    size: 64,
+                                    color: AppColors.burgundy,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    'no_products_title'.tr(),
+                                    style: AppTextStyles.headlineMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    'no_products_desc'.tr(),
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.taupe,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          AppButton(
-                            label: 'add_product_btn'.tr(),
-                            icon: Icons.add_photo_alternate_rounded,
-                            type: AppButtonType.primary,
-                            width: 240,
-                          onPressed: () {
-                            ref.read(homeTabIndexProvider.notifier).state = 3;
-                          },
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          AppButton(
-                            label: 'how_to_list_btn'.tr(),
-                            icon: Icons.play_circle_outline_rounded,
-                            type: AppButtonType.outlined,
-                            width: 240,
-                            onPressed: () {
-                              context.pushNamed(
-                                AppRouteConstants.listingTutorial,
-                              );
-                            },
-                          ),
-                        ],
+                            const SizedBox(height: AppSpacing.lg),
+                            AppButton(
+                              label: 'add_product_btn'.tr(),
+                              icon: Icons.add_photo_alternate_rounded,
+                              type: AppButtonType.primary,
+                              width: 240,
+                              onPressed: () {
+                                context.pushNamed(AppRouteConstants.addProduct);
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            AppButton(
+                              label: 'how_to_list_btn'.tr(),
+                              icon: Icons.play_circle_outline_rounded,
+                              type: AppButtonType.outlined,
+                              width: 240,
+                              onPressed: () {
+                                context.pushNamed(
+                                  AppRouteConstants.listingTutorial,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

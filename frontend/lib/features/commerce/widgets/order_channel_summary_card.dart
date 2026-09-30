@@ -27,7 +27,9 @@ class OrderChannelSummaryCard extends ConsumerWidget {
             const SizedBox(height: 12),
             summaryAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Text('Error: $error'),
+              error: (error, stack) => Text(
+                'order_summary_load_error'.tr(),
+              ),
               data: (summaries) {
                 if (summaries.isEmpty) {
                   return Text('No orders yet'.tr());

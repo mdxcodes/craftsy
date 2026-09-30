@@ -48,7 +48,7 @@ class WhereISellSection extends ConsumerWidget {
             ),
           ),
           error: (error, stack) => Text(
-            'Error: $error',
+            'channel_status_load_error'.tr(),
             style: const TextStyle(color: AppColors.sienna),
           ),
           data: (channels) => Column(

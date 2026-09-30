@@ -974,5 +974,8 @@
   "edit_profile": "Edit Profile",
   "profile_updated": "Profile Updated",
   "cancel_btn": "Cancel Btn",
-  "save_btn": "Save Btn"
+  "save_btn": "Save Btn",
+  "marketplace_load_error": "Couldn't load the marketplace. Please check your connection and try again.",
+  "channel_status_load_error": "Couldn't load listing status. Please try again later.",
+  "order_summary_load_error": "Couldn't load order summary. Please try again later."
 }

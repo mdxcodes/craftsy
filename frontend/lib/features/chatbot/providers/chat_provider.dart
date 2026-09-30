@@ -494,7 +494,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     // 2. Direct status update action tap -> jump to orders to see it
     if (action.isStatusUpdate) {
-      _ref.read(homeTabIndexProvider.notifier).state = 1; // Orders tab
+      _ref.read(homeTabIndexProvider.notifier).state = 2; // My Orders tab
       if (Navigator.of(context, rootNavigator: true).canPop()) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -529,7 +529,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       // Destination mapping fallback
       switch (action.destination) {
         case 'add_product':
-          _ref.read(homeTabIndexProvider.notifier).state = 2; // Add Product tab
+          _ref.read(homeTabIndexProvider.notifier).state = 3; // Add Product tab
           break;
         case 'catalogue':
           context.push('/catalogue');
@@ -541,7 +541,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
           _ref.read(homeTabIndexProvider.notifier).state = 4; // Profile tab
           break;
         case 'my_stats':
-          _ref.read(homeTabIndexProvider.notifier).state = 3; // Stats tab
+          context.push('/my-stats');
           break;
         case 'language_settings':
           context.push('/language-settings');
