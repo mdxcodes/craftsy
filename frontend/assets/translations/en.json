@@ -1037,5 +1037,6 @@
   "gem_copy": "Copy",
   "gem_copied": "Copied",
   "gem_copy_all": "Copy All Listing Information",
-  "gem_product_information": "Product Information"
+  "gem_product_information": "Product Information",
+  "otp_verification_failed": "OTP verification failed. Please check your code and try again."
 }

@@ -155,6 +155,10 @@ def _run_schema_migrations(engine: Engine) -> None:
                 conn.execute(
                     text("ALTER TABLE products ADD COLUMN cloudinary_public_id VARCHAR(255)")
                 )
+            if "platforms" not in product_cols:
+                conn.execute(
+                    text("ALTER TABLE products ADD COLUMN platforms TEXT DEFAULT '[\"craftsy\"]'")
+                )
 
         # ── ProductChannelDB GeM metadata columns ───────────────────────────────
         if "product_channels" in existing_tables:

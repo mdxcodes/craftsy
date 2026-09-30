@@ -467,9 +467,9 @@ class _CatalogueScreenState extends ConsumerState<CatalogueScreen> {
                             icon: Icons.add_photo_alternate_rounded,
                             type: AppButtonType.primary,
                             width: 240,
-                            onPressed: () {
-                              ref.read(homeTabIndexProvider.notifier).state = 2;
-                            },
+                          onPressed: () {
+                            ref.read(homeTabIndexProvider.notifier).state = 3;
+                          },
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           AppButton(

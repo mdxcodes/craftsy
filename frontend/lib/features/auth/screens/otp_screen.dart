@@ -43,16 +43,33 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     super.dispose();
   }
 
-  void _handleOtpComplete() async {
-    final otp = _controllers.map((c) => c.text).join();
-    if (otp.isEmpty) {
+  String get _otpValue => _controllers.map((c) => c.text).join();
+
+  bool get _isOtpComplete => _otpValue.length == 6;
+
+  void _clearOtpFields() {
+    for (var controller in _controllers) {
+      controller.clear();
+    }
+    _focusNodes[0].requestFocus();
+  }
+
+  void _submitOtp() async {
+    final otp = _otpValue;
+    if (otp.length != 6) {
       return;
     }
+
     final notifier = ref.read(authStateProvider.notifier);
-    await notifier.verifyOtp(
+    final success = await notifier.verifyOtp(
       widget.phoneNumber,
       otp,
     );
+
+    if (!success && mounted) {
+      _clearOtpFields();
+    }
+
     await ref.read(userProfileProvider.notifier).reloadProfile();
     if (mounted && ref.read(authStateProvider).isAuthenticated) {
       context.goNamed(AppRouteConstants.home);
@@ -87,6 +104,30 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           ),
         );
       }
+    }
+  }
+
+  void _onOtpFieldChanged(int index, String value) {
+    final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+    final trimmed = digitsOnly.length > 1 ? digitsOnly.substring(digitsOnly.length - 1) : digitsOnly;
+
+    if (trimmed.isEmpty) {
+      if (_controllers[index].text.isNotEmpty) {
+        _controllers[index].clear();
+      }
+      if (index > 0) {
+        _focusNodes[index - 1].requestFocus();
+      }
+      return;
+    }
+
+    _controllers[index].text = trimmed;
+    _controllers[index].selection = TextSelection.collapsed(offset: trimmed.length);
+
+    if (index < 5) {
+      _focusNodes[index + 1].requestFocus();
+    } else if (index == 5 && trimmed.isNotEmpty) {
+      _submitOtp();
     }
   }
 
@@ -178,16 +219,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         borderSide: BorderSide(color: AppColors.burgundy, width: 2),
                       ),
                     ),
-                    onChanged: (value) {
-                      if (value.isNotEmpty && index < 5) {
-                        _focusNodes[index + 1].requestFocus();
-                      } else if (value.isEmpty && index > 0) {
-                        _focusNodes[index - 1].requestFocus();
-                      }
-                      if (index == 5 && value.isNotEmpty) {
-                        _handleOtpComplete();
-                      }
-                    },
+                    onChanged: (value) => _onOtpFieldChanged(index, value),
                   ),
                 );
               }),
@@ -197,7 +229,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
             AppButton(
               label: 'verify_btn'.tr(),
-              onPressed: _handleOtpComplete,
+              onPressed: _isOtpComplete && !authState.isLoading ? _submitOtp : null,
               isLoading: authState.isLoading,
             ),
 

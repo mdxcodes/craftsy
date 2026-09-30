@@ -179,6 +179,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
+    if (backendProfile == null && token == null) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'otp_verification_failed'.tr(),
+      );
+      return false;
+    }
+
     final currentPending = state.pendingRegistration;
     final resolvedProfile =
         backendProfile ??
