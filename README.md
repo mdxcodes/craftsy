@@ -17,6 +17,12 @@
 
 </div>
 
+> ## 📲 Download Craftsy
+>
+> **Android App (APK)** — [Download Latest Release](https://github.com/mdxcodes/craftsy/releases/latest)
+>
+> Direct APK download. Open on your Android device and allow installs from unknown sources when prompted.
+
 ---
 
 ## ✨ Highlights
@@ -32,13 +38,7 @@
 
 ---
 
-## 📲 Download
-
-**Android App (APK)**
-
-[Download Craftsy Latest Release](https://github.com/mdxcodes/craftsy/releases/latest)
-
-> Direct APK download. Install and enable installs from unknown sources when prompted.
+## 🔗 Live Services
 
 **Live API**
 https://web-production-8ece9b.up.railway.app/api/v1/health
