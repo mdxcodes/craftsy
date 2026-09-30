@@ -28,6 +28,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
   bool _isPublishing = false;
   bool _listOnCraftsy = true;
   bool _listOnOndc = true;
+  bool _actuallyLive = false;
   final AppTtsService _tts = AppTtsService();
 
   @override
@@ -92,6 +93,8 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
         .read(productListProvider.notifier)
         .addProduct(newProduct);
 
+    _actuallyLive = createdProduct.status == ProductStatus.live;
+
     if (isOnline && draft.draftId.isNotEmpty) {
       try {
         await HttpSocialMediaService().linkDraftsToListing(
@@ -124,14 +127,14 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
             title: Row(
               children: [
                 Icon(
-                  isOnline ? Icons.check_circle : Icons.cloud_queue,
-                  color: isOnline ? AppColors.success : AppColors.goldDark,
+                  _actuallyLive ? Icons.check_circle : Icons.cloud_queue,
+                  color: _actuallyLive ? AppColors.success : AppColors.goldDark,
                   size: 28,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    isOnline
+                    _actuallyLive
                         ? 'listing_online_success'.tr()
                         : 'queued_offline_success'.tr(),
                     style: AppTextStyles.headlineMedium,
@@ -145,7 +148,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    isOnline
+                    _actuallyLive
                         ? 'listing_online_desc'.tr()
                         : 'listing_offline_desc'.tr(),
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -350,7 +353,6 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
   @override
   Widget build(BuildContext context) {
     final draft = ref.watch(addProductFlowProvider);
-    final isOnline = ref.watch(connectivityProvider).value ?? true;
     final displayImage = draft.isEnhanced
         ? draft.enhancedImagePath
         : draft.originalImagePath;
@@ -500,7 +502,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: isOnline
+                              color: _actuallyLive
                                   ? AppColors.statusSuccessBg
                                   : AppColors.statusPendingBg,
                               borderRadius: BorderRadius.circular(
@@ -514,18 +516,18 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
                                   height: 6,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: isOnline
+                                    color: _actuallyLive
                                         ? AppColors.statusSuccessFg
                                         : AppColors.statusPendingFg,
                                   ),
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  isOnline
+                                  _actuallyLive
                                       ? 'status_live'.tr()
                                       : 'status_pending_sync'.tr(),
                                   style: AppTextStyles.labelSmall.copyWith(
-                                    color: isOnline
+                                    color: _actuallyLive
                                         ? AppColors.statusSuccessFg
                                         : AppColors.statusPendingFg,
                                     fontWeight: FontWeight.bold,

@@ -218,6 +218,11 @@ class ProductListNotifier extends StateNotifier<AsyncValue<List<Product>>> {
       isOnline: isOnline,
       artisanId: artisanId.isNotEmpty ? artisanId : null,
     );
+
+    if (created.status == ProductStatus.pendingSync && isOnline) {
+      unawaited(_syncService.triggerSync());
+    }
+
     await loadProducts();
     return created;
   }

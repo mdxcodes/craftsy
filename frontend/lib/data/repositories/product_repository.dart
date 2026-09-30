@@ -169,11 +169,14 @@ class ProductRepository {
           final product = productsBox.get(id);
           if (product != null) {
             if (action == 'CREATE') {
-              final created = await _apiService.createProduct(product);
-              await productsBox.put(
-                id,
-                created.copyWith(status: ProductStatus.live),
-              );
+              final syncProduct = product.status == ProductStatus.pendingSync
+                  ? product.copyWith(status: ProductStatus.live)
+                  : product;
+              final created = await _apiService.createProduct(syncProduct);
+              final targetStatus = product.status == ProductStatus.pendingSync
+                  ? ProductStatus.live
+                  : created.status;
+              await productsBox.put(id, created.copyWith(status: targetStatus));
             } else {
               final updated = await _apiService.updateProduct(product);
               final targetStatus = product.status == ProductStatus.pendingSync
