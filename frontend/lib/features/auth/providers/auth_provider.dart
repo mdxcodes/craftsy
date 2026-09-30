@@ -92,21 +92,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isNewUser: false,
     );
     await _authRepository.savePhoneNumber(phoneNumber);
-    final result = await _authRepository.requestOtp(phoneNumber);
-    if (result == null) {
+    try {
+      final result = await _authRepository.requestOtp(phoneNumber);
+      state = state.copyWith(
+        phoneNumber: phoneNumber,
+        otpRequestId: result['request_id'] as String?,
+        isNewUser: result['is_new_user'] as bool? ?? false,
+        isLoading: false,
+        errorMessage: null,
+      );
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+    } catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'otp_send_failed'.tr(),
       );
-      return;
     }
-    state = state.copyWith(
-      phoneNumber: phoneNumber,
-      otpRequestId: result['request_id'] as String?,
-      isNewUser: result['is_new_user'] as bool? ?? false,
-      isLoading: false,
-      errorMessage: null,
-    );
   }
 
   Future<void> registerWithDetails(UserProfile profile) async {
@@ -223,29 +228,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isNewUser: false,
     );
 
-    final result = await _authRepository.resendOtp(phoneNumber);
-    state = state.copyWith(isLoading: false);
+    try {
+      final result = await _authRepository.resendOtp(phoneNumber);
+      state = state.copyWith(isLoading: false);
 
-    if (result == null) {
+      final cooldown = result['cooldown_seconds'] as int?;
+      if (cooldown != null && cooldown > 0) {
+        state = state.copyWith(
+          resendCooldownSeconds: cooldown,
+        );
+        _startCooldown(cooldown);
+        return;
+      }
+
       state = state.copyWith(
+        errorMessage: null,
+        otpRequestId: result['request_id'] as String?,
+      );
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
         errorMessage: 'otp_send_failed'.tr(),
       );
-      return;
     }
-
-    final cooldown = result['cooldown_seconds'] as int?;
-    if (cooldown != null && cooldown > 0) {
-      state = state.copyWith(
-        resendCooldownSeconds: cooldown,
-      );
-      _startCooldown(cooldown);
-      return;
-    }
-
-    state = state.copyWith(
-      errorMessage: null,
-      otpRequestId: result['request_id'] as String?,
-    );
   }
 
   void _startCooldown(int seconds) {

@@ -4,6 +4,17 @@ import 'package:hive/hive.dart';
 import '../../core/config/api_config.dart';
 import '../models/user_profile.dart';
 
+class AuthException implements Exception {
+  final String message;
+  final String? details;
+
+  const AuthException(this.message, {this.details});
+
+  @override
+  String toString() =>
+      'AuthException: $message${details != null ? " | $details" : ""}';
+}
+
 /// Repository for authentication operations with Hive persistence and live backend integration
 class AuthRepository {
   static const String _boxName = 'auth_box';
@@ -122,7 +133,7 @@ class AuthRepository {
   }
 
   /// Requests login OTP from `/api/v1/auth/login`
-  Future<Map<String, dynamic>?> requestOtp(String phoneNumber) async {
+  Future<Map<String, dynamic>> requestOtp(String phoneNumber) async {
     _syncBaseUrl();
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
     try {
@@ -136,16 +147,32 @@ class AuthRepository {
       if (response.statusCode == 200 && response.data != null) {
         return Map<String, dynamic>.from(response.data as Map);
       }
+      debugPrint(
+        '[AuthRepository] requestOtp unexpected status: ${response.statusCode}',
+      );
+      throw AuthException(
+        'Could not send OTP',
+        details: 'Unexpected response status: ${response.statusCode}',
+      );
     } on DioException catch (e) {
-      debugPrint('[AuthRepository] requestOtp failed: ${e.message}');
+      debugPrint(
+        '[AuthRepository] requestOtp failed: ${e.message}; type=${e.type}; response=${e.response?.statusCode} ${e.response?.data}',
+      );
+      throw AuthException(
+        'Could not send OTP',
+        details: e.message,
+      );
     } catch (e) {
       debugPrint('[AuthRepository] requestOtp unexpected error: $e');
+      throw AuthException(
+        'Could not send OTP',
+        details: e.toString(),
+      );
     }
-    return null;
   }
 
   /// Resends OTP via `/api/v1/auth/resend-otp`
-  Future<Map<String, dynamic>?> resendOtp(String phoneNumber) async {
+  Future<Map<String, dynamic>> resendOtp(String phoneNumber) async {
     _syncBaseUrl();
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
     try {
@@ -159,12 +186,26 @@ class AuthRepository {
       if (response.statusCode == 200 && response.data != null) {
         return Map<String, dynamic>.from(response.data as Map);
       }
+      debugPrint(
+        '[AuthRepository] resendOtp unexpected status: ${response.statusCode}',
+      );
+      throw AuthException(
+        'Could not send OTP',
+        details: 'Unexpected response status: ${response.statusCode}',
+      );
     } on DioException catch (e) {
       debugPrint('[AuthRepository] resendOtp failed: ${e.message}');
+      throw AuthException(
+        'Could not send OTP',
+        details: e.message,
+      );
     } catch (e) {
       debugPrint('[AuthRepository] resendOtp unexpected error: $e');
+      throw AuthException(
+        'Could not send OTP',
+        details: e.toString(),
+      );
     }
-    return null;
   }
 
   /// Verifies OTP with backend `/api/v1/auth/verify-otp`
