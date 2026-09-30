@@ -9,7 +9,7 @@ import logging
 import uuid
 from datetime import datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, Form
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,7 @@ from ..models.schemas import (
     ProductSyncBatch,
     ProductSyncResponse,
 )
+from ..services.cloudinary_service import cloudinary_service
 
 router = APIRouter(prefix="/api/v1/products", tags=["Products"])
 
@@ -96,14 +97,15 @@ async def get_product(product_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=ProductResponse, status_code=201)
-async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+async def create_product(
+    product: ProductCreate,
+    db: Session = Depends(get_db),
+):
     """Create a new artisan product listing."""
     prod_id = product.id if product.id else f"prod_{uuid.uuid4().hex[:10]}"
     
-    # Check if exists (idempotent for offline sync)
     existing = db.query(ProductDB).filter(ProductDB.id == prod_id).first()
     if existing:
-        # Update existing
         existing.title = product.title
         existing.title_hi = product.title_hi or ""
         existing.description = product.description
@@ -157,6 +159,43 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
         updated_at=db_item.updated_at,
         cloudinary_public_id=db_item.cloudinary_public_id,
     )
+
+
+@router.post("/upload-image", response_model=dict)
+async def upload_product_image(
+    image: UploadFile = File(...),
+):
+    """Upload a product image to Cloudinary and return the permanent URL."""
+    try:
+        import tempfile
+        import os
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(image.filename)[1]) as tmp:
+            content = await image.read()
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        try:
+            if cloudinary_service.enabled:
+                upload_result = cloudinary_service.upload_image(
+                    file_path=tmp_path,
+                    folder="craftsy/products",
+                    public_id=f"product_{uuid.uuid4().hex[:8]}",
+                )
+                cloudinary_url = upload_result.get("secure_url")
+                if cloudinary_url:
+                    return {"image_url": cloudinary_url, "public_id": upload_result.get("public_id")}
+
+            return {"image_url": tmp_path, "public_id": None}
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
 
 @router.put("/{product_id}", response_model=ProductResponse)

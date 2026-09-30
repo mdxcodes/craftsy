@@ -53,6 +53,7 @@ from backend.routers import (
     checkout_router,
     marketplace_router,
     ondc_router,
+    gem_router,
 )
 
 settings = get_settings()
@@ -138,9 +139,18 @@ app = FastAPI(
 # ── CORS Middleware ──────────────────────────────────────────────────────────
 # Origins are configurable via CORS_ORIGINS. Credentials are automatically
 # disabled if a wildcard origin is configured (guarded in Settings).
+cors_origins = settings.cors_origins
+if settings.is_production and "*" in cors_origins:
+    cors_origins = [o for o in cors_origins if o != "*"]
+    if not cors_origins:
+        cors_origins = ["http://localhost:3000", "http://localhost:8080"]
+    logger.warning(
+        "CORS wildcard origin removed for production. Using: %s", cors_origins
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=cors_origins,
     allow_credentials=settings.cors_allow_credentials,
     allow_methods=settings.cors_allow_methods,
     allow_headers=settings.cors_allow_headers,
@@ -168,6 +178,7 @@ app.include_router(address_router)
 app.include_router(checkout_router)
 app.include_router(marketplace_router)
 app.include_router(ondc_router)
+app.include_router(gem_router)
 from backend.routers.advisor import router as advisor_router
 app.include_router(advisor_router)
 

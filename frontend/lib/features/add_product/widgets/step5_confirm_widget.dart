@@ -51,17 +51,11 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
     final draft = ref.read(addProductFlowProvider);
     final isOnline = ref.read(connectivityProvider).value ?? true;
 
-    final fallbackCategory =
-        ref.read(userProfileProvider).craftType.trim().isNotEmpty
-        ? ref.read(userProfileProvider).craftType.trim()
-        : 'craft_category_handicraft'.tr();
-
     final effectiveCategory = draft.category.trim().isNotEmpty
         ? draft.category.trim()
-        : fallbackCategory;
-
-    const fallbackPhoto =
-        'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=600&q=80';
+        : (ref.read(userProfileProvider).craftType.trim().isNotEmpty
+            ? ref.read(userProfileProvider).craftType.trim()
+            : 'craft_category_handicraft'.tr());
 
     final newProduct = Product(
       id: 'prod_${DateTime.now().millisecondsSinceEpoch}',
@@ -74,9 +68,7 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
           : draft.voiceTranscript,
       descriptionHi: draft.descriptionHi,
       price: draft.finalPrice,
-      photoPath: draft.originalImagePath.isNotEmpty
-          ? draft.originalImagePath
-          : fallbackPhoto,
+      photoPath: draft.originalImagePath,
       aiEnhancedPhotoPath: draft.isEnhanced ? draft.enhancedImagePath : '',
       additionalPhotoPaths: draft.additionalImagePaths,
       category: effectiveCategory,

@@ -161,18 +161,24 @@ class CommerceHubService:
             .filter(ProductDB.artisan_id == artisan_id)
             .all()
         )
+        product_ids = [p.id for p in products]
+        all_pcs = (
+            db.query(ProductChannelDB)
+            .filter(ProductChannelDB.product_id.in_(product_ids))
+            .all()
+        ) if product_ids else []
+        pc_map = {}
+        for pc in all_pcs:
+            pc_map.setdefault(pc.product_id, []).append(pc)
+
         for product in products:
             for channel in ChannelType:
                 if channel == ChannelType.CRAFTSY:
                     continue
-                pc = (
-                    db.query(ProductChannelDB)
-                    .filter(
-                        ProductChannelDB.product_id == product.id,
-                        ProductChannelDB.channel == channel.value,
-                    )
-                    .first()
-                )
+                pcs = pc_map.get(product.id, [])
+                if not pcs:
+                    continue
+                pc = next((p for p in pcs if p.channel == channel.value), None)
                 if pc and pc.status in [
                     ONDCChannelStatus.NEEDS_INFORMATION.value,
                     ONDCChannelStatus.ERROR.value,

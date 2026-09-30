@@ -136,6 +136,10 @@ class Settings(BaseSettings):
         default="groq",
         description="Primary LLM provider: groq or gemini.",
     )
+    llm_model: str = Field(
+        default="gemini-2.0-flash",
+        description="Primary LLM model identifier for cataloging, pricing, and social media.",
+    )
 
     def get_active_groq_key(self) -> str:
         """Resolve active Groq API key from groq_api_key or whisper_api_key."""
@@ -178,9 +182,16 @@ class Settings(BaseSettings):
         description="Cloudinary API secret.",
     )
 
-    # Models
-    llm_model: str = "gemini-3.6-flash"
-    embedding_model: str = "gemini-embedding-001"
+    # Authentication
+    auth_secret_key: str = Field(
+        default="",
+        description="Secret key for signing and verifying authentication tokens. "
+                    "Must be set in production.",
+    )
+    auth_token_expiry_minutes: int = Field(
+        default=60 * 24,
+        description="Authentication token expiry in minutes (default 24 hours).",
+    )
 
     # Database — defaults to local SQLite, overridden by DATABASE_URL in production.
     database_url: str = f"sqlite:///{BACKEND_ROOT / 'craftsy.db'}"

@@ -32,4 +32,8 @@ class AppRouteConstants {
   static const String myStats = 'myStats';
   static const String listingTutorial = 'listingTutorial';
   static const String assistant = 'assistant';
+
+  static const String gemRegistration = 'gemRegistration';
+  static const String gemReadiness = 'gemReadiness';
+  static const String gemListingReview = 'gemListingReview';
 }

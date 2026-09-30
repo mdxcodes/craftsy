@@ -75,9 +75,7 @@ def _get_otp_provider() -> StartMessagingOtpProvider:
     return StartMessagingOtpProvider()
 
 
-def _issue_token_for_artisan(artisan: ArtisanDB) -> str:
-    """Return the existing mock token for the artisan."""
-    return f"mock_jwt_token_{artisan.phone}"
+from ..middleware.auth import create_access_token
 
 
 @router.post(
@@ -281,7 +279,7 @@ async def verify_otp(
 
     return AuthResponse(
         status="success",
-        access_token=_issue_token_for_artisan(artisan),
+        access_token=create_access_token(artisan.phone),
         artisan=ArtisanProfileResponse.model_validate(artisan),
     )
 

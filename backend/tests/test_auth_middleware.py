@@ -25,8 +25,18 @@ from backend.database import Base, get_db
 from backend.models.db_models import ArtisanDB
 from backend.models.order_models import OrderDB
 from backend.models.commerce_foundation_models import (  # noqa: F401
-    CartDB, CartItemDB, AddressDB, OrderItemDB, PaymentDB, ShipmentDB,
+    CartDB,
+    CartItemDB,
+    AddressDB,
+    OrderItemDB,
+    PaymentDB,
+    ShipmentDB,
 )
+from backend.middleware.auth import create_access_token
+
+
+def _auth_token(phone: str) -> str:
+    return create_access_token(phone)
 
 
 @pytest.fixture
@@ -153,7 +163,7 @@ def test_current_artisan_dep_returns_artisan_with_valid_token(client, db):
     artisan = _create_artisan(db, phone="9876543300")
 
     mock_request = MagicMock()
-    mock_request.headers.get.return_value = f"Bearer mock_jwt_token_{artisan.phone}"
+    mock_request.headers.get.return_value = f"Bearer {_auth_token(artisan.phone)}"
 
     result = get_current_artisan(mock_request, db)
     assert result.id == artisan.id
@@ -182,7 +192,7 @@ def test_orders_endpoint_accepts_valid_token(client, db):
     artisan = _create_artisan(db, phone="9876543400")
     response = client.get(
         f"/api/v1/orders/artisan/{artisan.id}",
-        headers=_headers(f"mock_jwt_token_{artisan.phone}"),
+        headers=_headers(_auth_token(artisan.phone)),
     )
     assert response.status_code == 200
     assert isinstance(response.json(), list)

@@ -50,7 +50,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
     final notifier = ref.read(authStateProvider.notifier);
     await notifier.verifyOtp(
-      widget.phoneNumber.isEmpty ? '9876543210' : widget.phoneNumber,
+      widget.phoneNumber,
       otp,
     );
     await ref.read(userProfileProvider.notifier).reloadProfile();
@@ -66,7 +66,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
     final notifier = ref.read(authStateProvider.notifier);
     await notifier.resendOtp(
-      widget.phoneNumber.isEmpty ? '9876543210' : widget.phoneNumber,
+      widget.phoneNumber,
     );
     if (mounted) {
       final result = ref.read(authStateProvider);

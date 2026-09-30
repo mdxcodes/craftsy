@@ -400,6 +400,10 @@ class ProductDetailScreen extends ConsumerWidget {
     return CraftCategoryBadge.all(label: category, isActive: false);
   }
 
+  void _navigateToGem(BuildContext context, String productId) {
+    context.push('/gem/registration/$productId');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _ = Localizations.maybeLocaleOf(context);
@@ -524,62 +528,79 @@ class ProductDetailScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(AppRadii.card),
                             side: const BorderSide(color: AppColors.line),
                           ),
-                          onSelected: (val) {
-                            switch (val) {
-                              case 'sold_out':
-                                _showSoldOutDialog(context, ref, product);
-                                break;
-                              case 'remove_listing':
-                                _showRemoveListingDialog(context, ref, product);
-                                break;
-                              case 'relist':
-                                _relistProduct(context, ref, product);
-                                break;
-                              case 'delete':
-                                _showDeleteDialog(context, ref);
-                                break;
-                              case 'legend':
-                                _showLegendDialog(context);
-                                break;
-                            }
-                          },
-                          itemBuilder: (ctx) => [
-                            if (isNonLive)
-                              PopupMenuItem(
-                                value: 'relist',
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.refresh,
-                                      color: AppColors.sage,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text('relist_item_btn'.tr()),
-                                  ],
-                                ),
-                              )
-                            else ...[
-                              PopupMenuItem(
-                                value: 'sold_out',
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.remove_shopping_cart_outlined,
-                                      color: AppColors.sienna,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text('mark_sold_out_btn'.tr()),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: 'remove_listing',
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.visibility_off_outlined,
+                           onSelected: (val) {
+                             switch (val) {
+                               case 'sold_out':
+                                 _showSoldOutDialog(context, ref, product);
+                                 break;
+                               case 'remove_listing':
+                                 _showRemoveListingDialog(context, ref, product);
+                                 break;
+                               case 'relist':
+                                 _relistProduct(context, ref, product);
+                                 break;
+                               case 'sell_on_gem':
+                                 _navigateToGem(context, product.id);
+                                 break;
+                               case 'delete':
+                                 _showDeleteDialog(context, ref);
+                                 break;
+                               case 'legend':
+                                 _showLegendDialog(context);
+                                 break;
+                             }
+                           },
+                           itemBuilder: (ctx) => [
+                             PopupMenuItem(
+                               value: 'sell_on_gem',
+                               child: Row(
+                                 children: [
+                                   const Icon(
+                                     Icons.public,
+                                     color: AppColors.burgundy,
+                                     size: 18,
+                                   ),
+                                   const SizedBox(width: 8),
+                                   Text('Sell on GeM'),
+                                 ],
+                               ),
+                             ),
+                             if (isNonLive)
+                               PopupMenuItem(
+                                 value: 'relist',
+                                 child: Row(
+                                   children: [
+                                     const Icon(
+                                       Icons.refresh,
+                                       color: AppColors.sage,
+                                       size: 18,
+                                     ),
+                                     const SizedBox(width: 8),
+                                     Text('relist_item_btn'.tr()),
+                                   ],
+                                 ),
+                               )
+                             else ...[
+                               PopupMenuItem(
+                                 value: 'sold_out',
+                                 child: Row(
+                                   children: [
+                                     const Icon(
+                                       Icons.remove_shopping_cart_outlined,
+                                       color: AppColors.sienna,
+                                       size: 18,
+                                     ),
+                                     const SizedBox(width: 8),
+                                     Text('mark_sold_out_btn'.tr()),
+                                   ],
+                                 ),
+                               ),
+                               PopupMenuItem(
+                                 value: 'remove_listing',
+                                 child: Row(
+                                   children: [
+                                     const Icon(
+                                       Icons.visibility_off_outlined,
                                       color: AppColors.taupe,
                                       size: 18,
                                     ),

@@ -25,8 +25,18 @@ from backend.database import Base, get_db
 from backend.models.db_models import ArtisanDB, ProductDB
 from backend.models.order_models import OrderDB  # noqa: F401 — needed for FK resolution
 from backend.models.commerce_foundation_models import (  # noqa: F401
-    CartDB, CartItemDB, AddressDB, OrderItemDB, PaymentDB, ShipmentDB,
+    CartDB,
+    CartItemDB,
+    AddressDB,
+    OrderItemDB,
+    PaymentDB,
+    ShipmentDB,
 )
+from backend.middleware.auth import create_access_token
+
+
+def _auth_token(phone: str) -> str:
+    return create_access_token(phone)
 
 
 @pytest.fixture
@@ -104,7 +114,7 @@ def _headers(token):
 
 def test_get_cart_creates_cart_if_not_exists(client, db):
     artisan = _create_artisan(db)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.get("/api/v1/cart", headers=_headers(token))
     assert response.status_code == 200
@@ -116,7 +126,7 @@ def test_get_cart_creates_cart_if_not_exists(client, db):
 def test_add_item_to_cart(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan_id=artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/cart/items",
@@ -142,7 +152,7 @@ def test_add_item_to_cart_requires_auth(client, db):
 def test_update_cart_item_quantity(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan_id=artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     client.post(
         "/api/v1/cart/items",
@@ -165,7 +175,7 @@ def test_update_cart_item_quantity(client, db):
 def test_remove_cart_item(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan_id=artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     client.post(
         "/api/v1/cart/items",
@@ -187,7 +197,7 @@ def test_remove_cart_item(client, db):
 def test_clear_cart(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan_id=artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     client.post(
         "/api/v1/cart/items",
@@ -207,7 +217,7 @@ def test_clear_cart(client, db):
 
 def test_list_addresses(client, db):
     artisan = _create_artisan(db)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.get("/api/v1/addresses", headers=_headers(token))
     assert response.status_code == 200
@@ -216,7 +226,7 @@ def test_list_addresses(client, db):
 
 def test_create_address(client, db):
     artisan = _create_artisan(db)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/addresses",
@@ -241,7 +251,7 @@ def test_create_address(client, db):
 
 def test_update_address(client, db):
     artisan = _create_artisan(db)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     create_response = client.post(
         "/api/v1/addresses",
@@ -270,7 +280,7 @@ def test_update_address(client, db):
 
 def test_delete_address(client, db):
     artisan = _create_artisan(db)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     create_response = client.post(
         "/api/v1/addresses",

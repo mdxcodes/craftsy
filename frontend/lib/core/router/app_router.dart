@@ -36,6 +36,9 @@ import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/orders/models/order.dart';
 import '../../features/commerce/screens/unified_commerce_hub_screen.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../../features/gem/screens/gem_registration_screen.dart';
+import '../../features/gem/screens/gem_readiness_screen.dart';
+import '../../features/gem/screens/gem_listing_review_screen.dart';
 import '../providers/app_providers.dart';
 
 class RouterNotifier extends ChangeNotifier {
@@ -303,6 +306,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             return Scaffold(body: Center(child: Text('order_not_found'.tr())));
           }
           return OrderDetailScreen(order: order);
+        },
+      ),
+      GoRoute(
+        path: '/gem/registration/:productId',
+        name: AppRouteConstants.gemRegistration,
+        builder: (context, state) {
+          final productId = state.pathParameters['productId'] ?? '';
+          return GemRegistrationScreen(productId: productId);
+        },
+      ),
+      GoRoute(
+        path: '/gem/readiness/:productId',
+        name: AppRouteConstants.gemReadiness,
+        builder: (context, state) {
+          final productId = state.pathParameters['productId'] ?? '';
+          return GemReadinessScreen(productId: productId);
+        },
+      ),
+      GoRoute(
+        path: '/gem/listing-review/:productId',
+        name: AppRouteConstants.gemListingReview,
+        builder: (context, state) {
+          final productId = state.pathParameters['productId'] ?? '';
+          return GemListingReviewScreen(productId: productId);
         },
       ),
     ],

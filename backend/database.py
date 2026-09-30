@@ -156,6 +156,21 @@ def _run_schema_migrations(engine: Engine) -> None:
                     text("ALTER TABLE products ADD COLUMN cloudinary_public_id VARCHAR(255)")
                 )
 
+        # ── ProductChannelDB GeM metadata columns ───────────────────────────────
+        if "product_channels" in existing_tables:
+            pc_cols = {c["name"] for c in inspector.get_columns("product_channels")}
+            gem_migrations = [
+                ("gem_status", "VARCHAR(32)"),
+                ("gem_prepared_at", "DATETIME"),
+                ("gem_last_opened_at", "DATETIME"),
+                ("gem_submission_reference", "VARCHAR(255)"),
+                ("gem_listing_reference", "VARCHAR(255)"),
+                ("gem_last_error", "TEXT"),
+            ]
+            for col_name, col_type in gem_migrations:
+                if col_name not in pc_cols:
+                    conn.execute(text(f"ALTER TABLE product_channels ADD COLUMN {col_name} {col_type}"))
+
         conn.commit()
 
 
@@ -191,35 +206,35 @@ def init_db() -> None:
 
     _run_schema_migrations(engine)
 
-    # Ensure demo artisan exists so demo login and FK constraints always succeed
-    db = SessionLocal()
-    try:
-        demo_phone = "9876543210"
-        demo_artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == demo_phone).first()
-        if not demo_artisan:
-            demo_artisan = ArtisanDB(
-                id="artisan_01",
-                name="Rameshwar Lal Kumhar",
-                phone=demo_phone,
-                craft_type="Terracotta Pottery",
-                location_cluster="Kumhar Gram, Delhi NCR",
-                state="Delhi",
-                experience_years="25",
-                pehchan_id="PEHCHAN-DL-0042",
-                preferred_language="en",
-                role="artisan",
-                created_at=datetime.now(),
-            )
-            db.add(demo_artisan)
-            db.flush()
+    if not settings.is_production:
+        db = SessionLocal()
+        try:
+            demo_phone = "9876543210"
+            demo_artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == demo_phone).first()
+            if not demo_artisan:
+                demo_artisan = ArtisanDB(
+                    id="artisan_01",
+                    name="Rameshwar Lal Kumhar",
+                    phone=demo_phone,
+                    craft_type="Terracotta Pottery",
+                    location_cluster="Kumhar Gram, Delhi NCR",
+                    state="Delhi",
+                    experience_years="25",
+                    pehchan_id="PEHCHAN-DL-0042",
+                    preferred_language="en",
+                    role="artisan",
+                    created_at=datetime.now(),
+                )
+                db.add(demo_artisan)
+                db.flush()
 
-        seed_demo_products(db, demo_artisan.id)
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        logger.warning("Could not seed demo data: %s", e)
-    finally:
-        db.close()
+            seed_demo_products(db, demo_artisan.id)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            logger.warning("Could not seed demo data: %s", e)
+        finally:
+            db.close()
 
 
 def seed_demo_products(db: Session, artisan_id: str) -> None:

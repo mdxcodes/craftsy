@@ -15,6 +15,7 @@ from .address import router as address_router
 from .checkout import router as checkout_router
 from .marketplace import router as marketplace_router
 from .ondc import router as ondc_router
+from .gem import router as gem_router
 
 __all__ = [
     "health_router",
@@ -34,4 +35,5 @@ __all__ = [
     "checkout_router",
     "marketplace_router",
     "ondc_router",
+    "gem_router",
 ]

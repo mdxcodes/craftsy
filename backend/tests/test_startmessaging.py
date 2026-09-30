@@ -39,6 +39,9 @@ from backend.services.startmessaging_service import (
     _normalize_indian_phone,
 )
 from backend.routers.auth import router as auth_router
+from backend.middleware.auth import create_access_token
+def _auth_token(phone: str) -> str:
+    return create_access_token(phone)
 
 
 # ── Phone normalization ───────────────────────────────────────────────────────
@@ -550,7 +553,7 @@ class TestAutoCreateUserFlow:
     @patch("backend.routers.auth.StartMessagingOtpProvider")
     def test_update_profile(self, mock_provider_cls, client, db):
         artisan = _create_artisan(db, phone="9876543210")
-        token = f"mock_jwt_token_{artisan.phone}"
+        token = create_access_token(artisan.phone)
 
         response = client.patch(
             "/api/v1/auth/profile",

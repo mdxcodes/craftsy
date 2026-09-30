@@ -58,10 +58,16 @@ class CartService:
         cart = self.get_or_create_cart(db, user_id)
         items = db.query(CartItemDB).filter(CartItemDB.cart_id == cart.id).all()
 
+        product_ids = [item.product_id for item in items]
+        products = {
+            p.id: p
+            for p in db.query(ProductDB).filter(ProductDB.id.in_(product_ids)).all()
+        } if product_ids else {}
+
         subtotal = 0.0
         item_dicts = []
         for item in items:
-            product = db.query(ProductDB).filter(ProductDB.id == item.product_id).first()
+            product = products.get(item.product_id)
             item_total = item.unit_price * item.quantity
             subtotal += item_total
             item_dicts.append({
@@ -92,7 +98,12 @@ class CartService:
         cart = self.get_or_create_cart(db, user_id)
 
         # Check if product exists
-        product = db.query(ProductDB).filter(ProductDB.id == product_id).first()
+        product = (
+            db.query(ProductDB)
+            .filter(ProductDB.id == product_id)
+            .with_for_update()
+            .first()
+        )
         if not product:
             raise ProductNotFoundError(f"Product {product_id} not found")
 
@@ -153,9 +164,12 @@ class CartService:
 
         # Validate stock when increasing quantity (display data refreshed below)
         if quantity > 0:
-            product = db.query(ProductDB).filter(
-                ProductDB.id == item.product_id
-            ).first()
+            product = (
+                db.query(ProductDB)
+                .filter(ProductDB.id == item.product_id)
+                .with_for_update()
+                .first()
+            )
             if product and product.stock < quantity:
                 raise InsufficientStockError(
                     f"Only {product.stock} left for {product.title}"

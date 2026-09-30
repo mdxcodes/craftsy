@@ -285,6 +285,7 @@ class GeMReadiness(BaseModel):
     next_actions: List[str] = Field(default_factory=list)
     ready_for_workflow: bool
     readiness_status: str
+    available_fields: List[str] = Field(default_factory=list)
 
 
 # ── Channel Requirements ─────────────────────────────────────────────────────
@@ -371,6 +372,14 @@ class ProductChannelDB(Base):
     last_synced = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    # GeM-specific metadata (nullable; only meaningful when channel='gem')
+    gem_status = Column(String(32), nullable=True)
+    gem_prepared_at = Column(DateTime, nullable=True)
+    gem_last_opened_at = Column(DateTime, nullable=True)
+    gem_submission_reference = Column(String(255), nullable=True)
+    gem_listing_reference = Column(String(255), nullable=True)
+    gem_last_error = Column(Text, nullable=True)
 
     # Relationship (no backref to avoid lazy-load issues in tests)
     product = relationship("ProductDB")

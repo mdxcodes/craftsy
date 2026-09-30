@@ -137,7 +137,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       resendCooldownSeconds: null,
     );
 
-    final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
+    final effectivePhone = phoneNumber;
     final registrationProfile = profileOverride ?? state.pendingRegistration;
     final requestId = state.otpRequestId;
 

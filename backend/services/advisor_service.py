@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from ..config import get_settings
@@ -53,7 +53,7 @@ class AdvisorService:
             return []
 
         advice_list: List[ProductAdvice] = []
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         category_prices: dict[str, List[float]] = {}
         for product in products:

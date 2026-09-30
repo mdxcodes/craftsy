@@ -197,40 +197,55 @@ class ONDCBPPAdapter:
             },
         )
 
-        order = order_service.create_order(db, order_create)
-
-        product_quantities: Dict[str, int] = {}
-        for item in validated_items:
-            product_quantities[item["id"]] = (
-                product_quantities.get(item["id"], 0) + item["quantity"]
-            )
-
-        for product_id, qty in product_quantities.items():
-            product = db.query(ProductDB).filter(ProductDB.id == product_id).first()
-            if product and product.stock >= qty:
-                product.stock -= qty
-
-        db.commit()
-        db.refresh(order)
-
-        idempotency_store.set(transaction_id, message_id, order.id)
-
         try:
-            commerce_service._log_audit(
-                db,
-                order.product_id,
-                ChannelType.ONDC,
-                "ondc_confirm",
-                None,
-                "confirmed",
-                message=f"ONDC order confirmed: {order.id}",
-                success=True,
-                external_id=order.external_order_id,
-            )
-        except Exception:  # noqa: BLE001
-            logger.debug("Audit log skipped", exc_info=True)
+            order = order_service.create_order(db, order_create)
 
-        return self._build_confirm_response(request_body, order)
+            product_quantities: Dict[str, int] = {}
+            for item in validated_items:
+                product_quantities[item["id"]] = (
+                    product_quantities.get(item["id"], 0) + item["quantity"]
+                )
+
+            for product_id, qty in product_quantities.items():
+                product = (
+                    db.query(ProductDB)
+                    .filter(ProductDB.id == product_id)
+                    .with_for_update()
+                    .first()
+                )
+                if product and product.stock >= qty:
+                    product.stock -= qty
+                else:
+                    db.rollback()
+                    raise ValueError(
+                        f"Insufficient stock for product {product_id}. "
+                        f"Available: {product.stock if product else 0}, Requested: {qty}"
+                    )
+
+            db.commit()
+            db.refresh(order)
+
+            idempotency_store.set(transaction_id, message_id, order.id)
+
+            try:
+                commerce_service._log_audit(
+                    db,
+                    order.product_id,
+                    ChannelType.ONDC,
+                    "ondc_confirm",
+                    None,
+                    "confirmed",
+                    message=f"ONDC order confirmed: {order.id}",
+                    success=True,
+                    external_id=order.external_order_id,
+                )
+            except Exception:  # noqa: BLE001
+                logger.debug("Audit log skipped", exc_info=True)
+
+            return self._build_confirm_response(request_body, order)
+        except Exception:
+            db.rollback()
+            raise
 
     def status(self, db: Session, request_body: Dict[str, Any]) -> Dict[str, Any]:
         """Handle BAP status request and return current order state."""

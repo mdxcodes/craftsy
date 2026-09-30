@@ -27,8 +27,18 @@ from backend.database import Base, get_db
 from backend.models.db_models import ArtisanDB, ProductDB
 from backend.models.order_models import OrderDB
 from backend.models.commerce_foundation_models import (  # noqa: F401
-    CartDB, CartItemDB, AddressDB, OrderItemDB, PaymentDB, ShipmentDB,
+    CartDB,
+    CartItemDB,
+    AddressDB,
+    OrderItemDB,
+    PaymentDB,
+    ShipmentDB,
 )
+from backend.middleware.auth import create_access_token
+
+
+def _auth_token(phone: str) -> str:
+    return create_access_token(phone)
 
 
 @pytest.fixture
@@ -141,7 +151,7 @@ def test_my_orders_requires_auth(client):
 
 def test_my_orders_empty_initially(client, db):
     user = _create_user(db)
-    token = f"mock_jwt_token_{user.phone}"
+    token = _auth_token(user.phone)
 
     response = client.get("/api/v1/orders/my", headers=_headers(token))
     assert response.status_code == 200
@@ -157,19 +167,19 @@ def test_my_orders_returns_only_own_orders(client, db):
     addr2 = _create_address(db, buyer2.id)
 
     r1 = _checkout(
-        client, f"mock_jwt_token_{buyer1.phone}", addr1.id,
+        client, _auth_token(buyer1.phone), addr1.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     assert r1.status_code == 201
     r2 = _checkout(
-        client, f"mock_jwt_token_{buyer2.phone}", addr2.id,
+        client, _auth_token(buyer2.phone), addr2.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     assert r2.status_code == 201
 
     # buyer1 sees only their own order
     response = client.get(
-        "/api/v1/orders/my", headers=_headers(f"mock_jwt_token_{buyer1.phone}")
+        "/api/v1/orders/my", headers=_headers(_auth_token(buyer1.phone))
     )
     data = response.json()
     assert data["total"] == 1
@@ -185,7 +195,7 @@ def test_my_orders_summary_shape(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [
             {"product_id": p1.id, "quantity": 2},
             {"product_id": p2.id, "quantity": 1},
@@ -194,7 +204,7 @@ def test_my_orders_summary_shape(client, db):
     assert r.status_code == 201
 
     response = client.get(
-        "/api/v1/orders/my", headers=_headers(f"mock_jwt_token_{buyer.phone}")
+        "/api/v1/orders/my", headers=_headers(_auth_token(buyer.phone))
     )
     order = response.json()["orders"][0]
     assert order["item_count"] == 2
@@ -213,14 +223,14 @@ def test_my_orders_supports_pagination(client, db):
 
     for _ in range(3):
         r = _checkout(
-            client, f"mock_jwt_token_{buyer.phone}", address.id,
+            client, _auth_token(buyer.phone), address.id,
             [{"product_id": product.id, "quantity": 1}],
         )
         assert r.status_code == 201
 
     page = client.get(
         "/api/v1/orders/my?limit=2&offset=0",
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     ).json()
     assert page["total"] == 3
     assert len(page["orders"]) == 2
@@ -236,14 +246,14 @@ def test_my_order_detail_returns_full_data(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [{"product_id": product.id, "quantity": 2}],
     )
     order_id = r.json()["id"]
 
     response = client.get(
         f"/api/v1/orders/my/{order_id}",
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     )
     assert response.status_code == 200
     data = response.json()
@@ -269,14 +279,14 @@ def test_my_order_detail_forbidden_for_other_user(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     order_id = r.json()["id"]
 
     response = client.get(
         f"/api/v1/orders/my/{order_id}",
-        headers=_headers(f"mock_jwt_token_{intruder.phone}"),
+        headers=_headers(_auth_token(intruder.phone)),
     )
     assert response.status_code == 404
 
@@ -285,7 +295,7 @@ def test_my_order_detail_nonexistent_returns_404(client, db):
     user = _create_user(db)
     response = client.get(
         "/api/v1/orders/my/ord_doesnotexist",
-        headers=_headers(f"mock_jwt_token_{user.phone}"),
+        headers=_headers(_auth_token(user.phone)),
     )
     assert response.status_code == 404
 
@@ -300,7 +310,7 @@ def test_status_update_requires_auth(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     order_id = r.json()["id"]
@@ -317,14 +327,14 @@ def test_status_update_rejected_for_non_seller(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     order_id = r.json()["id"]
 
     response = client.patch(
         f"/api/v1/orders/{order_id}/status?status=confirmed",
-        headers=_headers(f"mock_jwt_token_{intruder.phone}"),
+        headers=_headers(_auth_token(intruder.phone)),
     )
     assert response.status_code == 403
 
@@ -336,7 +346,7 @@ def test_status_update_by_seller_syncs_shipment(client, db):
     address = _create_address(db, buyer.id)
 
     r = _checkout(
-        client, f"mock_jwt_token_{buyer.phone}", address.id,
+        client, _auth_token(buyer.phone), address.id,
         [{"product_id": product.id, "quantity": 1}],
     )
     order_id = r.json()["id"]
@@ -345,14 +355,14 @@ def test_status_update_by_seller_syncs_shipment(client, db):
     for status in ("confirmed", "packed", "shipped", "delivered"):
         resp = client.patch(
             f"/api/v1/orders/{order_id}/status?status={status}",
-            headers=_headers(f"mock_jwt_token_{seller.phone}"),
+            headers=_headers(_auth_token(seller.phone)),
         )
         assert resp.status_code == 200
 
     # Consumer sees final state with shipment in step
     detail = client.get(
         f"/api/v1/orders/my/{order_id}",
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     ).json()
     assert detail["status"] == "delivered"
     assert detail["shipment"]["status"] == "delivered"
@@ -371,7 +381,7 @@ def test_add_to_cart_rejects_non_live_product(client, db):
     response = client.post(
         "/api/v1/cart/items",
         json={"product_id": product.id, "quantity": 1},
-        headers=_headers(f"mock_jwt_token_{seller.phone}"),
+        headers=_headers(_auth_token(seller.phone)),
     )
     assert response.status_code == 400
 
@@ -384,7 +394,7 @@ def test_add_to_cart_rejects_insufficient_stock(client, db):
     response = client.post(
         "/api/v1/cart/items",
         json={"product_id": product.id, "quantity": 5},
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     )
     assert response.status_code == 409
 
@@ -398,16 +408,16 @@ def test_cart_includes_product_details_and_subtotal(client, db):
     client.post(
         "/api/v1/cart/items",
         json={"product_id": p1.id, "quantity": 2},
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     )
     client.post(
         "/api/v1/cart/items",
         json={"product_id": p2.id, "quantity": 1},
-        headers=_headers(f"mock_jwt_token_{buyer.phone}"),
+        headers=_headers(_auth_token(buyer.phone)),
     )
 
     response = client.get(
-        "/api/v1/cart", headers=_headers(f"mock_jwt_token_{buyer.phone}")
+        "/api/v1/cart", headers=_headers(_auth_token(buyer.phone))
     )
     data = response.json()
     assert data["subtotal"] == 450.0

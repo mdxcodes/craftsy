@@ -29,8 +29,18 @@ from backend.database import Base, get_db
 from backend.models.db_models import ArtisanDB, ProductDB
 from backend.models.order_models import OrderDB
 from backend.models.commerce_foundation_models import (  # noqa: F401
-    CartDB, CartItemDB, AddressDB, OrderItemDB, PaymentDB, ShipmentDB,
+    CartDB,
+    CartItemDB,
+    AddressDB,
+    OrderItemDB,
+    PaymentDB,
+    ShipmentDB,
 )
+from backend.middleware.auth import create_access_token
+
+
+def _auth_token(phone: str) -> str:
+    return create_access_token(phone)
 
 
 @pytest.fixture
@@ -137,7 +147,7 @@ def test_order_uses_server_price_not_client_price(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan.id, price=500.0)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     # Client tries to pay 100.0 instead of 500.0
     response = client.post(
@@ -158,7 +168,7 @@ def test_order_rejects_nonexistent_product(client, db):
     """Order creation should fail if product doesn't exist."""
     artisan = _create_artisan(db)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",
@@ -175,7 +185,7 @@ def test_order_rejects_insufficient_stock(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan.id, stock=2)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",
@@ -195,7 +205,7 @@ def test_order_decrements_stock(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan.id, stock=10)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",
@@ -216,7 +226,7 @@ def test_order_does_not_decrement_stock_on_failure(client, db):
     artisan = _create_artisan(db)
     product = _create_product(db, artisan.id, stock=5)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     # First order succeeds
     client.post(
@@ -251,7 +261,7 @@ def test_order_creates_order_items(client, db):
     product1 = _create_product(db, artisan.id, price=100.0)
     product2 = _create_product(db, artisan.id, price=200.0)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",
@@ -293,7 +303,7 @@ def test_order_requires_valid_address(client, db):
     artisan2 = _create_artisan(db, phone="9876543220")
     product = _create_product(db, artisan1.id)
     address = _create_address(db, artisan2.id)  # artisan2's address
-    token = f"mock_jwt_token_{artisan1.phone}"
+    token = _auth_token(artisan1.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",
@@ -315,7 +325,7 @@ def test_multi_product_order_creates_single_order(client, db):
     product2 = _create_product(db, artisan.id, price=200.0)
     product3 = _create_product(db, artisan.id, price=300.0)
     address = _create_address(db, artisan.id)
-    token = f"mock_jwt_token_{artisan.phone}"
+    token = _auth_token(artisan.phone)
 
     response = client.post(
         "/api/v1/orders/checkout",

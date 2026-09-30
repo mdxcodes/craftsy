@@ -15,8 +15,10 @@ class ONDCMapper:
     """Maps Craftsy product/order data to/from ONDC Retail protocol format."""
 
     def __init__(self) -> None:
+        from ...config import get_settings
+        self.settings = get_settings()
         self.bpp_id = "craftsy.bpp.hackathon"
-        self.bpp_uri = "http://localhost:8000/api/v1/ondc"
+        self.bpp_uri = f"http://{self.settings.host}:{self.settings.port}/api/v1/ondc"
         self.bpp_descriptor = {
             "name": "Craftsy BPP",
             "short_desc": "Handicrafts and artisan marketplace",
