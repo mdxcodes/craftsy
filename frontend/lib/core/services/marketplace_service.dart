@@ -60,7 +60,7 @@ class MarketplaceService {
   Future<List<MarketplaceProduct>> getProducts({
     String? category,
     String? search,
-    int limit = 50,
+    int limit = 500,
     int offset = 0,
   }) async {
     final response = await _dio.get(

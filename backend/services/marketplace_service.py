@@ -25,7 +25,7 @@ class MarketplaceService:
         db: Session,
         category: Optional[str] = None,
         search: Optional[str] = None,
-        limit: int = 50,
+        limit: int = 500,
         offset: int = 0,
     ) -> List[ProductDB]:
         """
@@ -35,7 +35,7 @@ class MarketplaceService:
             db: Database session
             category: Filter by category (optional)
             search: Search in title (optional)
-            limit: Maximum results (default 50)
+            limit: Maximum results (default 500)
             offset: Pagination offset (default 0)
 
         Returns:

@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/v1/marketplace", tags=["Marketplace"])
 async def list_products(
     category: Optional[str] = Query(None, description="Filter by category"),
     search: Optional[str] = Query(None, description="Search in product title"),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(500, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
