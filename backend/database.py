@@ -159,13 +159,18 @@ def _run_schema_migrations(engine: Engine) -> None:
         # ── ProductChannelDB GeM metadata columns ───────────────────────────────
         if "product_channels" in existing_tables:
             pc_cols = {c["name"] for c in inspector.get_columns("product_channels")}
-            gem_migrations = [
+            base_gem_migrations = [
                 ("gem_status", "VARCHAR(32)"),
-                ("gem_prepared_at", "DATETIME"),
-                ("gem_last_opened_at", "DATETIME"),
+                ("gem_prepared_at", "TIMESTAMP"),
+                ("gem_last_opened_at", "TIMESTAMP"),
                 ("gem_submission_reference", "VARCHAR(255)"),
                 ("gem_listing_reference", "VARCHAR(255)"),
                 ("gem_last_error", "TEXT"),
+            ]
+            # SQLite accepts TIMESTAMP; PostgreSQL requires TIMESTAMP instead of DATETIME.
+            gem_migrations = [
+                (col_name, col_type)
+                for col_name, col_type in base_gem_migrations
             ]
             for col_name, col_type in gem_migrations:
                 if col_name not in pc_cols:
