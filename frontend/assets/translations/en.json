@@ -978,6 +978,6 @@
   "verify_phone_subtitle_new": "Verify your number to create your account",
   "edit_profile": "Edit Profile",
   "profile_updated": "Profile Updated",
-  "cancel_btn": "Cancel Btn",
-  "save_btn": "Save Btn"
+  "cancel_btn": "Cancel",
+  "save_btn": "Save"
 }

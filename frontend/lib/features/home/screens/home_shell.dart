@@ -12,7 +12,6 @@ import '../../catalogue/screens/catalogue_screen.dart';
 import '../screens/home_v2_screen.dart';
 import '../../orders/screens/my_orders_screen.dart';
 import '../../add_product/screens/add_product_flow_screen.dart';
-import '../../profile/screens/my_stats_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../chatbot/widgets/craftmitra_fab.dart';
 

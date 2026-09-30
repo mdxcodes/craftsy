@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
                  decoration: BoxDecoration(
                 color: AppColors.cardSurface,
                 borderRadius: BorderRadius.circular(AppRadii.card),
-                border: Border.all(color: AppColors.line),
+                border: Border.all(color: AppColors.warmMist),
               ),
               child: Row(
                 children: [
@@ -105,6 +105,30 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
                         ],
+                        if (profile.state.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            profile.state,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.taupe,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                        if (profile.locationCluster.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            profile.locationCluster,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.taupe,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -168,7 +192,7 @@ class ProfileScreen extends ConsumerWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadii.dialog),
                     ),
-                    backgroundColor: AppColors.surface,
+                    backgroundColor: AppColors.cardSurface,
                     insetPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.screenPadding,
                       vertical: AppSpacing.lg,
@@ -248,6 +272,7 @@ void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile pro
   final clusterController = TextEditingController(text: profile.locationCluster);
   final stateController = TextEditingController(text: profile.state);
   final experienceController = TextEditingController(text: profile.experienceYears ?? '');
+  final pehchanController = TextEditingController(text: profile.pehchanId ?? '');
   final formKey = GlobalKey<FormState>();
 
   showDialog(
@@ -272,7 +297,7 @@ void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile pro
                 controller: craftController,
                 decoration: InputDecoration(
                   labelText: 'craft_type_label'.tr(),
-                  hintText: 'craft_type_label'.tr(),
+                  hintText: 'craft_type_hint'.tr(),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -288,7 +313,7 @@ void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile pro
                 controller: stateController,
                 decoration: InputDecoration(
                   labelText: 'state_label'.tr(),
-                  hintText: 'state_label'.tr(),
+                  hintText: 'state_hint'.tr(),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -297,6 +322,14 @@ void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile pro
                 decoration: InputDecoration(
                   labelText: 'experience_label'.tr(),
                   hintText: 'experience_hint'.tr(),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextFormField(
+                controller: pehchanController,
+                decoration: InputDecoration(
+                  labelText: 'pehchan_id_label'.tr(),
+                  hintText: 'pehchan_id_hint'.tr(),
                 ),
               ),
             ],
@@ -320,6 +353,9 @@ void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile pro
               experienceYears: experienceController.text.trim().isEmpty
                   ? null
                   : experienceController.text.trim(),
+              pehchanId: pehchanController.text.trim().isEmpty
+                  ? null
+                  : pehchanController.text.trim(),
             );
             final result = await ref.read(authStateProvider.notifier).updateProfile(updated);
             if (context.mounted) {
@@ -361,7 +397,7 @@ class _MenuTile extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.card),
-          side: const BorderSide(color: AppColors.divider),
+          side: const BorderSide(color: AppColors.warmMist),
         ),
         child: InkWell(
           onTap: onTap,

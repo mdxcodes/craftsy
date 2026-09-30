@@ -196,7 +196,9 @@ def init_db() -> None:
     try:
         demo_phone = "9876543210"
         existing = db.query(ArtisanDB).filter(ArtisanDB.phone == demo_phone).first()
-        if not existing:
+        if existing:
+            demo_artisan = existing
+        else:
             demo_artisan = ArtisanDB(
                 id="artisan_01",
                 name="Rameshwar Lal Kumhar",
@@ -213,7 +215,7 @@ def init_db() -> None:
             db.add(demo_artisan)
             db.commit()
 
-        seed_demo_products(db, demo_artisan.id if existing else "artisan_01")
+        seed_demo_products(db, demo_artisan.id)
     except Exception as e:
         db.rollback()
         logger.warning("Could not seed demo data: %s", e)

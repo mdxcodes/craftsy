@@ -29,9 +29,9 @@ from ..config import get_settings
 
 logger = logging.getLogger(__name__)
 
-# StartMessaging OTP endpoints
-STARTMESSAGING_SEND_OTP_URL = "https://api.startmessaging.com/otp/send"
-STARTMESSAGING_VERIFY_OTP_URL = "https://api.startmessaging.com/otp/verify"
+# StartMessaging Auth API endpoints
+STARTMESSAGING_SEND_OTP_URL = "https://api.startmessaging.com/v1/auth/send-otp"
+STARTMESSAGING_VERIFY_OTP_URL = "https://api.startmessaging.com/v1/auth/verify-otp"
 
 
 class OtpProviderConfigError(Exception):
@@ -274,8 +274,8 @@ class StartMessagingOtpProvider:
 
         api_key = self._api_key()
         payload = {
-            "requestId": request_id.strip(),
-            "otpCode": otp.strip(),
+            "request_id": request_id.strip(),
+            "otp": otp.strip(),
         }
 
         logger.info(

@@ -55,7 +55,7 @@ class LanguagePicker extends ConsumerWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.line,
+                    color: AppColors.warmMist,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -64,7 +64,7 @@ class LanguagePicker extends ConsumerWidget {
                 children: [
                   const Icon(
                     Icons.language,
-                    color: AppColors.terracotta,
+                    color: AppColors.burgundy,
                     size: 22,
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -75,7 +75,7 @@ class LanguagePicker extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              const Divider(color: AppColors.line, height: 1),
+              const Divider(color: AppColors.warmMist, height: 1),
               const SizedBox(height: AppSpacing.xs),
               ...languages.map((lang) {
                 final isSelected = currentLocaleCode == lang['code'];
@@ -99,37 +99,33 @@ class LanguagePicker extends ConsumerWidget {
                               ? FontWeight.bold
                               : FontWeight.normal,
                           color: isSelected
-                              ? AppColors.terracotta
-                              : AppColors.ink,
+                              ? AppColors.burgundy
+                              : AppColors.espresso,
                         ),
                       ),
                       subtitle: Text(
                         lang['native']!,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.inkSoft,
+                          color: AppColors.taupe,
                         ),
                       ),
                       trailing: isSelected
                           ? const Icon(
                               Icons.check_circle,
-                              color: AppColors.terracotta,
+                              color: AppColors.burgundy,
                             )
                           : const Icon(
                               Icons.circle_outlined,
-                              color: AppColors.border,
+                              color: AppColors.warmMist,
                             ),
                       onTap: () async {
                         final newLocale = Locale(lang['code']!);
                         try {
                           await context.setLocale(newLocale);
-                          debugPrint(
-                            'setLocale SUCCESS: ${newLocale.languageCode}',
-                          );
                         } catch (e, st) {
                           debugPrint('setLocale ERROR: $e\n$st');
                         }
 
-                        // Also update profile state
                         final currentProfile = ref.read(userProfileProvider);
                         ref
                             .read(userProfileProvider.notifier)
@@ -184,9 +180,9 @@ class LanguagePicker extends ConsumerWidget {
             vertical: isCompact ? AppSpacing.xs : AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: AppColors.cardSurface,
             borderRadius: BorderRadius.circular(AppRadii.md),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.warmMist),
           ),
           child: Row(
             mainAxisSize: isCompact ? MainAxisSize.min : MainAxisSize.max,
@@ -195,7 +191,7 @@ class LanguagePicker extends ConsumerWidget {
               const Icon(
                 Icons.language,
                 size: AppSpacing.iconSize,
-                color: AppColors.terracotta,
+                color: AppColors.burgundy,
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
@@ -206,7 +202,7 @@ class LanguagePicker extends ConsumerWidget {
               const Icon(
                 Icons.arrow_drop_down,
                 size: AppSpacing.iconSize,
-                color: AppColors.textSecondary,
+                color: AppColors.taupe,
               ),
             ],
           ),
