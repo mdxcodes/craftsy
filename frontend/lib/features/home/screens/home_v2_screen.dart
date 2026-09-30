@@ -15,6 +15,8 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/offline_state.dart';
 import '../../../core/widgets/sync_status_banner.dart';
 import '../../../core/widgets/draft_resume_card.dart';
+import '../../../core/services/marketplace_service.dart';
+
 import '../../orders/models/order.dart';
 import '../../orders/providers/orders_provider.dart';
 import 'business_advisor_screen.dart';
@@ -65,6 +67,11 @@ class HomeV2Screen extends ConsumerWidget {
 
             // Quick actions
             _QuickActions(),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // Marketplace preview — Craftsy listings visible to everyone
+            _MarketplacePreviewSection(),
 
             const SizedBox(height: AppSpacing.lg),
 
@@ -560,6 +567,125 @@ class _EarningsMetric extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Marketplace Preview Section
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _MarketplacePreviewSection extends ConsumerWidget {
+  const _MarketplacePreviewSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isOnline = ref.watch(connectivityProvider).value ?? true;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'home_marketplace_title'.tr(),
+                style: AppTextStyles.headlineSmall,
+              ),
+              TextButton(
+                onPressed: () => context.pushNamed(AppRouteConstants.marketplace),
+                child: Text('home_view_all'.tr()),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          FutureBuilder<List<MarketplaceProduct>>(
+            future: isOnline ? marketplaceService.getProducts(limit: 10) : Future.value(<MarketplaceProduct>[]),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.md),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ));
+              }
+              final products = snapshot.data ?? <MarketplaceProduct>[];
+              if (products.isEmpty) {
+                return EmptyState(
+                  icon: Icons.storefront_outlined,
+                  title: 'marketplace_no_products'.tr(),
+                  message: 'marketplace_no_products_desc'.tr(),
+                  actionLabel: 'home_start_listing'.tr(),
+                  onAction: () => context.pushNamed(AppRouteConstants.addProduct),
+                );
+              }
+              return SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return Container(
+                      width: 160,
+                      margin: EdgeInsets.only(right: AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardSurface,
+                        borderRadius: BorderRadius.circular(AppRadii.card),
+                        border: Border.all(color: AppColors.line),
+                      ),
+                      child: InkWell(
+                        onTap: () => context.pushNamed(
+                          AppRouteConstants.marketplace,
+                          extra: product.id,
+                        ),
+                        borderRadius: BorderRadius.circular(AppRadii.card),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: AppImage(
+                                imageUrl: product.imageUrl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(AppSpacing.sm),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.title,
+                                    style: AppTextStyles.labelSmall.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '₹${product.price.toStringAsFixed(0)}',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.burgundy,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

@@ -102,21 +102,48 @@ def test_price_suggest_request_precedence_and_aliases():
 
 def test_generate_listing_api_returns_cost_inputs():
     """Verify /api/v1/catalog/generate-listing extracts and returns structured cost_inputs."""
+    from unittest.mock import patch, MagicMock
+    import asyncio
+
     payload = {
         "transcript": "Handmade wooden toy cart. Making cost was ₹350 and took 3 hours to craft.",
         "language_code": "en",
         "category_hint": "Woodwork",
     }
-    response = client.post("/api/v1/catalog/generate-listing", json=payload)
-    assert response.status_code == 200
-    data = response.json()
 
-    assert "cost_inputs" in data
-    assert data["cost_inputs"] is not None
-    cost_inputs = data["cost_inputs"]
-    assert cost_inputs["materials"] == 350.0
-    assert cost_inputs["labor_hours"] == 3.0
-    assert cost_inputs["hourly_rate"] == DEFAULT_HOURLY_RATE
+    async def mock_async_return(value):
+        return value
+
+    with patch("backend.routers.catalog.catalog_service") as mock_service:
+        from backend.models.schemas import ListingGenerateResponse, CostInputsSchema
+        mock_service.generate_listing = MagicMock(
+            side_effect=lambda *args, **kwargs: mock_async_return(
+                ListingGenerateResponse(
+                    title_en="Handmade Wooden Toy Cart",
+                    title_hi="हाथ से बना लकड़ी का खिलौना गाड़ी",
+                    description_en="A handmade wooden toy cart.",
+                    description_hi="एक हाथ से बनी लकड़ी की खिलौना गाड़ी।",
+                    category="Woodwork",
+                    tags=["woodwork", "handmade", "toy"],
+                    cost_inputs=CostInputsSchema(
+                        materials=350.0,
+                        labor_hours=3.0,
+                        hourly_rate=DEFAULT_HOURLY_RATE,
+                    ),
+                )
+            )
+        )
+
+        response = client.post("/api/v1/catalog/generate-listing", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+
+        assert "cost_inputs" in data
+        assert data["cost_inputs"] is not None
+        cost_inputs = data["cost_inputs"]
+        assert cost_inputs["materials"] == 350.0
+        assert cost_inputs["labor_hours"] == 3.0
+        assert cost_inputs["hourly_rate"] == DEFAULT_HOURLY_RATE
 
 
 def test_pricing_suggest_honors_base_cost_and_calculates_non_zero_floor():

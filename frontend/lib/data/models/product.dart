@@ -83,6 +83,10 @@ class Product extends HiveObject {
   @HiveField(16)
   final int stock;
 
+  /// Platforms this product is listed on (e.g. ['craftsy'], ['craftsy', 'ondc'])
+  @HiveField(17)
+  final List<String> platforms;
+
   Product({
     required this.id,
     required this.title,
@@ -101,6 +105,7 @@ class Product extends HiveObject {
     this.restockQuantity,
     this.statusReason,
     this.stock = 0,
+    this.platforms = const ['craftsy'],
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// All captured photos in order (primary first), for the review screen's
@@ -136,6 +141,7 @@ class Product extends HiveObject {
     int? restockQuantity,
     String? statusReason,
     int? stock,
+    List<String>? platforms,
   }) {
     return Product(
       id: id ?? this.id,
@@ -155,6 +161,7 @@ class Product extends HiveObject {
       restockQuantity: restockQuantity ?? this.restockQuantity,
       statusReason: statusReason ?? this.statusReason,
       stock: stock ?? this.stock,
+      platforms: platforms ?? this.platforms,
     );
   }
 
@@ -177,6 +184,7 @@ class Product extends HiveObject {
       'restockQuantity': restockQuantity,
       'statusReason': statusReason,
       'stock': stock,
+      'platforms': platforms,
     };
   }
 
@@ -193,6 +201,7 @@ class Product extends HiveObject {
       'category': category,
       'tags': tags,
       'status': status.name,
+      'platforms': platforms,
     };
   }
 
@@ -240,6 +249,10 @@ class Product extends HiveObject {
       restockQuantity: json['restockQuantity'] as int?,
       statusReason: json['statusReason'] as String?,
       stock: json['stock'] as int? ?? 0,
+      platforms: (json['platforms'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const ['craftsy'],
     );
   }
 }

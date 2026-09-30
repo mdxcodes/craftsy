@@ -8,7 +8,7 @@ bilingual listing generation, and complete voice-to-product draft creation.
 import logging
 from pathlib import Path
 from typing import Optional
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -196,6 +196,18 @@ async def generate_bilingual_listing(
     """
     try:
         return await catalog_service.generate_listing(request)
+    except RuntimeError as exc:
+        error_message = str(exc)
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        if "AI_LISTING_GENERATION_FAILED" in error_message:
+            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        raise HTTPException(
+            status_code=status_code,
+            detail={
+                "error_code": "AI_LISTING_GENERATION_FAILED",
+                "message": "Listing generation failed. Please try again or enter details manually.",
+            },
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Listing generation failed: {str(e)}")
 

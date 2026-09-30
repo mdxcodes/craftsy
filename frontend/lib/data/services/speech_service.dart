@@ -17,6 +17,14 @@ class TranscriptionResult {
   });
 }
 
+class ListingGenerationException implements Exception {
+  final String message;
+  const ListingGenerationException(this.message);
+
+  @override
+  String toString() => 'ListingGenerationException: $message';
+}
+
 class AiListingSuggestion {
   final String titleEn;
   final String titleHi;
@@ -393,8 +401,8 @@ class HttpSpeechService implements SpeechService {
               : cleanTranscript,
           descriptionEn:
               (data['description_en'] as String?)?.trim().isNotEmpty == true
-              ? data['description_en'] as String
-              : cleanTranscript,
+                  ? data['description_en'] as String
+                  : cleanTranscript,
           descriptionHi: data['description_hi'] as String? ?? '',
           category: (data['category'] as String?)?.trim().isNotEmpty == true
               ? data['category'] as String
@@ -406,6 +414,16 @@ class HttpSpeechService implements SpeechService {
           floorPrice: floor,
         );
       }
+
+      // Non-200 response: throw so callers do not silently use fallback data
+      final detail = response.data?['detail'];
+      String message = 'Listing generation failed.';
+      if (detail is String) {
+        message = detail;
+      } else if (detail is Map<String, dynamic>) {
+        message = detail['message'] as String? ?? message;
+      }
+      throw ListingGenerationException(message);
     } catch (e) {
       debugPrint('[HttpSpeechService] Listing generation failed: $e');
     }

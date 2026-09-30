@@ -26,6 +26,8 @@ class Step5ConfirmWidget extends ConsumerStatefulWidget {
 
 class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
   bool _isPublishing = false;
+  bool _listOnCraftsy = true;
+  bool _listOnOndc = true;
   final AppTtsService _tts = AppTtsService();
 
   @override
@@ -79,6 +81,10 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
       category: effectiveCategory,
       tags: draft.tags,
       status: isOnline ? ProductStatus.live : ProductStatus.pendingSync,
+      platforms: [
+        if (_listOnCraftsy) 'craftsy',
+        if (_listOnOndc) 'ondc',
+      ],
       createdAt: DateTime.now(),
     );
 
@@ -623,6 +629,68 @@ class _Step5ConfirmWidgetState extends ConsumerState<Step5ConfirmWidget> {
           ),
 
           const SizedBox(height: AppSpacing.lg),
+
+          // ── PLATFORM SELECTION ───────────────────────────────────────
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: AppColors.line),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.storefront_outlined, size: 18, color: AppColors.espresso),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      'list_on_platforms_title'.tr(),
+                      style: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'list_on_platforms_desc'.tr(),
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.taupe),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                CheckboxListTile(
+                  value: _listOnCraftsy,
+                  title: Text(
+                    'platform_craftsy'.tr(),
+                    style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'platform_craftsy_desc'.tr(),
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.taupe, fontSize: 12),
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  onChanged: (value) => setState(() => _listOnCraftsy = value ?? true),
+                ),
+                CheckboxListTile(
+                  value: _listOnOndc,
+                  title: Text(
+                    'platform_ondc'.tr(),
+                    style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'platform_ondc_desc'.tr(),
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.taupe, fontSize: 12),
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  onChanged: (value) => setState(() => _listOnOndc = value ?? true),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
 
           // ── SOCIAL MEDIA HELPER ─────────────────────────────────────
           if (draft.originalImagePath.isNotEmpty ||

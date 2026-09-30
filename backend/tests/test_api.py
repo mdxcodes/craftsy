@@ -112,19 +112,55 @@ def test_products_crud_and_sync():
 
 def test_catalog_listing_generation():
     """Test AI bilingual listing generator."""
+    from unittest.mock import patch, MagicMock
+    import asyncio
+
     payload = {
         "transcript": "यह हाथ से बुनी चंदेरी सिल्क साड़ी है जिसमें असली सुनहरी ज़री का काम है",
         "language_code": "hi",
         "category_hint": "Textiles",
     }
-    response = client.post("/api/v1/catalog/generate-listing", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert "title_en" in data
-    assert "title_hi" in data
-    assert "description_en" in data
-    assert "description_hi" in data
-    assert "category" in data
+
+    async def mock_async_return(value):
+        return value
+
+    async def mock_async_raise(exc):
+        raise exc
+
+    # Test 1: When both providers fail, endpoint must NOT return HTTP 200 with fake data
+    with patch("backend.routers.catalog.catalog_service") as mock_service:
+        mock_service.generate_listing = MagicMock(
+            side_effect=lambda *args, **kwargs: mock_async_raise(
+                RuntimeError("AI_LISTING_GENERATION_FAILED")
+            )
+        )
+
+        response = client.post("/api/v1/catalog/generate-listing", json=payload)
+        assert response.status_code == 422
+        data = response.json()
+        assert "error_code" in data.get("detail", {})
+
+    # Test 2: When provider succeeds, endpoint returns HTTP 200 with listing data
+    with patch("backend.routers.catalog.catalog_service") as mock_service:
+        from backend.models.schemas import ListingGenerateResponse
+        mock_service.generate_listing = MagicMock(
+            side_effect=lambda *args, **kwargs: mock_async_return(
+                ListingGenerateResponse(
+                    title_en="Handwoven Pure Silk Dupatta",
+                    title_hi="हाथ से बुना सिल्क दुपट्टा",
+                    description_en="A beautiful handwoven dupatta.",
+                    description_hi="एक सुंदर हाथ से बुना दुपट्टा।",
+                    category="Textiles",
+                    tags=["handwoven", "silk"],
+                )
+            )
+        )
+
+        response = client.post("/api/v1/catalog/generate-listing", json=payload)
+        assert response.status_code == 200
+        data = response.json()
+        assert "title_en" in data
+        assert "title_hi" in data
 
 
 def test_voice_glossary_api():

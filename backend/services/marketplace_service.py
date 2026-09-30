@@ -49,6 +49,9 @@ class MarketplaceService:
         if search:
             query = query.filter(ProductDB.title.ilike(f"%{search}%"))
 
+        # Show all live products for backward compatibility, but prioritize
+        # products explicitly marked for Craftsy marketplace.
+        # Products without a platforms field (legacy) are treated as Craftsy-listed.
         return query.order_by(ProductDB.created_at.desc()).offset(offset).limit(limit).all()
 
     def get_product(self, db: Session, product_id: str) -> Optional[ProductDB]:

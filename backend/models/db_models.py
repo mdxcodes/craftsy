@@ -64,6 +64,7 @@ class ProductDB(Base):
     tags = Column(Text, default="[]")  # JSON encoded list of strings
     status = Column(String(32), default="live", index=True)  # live, draft, archived
     stock = Column(Integer, default=0)  # Unified inventory — one source of truth
+    platforms = Column(Text, default='["craftsy"]')  # JSON array: ["craftsy"], ["craftsy", "ondc"], etc.
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -77,6 +78,14 @@ class ProductDB(Base):
             return json.loads(self.tags) if self.tags else []
         except Exception:
             return []
+
+    @property
+    def platforms_list(self) -> list[str]:
+        """Deserialize platforms from JSON."""
+        try:
+            return json.loads(self.platforms) if self.platforms else ["craftsy"]
+        except Exception:
+            return ["craftsy"]
 
 
 class SocialDraftDB(Base):

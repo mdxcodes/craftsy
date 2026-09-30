@@ -14,7 +14,7 @@ import sys
 import wave
 import io
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 
 # Fix Windows console encoding for emoji output
 if sys.platform == "win32":
@@ -53,7 +53,7 @@ def generate_synthetic_wav_bytes(duration_seconds: float = 1.0, framerate: int =
 
 @pytest.fixture
 def mock_voice_processor():
-    """Mock ArtisanVoiceProcessor to return realistic transcripts for offline testing."""
+    """Mock ArtisanVoiceProcessor and catalog AI providers for offline testing."""
     def mock_process(audio_path, language_code="auto", category_hint=None, note_id=None, product_draft_id=None):
         effective_lang = "en" if language_code == "en" else "hi"
         text = (
@@ -74,7 +74,50 @@ def mock_voice_processor():
         )
 
     with patch("backend.services.catalog_service.ArtisanVoiceProcessor.process_voice_note", side_effect=mock_process), \
-         patch("backend.services.catalog_service.CatalogService._is_audio_silent", return_value=False):
+         patch("backend.services.catalog_service.CatalogService._is_audio_silent", return_value=False), \
+         patch("backend.services.catalog_service.CatalogService.transcribe_audio", new_callable=AsyncMock) as mock_transcribe, \
+         patch("backend.services.catalog_service.CatalogService.generate_listing", new_callable=AsyncMock) as mock_listing, \
+         patch("backend.services.catalog_service.CatalogService.extract_cost_cues", new_callable=AsyncMock) as mock_cost:
+        from backend.models.schemas import ListingGenerateResponse, CostInputsSchema
+
+        def mock_transcribe_side_effect(*args, **kwargs):
+            # Extract language_code from args/kwargs
+            lang = "hi"
+            for arg in args:
+                if isinstance(arg, str) and len(arg) <= 3:
+                    lang = arg
+                    break
+            if "language_code" in kwargs:
+                lang = kwargs["language_code"]
+
+            effective_lang = "en" if lang == "en" else "hi"
+            transcript_text = (
+                "This is a handcrafted terracotta flower vase made on traditional potter's wheel"
+                if effective_lang == "en"
+                else "यह हाथ से बना मिट्टी का सुराहीदार फूलदान है, 200 रुपये का मटेरियल और 4 घंटे का काम लगा"
+            )
+            return type('TranscribeResult', (), {
+                'status': 'completed',
+                'transcript': transcript_text,
+                'language_code': effective_lang,
+                'confidence': 0.95,
+                'error_code': None,
+            })()
+
+        mock_transcribe.side_effect = mock_transcribe_side_effect
+        mock_listing.return_value = ListingGenerateResponse(
+            title_en="Handcrafted Terracotta Flower Vase",
+            title_hi="हाथ से बना मिट्टी का फूलदान",
+            description_en="A beautiful handcrafted terracotta flower vase.",
+            description_hi="एक सुंदर हाथ से बना मिट्टी का फूलदान।",
+            category="Pottery",
+            tags=["pottery", "terracotta", "handmade"],
+        )
+        mock_cost.return_value = CostInputsSchema(
+            materials=200.0,
+            labor_hours=4.0,
+            hourly_rate=50.0,
+        )
         yield
 
 

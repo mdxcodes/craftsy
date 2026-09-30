@@ -151,12 +151,17 @@ class TestStartMessagingOtpProvider:
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             "success": True,
+            "statusCode": 200,
+            "requestId": "req_123",
             "data": {"verified": True},
         }
         mock_post.return_value.text = '{"success":true,"data":{"verified":true}}'
 
         result = self.provider.verify_otp("req_123", "123456")
         assert result.success is True
+        call_payload = mock_post.call_args[1]["json"]
+        assert call_payload["requestId"] == "req_123"
+        assert call_payload["otpCode"] == "123456"
 
     @patch("backend.services.startmessaging_service.requests.post")
     def test_verify_otp_invalid(self, mock_post):
@@ -192,6 +197,34 @@ class TestStartMessagingOtpProvider:
         result = self.provider.verify_otp("req_123", "123456")
         assert result.success is False
         assert result.error_code == "OTP_PROVIDER_UNAVAILABLE"
+
+    @patch("backend.services.startmessaging_service.requests.post")
+    def test_verify_otp_provider_404(self, mock_post):
+        mock_post.return_value.status_code = 404
+        mock_post.return_value.text = "Cannot POST /otp/verify"
+
+        result = self.provider.verify_otp("req_123", "123456")
+        assert result.success is False
+        assert result.error_code == "OTP_INVALID"
+
+    @patch("backend.services.startmessaging_service.requests.post")
+    def test_verify_otp_provider_5xx(self, mock_post):
+        mock_post.return_value.status_code = 503
+        mock_post.return_value.text = "Service Unavailable"
+
+        result = self.provider.verify_otp("req_123", "123456")
+        assert result.success is False
+        assert result.error_code == "OTP_INVALID"
+
+    @patch("backend.services.startmessaging_service.requests.post")
+    def test_verify_otp_malformed_response(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.text = "not-json"
+        mock_post.return_value.json.side_effect = ValueError("No JSON")
+
+        result = self.provider.verify_otp("req_123", "123456")
+        assert result.success is False
+        assert result.error_code == "OTP_INVALID"
 
     def test_send_otp_rate_limit_cooldown(self):
         self.provider._last_send_ts["+919876543210"] = 9999999999

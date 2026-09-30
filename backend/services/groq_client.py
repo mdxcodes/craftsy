@@ -46,6 +46,20 @@ class GroqClient:
         return cleaned
 
     @staticmethod
+    def normalize_ai_error(exc: Exception) -> str:
+        """Map provider exceptions to normalized error codes."""
+        error_str = str(exc).lower()
+        if "429" in error_str or "resource_exhausted" in error_str or "rate limit" in error_str:
+            return "AI_RATE_LIMITED"
+        if "404" in error_str or "model_not_found" in error_str:
+            return "AI_MODEL_UNAVAILABLE"
+        if "503" in error_str or "unavailable" in error_str or "service_unavailable" in error_str:
+            return "AI_PROVIDER_UNAVAILABLE"
+        if "400" in error_str or "invalid" in error_str or "validation" in error_str:
+            return "AI_INVALID_RESPONSE"
+        return "AI_GENERATION_FAILED"
+
+    @staticmethod
     def extract_json_payload(text: str) -> Dict[str, Any]:
         """Extract and parse a JSON dictionary from LLM response text."""
         cleaned = GroqClient.clean_response_text(text)
@@ -87,8 +101,15 @@ class GroqClient:
         if not self.is_available():
             raise RuntimeError("Groq API key is not configured. Set GROQ_API_KEY in .env.")
 
-        active_model = model or self.default_model
-        fallback_models = ["openai/gpt-oss-120b", "groq/compound-mini", "qwen/qwen3.6-27b"]
+        active_model = model or self.settings.groq_model_primary or self.settings.groq_chat_model
+        fallback_models = [
+            m for m in [
+                self.settings.groq_model_fallback,
+                "llama-3.3-70b-versatile",
+                "llama-3.1-8b-instant",
+            ]
+            if m and m != active_model
+        ]
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -104,7 +125,7 @@ class GroqClient:
         if response_format_json:
             payload["response_format"] = {"type": "json_object"}
 
-        models_to_try = [active_model] + [m for m in fallback_models if m != active_model]
+        models_to_try = [active_model] + fallback_models
 
         async with httpx.AsyncClient(timeout=timeout) as client:
             last_error: Optional[Exception] = None
@@ -124,24 +145,35 @@ class GroqClient:
                         raise RuntimeError("Groq returned empty choices list.")
 
                     error_data = resp.text
+                    error_code = self.normalize_ai_error(
+                        RuntimeError(f"Groq API error ({resp.status_code}): {error_data}")
+                    )
                     logger.warning(
-                        "[GroqClient] Model '%s' returned status %s: %s",
+                        "[GroqClient] Model '%s' returned status %s (%s): %s",
                         attempt_model,
                         resp.status_code,
-                        error_data,
+                        error_code,
+                        error_data[:200],
                     )
                     last_error = RuntimeError(f"Groq API error ({resp.status_code}): {error_data}")
                     
-                    # If model not found or forbidden, try next fallback model
-                    if resp.status_code in (404, 400):
+                    # Do NOT retry non-retryable errors
+                    if error_code in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break
+                    # For transient server errors, retry with next fallback
+                    if resp.status_code in (500, 502, 503) and attempt_model != models_to_try[-1]:
                         continue
-                    # For rate limit or server error on the primary, retry once with fallback
-                    if resp.status_code in (429, 500, 502, 503):
+                    # For 400/404 on non-primary, try next; on primary, break
+                    if resp.status_code in (400, 404) and attempt_model != models_to_try[-1]:
                         continue
+                    break
 
                 except Exception as e:
-                    logger.warning("[GroqClient] Request to '%s' failed: %s", attempt_model, e)
+                    error_code = self.normalize_ai_error(e)
+                    logger.warning("[GroqClient] Request to '%s' failed (%s): %s", attempt_model, error_code, e)
                     last_error = e
+                    if error_code in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break
 
             raise last_error or RuntimeError("All Groq model attempts failed.")
 
@@ -181,8 +213,15 @@ class GroqClient:
         if not self.is_available():
             raise RuntimeError("Groq API key is not configured.")
 
-        active_model = model or self.default_model
-        fallback_models = ["openai/gpt-oss-120b", "groq/compound-mini", "qwen/qwen3.6-27b"]
+        active_model = model or self.settings.groq_model_primary or self.settings.groq_chat_model
+        fallback_models = [
+            m for m in [
+                self.settings.groq_model_fallback,
+                "llama-3.3-70b-versatile",
+                "llama-3.1-8b-instant",
+            ]
+            if m and m != active_model
+        ]
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -196,7 +235,7 @@ class GroqClient:
         if response_format_json:
             payload["response_format"] = {"type": "json_object"}
 
-        models_to_try = [active_model] + [m for m in fallback_models if m != active_model]
+        models_to_try = [active_model] + fallback_models
 
         with httpx.Client(timeout=timeout) as client:
             last_error: Optional[Exception] = None
@@ -210,10 +249,30 @@ class GroqClient:
                         if choices:
                             raw_content = choices[0].get("message", {}).get("content", "")
                             return self.clean_response_text(raw_content)
-                    if resp.status_code in (404, 400, 429, 500, 502, 503):
+                    error_code = self.normalize_ai_error(
+                        RuntimeError(f"Groq API error ({resp.status_code}): {resp.text}")
+                    )
+                    logger.warning(
+                        "[GroqClient] Sync model '%s' returned status %s (%s): %s",
+                        attempt_model,
+                        resp.status_code,
+                        error_code,
+                        resp.text[:200],
+                    )
+                    last_error = RuntimeError(f"Groq API error ({resp.status_code}): {resp.text}")
+                    if error_code in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break
+                    if resp.status_code in (500, 502, 503) and attempt_model != models_to_try[-1]:
                         continue
+                    if resp.status_code in (400, 404) and attempt_model != models_to_try[-1]:
+                        continue
+                    break
                 except Exception as e:
+                    error_code = self.normalize_ai_error(e)
+                    logger.warning("[GroqClient] Sync request to '%s' failed (%s): %s", attempt_model, error_code, e)
                     last_error = e
+                    if error_code in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break
             raise last_error or RuntimeError("All Groq sync model attempts failed.")
 
     def chat_json_sync(

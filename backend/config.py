@@ -122,7 +122,15 @@ class Settings(BaseSettings):
     )
     groq_chat_model: str = Field(
         default="openai/gpt-oss-120b",
-        description="Groq model identifier for chat, cataloging, and assistance.",
+        description="Primary Groq model identifier for chat, cataloging, and assistance.",
+    )
+    groq_model_primary: str = Field(
+        default="",
+        description="Override primary Groq model for catalog generation (defaults to groq_chat_model if empty).",
+    )
+    groq_model_fallback: str = Field(
+        default="",
+        description="Fallback Groq model for catalog generation when primary is unavailable.",
     )
     llm_provider: str = Field(
         default="groq",

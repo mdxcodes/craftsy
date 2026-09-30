@@ -133,6 +133,7 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
             tags=json.dumps(product.tags),
             status=product.status,
             stock=product.stock if product.stock is not None else 0,
+            platforms=json.dumps(product.platforms),
             created_at=product.created_at or datetime.now(),
         )
         db.add(db_item)
@@ -230,6 +231,8 @@ async def update_product(
         db_item.status = update_data.status
     if update_data.stock is not None:
         db_item.stock = update_data.stock
+    if update_data.platforms is not None:
+        db_item.platforms = json.dumps(update_data.platforms)
 
     db_item.updated_at = datetime.now()
     db.commit()

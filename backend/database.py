@@ -12,6 +12,7 @@ run *only* when the active dialect is SQLite.
 
 import json
 import logging
+from datetime import datetime
 from typing import Generator
 
 from sqlalchemy import create_engine, inspect, text
@@ -176,7 +177,6 @@ def init_db() -> None:
         PaymentDB,
         ShipmentDB,
     )
-    from datetime import datetime
 
     if settings.is_production and IS_SQLITE:
         logger.warning(
@@ -195,10 +195,8 @@ def init_db() -> None:
     db = SessionLocal()
     try:
         demo_phone = "9876543210"
-        existing = db.query(ArtisanDB).filter(ArtisanDB.phone == demo_phone).first()
-        if existing:
-            demo_artisan = existing
-        else:
+        demo_artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == demo_phone).first()
+        if not demo_artisan:
             demo_artisan = ArtisanDB(
                 id="artisan_01",
                 name="Rameshwar Lal Kumhar",
@@ -213,9 +211,10 @@ def init_db() -> None:
                 created_at=datetime.now(),
             )
             db.add(demo_artisan)
-            db.commit()
+            db.flush()
 
         seed_demo_products(db, demo_artisan.id)
+        db.commit()
     except Exception as e:
         db.rollback()
         logger.warning("Could not seed demo data: %s", e)
@@ -245,6 +244,7 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             "tags": ["handwoven", "cotton", "dupatta", "traditional"],
             "status": "live",
             "stock": 25,
+            "platforms": ["craftsy"],
         },
         {
             "id": "prod_vase_02",
@@ -259,6 +259,7 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             "tags": ["terracotta", "vase", "handcrafted", "pottery"],
             "status": "live",
             "stock": 12,
+            "platforms": ["craftsy"],
         },
         {
             "id": "prod_tray_03",
@@ -273,6 +274,7 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             "tags": ["wooden", "tray", "madhubani", "hand-painted"],
             "status": "live",
             "stock": 18,
+            "platforms": ["craftsy"],
         },
         {
             "id": "prod_panel_04",
@@ -280,13 +282,14 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             "title": "Madhubani Art Panel",
             "title_hi": "मधुबनी कला पैनल",
             "description": "Traditional Madhubani painting on handmade paper. Features nature-inspired motifs including fish, birds, and floral patterns. Ready to frame.",
-            "description_hi": "हाथ से बनے कागज पर पारंपरिक मधुबनी चित्रकला। मछली, पक्षी और फूलों के पैटर्न सहित प्रकृति से प्रेरित अलंकार शामिल हैं। फ्रेम करने के लिए तैयार।",
+            "description_hi": "हाथ से बनने कागज पर पारंपरिक मधुबनी चित्रकला। मछली, पक्षी और फूलों के पैटर्न सहित प्रकृति से प्रेरित अलंकार शामिल हैं। फ्रेम करने के लिए तैयार।",
             "price": 2200.0,
             "image_url": "/uploads/images/panel_demo.jpg",
             "category": "Paintings",
             "tags": ["madhubani", "painting", "handmade", "art"],
             "status": "live",
             "stock": 8,
+            "platforms": ["craftsy"],
         },
         {
             "id": "prod_basket_05",
@@ -301,6 +304,7 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             "tags": ["bamboo", "basket", "storage", "eco-friendly"],
             "status": "live",
             "stock": 30,
+            "platforms": ["craftsy"],
         },
     ]
 
@@ -318,6 +322,7 @@ def seed_demo_products(db: Session, artisan_id: str) -> None:
             tags=json.dumps(product_data["tags"]),
             status=product_data["status"],
             stock=product_data["stock"],
+            platforms=json.dumps(product_data.get("platforms", ["craftsy"])),
             created_at=datetime.now(),
         )
         db.add(product)

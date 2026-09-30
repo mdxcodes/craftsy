@@ -57,6 +57,34 @@ from ..models.schemas import (
 logger = logging.getLogger(__name__)
 
 
+def _categorize_gemini_error(exc: Exception) -> str:
+    """Map Gemini/Google-genai exceptions to normalized error codes."""
+    error_str = str(exc).lower()
+    if "429" in error_str or "resource_exhausted" in error_str or "quota" in error_str:
+        return "AI_RATE_LIMITED"
+    if "404" in error_str or "model_not_found" in error_str:
+        return "AI_MODEL_UNAVAILABLE"
+    if "503" in error_str or "unavailable" in error_str or "service_unavailable" in error_str:
+        return "AI_PROVIDER_UNAVAILABLE"
+    if "400" in error_str or "invalid" in error_str or "validation" in error_str:
+        return "AI_INVALID_RESPONSE"
+    return "AI_GENERATION_FAILED"
+
+
+def _categorize_groq_error(exc: Exception) -> str:
+    """Map Groq exceptions to normalized error codes."""
+    error_str = str(exc).lower()
+    if "429" in error_str or "rate limit" in error_str:
+        return "AI_RATE_LIMITED"
+    if "404" in error_str or "model_not_found" in error_str:
+        return "AI_MODEL_UNAVAILABLE"
+    if "503" in error_str or "unavailable" in error_str or "service_unavailable" in error_str:
+        return "AI_PROVIDER_UNAVAILABLE"
+    if "400" in error_str or "invalid" in error_str or "validation" in error_str:
+        return "AI_INVALID_RESPONSE"
+    return "AI_GENERATION_FAILED"
+
+
 class CatalogService:
     """Provides speech-to-text, image enhancement, and bilingual catalog listing generation."""
 
@@ -448,7 +476,10 @@ Please generate the structured bilingual catalog listing, strictly observing the
                     },
                     {"role": "user", "content": user_prompt},
                 ]
-                data = await self.groq_client.chat_json(groq_messages)
+                data = await self.groq_client.chat_json(
+                    groq_messages,
+                    max_tokens=2048,
+                )
                 return ListingGenerateResponse(
                     title_en=self._sanitize_customer_facing_text(data.get("title_en", "Handcrafted Artisan Product")),
                     title_hi=self._sanitize_customer_facing_text(data.get("title_hi", "हस्तनिर्मित उत्पाद")),
@@ -459,69 +490,79 @@ Please generate the structured bilingual catalog listing, strictly observing the
                     cost_inputs=extracted_costs,
                 )
             except Exception as e:
-                logger.warning("[CatalogService] Groq listing generation failed, trying fallback: %s", e)
+                error_code = _categorize_groq_error(e)
+                logger.warning("[CatalogService] Groq listing generation failed (%s): %s", error_code, e)
+                if error_code == "AI_RATE_LIMITED":
+                    raise RuntimeError("AI_RATE_LIMITED: Groq quota exhausted.") from e
+                if error_code == "AI_MODEL_UNAVAILABLE":
+                    raise RuntimeError("AI_MODEL_UNAVAILABLE: Groq model not found.") from e
 
         # ── 2. Try Google Gemini if available ───────────────────────────────
         if self.client:
-            try:
-                response = await run_in_threadpool(
-                    self.client.models.generate_content,
-                    model=self.settings.llm_model,
-                    contents=user_prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_prompt,
-                        temperature=0.2,
-                        response_mime_type="application/json",
-                        response_schema={
-                            "type": "object",
-                            "properties": {
-                                "title_en": {"type": "string"},
-                                "title_hi": {"type": "string"},
-                                "description_en": {"type": "string"},
-                                "description_hi": {"type": "string"},
-                                "category": {"type": "string"},
-                                "tags": {
-                                    "type": "array",
-                                    "items": {"type": "string"},
+            gemini_error: Optional[str] = None
+            for attempt in range(2):  # Bounded retry: max 1 retry for transient failures
+                try:
+                    response = await run_in_threadpool(
+                        self.client.models.generate_content,
+                        model=self.settings.llm_model,
+                        contents=user_prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_prompt,
+                            temperature=0.2,
+                            response_mime_type="application/json",
+                            response_schema={
+                                "type": "object",
+                                "properties": {
+                                    "title_en": {"type": "string"},
+                                    "title_hi": {"type": "string"},
+                                    "description_en": {"type": "string"},
+                                    "description_hi": {"type": "string"},
+                                    "category": {"type": "string"},
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                    },
                                 },
+                                "required": [
+                                    "title_en",
+                                    "title_hi",
+                                    "description_en",
+                                    "description_hi",
+                                    "category",
+                                    "tags",
+                                ],
                             },
-                            "required": [
-                                "title_en",
-                                "title_hi",
-                                "description_en",
-                                "description_hi",
-                                "category",
-                                "tags",
-                            ],
-                        },
-                    ),
-                )
+                        ),
+                    )
 
-                data = json.loads(response.text)
-                return ListingGenerateResponse(
-                    title_en=self._sanitize_customer_facing_text(data.get("title_en", "Handcrafted Artisan Product")),
-                    title_hi=self._sanitize_customer_facing_text(data.get("title_hi", "हस्तनिर्मित उत्पाद")),
-                    description_en=self._sanitize_customer_facing_text(data.get("description_en", "")),
-                    description_hi=self._sanitize_customer_facing_text(data.get("description_hi", "")),
-                    category=data.get("category", request.category_hint or "General"),
-                    tags=self._sanitize_tags(data.get("tags", ["handmade", "handicraft", "artisan"])),
-                    cost_inputs=extracted_costs,
-                )
-            except Exception as e:
-                logger.error("[CatalogService] Gemini listing generation failed: %s", e)
+                    data = json.loads(response.text)
+                    return ListingGenerateResponse(
+                        title_en=self._sanitize_customer_facing_text(data.get("title_en", "Handcrafted Artisan Product")),
+                        title_hi=self._sanitize_customer_facing_text(data.get("title_hi", "हस्तनिर्मित उत्पाद")),
+                        description_en=self._sanitize_customer_facing_text(data.get("description_en", "")),
+                        description_hi=self._sanitize_customer_facing_text(data.get("description_hi", "")),
+                        category=data.get("category", request.category_hint or "General"),
+                        tags=self._sanitize_tags(data.get("tags", ["handmade", "handicraft", "artisan"])),
+                        cost_inputs=extracted_costs,
+                    )
+                except Exception as e:
+                    gemini_error = _categorize_gemini_error(e)
+                    logger.error(
+                        "[CatalogService] Gemini listing generation failed (attempt %d): %s (%s)",
+                        attempt + 1,
+                        e,
+                        gemini_error,
+                    )
+                    if gemini_error in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break  # Do NOT retry non-transient failures
+                    if attempt == 0:
+                        import asyncio
+                        await asyncio.sleep(1)  # Brief backoff before retry
 
-        # ── 3. Offline / Mock Fallback ──────────────────────────────────────
-        clean_text = self._sanitize_customer_facing_text((request.transcript or "").strip())
-        detected_cat = effective_category or request.category_hint or "Handicrafts"
-        title_snippet = (clean_text[:50] + "...") if len(clean_text) > 50 else clean_text
-        return ListingGenerateResponse(
-            title_en=f"Handcrafted {detected_cat} Item: {title_snippet}" if title_snippet else f"Handcrafted {detected_cat} Artisan Product",
-            title_hi="प्रामाणिक हस्तशिल्प उत्पाद",
-            description_en=clean_text or "Authentic handcrafted artisanal creation with traditional craft value.",
-            description_hi="पारंपरिक कला व कारीगरी से बना प्रामाणिक हस्तशिल्प उत्पाद।",
-            category=detected_cat,
-            tags=self._sanitize_tags(["handcrafted", "artisan", detected_cat.lower().replace(" ", "-"), "made-in-india"]),
-            cost_inputs=extracted_costs,
+        # Both providers failed: raise a typed error
+        raise RuntimeError(
+            "AI_LISTING_GENERATION_FAILED: Both Groq and Gemini listing generation failed. "
+            "No listing was produced."
         )
 
     # ── Voice Cost Cue Extractor ────────────────────────────────────────────
@@ -570,7 +611,7 @@ Return ONLY a valid JSON object matching keys: materials, labor_hours, hourly_ra
                     {"role": "system", "content": "You are a cost extraction assistant. Return ONLY valid JSON with keys: materials, labor_hours, hourly_rate, transport, overhead."},
                     {"role": "user", "content": cost_prompt},
                 ]
-                data = await self.groq_client.chat_json(groq_messages)
+                data = await self.groq_client.chat_json(groq_messages, max_tokens=512)
                 mat = float(data.get("materials", 0.0) or 0.0)
                 hrs = float(data.get("labor_hours", 0.0) or 0.0)
                 rate = float(data.get("hourly_rate", 50.0) or 50.0)
@@ -585,46 +626,54 @@ Return ONLY a valid JSON object matching keys: materials, labor_hours, hourly_ra
                     overhead=float(data.get("overhead", 0.0) or 0.0),
                 )
             except Exception as e:
-                logger.warning("[CatalogService] Groq cost extraction failed, falling back: %s", e)
+                error_code = _categorize_groq_error(e)
+                logger.warning("[CatalogService] Groq cost extraction failed (%s): %s", error_code, e)
 
         # 3. Try Google Gemini if available
         if self.client:
-            try:
-                response = await run_in_threadpool(
-                    self.client.models.generate_content,
-                    model=self.settings.llm_model,
-                    contents=cost_prompt,
-                    config=types.GenerateContentConfig(
-                        temperature=0.0,
-                        response_mime_type="application/json",
-                        response_schema={
-                            "type": "object",
-                            "properties": {
-                                "materials": {"type": "number"},
-                                "labor_hours": {"type": "number"},
-                                "hourly_rate": {"type": "number"},
-                                "transport": {"type": "number"},
-                                "overhead": {"type": "number"},
+            gemini_error: Optional[str] = None
+            for attempt in range(2):  # Bounded retry
+                try:
+                    response = await run_in_threadpool(
+                        self.client.models.generate_content,
+                        model=self.settings.llm_model,
+                        contents=cost_prompt,
+                        config=types.GenerateContentConfig(
+                            temperature=0.0,
+                            response_mime_type="application/json",
+                            response_schema={
+                                "type": "object",
+                                "properties": {
+                                    "materials": {"type": "number"},
+                                    "labor_hours": {"type": "number"},
+                                    "hourly_rate": {"type": "number"},
+                                    "transport": {"type": "number"},
+                                    "overhead": {"type": "number"},
+                                },
                             },
-                        },
-                    ),
-                )
-                data = json.loads(response.text)
-                mat = float(data.get("materials", 0.0) or 0.0)
-                hrs = float(data.get("labor_hours", 0.0) or 0.0)
-                rate = float(data.get("hourly_rate", 50.0) or 50.0)
-                final_mat = mat if mat > 0 else base_costs.materials
-                final_hrs = hrs if hrs > 0 else base_costs.labor_hours
-                final_rate = rate if rate > 0 else (base_costs.hourly_rate if final_hrs > 0 else DEFAULT_HOURLY_RATE)
-                return CostInputsSchema(
-                    materials=final_mat,
-                    labor_hours=final_hrs,
-                    hourly_rate=final_rate,
-                    transport=float(data.get("transport", 0.0) or 0.0),
-                    overhead=float(data.get("overhead", 0.0) or 0.0),
-                )
-            except Exception as e:
-                logger.warning("[CatalogService] Gemini cost extraction failed: %s", e)
+                        ),
+                    )
+                    data = json.loads(response.text)
+                    mat = float(data.get("materials", 0.0) or 0.0)
+                    hrs = float(data.get("labor_hours", 0.0) or 0.0)
+                    rate = float(data.get("hourly_rate", 50.0) or 50.0)
+                    final_mat = mat if mat > 0 else base_costs.materials
+                    final_hrs = hrs if hrs > 0 else base_costs.labor_hours
+                    final_rate = rate if rate > 0 else (base_costs.hourly_rate if final_hrs > 0 else DEFAULT_HOURLY_RATE)
+                    return CostInputsSchema(
+                        materials=final_mat,
+                        labor_hours=final_hrs,
+                        hourly_rate=final_rate,
+                        transport=float(data.get("transport", 0.0) or 0.0),
+                        overhead=float(data.get("overhead", 0.0) or 0.0),
+                    )
+                except Exception as e:
+                    gemini_error = _categorize_gemini_error(e)
+                    logger.warning("[CatalogService] Gemini cost extraction failed (attempt %d, %s): %s", attempt + 1, gemini_error, e)
+                    if gemini_error in ("AI_MODEL_UNAVAILABLE", "AI_RATE_LIMITED"):
+                        break
+                    if attempt == 0:
+                        await asyncio.sleep(1)
 
         # 4. Fall back to deterministic regex extraction
         return base_costs
