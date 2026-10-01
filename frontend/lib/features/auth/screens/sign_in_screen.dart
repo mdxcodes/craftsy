@@ -51,7 +51,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             ),
           ),
         );
-        return;
       }
       context.pushNamed(
         AppRouteConstants.otp,
