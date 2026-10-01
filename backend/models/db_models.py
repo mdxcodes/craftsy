@@ -7,10 +7,24 @@ Two core tables:
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey, Boolean, Integer
 from sqlalchemy.orm import relationship
 from ..database import Base
+
+
+class OtpTransactionDB(Base):
+    """Server-side OTP transaction for demo-mode verification."""
+
+    __tablename__ = "otp_transactions"
+
+    id = Column(String(64), primary_key=True, index=True)
+    phone = Column(String(15), nullable=False, index=True)
+    provider = Column(String(32), default="startmessaging", nullable=False)
+    request_id = Column(String(128), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+    consumed = Column(Boolean, default=False, nullable=False)
 
 
 class ArtisanDB(Base):

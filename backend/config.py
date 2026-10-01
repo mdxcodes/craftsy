@@ -167,11 +167,19 @@ class Settings(BaseSettings):
         default="",
         description="StartMessaging OTP template ID for SMS delivery (optional).",
     )
+    startmessaging_base_url: str = Field(
+        default="https://api.startmessaging.com",
+        description="StartMessaging API base URL.",
+    )
 
     # OTP verification mode: "provider" or "demo"
     otp_verification_mode: str = Field(
         default="provider",
         description="OTP verification mode: 'provider' uses StartMessaging verify, 'demo' accepts any valid 6-digit OTP.",
+    )
+    otp_transaction_expire_seconds: int = Field(
+        default=300,
+        description="OTP transaction expiry time in seconds.",
     )
 
     # Cloudinary Image Storage (optional; falls back to local uploads if absent)
