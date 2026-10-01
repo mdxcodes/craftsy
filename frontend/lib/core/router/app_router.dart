@@ -139,8 +139,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: AppRouteConstants.otp,
         builder: (context, state) {
           final phoneNumber = state.uri.queryParameters['phone'] ?? '';
+          final requestId = state.uri.queryParameters['request_id'] ?? '';
           final isNewUser = state.uri.queryParameters['isNewUser'] == 'true';
-          return OtpScreen(phoneNumber: phoneNumber, isNewUser: isNewUser);
+          return OtpScreen(phoneNumber: phoneNumber, requestId: requestId, isNewUser: isNewUser);
         },
       ),
       GoRoute(

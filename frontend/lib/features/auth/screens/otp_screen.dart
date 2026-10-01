@@ -13,11 +13,13 @@ import '../providers/auth_provider.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
+  final String requestId;
   final bool isNewUser;
 
   const OtpScreen({
     super.key,
     required this.phoneNumber,
+    this.requestId = '',
     this.isNewUser = false,
   });
 
@@ -48,14 +50,37 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     if (otp.isEmpty) {
       otp = '123456';
     }
+    if (otp.length != 6 || !otp.contains(RegExp(r'^\d{6}$'))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('auth_invalid_otp_format'.tr()),
+          backgroundColor: AppColors.sienna,
+        ),
+      );
+      return;
+    }
+
     final notifier = ref.read(authStateProvider.notifier);
-    await notifier.verifyOtp(
+    final success = await notifier.verifyOtp(
       widget.phoneNumber.isEmpty ? '9876543210' : widget.phoneNumber,
       otp,
+      requestId: widget.requestId,
     );
     await ref.read(userProfileProvider.notifier).reloadProfile();
-    if (mounted) {
+    if (!mounted) return;
+
+    if (success) {
       context.goNamed(AppRouteConstants.home);
+    } else {
+      final errorMessage = ref.read(authStateProvider).errorMessage;
+      if (errorMessage != null && errorMessage.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: AppColors.sienna,
+          ),
+        );
+      }
     }
   }
 
