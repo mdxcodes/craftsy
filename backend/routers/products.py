@@ -9,13 +9,13 @@ import logging
 import uuid
 from datetime import datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, Form, Request
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
 from ..database import get_db
-from ..models.db_models import ProductDB
+from ..models.db_models import ArtisanDB, ProductDB
 from ..models.schemas import (
     ProductCreate,
     ProductUpdate,
@@ -24,31 +24,35 @@ from ..models.schemas import (
     ProductSyncResponse,
 )
 from ..services.cloudinary_service import cloudinary_service
+from ..utils.authorization import get_artisan_from_x_user_id, verify_product_owner
 
 router = APIRouter(prefix="/api/v1/products", tags=["Products"])
 
 
+def _handle_permission_error(exc: PermissionError) -> None:
+    raise HTTPException(status_code=403, detail=str(exc))
+
+
+def _get_current_artisan(request: Request, db: Session) -> ArtisanDB:
+    artisan = get_artisan_from_x_user_id(request, db)
+    if not artisan:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return artisan
+
+
 @router.get("", response_model=List[ProductResponse])
 async def list_products(
-    artisan_id: Optional[str] = Query(None, description="Filter by owner artisan ID"),
-    category: Optional[str] = Query(None, description="Filter by craft category"),
-    status: Optional[str] = Query(None, description="Filter by status (live, draft)"),
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """
-    List all catalog products with optional category/status filters.
+    List the authenticated artisan's own catalog products.
     """
-    query = db.query(ProductDB)
-    if artisan_id:
-        query = query.filter(ProductDB.artisan_id == artisan_id)
-    if category:
-        query = query.filter(ProductDB.category.ilike(f"%{category}%"))
-    if status:
-        query = query.filter(ProductDB.status == status)
+    artisan = _get_current_artisan(request, db)
 
-    items = query.order_by(ProductDB.created_at.desc()).offset(offset).limit(limit).all()
+    query = db.query(ProductDB).filter(ProductDB.artisan_id == artisan.id)
+
+    items = query.order_by(ProductDB.created_at.desc()).all()
 
     return [
         ProductResponse(
@@ -98,12 +102,15 @@ async def get_product(product_id: str, db: Session = Depends(get_db)):
 
 @router.post("", response_model=ProductResponse, status_code=201)
 async def create_product(
+    request: Request,
     product: ProductCreate,
     db: Session = Depends(get_db),
 ):
     """Create a new artisan product listing."""
+    artisan = _get_current_artisan(request, db)
+
     prod_id = product.id if product.id else f"prod_{uuid.uuid4().hex[:10]}"
-    
+
     existing = db.query(ProductDB).filter(ProductDB.id == prod_id).first()
     if existing:
         existing.title = product.title
@@ -124,7 +131,7 @@ async def create_product(
     else:
         db_item = ProductDB(
             id=prod_id,
-            artisan_id=product.artisan_id,
+            artisan_id=artisan.id,
             title=product.title,
             title_hi=product.title_hi or "",
             description=product.description,
@@ -163,9 +170,13 @@ async def create_product(
 
 @router.post("/upload-image", response_model=dict)
 async def upload_product_image(
+    request: Request,
     image: UploadFile = File(...),
+    db: Session = Depends(get_db),
 ):
     """Upload a product image to Cloudinary and return the permanent URL."""
+    _get_current_artisan(request, db)
+
     try:
         import tempfile
         import os
@@ -200,14 +211,22 @@ async def upload_product_image(
 
 @router.put("/{product_id}", response_model=ProductResponse)
 async def update_product(
+    request: Request,
     product_id: str,
     update_data: ProductUpdate,
     db: Session = Depends(get_db),
 ):
     """Update product fields."""
+    artisan = _get_current_artisan(request, db)
+
     db_item = db.query(ProductDB).filter(ProductDB.id == product_id).first()
     if not db_item:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    try:
+        verify_product_owner(artisan, db_item)
+    except PermissionError as exc:
+        _handle_permission_error(exc)
 
     if update_data.title is not None:
         db_item.title = update_data.title
@@ -297,11 +316,18 @@ async def update_product(
 
 
 @router.delete("/{product_id}")
-async def delete_product(product_id: str, db: Session = Depends(get_db)):
+async def delete_product(request: Request, product_id: str, db: Session = Depends(get_db)):
     """Delete product from database and remove associated Cloudinary image if present."""
+    artisan = _get_current_artisan(request, db)
+
     db_item = db.query(ProductDB).filter(ProductDB.id == product_id).first()
     if not db_item:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    try:
+        verify_product_owner(artisan, db_item)
+    except PermissionError as exc:
+        _handle_permission_error(exc)
 
     # Delete Cloudinary image before removing the database record
     cloudinary_public_id = db_item.cloudinary_public_id
@@ -325,6 +351,7 @@ async def delete_product(product_id: str, db: Session = Depends(get_db)):
 
 @router.post("/sync", response_model=ProductSyncResponse)
 async def sync_offline_products(
+    request: Request,
     batch: ProductSyncBatch,
     db: Session = Depends(get_db),
 ):
@@ -332,6 +359,8 @@ async def sync_offline_products(
     Batch drain endpoint for Flutter's offline queue.
     Accepts products captured while offline and persists them.
     """
+    artisan = _get_current_artisan(request, db)
+
     synced_items = []
     for item in batch.products:
         prod_id = item.id if item.id else f"prod_{uuid.uuid4().hex[:10]}"
@@ -351,7 +380,7 @@ async def sync_offline_products(
         else:
             db_item = ProductDB(
                 id=prod_id,
-                artisan_id=item.artisan_id,
+                artisan_id=artisan.id,
                 title=item.title,
                 title_hi=item.title_hi or "",
                 description=item.description,

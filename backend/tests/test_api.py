@@ -16,14 +16,51 @@ if sys.platform == "win32":
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from backend.main import app
+from backend.database import Base, get_db
+from backend.models.db_models import ArtisanDB, ProductDB
 
 client = TestClient(app)
+
+
+def _setup_db():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(bind=engine)
+    TestSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = TestSession()
+    return session
+
+
+def _create_artisan(db, phone="9876543210"):
+    artisan = ArtisanDB(
+        id=f"artisan_{phone[-4:]}",
+        name="Test Artisan",
+        phone=phone,
+        craft_type="Pottery",
+        location_cluster="Test Cluster",
+        state="Delhi",
+        preferred_language="en",
+        role="artisan",
+    )
+    db.add(artisan)
+    db.commit()
+    return artisan
+
+
+def _headers(phone: str) -> dict:
+    return {"X-User-Id": f"artisan_{phone[-4:]}"}
 
 
 def test_health():
@@ -63,51 +100,67 @@ def test_pricing_suggest():
 
 def test_products_crud_and_sync():
     """Test product listing, creation, and offline batch sync."""
-    res = client.get("/api/v1/products")
-    assert res.status_code == 200
-    initial_products = res.json()
-    assert isinstance(initial_products, list)
+    db = _setup_db()
 
-    new_prod = {
-        "title": "Test Dokra Brass Figurine",
-        "description": "Lost wax cast brass craft",
-        "price": 1500.0,
-        "image_url": "/uploads/images/test.jpg",
-        "category": "Jewelry",
-        "tags": ["dokra", "brass", "tribal"],
-        "status": "live",
-    }
-    res_create = client.post("/api/v1/products", json=new_prod)
-    assert res_create.status_code == 201
-    created = res_create.json()
-    prod_id = created["id"]
+    def override_get_db():
+        try:
+            yield db
+        finally:
+            pass
 
-    res_get = client.get(f"/api/v1/products/{prod_id}")
-    assert res_get.status_code == 200
-    assert res_get.json()["title"] == "Test Dokra Brass Figurine"
+    app.dependency_overrides[get_db] = override_get_db
+    try:
+        artisan = _create_artisan(db)
+        headers = _headers(artisan.phone)
 
-    sync_payload = {
-        "products": [
-            {
-                "id": "offline_prod_101",
-                "title": "Offline Queued Saree",
-                "description": "Handloom silk saree captured offline",
-                "price": 4200.0,
-                "image_url": "/uploads/images/offline.jpg",
-                "category": "Textiles",
-                "tags": ["offline", "sync"],
-                "status": "pendingSync",
-            }
-        ]
-    }
-    res_sync = client.post("/api/v1/products/sync", json=sync_payload)
-    assert res_sync.status_code == 200
-    sync_data = res_sync.json()
-    assert sync_data["synced_count"] == 1
-    assert sync_data["products"][0]["id"] == "offline_prod_101"
+        res = client.get("/api/v1/products", headers=headers)
+        assert res.status_code == 200
+        initial_products = res.json()
+        assert isinstance(initial_products, list)
 
-    res_del = client.delete(f"/api/v1/products/{prod_id}")
-    assert res_del.status_code == 200
+        new_prod = {
+            "title": "Test Dokra Brass Figurine",
+            "description": "Lost wax cast brass craft",
+            "price": 1500.0,
+            "image_url": "/uploads/images/test.jpg",
+            "category": "Jewelry",
+            "tags": ["dokra", "brass", "tribal"],
+            "status": "live",
+        }
+        res_create = client.post("/api/v1/products", json=new_prod, headers=headers)
+        assert res_create.status_code == 201
+        created = res_create.json()
+        prod_id = created["id"]
+
+        res_get = client.get(f"/api/v1/products/{prod_id}", headers=headers)
+        assert res_get.status_code == 200
+        assert res_get.json()["title"] == "Test Dokra Brass Figurine"
+
+        sync_payload = {
+            "products": [
+                {
+                    "id": "offline_prod_101",
+                    "title": "Offline Queued Saree",
+                    "description": "Handloom silk saree captured offline",
+                    "price": 4200.0,
+                    "image_url": "/uploads/images/offline.jpg",
+                    "category": "Textiles",
+                    "tags": ["offline", "sync"],
+                    "status": "pendingSync",
+                }
+            ]
+        }
+        res_sync = client.post("/api/v1/products/sync", json=sync_payload, headers=headers)
+        assert res_sync.status_code == 200
+        sync_data = res_sync.json()
+        assert sync_data["synced_count"] == 1
+        assert sync_data["products"][0]["id"] == "offline_prod_101"
+
+        res_del = client.delete(f"/api/v1/products/{prod_id}", headers=headers)
+        assert res_del.status_code == 200
+    finally:
+        app.dependency_overrides.clear()
+        db.close()
 
 
 def test_catalog_listing_generation():

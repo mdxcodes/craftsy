@@ -89,15 +89,17 @@ class DraftResumeCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                AppButton(
-                  label: 'draft_resume_action'.tr(),
-                  icon: Icons.arrow_forward_rounded,
-                  type: AppButtonType.primary,
-                  onPressed: () {
-                    context.pushNamed(AppRouteConstants.addProduct);
-                  },
-                ),
+    const SizedBox(width: AppSpacing.sm),
+    Flexible(
+      child: AppButton(
+        label: 'draft_resume_action'.tr(),
+        icon: Icons.arrow_forward_rounded,
+        type: AppButtonType.primary,
+        onPressed: () {
+          context.pushNamed(AppRouteConstants.addProduct);
+        },
+      ),
+    ),
               ],
             ),
           ),

@@ -111,7 +111,12 @@ final apiServiceProvider = Provider<ApiService>((ref) {
   if (kMockAiBackend) {
     return MockApiService();
   }
-  return HttpApiService();
+  return HttpApiService(
+    userIdProvider: () async {
+      final profile = ref.read(userProfileProvider);
+      return profile.id.isNotEmpty ? profile.id : null;
+    },
+  );
 });
 
 final imageEnhancerServiceProvider = Provider<ImageEnhancerService>((ref) {

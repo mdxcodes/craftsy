@@ -16,9 +16,11 @@ abstract class ApiService {
 class HttpApiService implements ApiService {
   final Dio _dio;
   final String? _explicitBaseUrl;
+  final Future<String?> Function()? _userIdProvider;
 
-  HttpApiService({String? baseUrl, Dio? dio})
+  HttpApiService({String? baseUrl, Dio? dio, Future<String?> Function()? userIdProvider})
     : _explicitBaseUrl = baseUrl,
+      _userIdProvider = userIdProvider,
       _dio =
           dio ??
           Dio(
@@ -39,6 +41,17 @@ class HttpApiService implements ApiService {
     _dio.options.baseUrl = activeUrl;
   }
 
+  Future<Map<String, String>> _getAuthHeaders() async {
+    final headers = <String, String>{};
+    if (_userIdProvider != null) {
+      final userId = await _userIdProvider!();
+      if (userId != null && userId.isNotEmpty) {
+        headers['X-User-Id'] = userId;
+      }
+    }
+    return headers;
+  }
+
   @override
   Future<List<Product>> getProducts({
     String? artisanId,
@@ -51,6 +64,7 @@ class HttpApiService implements ApiService {
         if (category != null && category.isNotEmpty) 'category': category,
         'limit': 100,
       };
+      final headers = await _getAuthHeaders();
 
       debugPrint(
         '[HttpApiService] GET ${_dio.options.baseUrl}/api/v1/products',
@@ -58,6 +72,7 @@ class HttpApiService implements ApiService {
       final response = await _dio.get(
         '/api/v1/products',
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
+        options: Options(headers: headers),
       );
 
       if (response.statusCode == 200 && response.data != null) {
@@ -81,10 +96,15 @@ class HttpApiService implements ApiService {
     _syncBaseUrl();
     try {
       final payload = product.toBackendJson(artisanId: artisanId);
+      final headers = await _getAuthHeaders();
       debugPrint(
         '[HttpApiService] POST ${_dio.options.baseUrl}/api/v1/products: ${product.title}',
       );
-      final response = await _dio.post('/api/v1/products', data: payload);
+      final response = await _dio.post(
+        '/api/v1/products',
+        data: payload,
+        options: Options(headers: headers),
+      );
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           response.data != null) {
@@ -108,12 +128,14 @@ class HttpApiService implements ApiService {
     _syncBaseUrl();
     try {
       final payload = product.toBackendJson();
+      final headers = await _getAuthHeaders();
       debugPrint(
         '[HttpApiService] PUT ${_dio.options.baseUrl}/api/v1/products/${product.id}',
       );
       final response = await _dio.put(
         '/api/v1/products/${product.id}',
         data: payload,
+        options: Options(headers: headers),
       );
 
       if (response.statusCode == 200 && response.data != null) {
@@ -136,10 +158,14 @@ class HttpApiService implements ApiService {
   Future<bool> deleteProduct(String id) async {
     _syncBaseUrl();
     try {
+      final headers = await _getAuthHeaders();
       debugPrint(
         '[HttpApiService] DELETE ${_dio.options.baseUrl}/api/v1/products/$id',
       );
-      final response = await _dio.delete('/api/v1/products/$id');
+      final response = await _dio.delete(
+        '/api/v1/products/$id',
+        options: Options(headers: headers),
+      );
       return response.statusCode == 200;
     } on DioException catch (e) {
       debugPrint('[HttpApiService] deleteProduct failed: ${e.message}');

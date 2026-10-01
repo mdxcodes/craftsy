@@ -124,16 +124,16 @@ class _GreetingHeader extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       if (name != null && name!.isNotEmpty)
-                         Semantics(
-                           label: 'home_greeting'.tr(args: [name!]),
-                           child: Text(
-                             'home_greeting'.tr(args: [name!]),
-                             style: AppTextStyles.headlineLarge.copyWith(
-                               color: AppColors.cardSurface,
-                             ),
-                           ),
-                         )
+                        if (name != null && name!.isNotEmpty)
+                          Semantics(
+                            label: 'home_greeting'.tr(context: context, namedArgs: {'name': name!}),
+                            child: Text(
+                              'home_greeting'.tr(context: context, namedArgs: {'name': name!}),
+                              style: AppTextStyles.headlineLarge.copyWith(
+                                color: AppColors.cardSurface,
+                              ),
+                            ),
+                          )
                        else
                          Semantics(
                            label: 'home_greeting_no_name'.tr(),
@@ -575,12 +575,27 @@ class _EarningsMetric extends StatelessWidget {
 // Marketplace Preview Section
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _MarketplacePreviewSection extends ConsumerWidget {
+class _MarketplacePreviewSection extends ConsumerStatefulWidget {
   const _MarketplacePreviewSection();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MarketplacePreviewSection> createState() => _MarketplacePreviewSectionState();
+}
+
+class _MarketplacePreviewSectionState extends ConsumerState<_MarketplacePreviewSection> {
+  Future<List<MarketplaceProduct>>? _cachedFuture;
+  bool? _lastIsOnline;
+
+  @override
+  Widget build(BuildContext context) {
     final isOnline = ref.watch(connectivityProvider).value ?? true;
+
+    if (_cachedFuture == null || _lastIsOnline != isOnline) {
+      _lastIsOnline = isOnline;
+      _cachedFuture = isOnline
+          ? marketplaceService.getProducts(limit: 10)
+          : Future.value(<MarketplaceProduct>[]);
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -591,18 +606,18 @@ class _MarketplacePreviewSection extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'home_marketplace_title'.tr(),
+                'home_marketplace_title'.tr(context: context),
                 style: AppTextStyles.headlineSmall,
               ),
               TextButton(
                 onPressed: () => context.pushNamed(AppRouteConstants.marketplace),
-                child: Text('home_view_all'.tr()),
+                child: Text('home_view_all'.tr(context: context)),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
           FutureBuilder<List<MarketplaceProduct>>(
-            future: isOnline ? marketplaceService.getProducts(limit: 10) : Future.value(<MarketplaceProduct>[]),
+            future: _cachedFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: Padding(
@@ -614,9 +629,9 @@ class _MarketplacePreviewSection extends ConsumerWidget {
               if (products.isEmpty) {
                 return EmptyState(
                   icon: Icons.storefront_outlined,
-                  title: 'marketplace_no_products'.tr(),
-                  message: 'marketplace_no_products_desc'.tr(),
-                  actionLabel: 'home_start_listing'.tr(),
+                  title: 'marketplace_no_products'.tr(context: context),
+                  message: 'marketplace_no_products_desc'.tr(context: context),
+                  actionLabel: 'home_start_listing'.tr(context: context),
                   onAction: () => context.pushNamed(AppRouteConstants.addProduct),
                 );
               }

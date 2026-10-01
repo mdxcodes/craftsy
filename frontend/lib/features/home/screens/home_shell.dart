@@ -106,15 +106,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        child: IndexedStack(
-          key: ValueKey<int>(currentIndex),
-          index: currentIndex,
-          children: screens,
-        ),
+      body: IndexedStack(
+        key: ValueKey<int>(currentIndex),
+        index: currentIndex,
+        children: screens,
       ),
       floatingActionButton: const CraftMitraFab(),
       bottomNavigationBar: Container(

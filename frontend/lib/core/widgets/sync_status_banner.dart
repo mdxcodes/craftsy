@@ -71,18 +71,21 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner> {
 
         if (failedCount > 0) {
           statusLabel = 'sync_failed_status'.tr(
+            context: context,
             namedArgs: {'count': '$failedCount'},
           );
           statusIcon = Icons.error_outline_rounded;
           statusColor = AppColors.sienna;
         } else if (processingCount > 0) {
           statusLabel = 'syncing_status'.tr(
+            context: context,
             namedArgs: {'count': '$processingCount'},
           );
           statusIcon = Icons.sync_rounded;
           statusColor = AppColors.gold;
         } else {
           statusLabel = 'sync_pending_status'.tr(
+            context: context,
             namedArgs: {'count': '$pendingCount'},
           );
           statusIcon = Icons.cloud_queue_rounded;
