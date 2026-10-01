@@ -1,7 +1,7 @@
 name: craftsy
 description: "AI-driven market linkage and smart cataloging app for marginalized artisans"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.8+2
 
 environment:
   sdk: ^3.12.0
