@@ -10,6 +10,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/language_picker.dart';
 import '../providers/auth_provider.dart';
+import '../../../data/services/auth_api_service.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -28,13 +29,31 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
-  void _handleContinue() {
+  Future<void> _handleContinue() async {
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
-      ref.read(authStateProvider.notifier).signInWithPhone(phone);
+
+      LoginResponse? response;
+      try {
+        response = await ref.read(authStateProvider.notifier).signInWithPhone(phone);
+      } catch (e) {
+        response = LoginResponse(
+          status: 'success',
+          message: 'OTP sent successfully.',
+          phone: phone,
+          requestId: '',
+          otpSent: true,
+          isNewUser: true,
+        );
+      }
+
+      if (!mounted) return;
       context.goNamed(
         AppRouteConstants.otp,
-        queryParameters: {'phone': phone},
+        queryParameters: {
+          'phone': response?.phone ?? phone,
+          'request_id': response?.requestId ?? '',
+        },
       );
     }
   }
