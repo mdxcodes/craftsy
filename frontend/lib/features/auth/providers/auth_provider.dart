@@ -104,7 +104,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } on AuthException catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString(),
+        errorMessage: e.message,
       );
     } catch (e) {
       state = state.copyWith(
@@ -165,21 +165,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
         requestId ?? '',
         otp,
       );
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message,
+      );
+      return false;
     } on DioException catch (e) {
-      String message = 'otp_send_failed'.tr();
-      if (e.response?.data is Map) {
-        final detail = (e.response?.data as Map)['detail'];
-        if (detail is Map) {
-          message = detail['message'] as String? ?? message;
-        } else if (detail is String) {
-          message = detail;
-        }
-      } else if (e.error is String && (e.error as String).isNotEmpty) {
-        message = e.error as String;
-      }
+      final message = _friendlyMessageForDio(e);
       state = state.copyWith(
         isLoading: false,
         errorMessage: message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'We couldn\'t verify the code. Please try again.',
       );
       return false;
     }
@@ -248,7 +250,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } on AuthException catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: e.toString(),
+        errorMessage: e.message,
       );
     } catch (e) {
       state = state.copyWith(
@@ -282,6 +284,31 @@ class AuthNotifier extends StateNotifier<AuthState> {
       errorMessage: null,
       clearErrorMessage: true,
     );
+  }
+
+  String _friendlyMessageForDio(DioException e) {
+    if (e.response?.data is Map) {
+      final data = Map<String, dynamic>.from(e.response!.data as Map);
+      final detail = data['detail'];
+      if (detail is Map<String, dynamic>) {
+        final msg = detail['message'] as String?;
+        if (msg != null && msg.isNotEmpty) return msg;
+      } else if (detail is String && detail.isNotEmpty) {
+        return detail;
+      }
+    }
+    if (e.error is String && (e.error as String).isNotEmpty) {
+      return e.error as String;
+    }
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout =>
+        'Network is slow. Please try again.',
+      DioExceptionType.connectionError =>
+        'No internet connection. Please check and try again.',
+      _ => 'We couldn\'t verify the code. Please try again.',
+    };
   }
 
   Future<void> signInWithCoordinator(String coordinatorId) async {

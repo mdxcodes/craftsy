@@ -564,3 +564,84 @@ class TestAutoCreateUserFlow:
         data = response.json()
         assert data["name"] == "Updated Name"
         assert data["craft_type"] == "Woodwork"
+
+
+# ── OTP Verification Mode ─────────────────────────────────────────────────────
+
+
+class TestOtpVerificationMode:
+    """Tests for OTP_VERIFICATION_MODE=demo."""
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_demo_mode_accepts_any_valid_otp(
+        self, mock_provider_cls, client, db, monkeypatch
+    ):
+        """In demo mode, provider.verify_otp should NOT be called."""
+        _create_artisan(db, phone="9876543210")
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider_cls.return_value = mock_provider
+
+        monkeypatch.setenv("OTP_VERIFICATION_MODE", "demo")
+        from backend.config import get_settings
+
+        get_settings.cache_clear()
+
+        response = client.post(
+            "/api/v1/auth/verify-otp",
+            json={"phone": "9876543210", "request_id": "req_123", "otp": "123456"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert "access_token" in data
+
+        mock_provider.verify_otp.assert_not_called()
+
+    @patch("backend.routers.auth.StartMessagingOtpProvider")
+    def test_provider_mode_rejects_invalid_otp(
+        self, mock_provider_cls, client, db, monkeypatch
+    ):
+        """In provider mode, invalid OTP should still be rejected."""
+        _create_artisan(db, phone="9876543210")
+        mock_provider = MagicMock()
+        mock_provider.is_configured.return_value = True
+        mock_provider.verify_otp.return_value = OtpVerifyResult(
+            success=False,
+            error_code="OTP_INVALID",
+            message="Invalid OTP.",
+        )
+        mock_provider_cls.return_value = mock_provider
+
+        monkeypatch.setenv("OTP_VERIFICATION_MODE", "provider")
+        from backend.config import get_settings
+
+        get_settings.cache_clear()
+
+        response = client.post(
+            "/api/v1/auth/verify-otp",
+            json={"phone": "9876543210", "request_id": "req_123", "otp": "000000"},
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data["detail"]["error_code"] == "OTP_INVALID"
+
+    def test_demo_mode_creates_new_user(self, client, db, monkeypatch):
+        """Demo mode should auto-create a new user if phone doesn't exist."""
+        monkeypatch.setenv("OTP_VERIFICATION_MODE", "demo")
+        from backend.config import get_settings
+
+        get_settings.cache_clear()
+
+        response = client.post(
+            "/api/v1/auth/verify-otp",
+            json={"phone": "7777777777", "request_id": "req_777", "otp": "654321"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["artisan"]["phone"] == "7777777777"
+
+        artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == "7777777777").first()
+        assert artisan is not None
+

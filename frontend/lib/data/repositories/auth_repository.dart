@@ -242,31 +242,62 @@ class AuthRepository {
         return (profile, token);
       }
 
-      if (response.statusCode == 400 && response.data != null) {
-        final data = Map<String, dynamic>.from(response.data as Map);
-        final detail = data['detail'];
-        String message;
-        if (detail is Map<String, dynamic>) {
-          message = detail['message'] as String? ?? 'OTP verification failed.';
-        } else if (detail is String) {
-          message = detail;
-        } else {
-          message = 'OTP verification failed.';
-        }
-        debugPrint('[AuthRepository] verifyOtpWithBackend client error: $message');
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          type: DioExceptionType.badResponse,
-          error: message,
-        );
-      }
+      final message = _friendlyMessageForResponse(response);
+      debugPrint('[AuthRepository] verifyOtpWithBackend error: $message');
+      throw AuthException(message);
     } on DioException catch (e) {
       debugPrint('[AuthRepository] verifyOtpWithBackend failed: ${e.message}');
+      final message = _friendlyMessageForDio(e);
+      throw AuthException(message);
     } catch (e) {
       debugPrint('[AuthRepository] verifyOtpWithBackend unexpected error: $e');
+      throw AuthException('We couldn\'t verify the code. Please try again.');
     }
-    return (null, null);
+  }
+
+  String _friendlyMessageForResponse(Response response) {
+    final status = response.statusCode;
+    if (status == 400 && response.data != null) {
+      final data = Map<String, dynamic>.from(response.data as Map);
+      final detail = data['detail'];
+      if (detail is Map<String, dynamic>) {
+        final msg = detail['message'] as String?;
+        if (msg != null && msg.isNotEmpty) return msg;
+      } else if (detail is String && detail.isNotEmpty) {
+        return detail;
+      }
+    }
+    if (status == 401) return 'The code is incorrect or has expired.';
+    if (status == 404) return 'We couldn\'t verify the code. Please try again.';
+    if (status != null && status >= 500) {
+      return 'Something went wrong on our side. Please try again later.';
+    }
+    return 'We couldn\'t verify the code. Please try again.';
+  }
+
+  String _friendlyMessageForDio(DioException e) {
+    if (e.response?.data is Map) {
+      final data = Map<String, dynamic>.from(e.response!.data as Map);
+      final detail = data['detail'];
+      if (detail is Map<String, dynamic>) {
+        final msg = detail['message'] as String?;
+        if (msg != null && msg.isNotEmpty) return msg;
+      } else if (detail is String && detail.isNotEmpty) {
+        return detail;
+      }
+    }
+    if (e.error is String && (e.error as String).isNotEmpty) {
+      return e.error as String;
+    }
+    return switch (e.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout =>
+        'Network is slow. Please try again.',
+      DioExceptionType.connectionError =>
+        'No internet connection. Please check and try again.',
+      _ => 'We couldn\'t verify the code. Please try again.',
+    };
   }
 
   Future<UserProfile?> updateProfile(UserProfile profile) async {

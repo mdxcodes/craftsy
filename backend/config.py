@@ -168,6 +168,12 @@ class Settings(BaseSettings):
         description="StartMessaging OTP template ID for SMS delivery (optional).",
     )
 
+    # OTP verification mode: "provider" or "demo"
+    otp_verification_mode: str = Field(
+        default="provider",
+        description="OTP verification mode: 'provider' uses StartMessaging verify, 'demo' accepts any valid 6-digit OTP.",
+    )
+
     # Cloudinary Image Storage (optional; falls back to local uploads if absent)
     cloudinary_cloud_name: str = Field(
         default="",

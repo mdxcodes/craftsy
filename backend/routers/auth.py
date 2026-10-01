@@ -26,6 +26,7 @@ from ..models.schemas import (
 from ..services.startmessaging_service import (
     OtpProviderConfigError,
     OtpProviderError,
+    OtpVerifyResult,
     StartMessagingOtpProvider,
 )
 from pydantic import BaseModel, Field
@@ -256,26 +257,31 @@ async def verify_otp(
         db.commit()
         db.refresh(artisan)
 
-    provider = _get_otp_provider()
-    if not provider.is_configured():
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="OTP service is not configured on the server.",
-        )
+    settings = get_settings()
+    otp_mode = (settings.otp_verification_mode or "provider").strip().lower()
+    if otp_mode == "demo":
+        verify_result = OtpVerifyResult(success=True)
+    else:
+        provider = _get_otp_provider()
+        if not provider.is_configured():
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="OTP service is not configured on the server.",
+            )
 
-    verify_result = provider.verify_otp(
-        request_id=str(request.request_id).strip(),
-        otp=request.otp,
-    )
-    if not verify_result.success:
-        status_code = status.HTTP_400_BAD_REQUEST
-        if verify_result.error_code == "OTP_PROVIDER_UNAVAILABLE":
-            status_code = status.HTTP_502_BAD_GATEWAY
-        detail = {
-            "error_code": verify_result.error_code,
-            "message": verify_result.message,
-        }
-        raise HTTPException(status_code=status_code, detail=detail)
+        verify_result = provider.verify_otp(
+            request_id=str(request.request_id).strip(),
+            otp=request.otp,
+        )
+        if not verify_result.success:
+            status_code = status.HTTP_400_BAD_REQUEST
+            if verify_result.error_code == "OTP_PROVIDER_UNAVAILABLE":
+                status_code = status.HTTP_502_BAD_GATEWAY
+            detail = {
+                "error_code": verify_result.error_code,
+                "message": verify_result.message,
+            }
+            raise HTTPException(status_code=status_code, detail=detail)
 
     return AuthResponse(
         status="success",
