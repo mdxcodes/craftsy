@@ -652,8 +652,8 @@ class _MarketplacePreviewSectionState extends ConsumerState<_MarketplacePreviewS
                       ),
                       child: InkWell(
                         onTap: () => context.pushNamed(
-                          AppRouteConstants.marketplace,
-                          extra: product.id,
+                          AppRouteConstants.marketplaceProductDetail,
+                          pathParameters: {'id': product.id},
                         ),
                         borderRadius: BorderRadius.circular(AppRadii.card),
                         child: Column(

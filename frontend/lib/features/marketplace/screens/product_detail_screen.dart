@@ -219,31 +219,37 @@ class _ProductDetailBody extends StatelessWidget {
                         ),
                       ),
 
-                      // Category + stock
-                      const SizedBox(height: AppSpacing.sm),
-                      Wrap(
-                        spacing: AppSpacing.sm,
-                        runSpacing: AppSpacing.sm,
-                        children: [
-                          if (product.category.isNotEmpty)
-                            _InfoChip(
-                              icon: Icons.category_outlined,
-                              label: product.category,
-                            ),
-                          _InfoChip(
-                            icon: outOfStock
-                                ? Icons.error_outline
-                                : Icons.inventory_2_outlined,
-                            label: outOfStock
-                                ? 'product_out_of_stock'.tr()
-                                : 'product_in_stock'
-                                    .tr(namedArgs: {'count': '${product.stock}'}),
-                            color: outOfStock
-                                ? AppColors.sienna
-                                : AppColors.sage,
-                          ),
-                        ],
-                      ),
+                       // Category + stock + artisan
+                       const SizedBox(height: AppSpacing.sm),
+                       Wrap(
+                         spacing: AppSpacing.sm,
+                         runSpacing: AppSpacing.sm,
+                         children: [
+                           if (product.category.isNotEmpty)
+                             _InfoChip(
+                               icon: Icons.category_outlined,
+                               label: product.category,
+                             ),
+                           _InfoChip(
+                             icon: outOfStock
+                                 ? Icons.error_outline
+                                 : Icons.inventory_2_outlined,
+                             label: outOfStock
+                                 ? 'product_out_of_stock'.tr()
+                                 : 'product_in_stock'
+                                     .tr(namedArgs: {'count': '${product.stock}'}),
+                             color: outOfStock
+                                 ? AppColors.sienna
+                                 : AppColors.sage,
+                           ),
+                           if (product.artisanName != null && product.artisanName!.isNotEmpty)
+                             _InfoChip(
+                               icon: Icons.person_outline,
+                               label: product.artisanName!,
+                               color: AppColors.burgundy,
+                             ),
+                         ],
+                       ),
 
                        // Description
                        if (product.description.isNotEmpty) ...[
