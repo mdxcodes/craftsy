@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/services/auth_api_service.dart';
 
 /// Auth state model
 class AuthState {
@@ -43,8 +44,11 @@ class AuthState {
 /// Auth state notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
+  final AuthApiService _authApiService;
 
-  AuthNotifier(this._authRepository) : super(const AuthState()) {
+  AuthNotifier(this._authRepository, {AuthApiService? authApiService})
+    : _authApiService = authApiService ?? HttpAuthApiService(),
+      super(const AuthState()) {
     _checkAuthStatus();
   }
 
@@ -64,13 +68,30 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       isLoading: true,
       pendingRegistration: () => null,
+      errorMessage: null,
     );
-    await Future.delayed(const Duration(milliseconds: 500));
-    await _authRepository.savePhoneNumber(phoneNumber);
-    state = state.copyWith(
-      phoneNumber: phoneNumber,
-      isLoading: false,
-    );
+
+    try {
+      final response = await _authApiService.sendOtp(phoneNumber);
+      await _authRepository.savePhoneNumber(response.phone);
+
+      state = state.copyWith(
+        phoneNumber: response.phone,
+        isLoading: false,
+      );
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message,
+      );
+      rethrow;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to send OTP. Please try again.',
+      );
+      rethrow;
+    }
   }
 
   Future<void> registerWithDetails(UserProfile profile) async {
@@ -85,34 +106,53 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<bool> verifyOtp(String phoneNumber, String otp, {UserProfile? profileOverride}) async {
-    state = state.copyWith(isLoading: true);
-    // Mock: accept any OTP in demo mode
-    await Future.delayed(const Duration(milliseconds: 500));
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
-    final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
-    final userId = 'artisan_${DateTime.now().millisecondsSinceEpoch}';
-    await _authRepository.saveAuthData(userId, effectivePhone);
+    try {
+      final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
+      final requestId = state.userId ?? '';
 
-    final registrationProfile = profileOverride ?? state.pendingRegistration;
-    if (registrationProfile != null) {
-      final finalProfile = registrationProfile.copyWith(
-        id: userId,
+      final response = await _authApiService.verifyOtp(
         phone: effectivePhone,
+        requestId: requestId,
+        otp: otp,
       );
-      if (Hive.isBoxOpen('user_profile_box')) {
-        final box = Hive.box<UserProfile>('user_profile_box');
-        await box.put('current_profile', finalProfile);
-      }
-    }
 
-    state = state.copyWith(
-      isAuthenticated: true,
-      userId: userId,
-      phoneNumber: effectivePhone,
-      isLoading: false,
-      pendingRegistration: () => null,
-    );
-    return true;
+      await _authRepository.saveAuthData(response.artisan.id, effectivePhone);
+
+      final registrationProfile = profileOverride ?? state.pendingRegistration;
+      if (registrationProfile != null) {
+        final finalProfile = registrationProfile.copyWith(
+          id: response.artisan.id,
+          phone: effectivePhone,
+        );
+        if (Hive.isBoxOpen('user_profile_box')) {
+          final box = Hive.box<UserProfile>('user_profile_box');
+          await box.put('current_profile', finalProfile);
+        }
+      }
+
+      state = state.copyWith(
+        isAuthenticated: true,
+        userId: response.artisan.id,
+        phoneNumber: effectivePhone,
+        isLoading: false,
+        pendingRegistration: () => null,
+      );
+      return true;
+    } on AuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to verify OTP. Please try again.',
+      );
+      return false;
+    }
   }
 
   Future<void> signInWithCoordinator(String coordinatorId) async {
@@ -163,7 +203,15 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
 });
 
+/// Provider for auth API service
+final authApiServiceProvider = Provider<AuthApiService>((ref) {
+  return HttpAuthApiService();
+});
+
 /// Provider for auth state
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.watch(authRepositoryProvider));
+  return AuthNotifier(
+    ref.watch(authRepositoryProvider),
+    authApiService: ref.watch(authApiServiceProvider),
+  );
 });
