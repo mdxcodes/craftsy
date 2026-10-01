@@ -261,6 +261,7 @@ class StartMessagingOtpProvider:
         self.require_configured()
 
         if not request_id or not request_id.strip():
+            logger.warning("StartMessaging verify OTP missing request_id")
             return OtpVerifyResult(
                 success=False,
                 error_code="OTP_INVALID",
@@ -268,6 +269,7 @@ class StartMessagingOtpProvider:
             )
 
         if not re.fullmatch(r"\d{4,8}", otp or ""):
+            logger.warning("StartMessaging verify OTP invalid OTP format")
             return OtpVerifyResult(
                 success=False,
                 error_code="OTP_INVALID",
@@ -280,9 +282,12 @@ class StartMessagingOtpProvider:
             "otpCode": otp.strip(),
         }
 
+        masked_request_id = request_id.strip()[:8] + "****" if len(request_id.strip()) >= 8 else "****"
         logger.info(
-            "StartMessaging verify OTP request: request_id=%s",
-            request_id,
+            "StartMessaging verify OTP request: masked_request_id=%s otp_length=%s url=%s",
+            masked_request_id,
+            len(otp.strip()),
+            STARTMESSAGING_VERIFY_OTP_URL,
         )
 
         try:
@@ -296,9 +301,9 @@ class StartMessagingOtpProvider:
                 timeout=15,
             )
             logger.info(
-                "StartMessaging verify OTP response status=%s body=%s",
+                "StartMessaging verify OTP response: status=%s body=%s",
                 response.status_code,
-                response.text[:200],
+                response.text[:400],
             )
         except requests.RequestException as exc:
             logger.error("StartMessaging verify OTP network error: %s", exc)
@@ -312,22 +317,26 @@ class StartMessagingOtpProvider:
             try:
                 data = response.json()
             except ValueError:
+                logger.error("StartMessaging verify OTP invalid JSON response")
                 return OtpVerifyResult(
                     success=False,
                     error_code="OTP_INVALID",
                     message="Invalid response from StartMessaging.",
                 )
 
+            logger.info("StartMessaging verify OTP parsed response: %s", data)
             verified = data.get("verified") or (
                 isinstance(data.get("data"), dict) and data["data"].get("verified")
             )
             if verified:
+                logger.info("StartMessaging verify OTP success")
                 return OtpVerifyResult(success=True)
 
             message = data.get("message") or data.get("msg") or ""
             message_lower = str(message).lower()
 
             if "expired" in message_lower:
+                logger.warning("StartMessaging verify OTP expired")
                 return OtpVerifyResult(
                     success=False,
                     error_code="OTP_EXPIRED",
@@ -335,12 +344,14 @@ class StartMessagingOtpProvider:
                 )
 
             if "invalid" in message_lower or "incorrect" in message_lower:
+                logger.warning("StartMessaging verify OTP invalid: %s", message)
                 return OtpVerifyResult(
                     success=False,
                     error_code="OTP_INVALID",
                     message="Invalid OTP. Please check and try again.",
                 )
 
+            logger.warning("StartMessaging verify OTP failed without clear reason: %s", data)
             return OtpVerifyResult(
                 success=False,
                 error_code="OTP_INVALID",
@@ -348,12 +359,18 @@ class StartMessagingOtpProvider:
             )
 
         if response.status_code == 401:
+            logger.error("StartMessaging verify OTP authentication failed")
             return OtpVerifyResult(
                 success=False,
                 error_code="AUTHENTICATION_FAILED",
                 message="StartMessaging authentication failed.",
             )
 
+        logger.error(
+            "StartMessaging verify OTP unexpected HTTP status: %s body=%s",
+            response.status_code,
+            response.text[:200],
+        )
         return OtpVerifyResult(
             success=False,
             error_code="OTP_INVALID",
