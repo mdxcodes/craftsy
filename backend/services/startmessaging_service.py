@@ -222,7 +222,15 @@ class StartMessagingOtpProvider:
                     message="Invalid response from StartMessaging.",
                 )
 
-            request_id = data.get("requestId") or data.get("request_id")
+            request_id = (
+                data.get("requestId")
+                or data.get("request_id")
+                or (
+                    isinstance(data.get("data"), dict)
+                    and str(data["data"].get("otpRequestId") or "").strip()
+                    or None
+                )
+            )
             if request_id:
                 self._record_send(normalized)
                 return OtpSendResult(success=True, request_id=str(request_id))

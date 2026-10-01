@@ -1,19 +1,18 @@
 """
 Authentication and User Profile Router for Craftsy.
 
-Integrates with StartMessaging for real OTP delivery and verification.
-Craftsy remains responsible for its own users, sessions, and JWTs;
-StartMessaging is used only for OTP delivery and verification.
+Development/demo OTP flow:
+  - /login returns a successful response without contacting any SMS provider.
+  - /verify-otp accepts any valid 6-digit OTP.
+  - Authentication state is established with a mock bearer token.
 """
 
-import logging
 from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..config import get_settings
 from ..database import get_db
 from ..middleware.auth import get_current_artisan
 from ..models.db_models import ArtisanDB
@@ -23,15 +22,10 @@ from ..models.schemas import (
     OtpVerifyRequest,
     ArtisanProfileResponse,
 )
-from ..services.startmessaging_service import (
-    OtpProviderConfigError,
-    OtpProviderError,
-    OtpVerifyResult,
-    StartMessagingOtpProvider,
-)
+from ..middleware.auth import create_access_token
 from pydantic import BaseModel, Field
 
-logger = logging.getLogger(__name__)
+router = APIRouter(prefix="/api/v1/auth", tags=["Authentication & Artisans"])
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -61,9 +55,6 @@ class AuthResponse(BaseModel):
     artisan: ArtisanProfileResponse
 
 
-router = APIRouter(prefix="/api/v1/auth", tags=["Authentication & Artisans"])
-
-
 def _normalize_phone(phone: str) -> str:
     """Normalize phone to a consistent 10-digit string."""
     digits = "".join(ch for ch in (phone or "") if ch.isdigit())
@@ -72,11 +63,237 @@ def _normalize_phone(phone: str) -> str:
     return digits
 
 
-def _get_otp_provider() -> StartMessagingOtpProvider:
-    return StartMessagingOtpProvider()
+@router.post(
+    "/register",
+    response_model=ArtisanProfileResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new artisan",
+    description="Registers a new artisan profile with craft details and initiates phone verification.",
+)
+async def register_artisan(
+    request: ArtisanRegisterRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    existing = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An artisan with this phone number is already registered.",
+        )
+
+    artisan = ArtisanDB(
+        id=f"artisan_{phone_clean}",
+        name=request.name,
+        phone=phone_clean,
+        craft_type=request.craft_type,
+        location_cluster=request.location_cluster,
+        state=request.state or "",
+        experience_years=request.experience_years or "",
+        pehchan_id=request.pehchan_id,
+        preferred_language=request.preferred_language or "en",
+    )
+    db.add(artisan)
+    db.commit()
+    db.refresh(artisan)
+
+    return artisan
 
 
-from ..middleware.auth import create_access_token
+@router.post(
+    "/register-consumer",
+    response_model=ArtisanProfileResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new consumer/buyer",
+    description="Registers a new consumer account with role='customer'.",
+)
+async def register_consumer(
+    request: CustomerRegisterRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    existing = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="An account with this phone number is already registered.",
+        )
+
+    artisan = ArtisanDB(
+        id=f"customer_{phone_clean}",
+        name=request.name,
+        phone=phone_clean,
+        preferred_language=request.preferred_language or "en",
+        role="customer",
+    )
+    db.add(artisan)
+    db.commit()
+    db.refresh(artisan)
+
+    return artisan
+
+
+@router.post(
+    "/login",
+    summary="Request login OTP",
+    description="Development/demo login endpoint. Returns a successful response without SMS delivery.",
+)
+async def login_artisan(
+    request: ArtisanLoginRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
+    is_new_user = artisan is None
+
+    return {
+        "status": "success",
+        "message": "OTP sent successfully.",
+        "phone": phone_clean,
+        "request_id": f"demo_req_{phone_clean}",
+        "otp_sent": True,
+        "is_new_user": is_new_user,
+    }
+
+
+@router.post(
+    "/verify-otp",
+    response_model=AuthResponse,
+    summary="Verify phone OTP",
+    description="Development/demo OTP verification. Accepts any valid 6-digit OTP.",
+)
+async def verify_otp(
+    request: OtpVerifyRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    if not request.request_id or not str(request.request_id).strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid OTP request ID.",
+        )
+
+    if not request.otp or not request.otp.isdigit() or len(request.otp) != 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid OTP format. Must be 6 digits.",
+        )
+
+    artisan = db.query(ArtisanDB).filter(ArtisanDB.phone == phone_clean).first()
+    is_new_user = artisan is None
+
+    if is_new_user:
+        artisan = ArtisanDB(
+            id=f"artisan_{phone_clean}",
+            name=None,
+            phone=phone_clean,
+            preferred_language="en",
+            role="customer",
+            created_at=datetime.now(),
+        )
+        db.add(artisan)
+        db.commit()
+        db.refresh(artisan)
+
+    return AuthResponse(
+        status="success",
+        access_token=create_access_token(artisan.phone),
+        artisan=ArtisanProfileResponse.model_validate(artisan),
+    )
+
+
+@router.post(
+    "/resend-otp",
+    summary="Resend OTP",
+    description="Development/demo resend endpoint. No SMS is actually sent.",
+)
+async def resend_otp(
+    request: ResendOtpRequest,
+    db: Session = Depends(get_db),
+):
+    phone_clean = _normalize_phone(request.phone)
+    if len(phone_clean) != 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number. Must be exactly 10 digits.",
+        )
+
+    return {
+        "status": "success",
+        "message": "OTP resent successfully.",
+        "phone": phone_clean,
+        "request_id": f"demo_req_{phone_clean}",
+    }
+
+
+@router.get(
+    "/profile/{artisan_id}",
+    response_model=ArtisanProfileResponse,
+    summary="Get artisan profile",
+    description="Fetch an artisan profile by their unique ID.",
+)
+async def get_artisan_profile(
+    artisan_id: str,
+    db: Session = Depends(get_db),
+):
+    artisan = db.query(ArtisanDB).filter(ArtisanDB.id == artisan_id).first()
+    if not artisan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Artisan not found.",
+        )
+    return artisan
+
+
+@router.patch(
+    "/profile",
+    response_model=ArtisanProfileResponse,
+    summary="Update current user profile",
+    description="Update the authenticated user's own profile fields.",
+)
+async def update_own_profile(
+    request: ProfileUpdateRequest,
+    db: Session = Depends(get_db),
+    current_artisan: ArtisanDB = Depends(get_current_artisan),
+):
+    update_data = request.model_dump(exclude_none=True)
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields provided for update.",
+        )
+
+    for field, value in update_data.items():
+        if hasattr(current_artisan, field):
+            setattr(current_artisan, field, value)
+
+    db.commit()
+    db.refresh(current_artisan)
+    return current_artisan
 
 
 @router.post(

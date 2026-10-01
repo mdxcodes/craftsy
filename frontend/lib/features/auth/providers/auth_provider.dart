@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:dio/dio.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../../data/models/user_profile.dart';
 import '../../../data/repositories/auth_repository.dart';
 
@@ -13,9 +11,6 @@ class AuthState {
   final bool isLoading;
   final UserProfile? pendingRegistration;
   final String? errorMessage;
-  final int? resendCooldownSeconds;
-  final String? otpRequestId;
-  final bool isNewUser;
 
   const AuthState({
     this.isAuthenticated = false,
@@ -24,9 +19,6 @@ class AuthState {
     this.isLoading = false,
     this.pendingRegistration,
     this.errorMessage,
-    this.resendCooldownSeconds,
-    this.otpRequestId,
-    this.isNewUser = false,
   });
 
   AuthState copyWith({
@@ -36,27 +28,14 @@ class AuthState {
     bool? isLoading,
     UserProfile? Function()? pendingRegistration,
     String? errorMessage,
-    int? resendCooldownSeconds,
-    String? otpRequestId,
-    bool? isNewUser,
-    bool clearErrorMessage = false,
-    bool clearResendCooldown = false,
-    bool clearOtpRequestId = false,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       userId: userId ?? this.userId,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       isLoading: isLoading ?? this.isLoading,
-      pendingRegistration: pendingRegistration != null
-          ? pendingRegistration()
-          : this.pendingRegistration,
-      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
-      resendCooldownSeconds: clearResendCooldown
-          ? null
-          : (resendCooldownSeconds ?? this.resendCooldownSeconds),
-      otpRequestId: clearOtpRequestId ? null : (otpRequestId ?? this.otpRequestId),
-      isNewUser: isNewUser ?? this.isNewUser,
+      pendingRegistration: pendingRegistration != null ? pendingRegistration() : this.pendingRegistration,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }
@@ -85,33 +64,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(
       isLoading: true,
       pendingRegistration: () => null,
-      errorMessage: null,
-      resendCooldownSeconds: null,
-      otpRequestId: null,
-      clearOtpRequestId: true,
-      isNewUser: false,
     );
+    await Future.delayed(const Duration(milliseconds: 500));
     await _authRepository.savePhoneNumber(phoneNumber);
-    try {
-      final result = await _authRepository.requestOtp(phoneNumber);
-      state = state.copyWith(
-        phoneNumber: phoneNumber,
-        otpRequestId: result['request_id'] as String?,
-        isNewUser: result['is_new_user'] as bool? ?? false,
-        isLoading: false,
-        errorMessage: null,
-      );
-    } on AuthException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.message,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'otp_send_failed'.tr(),
-      );
-    }
+    state = state.copyWith(
+      phoneNumber: phoneNumber,
+      isLoading: false,
+    );
   }
 
   Future<void> registerWithDetails(UserProfile profile) async {
@@ -119,196 +78,41 @@ class AuthNotifier extends StateNotifier<AuthState> {
       isLoading: true,
       pendingRegistration: () => profile,
       phoneNumber: profile.phone,
-      errorMessage: null,
-      resendCooldownSeconds: null,
     );
+    await Future.delayed(const Duration(milliseconds: 500));
     await _authRepository.savePhoneNumber(profile.phone);
-    // Attempt registration on backend
-    final backendProfile = await _authRepository.registerArtisan(profile);
-    if (backendProfile != null) {
-      state = state.copyWith(pendingRegistration: () => backendProfile);
-    }
     state = state.copyWith(isLoading: false);
   }
 
-  Future<bool> verifyOtp(
-    String phoneNumber,
-    String otp, {
-    UserProfile? profileOverride,
-  }) async {
-    state = state.copyWith(
-      isLoading: true,
-      errorMessage: null,
-      resendCooldownSeconds: null,
-    );
+  Future<bool> verifyOtp(String phoneNumber, String otp, {UserProfile? profileOverride}) async {
+    state = state.copyWith(isLoading: true);
+    // Mock: accept any OTP in demo mode
+    await Future.delayed(const Duration(milliseconds: 500));
 
-    final effectivePhone = phoneNumber;
+    final effectivePhone = phoneNumber.isEmpty ? '9876543210' : phoneNumber;
+    final userId = 'artisan_${DateTime.now().millisecondsSinceEpoch}';
+    await _authRepository.saveAuthData(userId, effectivePhone);
+
     final registrationProfile = profileOverride ?? state.pendingRegistration;
-    final requestId = state.otpRequestId;
-
-    final isNewUser = state.isNewUser;
-
-    if (!isNewUser && registrationProfile != null && registrationProfile.id.isEmpty) {
-      final regResult = await _authRepository.registerArtisan(
-        registrationProfile,
+    if (registrationProfile != null) {
+      final finalProfile = registrationProfile.copyWith(
+        id: userId,
+        phone: effectivePhone,
       );
-      if (regResult != null) {
-        state = state.copyWith(pendingRegistration: () => regResult);
+      if (Hive.isBoxOpen('user_profile_box')) {
+        final box = Hive.box<UserProfile>('user_profile_box');
+        await box.put('current_profile', finalProfile);
       }
-    }
-
-    UserProfile? backendProfile;
-    String? token;
-    try {
-      (backendProfile, token) = await _authRepository.verifyOtpWithBackend(
-        effectivePhone,
-        requestId ?? '',
-        otp,
-      );
-    } on AuthException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.message,
-      );
-      return false;
-    } on DioException catch (e) {
-      final message = _friendlyMessageForDio(e);
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: message,
-      );
-      return false;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'We couldn\'t verify the code. Please try again.',
-      );
-      return false;
-    }
-
-    if (backendProfile == null || token == null) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'otp_verification_failed'.tr(),
-      );
-      return false;
-    }
-
-    final resolvedProfile = backendProfile;
-
-    await _authRepository.saveAuthData(
-      resolvedProfile.id,
-      effectivePhone,
-      token: token,
-    );
-
-    if (Hive.isBoxOpen('user_profile_box')) {
-      final box = Hive.box<UserProfile>('user_profile_box');
-      await box.put('current_profile', resolvedProfile);
     }
 
     state = state.copyWith(
       isAuthenticated: true,
-      userId: resolvedProfile.id,
+      userId: userId,
       phoneNumber: effectivePhone,
       isLoading: false,
       pendingRegistration: () => null,
-      otpRequestId: null,
-      clearOtpRequestId: true,
-      isNewUser: false,
     );
     return true;
-  }
-
-  Future<void> resendOtp(String phoneNumber) async {
-    state = state.copyWith(
-      isLoading: true,
-      errorMessage: null,
-      resendCooldownSeconds: null,
-      otpRequestId: null,
-      clearOtpRequestId: true,
-      isNewUser: false,
-    );
-
-    try {
-      final result = await _authRepository.resendOtp(phoneNumber);
-      state = state.copyWith(isLoading: false);
-
-      final cooldown = result['cooldown_seconds'] as int?;
-      if (cooldown != null && cooldown > 0) {
-        state = state.copyWith(
-          resendCooldownSeconds: cooldown,
-        );
-        _startCooldown(cooldown);
-        return;
-      }
-
-      state = state.copyWith(
-        errorMessage: null,
-        otpRequestId: result['request_id'] as String?,
-      );
-    } on AuthException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.message,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'otp_send_failed'.tr(),
-      );
-    }
-  }
-
-  void _startCooldown(int seconds) {
-    Future.doWhile(() async {
-      if (state.resendCooldownSeconds == null) {
-        return false;
-      }
-      await Future.delayed(const Duration(seconds: 1));
-      final remaining = (state.resendCooldownSeconds ?? 1) - 1;
-      if (remaining <= 0) {
-        state = state.copyWith(
-          resendCooldownSeconds: null,
-          clearResendCooldown: true,
-        );
-        return false;
-      }
-      state = state.copyWith(resendCooldownSeconds: remaining);
-      return true;
-    });
-  }
-
-  void clearError() {
-    state = state.copyWith(
-      errorMessage: null,
-      clearErrorMessage: true,
-    );
-  }
-
-  String _friendlyMessageForDio(DioException e) {
-    if (e.response?.data is Map) {
-      final data = Map<String, dynamic>.from(e.response!.data as Map);
-      final detail = data['detail'];
-      if (detail is Map<String, dynamic>) {
-        final msg = detail['message'] as String?;
-        if (msg != null && msg.isNotEmpty) return msg;
-      } else if (detail is String && detail.isNotEmpty) {
-        return detail;
-      }
-    }
-    if (e.error is String && (e.error as String).isNotEmpty) {
-      return e.error as String;
-    }
-    return switch (e.type) {
-      DioExceptionType.connectionTimeout ||
-      DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
-        'Network is slow. Please try again.',
-      DioExceptionType.connectionError =>
-        'No internet connection. Please check and try again.',
-      _ => 'We couldn\'t verify the code. Please try again.',
-    };
   }
 
   Future<void> signInWithCoordinator(String coordinatorId) async {
@@ -323,8 +127,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       phoneNumber: '',
       isLoading: false,
       pendingRegistration: () => null,
-      otpRequestId: null,
-      clearOtpRequestId: true,
     );
   }
 
@@ -335,28 +137,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<UserProfile?> updateProfile(UserProfile profile) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
-    final updated = await _authRepository.updateProfile(profile);
-    if (updated != null) {
-      await _authRepository.saveAuthData(
-        updated.id,
-        updated.phone,
-        token: await _authRepository.getAccessToken(),
-      );
-      if (Hive.isBoxOpen('user_profile_box')) {
-        final box = Hive.box<UserProfile>('user_profile_box');
-        await box.put('current_profile', updated);
-      }
-      state = state.copyWith(
-        userId: updated.id,
-        phoneNumber: updated.phone,
-        isLoading: false,
-      );
-    } else {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'profile_update_failed'.tr(),
-      );
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final updated = profile.copyWith(
+      id: state.userId ?? profile.id,
+      phone: state.phoneNumber ?? profile.phone,
+    );
+
+    if (Hive.isBoxOpen('user_profile_box')) {
+      final box = Hive.box<UserProfile>('user_profile_box');
+      await box.put('current_profile', updated);
     }
+
+    state = state.copyWith(
+      userId: updated.id,
+      phoneNumber: updated.phone,
+      isLoading: false,
+    );
     return updated;
   }
 }

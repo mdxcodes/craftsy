@@ -28,36 +28,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
-  void _handleContinue() async {
+  void _handleContinue() {
     if (_formKey.currentState?.validate() ?? false) {
       final phone = _phoneController.text.trim();
-      final notifier = ref.read(authStateProvider.notifier);
-      await notifier.signInWithPhone(phone);
-      if (!mounted) return;
-      final authState = ref.read(authStateProvider);
-      if (authState.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              authState.errorMessage!,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textOnPrimary,
-              ),
-            ),
-            backgroundColor: AppColors.sienna,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadii.md),
-            ),
-          ),
-        );
-      }
-      context.pushNamed(
+      ref.read(authStateProvider.notifier).signInWithPhone(phone);
+      context.goNamed(
         AppRouteConstants.otp,
-        queryParameters: {
-          'phone': phone,
-          'isNewUser': authState.isNewUser ? 'true' : 'false',
-        },
+        queryParameters: {'phone': phone},
       );
     }
   }
